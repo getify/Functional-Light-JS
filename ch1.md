@@ -19,7 +19,7 @@ So... what is a function?
 
 ### Brief Math Review
 
-I know I've promised we'd stay away from math notation as much as possible, but let's just quickly observe some simple things about funtions and graphs from basic algebra before we move on.
+I know I've promised we'd stay away from math notation as much as possible, but let's just quickly observe some simple things about functions and graphs from basic algebra before we move on.
 
 Do you remember learning anything about `f(x)` back in school? What about the equation `y = f(x)`?
 
