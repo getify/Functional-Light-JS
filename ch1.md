@@ -29,11 +29,11 @@ Let's say an equation is defined like this: `f(x) = 2x^2 + 3`. What does that me
 
 What you can notice is that for any value of `x`, say `2`, if you plug it into the equation, you get `11`. What is `11`, though? It's the *return value* of the `f(x)` function, which earlier we said represents a `y` value.
 
-In other words, there's a point as `(2,11)` on that curve in the graph. And for every value of `x` we plug in, we get another `y` value that pairs with it as a coordinate for a point. Another is `(0,3)`, and another is `(-1,5)`. Put all those points together, and you have the graph of that parabolic curve as shown above.
+In other words, there's a point at `(2,11)` on that curve in the graph. And for every value of `x` we plug in, we get another `y` value that pairs with it as a coordinate for a point. Another is `(0,3)`, and another is `(-1,5)`. Put all those points together, and you have the graph of that parabolic curve as shown above.
 
 So what's any of this got to do with FP?
 
-In math, a function always takes input, and always gives an output. Those inputs and outputs are often interpreted as parts of coordinates to be graphed.
+In math, a function always takes input(s), and always gives an output. Those inputs and outputs are often interpreted as parts of coordinates to be graphed.
 
 In our programs, however, we can define functions with all sorts of inputs and output(s), and they need not have any relationship to a curve on a graph.
 
@@ -43,9 +43,9 @@ So why all the talk of math and graphs? Because in a sense functional programmin
 
 You're probably most used to thinking of functions as general procedures. What is a procedure? An arbitrary collection of functionality. It may have inputs, it may not. It may have an output (`return` value), it may not.
 
-But a function specifically takes input(s), and definitely has a `return` value.
+But a function specifically takes input(s), and definitely always has a `return` value.
 
-So the first observation I'd make about functional programming is that you should be using functions as much as possible, and not procedures. Why? The answer to that will have many levels that we'll uncover throughout this book.
+So the first observation I'd make about functional programming is that **you should be using functions as much as possible**, and not procedures. Why? The answer to that will have many levels that we'll uncover throughout this book.
 
 
 
