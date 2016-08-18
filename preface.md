@@ -15,15 +15,25 @@ I *have* attended countless conference talks about FP, each one with the despera
 
 But little by little, across those various exposures, I teased out bits and pieces of important concepts that seem to come all too naturally to the formal FPer. I learned them slowly and I learned them pragmatically and experientially, not academically with appropriate terminology.
 
-Maybe you're like me; I heard terms like "map-reduce" around "big data" for years with no real idea what they were. And eventually I learned what the `map(..)` function did -- all long before I had any idea that list operations were a cornerstone of the FPer path and what makes them so important.
+Maybe you're like me; I heard terms like "map-reduce" around industry segments like "big data" for years with no real idea what they were. Eventually I learned what the `map(..)` function did -- all long before I had any idea that list operations were a cornerstone of the FPer path and what makes them so important.
+
+Eventually I began to gather all these bits and pieces of understanding into what I now call "Functional-Light Programming" (FLP).
 
 ## Mission
 
-Speaking of importance, why is it so important for you to learn functional programming?
+But, why is it so important for you to learn functional programming, even the light form?
 
 I've come to believe something very deeply in recent years, so much so you could *almost* call it a religious belief. I believe that programming is fundamentally about humans, not about code. I believe that code is first and foremost a means of human communication, and only as a *side effect* (self-referential chuckle) does it instruct the computer.
 
-The way I see it, functional programming is at its heart about using patterns in your code that are well-known, understandable, *and* proven to drive away the mistakes that make code harder to understand. In that view, FP -- or, ahem, FlP! -- might be one of the most important collections of tools any developer could acquire.
+The way I see it, functional programming is at its heart about using patterns in your code that are well-known, understandable, *and* proven to drive away the mistakes that make code harder to understand. In that view, FP -- or, ahem, FLP! -- might be one of the most important collections of tools any developer could acquire.
+
+> The curse of the monad is that... once you understand... you lose the ability to explain it to anyone else.
+>
+> Douglas Crockford 12/13/2012
+> "Monads and Gonads"
+> https://www.youtube.com/watch?v=dkZFtimgAcM
+
+I hope this book "Maybe" breaks the spirit of that curse, even though we won't talk about "monads" directly.
 
 The formal FPer will often assert that the *real value* of FP is in using it essentially 100%; that it's an all-or-nothing proposition. The notion is that if you use FP in one part of your program but not in another, the whole program is polluted by the non-FP stuff and therefore suffers enough that the FP was probably not worth it.
 
