@@ -52,9 +52,9 @@ But a function specifically takes input(s), and definitely always has a `return`
 
 So the first observation I'd make about functional programming is that **you should be using functions as much as possible**, and not procedures. As much as possible, all your functions should take input(s) and return output(s). Why? The answer to that will have many levels of meaning that we'll uncover throughout this book.
 
-## Function Inputs
+## Function Input
 
-By our current definition, all functions need inputs.
+By our current definition, all functions need input.
 
 You sometimes hear people refer to them as "arguments" and sometimes as "parameters". So what's that all about?
 
@@ -307,7 +307,7 @@ This pattern is approximating a feature that some languages have, which JS does 
 
 It will not be obvious at all right now why passing in an object that's destructured via its parameter is a benefit, especially to FP. The benefit will be that a function that only takes one parameter (the object) is much easier to compose with another function that also only takes a single parameter. Trust me for now. We'll come back to that point later in the text, in quite a bit of detail.
 
-## Function Outputs
+## Function Output
 
 // TODO
 

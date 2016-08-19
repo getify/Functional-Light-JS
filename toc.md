@@ -6,6 +6,6 @@
 * Preface
 * Chapter 1: Functional Functions
 	* What Is A Function?
-	* Function Inputs
-	* Function Outputs
+	* Function Input
+	* Function Output
 * Chapter 2: TODO
