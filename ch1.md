@@ -352,17 +352,79 @@ console.log( x + y );
 
 Structuring the multiple values into an array (or object) and subsequently destructuring those values back into distinct assignments is a way to transparently handle multiple outputs for a function.
 
-**Tip:** I'd be remiss if I didn't suggest you take a moment to consider if a function needing multiple outputs could be refactored to avoid that, perhaps separated into two or more smaller functions. Sometimes that will be possible, sometimes not, but you should at least consider it.
+**Tip:** I'd be remiss if I didn't suggest you take a moment to consider if a function needing multiple outputs could be refactored to avoid that, perhaps separated into two or more smaller functions? Sometimes that will be possible, sometimes not; you should at least consider it.
 
 ### Early Returns
 
-The `return` statement doesn't just return a value from a function, though. It's also a flow control structure; it ends the execution of the function at that point. A function with multiple `return` statements thus has multiple possible exit points, meaning that it may be harder to read a function to understand its behavior if there are many paths that output.
+The `return` statement doesn't just return a value from a function. It's also a flow control structure; it ends the execution of the function at that point. A function with multiple `return` statements thus has multiple possible exit points, meaning that it may be harder to read a function to understand its output behavior if there are many paths that output.
 
-### Non-`return` Outputs
+Consider:
 
-One technique that you've probably used in most code you've written, and maybe didn't even think about it much, is to have a function output some or all of its values by simply changing variables.
+```js
+function foo(x) {
+	if (x > 10) return x + 1;
 
-Remember our `y = f(x) = 2x^2 + 3` function from earlier in the chapter? We could have defined it like this:
+	var y = x / 2;
+
+	if (y > 3) {
+		if (x % 2 == 0) return x;
+	}
+
+	if (y > 1) return y;
+
+	return x;
+}
+```
+
+Pop quiz: without cheating and running this code in your browser, what does `foo(2)` return? What about `foo(4)`? And `foo(8)`? And `foo(12)`?
+
+How confident are you in your answers? How much mental tax did you pay to get those answers? I got it wrong the first two times I tried to think it through, and I wrote it!
+
+I think part of the readability problem here is that we're using `return` not just to return different values, but also as a flow control construct to quit a function's execution early in certain cases. There are obviously better ways to write that flow control (the `if` logic, etc), but I also think there are easier ways to make the output paths more obvious.
+
+**Note:** The answers to the pop quiz are `2`, `2`, `8`, and `13`.
+
+Consider this version of the code:
+
+```js
+function foo(x) {
+	var retValue;
+
+	if (retValue == null && x > 10) {
+		retValue = x + 1;
+	}
+
+	var y = x / 2;
+
+	if (y > 3) {
+		if (retValue == null && x % 2 == 0) {
+			retValue = x;
+		}
+	}
+
+	if (retValue == null && y > 1) {
+		retValue = y;
+	}
+
+	if (retValue == null) {
+		retValue = x;
+	}
+
+	return retValue;
+}
+```
+
+This version is unquestionably more verbose. But I would argue it's slightly simpler logic to follow, because every branch where `retValue` can get set is *guarded* by the condition that checks if it's already been set.
+
+Rather than `return`ing from the function early, we used normal flow control (`if` logic) to determine the `retValue`'s assignment. At the end, we simply `return retValue`.
+
+I'm not unconditionally saying that you should always have a single `return`, or that you should never do early `return`s, but I do think you should be careful about the flow control part of `return` creating more implicitness in your function definitions. Try to figure out the most explicit way to express the logic; that will usually be the best way.
+
+### Un`return`ed Outputs
+
+One technique that you've probably used in most code you've written, and maybe didn't even think about it much, is to have a function output some or all of its values by simply changing variables outside itself.
+
+Remember our `y = f(x) = 2x^2 + 3` function from earlier in the chapter? We could have defined it like this in JS:
 
 ```js
 var y;
