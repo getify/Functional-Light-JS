@@ -309,7 +309,117 @@ It will not be obvious at all right now why passing in an object that's destruct
 
 ## Function Output
 
-In JavaScript, functions always return a value.
+In JavaScript, functions always return a value. These three functions all have identical return behavior:
+
+```js
+function foo() {}
+
+function bar() {
+	return;
+}
+
+function baz() {
+	return undefined;
+}
+```
+
+The `undefined` value is implicitly `return`ed if you have no `return` or if you just have an empty `return;`.
+
+But keeping as much with the spirit of FP function definition as possible -- using functions and not procedures -- our functions should always have outputs, which means they should explicitly `return` a value.
+
+A `return` statement can only return a single value. So if your function needs to return multiple values, your only viable option is to collect them into a compound value like an array or an object:
+
+```js
+function foo() {
+	var retValue1 = 11;
+	var retValue2 = 31;
+	return [ retValue1, retValue2 ];
+}
+```
+
+Just like destructuring lets us de-construct array/object values in parameters, we can also do so in regular assignments:
+
+```js
+function foo() {
+	var retValue1 = 11;
+	var retValue2 = 31;
+	return [ retValue1, retValue2 ];
+}
+
+var [ x, y ] = foo();
+console.log( x + y );
+```
+
+Structuring the multiple values into an array (or object) and subsequently destructuring those values back into distinct assignments is a way to transparently handle multiple outputs for a function.
+
+**Tip:** I'd be remiss if I didn't suggest you take a moment to consider if a function needing multiple outputs could be refactored to avoid that, perhaps separated into two or more smaller functions. Sometimes that will be possible, sometimes not, but you should at least consider it.
+
+### Early Returns
+
+The `return` statement doesn't just return a value from a function, though. It's also a flow control structure; it ends the execution of the function at that point. A function with multiple `return` statements thus has multiple possible exit points, meaning that it may be harder to read a function to understand its behavior if there are many paths that output.
+
+### Non-`return` Outputs
+
+One technique that you've probably used in most code you've written, and maybe didn't even think about it much, is to have a function output some or all of its values by simply changing variables.
+
+Remember our `y = f(x) = 2x^2 + 3` function from earlier in the chapter? We could have defined it like this:
+
+```js
+var y;
+
+function foo(x) {
+	y = (2 * Math.pow( x, 2 )) + 3;
+}
+
+foo( 2 );
+
+y;		// 11
+```
+
+I know this is a silly example, because you can clearly see we could just as easily have `return`d the value instead of setting it into `y` from within the function:
+
+```js
+function foo(x) {
+	return (2 * Math.pow( x, 2 )) + 3;
+}
+
+var y = foo( 2 );
+
+y;		// 11
+```
+
+Both functions accomplish the same task. Is there any reason we should pick one over the other? **Yes, absolutely.**
+
+One way to frame the difference is that the `return` in the latter version signals an explicit output, whereas the `y` assignment in the former is an implicit output. You may already have some intuition that guides you in such cases; typically, developers prefer explicit patterns over implicit ones.
+
+But changing a variable in an outer scope, as we did with the `y` assignment inside of `foo(..)`, is just one way of achieving an implicit output. A more subtle form of this behavior is making changes to non-local values via reference.
+
+Consider:
+
+```js
+function sum(list) {
+	var total = 0;
+	for (var i = 0; i < list.length; i++) {
+		if (!list[i]) list[i] = 0;
+
+		total = total + list[i];
+	}
+
+	return total;
+}
+
+var nums = [ 1, 3, 9, 27, , 84 ];
+
+sum( nums );		// 124
+```
+
+The most obvious output from this function is the sum `124`. But do you spot the other output?
+
+Try that code and then inspect the `nums` array. Now do you spot the difference? Instead of an `undefined` empty slot value in position `4`, now there's a `0`. The harmless looking `list[i] = 0` operation ended up affecting the array value on the outside, even though we operated on a local `list` parameter variable.
+
+Why? Because `list` holds a reference-copy of the `nums` reference, not a value-copy of the `[1,3,9,..]` array value. Because JS uses references and reference-copies for arrays, objects, and functions, we can create an output from our function all too easily, even if by accident.
+
+This implicit function output has a special name in the FP world: side effects. And a function that has *no side effects* also has a special name: pure function. We'll talk a lot more about these in a later chapter, but the punchline is that we'll want to prefer pure functions and avoid side effects if at all possible.
 
 ## Functions Of Functions
 
