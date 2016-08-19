@@ -8,4 +8,6 @@
 	* What Is A Function?
 	* Function Input
 	* Function Output
+	* Functions Of Functions
+	* Syntax
 * Chapter 2: TODO

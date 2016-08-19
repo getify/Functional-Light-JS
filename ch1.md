@@ -309,8 +309,16 @@ It will not be obvious at all right now why passing in an object that's destruct
 
 ## Function Output
 
-// TODO
+In JavaScript, functions always return a value.
+
+## Functions Of Functions
+
+Functions can receive and return values of any type. There's a special term for when a function receives or returns one or more other functions: higher-order function.
+
+## Syntax
+
+So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz about the new ES6 `=>` arrow function syntax.
 
 ## Summary
 
-// TODO
+Functions are cool.
