@@ -95,7 +95,7 @@ function foo(x,y,z) {
 	// ..
 }
 
-foo.length;			// 3
+foo.length;				// 3
 ```
 
 One reason for determining the arity during execution would be if a piece of code received a function reference from multiple sources, and sent different values depending on the arity of each.
@@ -223,10 +223,10 @@ function foo(x = 3) {
 	console.log( x );
 }
 
-foo();				// 3
-foo( undefined );	// 3
-foo( null );		// null
-foo( 0 );			// 0
+foo();					// 3
+foo( undefined );		// 3
+foo( null );			// null
+foo( 0 );				// 0
 ```
 
 **Note:** We won't cover it here in any more detail, but the default value expression is lazy meaning it's not evaluated unless and until needed. Also, it can be any valid JS expression, even a function call. There's lots of cool tricks you can do with that capability. For example, you could declare `x = required()` in your parameter list, and in the `required()` function simply `throw "This argument is required."` to make sure someone always calls your function with that argument/parameter specified.
@@ -294,7 +294,7 @@ function foo( {x,y} ) {
 
 foo( {
 	y: 3
-} );				// undefined 3
+} );					// undefined 3
 ```
 
 We pass in an object as the single argument, and it's destructured into two separate parameter variables `x` and `y`, which are assigned the values of those corresponding property names from the object passed in. It didn't matter that the `x` property wasn't on the object; it just ended up as a variable with `undefined` like you'd expect.
@@ -441,7 +441,7 @@ function foo(x) {
 
 foo( 2 );
 
-y;		// 11
+y;						// 11
 ```
 
 I know this is a silly example, because you can clearly see we could just as easily have `return`d the value instead of setting it into `y` from within the function:
@@ -453,7 +453,7 @@ function foo(x) {
 
 var y = foo( 2 );
 
-y;		// 11
+y;						// 11
 ```
 
 Both functions accomplish the same task. Is there any reason we should pick one over the other? **Yes, absolutely.**
@@ -478,7 +478,7 @@ function sum(list) {
 
 var nums = [ 1, 3, 9, 27, , 84 ];
 
-sum( nums );		// 124
+sum( nums );			// 124
 ```
 
 The most obvious output from this function is the sum `124`. But do you spot the other output?
@@ -523,7 +523,7 @@ function foo() {
 
 var f = foo();
 
-f( "Hello!" );		// Hello!
+f( "Hello!" );			// Hello!
 ```
 
 `return` is not the only way to create and "output" another function:
@@ -541,12 +541,128 @@ function bar(func) {
 	func( "Hello!" );
 }
 
-foo();				// Hello!
+foo();					// Hello!
 ```
 
-### Closure
+### Keeping Scope
 
-Closure is when a function remembers and accesses variables from outside of its own scope, even when that function is executed in a different scope.
+One of the most powerful things in all of programming, and especially in FP, is how a function behaves when it's inside another function's scope. When the inner function makes reference to a variable from the outer function, this is called closure.
+
+Defined simply, closure is when a function remembers and accesses variables from outside of its own scope, even when that function is executed in a different scope.
+
+Consider:
+
+```js
+function foo(msg) {
+	var fn = function(){
+		console.log( msg );
+	};
+
+	return fn;
+}
+
+var helloFn = foo( "Hello!" );
+
+helloFn();				// Hello!
+```
+
+The `msg` parameter variable in the scope of `foo(..)` is referenced inside the inner function. When `foo(..)` is executed and the inner function is created, it captures the access to the `msg` variable, and retains that access even after being `return`d.
+
+Once we have `helloFn`, a reference to the inner function, `foo(..)` has finished and it would seem as if its should have gone away, meaning the `msg` variable would no longer exist. But that doesn't happen, because the inner function has a closure over `msg`, which keeps it alive. The closed over `msg` variable survives for as long as the inner function (now referenced by `helloFn` in a different scope) stays around.
+
+Let's look at a few more examples of closure in action:
+
+```js
+function person(id) {
+	var randNumber = Math.random();
+
+	return function identify() {
+		console.log( "I am " + id + ": " + randNumber );
+	};
+}
+
+var fred = person( "Fred" );
+var susan = person( "Susan" );
+
+fred();					// I am Fred: 0.8331252801601532
+susan();				// I am Susan: 0.3940753308893741
+```
+
+The inner function `identify()` has closure over two variables, the parameter `id` and the inner variable `randNumber`.
+
+The access that closure enables is not restricted to only reading the variable's original value -- it's not just a snapshot but rather a live link. You can update the value, and that new current state remains remembered until the next access.
+
+```js
+function runningCounter(start) {
+	var val = start;
+
+	return function current(increment = 1) {
+		val = val + increment;
+		return val;
+	};
+}
+
+var score = runningCounter( 0 );
+
+score();				// 1
+score();				// 2
+score( 13 );			// 15
+```
+
+**Warning:** For reasons that we'll cover more later in the text, this example of using closure to remember a state that changes (`val`) is probably something you'll want to avoid where possible.
+
+If you have an operation that needs two inputs, one of which you know now but the other will be specified later, you can use closure to remember the first input:
+
+```js
+function makeAdder(x) {
+	return function sum(y){
+		return x + y;
+	};
+}
+
+// we already know `10` and `37` as first inputs, respectively
+var addTo10 = makeAdder( 10 );
+var addTo37 = makeAdder( 37 );
+
+// later, we specify the second inputs
+addTo10( 3 );			// 13
+addTo10( 90 );			// 100
+
+addTo37( 13 );			// 50
+```
+
+Normally, a `sum(..)` function would take both an `x` and `y` input to add them together. But in this example we receive and remember (via closure) the `x` value(s) first, while the `y` value(s) are separately specified later.
+
+**Note:** This technique of specifying multiple inputs one at a time in successive function calls has a name: currying. We'll dive into it more thoroughly later in the text.
+
+Of course, since functions are just values in JS, we can just as easily remember function values via closure.
+
+```js
+function formatter(formatFn) {
+	return function(str) {
+		return formatFn( str );
+	};
+}
+
+var lower = formatter( function(v){
+	return v.toLowerCase();
+} );
+
+var upperFirst = formatter( function(v){
+	return v[0].toUpperCase() + v.substr( 1 ).toLowerCase();
+} );
+
+lower( "WOW" );				// wow
+upperFirst( "hello" );		// Hello
+```
+
+Instead of distributing/repeating the `toUpperCase()` and `toLowerCase()` logic all over our code, FP teaches us to create simple functions that encapsulate -- a fancy way of saying wrapping up -- that behavior.
+
+Specifically, we create two simple unary functions `lower(..)` and `upperFirst(..)`, because those functions will be much easier to wire up to work with other functions in the rest of our program.
+
+**Tip:** Did you spot how `upperFirst(..)` could have used `lower(..)`?
+
+We'll use closure heavily throughout the rest of the text. It may just be the most important foundational practice in all of FP, if not programming as a whole. Get really comfortable with it!
 
 ## Syntax
 
