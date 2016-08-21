@@ -12,9 +12,11 @@ But that's all changing. There's a groundswell of interest growing around FP, no
 
 Whatever your reason for reading this book, welcome to the party!
 
-We're going to approach FP from the ground up, and uncover the basic foundational principles that I believe all formal FPers would admit are the framework for everything they do. But we'll stay arms length away from any of the intimidating terminology or notation that can so easily frustrate learners.
+We're going to approach FP from the ground up, and uncover the basic foundational principles that I believe formal FPers would admit are the scaffolding for everything they do. But for the most part we'll stay arms length away from any of the intimidating terminology or mathematical notation that can so easily frustrate learners.
 
-Functional Programming is not just programming with functions. Oh if only it was that easy, I could end the book right here! But in a way, the function *is* at the center of FP. And yet, how sure are you that you know what is meant by *function*?
+Functional Programming is **not just programming with functions.** Oh if only it was that easy, I could end the book right here! But in a way, the function *is* at the center of FP.
+
+And yet, how sure are you that you know what is meant by *function*?
 
 ## What Is A Function?
 
@@ -24,7 +26,7 @@ So... what is a function?
 
 ### Brief Math Review
 
-I know I've promised we'd stay away from math notation as much as possible, but let's just quickly observe some simple things about functions and graphs from basic algebra before we move on.
+I know I've promised we'd stay away from math as much as possible, but let's just quickly observe some simple things about functions and graphs from basic algebra before we move on.
 
 Do you remember learning anything about `f(x)` back in school? What about the equation `y = f(x)`?
 
@@ -485,7 +487,7 @@ This implicit function output has a special name in the FP world: side effects. 
 
 ## Functions Of Functions
 
-Functions can receive and return values of any type. There's a special term for when a function receives or returns one or more other functions: higher-order function.
+Functions can receive and return values of any type. There's a special term for when a function receives or returns one or more other function values: higher-order function.
 
 ## Syntax
 
