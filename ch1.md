@@ -307,7 +307,11 @@ We didn't have to account for `x` in *that* new call-site because in effect we d
 
 This pattern is approximating a feature that some languages have, which JS does not officially: named arguments.
 
-It will not be obvious at all right now why passing in an object that's destructured via its parameter is a benefit, especially to FP. The benefit will be that a function that only takes one parameter (the object) is much easier to compose with another function that also only takes a single parameter. Trust me for now. We'll come back to that point later in the text, in quite a bit of detail.
+It will not be obvious at all right now why passing in an object that's destructured via its parameter is a benefit, especially to FP. The benefit will be that a function that only takes one parameter (the object) is much easier to compose with another function that also only takes a single parameter.
+
+Recall that the term arity refers to how many parameters a function expects to receive. A function with arity of 1 is also referred to as a unary function. In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
+
+We'll come back to this subject later in the text, in quite a bit of detail.
 
 ## Function Output
 
