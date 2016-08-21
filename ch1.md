@@ -491,9 +491,72 @@ This implicit function output has a special name in the FP world: side effects. 
 
 ## Functions Of Functions
 
-Functions can receive and return values of any type. There's a special term for when a function receives or returns one or more other function values: higher-order function.
+Obviously, functions can receive and return values of any type. There's a special term for when a function receives or returns one or more other function values: higher-order function.
+
+Consider:
+
+```js
+function forEach(list,fn) {
+	for (var i = 0; i < list.length; i++) {
+		fn( list[i] );
+	}
+}
+
+forEach( [1,2,3,4,5], function(val){
+	console.log( val );
+} );
+// 1 2 3 4 5
+```
+
+`forEach(..)` is a higher-order function because it receives a function as an argument.
+
+A higher-order function can also output another function, like:
+
+```js
+function foo() {
+	var fn = function(msg){
+		console.log( msg );
+	};
+
+	return fn;
+}
+
+var f = foo();
+
+f( "Hello!" );		// Hello!
+```
+
+`return` is not the only way to create and "output" another function:
+
+```js
+function foo() {
+	var fn = function(msg){
+		console.log( msg );
+	};
+
+	bar( fn );
+}
+
+function bar(func) {
+	func( "Hello!" );
+}
+
+foo();				// Hello!
+```
+
+### Closure
+
+Closure is when a function remembers and accesses variables from outside of its own scope, even when that function is executed in a different scope.
 
 ## Syntax
+
+Before we move on from functions to higher patterns, let's take a moment to discuss their syntax.
+
+### What's In A Name?
+
+Anonymous functions are function expressions without a name.
+
+### Functions Without `function`
 
 So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz about the new ES6 `=>` arrow function syntax.
 
