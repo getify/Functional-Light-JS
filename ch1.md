@@ -315,6 +315,41 @@ Recall that the term arity refers to how many parameters a function expects to r
 
 We'll come back to this subject later in the text, in quite a bit of detail.
 
+### Functions Varying By Input
+
+Consider this function:
+
+```js
+function foo(x,y) {
+	if (typeof x == "number" && typeof y == "number") {
+		return x * y;
+	}
+	else {
+		return x + y;
+	}
+}
+```
+
+Obviously, this contrived example is going to behave differently depending on what inputs you pass in.
+
+For example:
+
+```js
+foo( 3, 4 );			// 12
+
+foo( "3", 4 );			// "34"
+```
+
+One reason programmers define functions like this is because it can be more convenient to *overload* different behaviors into a single function. The most well-known example is the `$(..)` function provided by many major JS libraries like jQuery. The "dollar sign" function has about a dozen very different kinds of behaviors -- from DOM element lookup to DOM element creation to deferring a function until the `DOMContentLoaded` event -- depending on what arguments you pass to it.
+
+The perceived advantage is learning a smaller API (just one `$(..)` function), but the obvious downside is in reading code and having to carefully inspect exactly what's being passed in to try to decipher what a call will do.
+
+This technique of overloading a function with lots of behaviors based on its inputs is called ad hoc polymorphism.
+
+Another manifestation of this design pattern is making a function that has different outputs (see the next section for more detail) under different scenarios.
+
+**Warning:** Be very careful of the *convenience* temptation here. Just because you can design a function in this way, and even when there may be immediate perceived wins, the long-term costs of this design are usually unpleasant.
+
 ## Function Output
 
 In JavaScript, functions always return a value. These three functions all have identical return behavior:
@@ -490,8 +525,6 @@ Try that code and then inspect the `nums` array. Now do you spot the difference?
 Why? Because `list` holds a reference-copy of the `nums` reference, not a value-copy of the `[1,3,9,..]` array value. Because JS uses references and reference-copies for arrays, objects, and functions, we can create an output from our function all too easily, even if by accident.
 
 This implicit function output has a special name in the FP world: side effects. And a function that has *no side effects* also has a special name: pure function. We'll talk a lot more about these in a later chapter, but the punchline is that we'll want to prefer pure functions and avoid side effects if at all possible.
-
-##
 
 ## Functions Of Functions
 
