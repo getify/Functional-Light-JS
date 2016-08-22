@@ -813,8 +813,7 @@ In all these cases, the named function's name was a useful and reliable self-ref
 Moreover, even in simple cases with one-liner functions, naming them tends to make code more self-explanatory and thus easier to read for those who haven't read it before:
 
 ```js
-people
-.map( function getPreferredName(person){
+people.map( function getPreferredName(person){
 	return person.nicknames[0] || person.firstName;
 } )
 ..
@@ -856,7 +855,56 @@ I can testify from my own experience that in the struggle to name something well
 
 ### Functions Without `function`
 
-So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz about the new ES6 `=>` arrow function syntax.
+So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz around the new ES6 `=>` arrow function syntax.
+
+Compare:
+
+```js
+people.map( function getPreferredName(person){
+	return person.nicknames[0] || person.firstName;
+} )
+..
+
+people.map( person => person.nicknames[0] || person.firstName );
+```
+
+Whoa.
+
+The keyword `function` is gone, so is `return`, the `( )` parentheses, the `{ }` curly braces, and the `;` semicolon. For all that, we traded for a so-called fat arrow `=>` symbol.
+
+But there's another thing we omitted. Did you spot it? The `getPreferredName` function name.
+
+That's right; `=>` arrow functions are syntatically anonymous. There's no way to directly provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values as arguments won't get any assistance in that way.
+
+If `person.nicknames` isn't defined for some reason, an exception will be thrown, meaning this `(anonymous function)` will be at the top of the stack trace. Ugh.
+
+Honestly, the anonymity of `=>` arrow functions is a `=>` dagger to the heart, for me. I cannot abide by the loss of naming. It's harder to read, harder to debug, and impossible to self-reference.
+
+But if that wasn't bad enough, the other slap in the face is that there's a whole bunch of subtle syntactic variations that you must wade through if you have different scenarios for your function definition. I'm not going to cover all of them in detail here, but briefly:
+
+```js
+people.map( person => person.nicknames[0] || person.firstName );
+
+// multiple parameters? need ( )
+people.map( (person,idx) => person.nicknames[0] || person.firstName );
+
+// parameter destructuring? need ( )
+people.map( ({ person }) => person.nicknames[0] || person.firstName );
+
+// parameter default? need ( )
+people.map( (person = {}) => person.nicknames[0] || person.firstName );
+
+// returning an object? need ( )
+people.map( person =>
+	({ preferredName: person.nicknames[0] || person.firstName })
+);
+```
+
+The case for excitement over `=>` in the FP world is primarily that it follows almost exactly from the mathematical notation for functions, especially around FP languages like Haskell. The shape of `=>` arrow function syntax communicates mathematically.
+
+Digging even further, I'd suggest that the argument in favor of `=>` is that by using much lighter-weight syntax, we reduce the vidual boundaries between functions which helps let us use simple function expressions much like we'd use lazy expressions -- another favorite of the FPer.
+
+I think most FPers are going to blink and wave off the concerns I've just presented. They love anonymous functions and they love saving on syntax. But like I said before: you decide.
 
 ## Summary
 
