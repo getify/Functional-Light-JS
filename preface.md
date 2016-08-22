@@ -29,8 +29,8 @@ The way I see it, functional programming is at its heart about using patterns in
 
 > The curse of the monad is that... once you understand... you lose the ability to explain it to anyone else.
 >
-> Douglas Crockford 12/13/2012
-> "Monads and Gonads"
+> Douglas Crockford 2012 "Monads and Gonads"
+>
 > https://www.youtube.com/watch?v=dkZFtimgAcM
 
 I hope this book "Maybe" breaks the spirit of that curse, even though we won't talk about "monads" directly.
