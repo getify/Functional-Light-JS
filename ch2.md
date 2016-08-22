@@ -73,7 +73,18 @@ When the `partiallyApplied(..)` function is later executed somewhere else in you
 
 If any of that was confusing, stop and go re-read it. Trust me, you'll be glad you did as we get further into the text.
 
-Now let's use the `partial(..)` utility to make those earlier partially-applied functions:
+As a side note, the FPer will often prefer the shorter `=>` arrow function syntax for such code (see Chapter 1 "Syntax"), such as:
+
+```js
+var partial =
+	(fn,...presetArgs) =>
+		(...laterArgs) =>
+			fn( ...presetArgs, ...laterArgs );
+```
+
+No question this is more terse, sparse even. But I personally feel that whatever it may gain in symmetry with the mathematical notation, it loses more in overall readability with the functions all being anonymous, and by obscuring the scope boundaries making deciphering closure a little more cryptic.
+
+Whichever syntax approach tickles your fancy, let's now use the `partial(..)` utility to make those earlier partially-applied functions:
 
 ```js
 var getPerson = partial( ajax, "http://some.api/person" );
