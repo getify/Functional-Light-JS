@@ -467,7 +467,7 @@ Consider:
 ```js
 function sum(list) {
 	var total = 0;
-	for (var i = 0; i < list.length; i++) {
+	for (let i = 0; i < list.length; i++) {
 		if (!list[i]) list[i] = 0;
 
 		total = total + list[i];
@@ -497,7 +497,7 @@ Consider:
 
 ```js
 function forEach(list,fn) {
-	for (var i = 0; i < list.length; i++) {
+	for (let i = 0; i < list.length; i++) {
 		fn( list[i] );
 	}
 }
@@ -668,9 +668,154 @@ We'll use closure heavily throughout the rest of the text. It may just be the mo
 
 Before we move on from functions to higher patterns, let's take a moment to discuss their syntax.
 
+More than any other part of this text, the discussions in this section are mostly opinion and preference, whether you agree with the views presented here or take opposite ones. This stuff is highly subjective, though many people seem to present it rather absolutely. You decide.
+
 ### What's In A Name?
 
-Anonymous functions are function expressions without a name.
+Syntatically speaking, function declarations require the inclusion of a name:
+
+```js
+function helloMyNameIs() {
+	// ..
+}
+```
+
+But function expressions can come in both named and anonymous forms:
+
+```js
+foo( function namedFunctionExpr(){
+	// ..
+} );
+
+bar( function(){	// <-- look, no name!
+	// ..
+} );
+```
+
+What exactly do we mean by anonymous, by the way? Specifically, functions have a `name` property that holds the string value of the name the function was given syntactically, such as `"helloMyNameIs"` or `"namedFunctionExpr"`. This `name` property is most notably used by the console/developer tools of your JS environment to list the function when it participates in a stack trace (usually from an exception).
+
+Anonymous functions are generally displayed as `(anonymous function)`.
+
+If you've ever had to debug a JS program from nothing but a stack trace of an exception, you probably have felt the pain of seeing `(anonymous function)` appear line after line. This listing doesn't give a developer any clue whatsoever as to the path the exception came from. It's not doing the developer any favors.
+
+If you name your function expressions, the name is always used. So if you use a good name like `handleProfileClicks` instead of `foo`, you'll get much more helpful stack traces.
+
+As of ES6, anonymous function expressions can be aided by *name inferencing*. Consider:
+
+```js
+var x = function(){};
+
+x.name;			// x
+```
+
+If the engine is able to guess what name you *probably* want the function to take, it will go ahead and do so.
+
+But beware, not all syntactic forms benefit from name inferencing. Probably the most common place a function expression shows up is as an argument to a function call:
+
+```js
+function foo(fn) {
+	console.log( fn.name );
+}
+
+var x = function(){};
+
+foo( x );				// x
+foo( function(){} );	//
+```
+
+When the name can't be inferred from the immediate surrounding syntax, it remains an empty string. Such a function will be reported as `(anonymous function)` in a stack trace should one occur.
+
+There are other benefits to a function being named besides the debugging question. First, the syntactic name (aka lexical name) is useful for internal self-reference. Self-reference is necessary for recursion (both sync and async) and also helpful with event handlers.
+
+Consider these different scenarios:
+
+```js
+// sync recursion:
+function findPropIn(propName,obj) {
+	if (obj == null || typeof obj != "object") return;
+
+	if (propName in obj) {
+		return obj[propName];
+	}
+	else {
+		let props = Object.keys( obj );
+		for (let i = 0; i < props.length; i++) {
+			let ret = findPropIn( propName, obj[props[i]] );
+			if (ret !== undefined) {
+				return ret;
+			}
+		}
+	}
+}
+```
+
+```
+// async recursion:
+setTimeout( function waitForIt(){
+	// does `it` exist yet?
+	if (!o.it) {
+		// try again later
+		setTimeout( waitForIt, 100 );
+	}
+}, 100 );
+```
+
+```
+// event handler unbinding
+document.getElementById( "onceBtn" )
+	.addEventListener( "click", function handleClick(evt){
+		// unbind event
+		evt.target.removeEventListener( "click", handleClick, false );
+
+		// ..
+	}, false );
+```
+
+In all these cases, the named function's name was a useful and reliable self-reference from inside itself.
+
+Moreover, even in simple cases with one-liner functions, naming them tends to make code more self-explanatory and thus easier to read for those who haven't read it before:
+
+```js
+people
+.map( function getPreferredName(person){
+	return person.nicknames[0] || person.firstName;
+} )
+..
+```
+
+The function name `getPreferredName(..)` tells the reader something about what the mapping operation is intending to do that is not entirely obvious from just its code. This name label helps the code be more readable.
+
+Another place where anonymous function expressions are common is with IIFEs (immediately invoked function expressions):
+
+```js
+(function(){
+
+	// look, I'm an IIFE!
+
+})();
+```
+
+You virtually never see IIFEs using names for their function expressions, but they should. Why? For all the same reasons we just went over: stack trace debugging, reliable self-reference, and readability. If you can't come up with any other name for your IIFE, at least use the word IIFE:
+
+```js
+(function IIFE(){
+
+	// You already knew I was an IIFE!
+
+})();
+```
+
+What I'm getting at is there's multiple reasons why **named functions are always more preferable to anonymous functions.** As a matter of fact, I'd go so far as to say that there's basically never a case where an anonymous function is more preferable. They just don't really have any advantage over their named counterparts.
+
+It's incredibly easy to write anonymous functions, because it's one less name we have to devote our mental attention to figuring out.
+
+I'll be honest; I'm as guilty of this as anyone. I don't like to struggle with naming. The first 3 or 4 names I come up with a function are usually bad. I have to revisit the naming over and over. I'd much rather just punt with a good ol' anonymous function expression.
+
+But we're trading ease-of-writing for pain-of-reading. This is not a good trade off. Being lazy or uncreative enough to not want to figure out names for your functions is an all too common, but poor, excuse for using anonymous functions.
+
+**Name every single function.** And if you sit there stumped, unable to come up with a good name for some function you've written, I'd strongly suggest you don't fully understand that function's purpose yet -- or it's just too broad or abstract. You need to go back and re-design the function until this is more clear. And by that point, a name will become more apparent.
+
+I can testify from my own experience that in the struggle to name something well, I usually have come to understand it better and often even refactor its design for improved readability and maintability. This time investment is well worth it.
 
 ### Functions Without `function`
 
