@@ -907,6 +907,10 @@ Digging even further, I'd suggest that the argument in favor of `=>` is that by 
 
 I think most FPers are going to blink and wave off the concerns I've just presented. They love anonymous functions and they love saving on syntax. But like I said before: you decide.
 
+## What's This?
+
+// TODO: cover how FP typically avoids `this`-aware functions and why
+
 ## Summary
 
 Functions are cool.
