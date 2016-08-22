@@ -119,7 +119,7 @@ else if (fn.length == 3) {
 
 **Tip:** The `length` property of a function is read-only and it's determined at the time you declare the function. It should be thought of as essentially a piece of metadata that describes something about the intended usage of the function.
 
-What about counting the number of arguments a function receives? This used to be trivial, but now the situation is slightly more complicated. In the original version(s) of JavaScript, each function had an `arguments` object (array-like) that held a reference to all the arguments passed in. You could then inspect the `length` property of `arguments` to figure out how many were actually passed.
+What about counting the number of arguments a function receives? This used to be trivial, but now the situation is slightly more complicated. In the original version(s) of JavaScript, each function had an `arguments` object (array-like) that held a reference to each of the arguments passed in. You could then inspect the `length` property of `arguments` to figure out how many were actually passed.
 
 ```js
 function foo(x,y,z) {
@@ -137,7 +137,9 @@ Be warned: **never** access arguments positionally, like `arguments[1]`.
 
 Except... how will you access an argument that was passed in a position beyond the declared parameters? I'll answer that in a moment; but first, take a step back and ask yourself, "Why would I want to allow that?". Seriously. Think about that hard for a minute.
 
-It should be pretty rare that this occurs; it shouldn't be something you regularly expect or rely on when writing your functions. If you find yourself in such a scenario, spend an extra 20 minutes trying to design the interaction with that function in a different way. Name that extra argument even if it's exceptional. Don't make a function signature that can just accept an indeterminate amount of arguments if you can avoid it.
+It should be pretty rare that this occurs; it shouldn't be something you regularly expect or rely on when writing your functions. If you find yourself in such a scenario, spend an extra 20 minutes trying to design the interaction with that function in a different way. Name that extra argument even if it's exceptional.
+
+A function signature that accepts an indeterminate amount of arguments is referred to as a variadic function. Some people prefer this style of function design, but I think you'll find that most of the time the FPer wants to avoid these where possible.
 
 **Note:** You'll understand later in the book why I'm making such a big deal out of this point about indeterminate numbers of arguments.
 
@@ -488,6 +490,8 @@ Try that code and then inspect the `nums` array. Now do you spot the difference?
 Why? Because `list` holds a reference-copy of the `nums` reference, not a value-copy of the `[1,3,9,..]` array value. Because JS uses references and reference-copies for arrays, objects, and functions, we can create an output from our function all too easily, even if by accident.
 
 This implicit function output has a special name in the FP world: side effects. And a function that has *no side effects* also has a special name: pure function. We'll talk a lot more about these in a later chapter, but the punchline is that we'll want to prefer pure functions and avoid side effects if at all possible.
+
+##
 
 ## Functions Of Functions
 
