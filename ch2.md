@@ -81,7 +81,7 @@ var getPerson = partial( ajax, "http://some.api/person" );
 var getOrder = partial( ajax, "http://some.api/order" );
 ```
 
-Stop and think about the shape/internals of what `getPerson(..)` will look like. It will look sorta like this:
+Stop and think about the shape/internals of `getPerson(..)`. It will look sorta like this:
 
 ```js
 var getPerson = function partiallyApplied(...laterArgs) {
@@ -121,19 +121,17 @@ var getCurrentUser = function partiallyApplied(...laterArgs) {
 
 // version 2
 var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs) {
-	return (
-		function innerPartiallyApplied(...innerLaterArgs) {
-			return ajax( "http://some.api/person", ...innerLaterArgs );
-		}
-	)(
-		{ user: CURRENT_USER_ID },
-		...outerLaterArgs
-	);
+	var getPerson = function innerPartiallyApplied(...innerLaterArgs) {
+		return ajax( "http://some.api/person", ...innerLaterArgs );
+	};
+
+	return getPerson( { user: CURRENT_USER_ID }, ...outerLaterArgs );
 }
 ```
 
 Again, stop and re-read those code snippets to make sure you understand what's going on there.
 
+**Note:** The second version has an extra layer of function wrapping involved. That may smell strange and unnecessary, but this is just one of those things in FP that you'll want to get really comfortable with. We'll be wrapping many layers of functions onto each other as we progress through the text. Remember, this is *function*al programming!
 
 ## One At A Time
 
