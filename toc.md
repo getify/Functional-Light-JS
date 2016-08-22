@@ -10,4 +10,5 @@
 	* Function Output
 	* Functions Of Functions
 	* Syntax
-* Chapter 2: TODO
+* Chapter 2: Managing Function Inputs
+	* Some Now, Some Later
