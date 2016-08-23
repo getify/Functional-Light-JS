@@ -221,7 +221,7 @@ var curriedGetCurrentUser = curriedGetPerson( { user: CURRENT_USER_ID } );
 curriedGetCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
-How about another example, this time with adding numbers together:
+How about another example, this time adding numbers together one at a time:
 
 ```js
 function sum(...args) {
@@ -232,14 +232,29 @@ function sum(...args) {
 	return sum;
 }
 
+sum( 1, 2, 3, 4, 5 );						// 15
+
+// now with currying:
 var curriedSum = curry( sum, 5 );
 
 curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
 ```
 
+### Why Currying Or Partial Application?
+
+With either currying style (`sum(1)(2)(3)`) or partial application style (`sum(1,2)(3)`), the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we go this direction** when adopting FP? There's multiple layers to answering that question.
+
+The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your code base) when separate arguments are specified, whereas traditional function calls require all the arguments to be present all at once. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
+
+Another layer to this answer, which applies most specifically to currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs 3 arguments, if curried, becomes a function that needs just one, three times. That kind of function will be a lot easier to work with when we start composing them. We'll tackle this later in the text.
+
+### Currying More Than One Argument?
+
+// TODO: discuss `curry(..)` implementations that allow multiple arguments
+
 ## All But One
 
-// TODO: discuss `unary(..)` transform.
+// TODO: discuss `unary(..)` transform
 
 ## No Points
 
