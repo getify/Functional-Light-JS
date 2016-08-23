@@ -298,7 +298,56 @@ Another layer to this answer, which applies most specifically to currying, is th
 
 ### Currying More Than One Argument?
 
-// TODO: discuss `curry(..)` implementations that allow multiple arguments
+The definition and implementation I've given of currying thus far is, I believe, as true to the spirit as we can likely get in JavaScript.
+
+Specifically, if we look briefly at how currying works in Haskell, we can observe that multiple arguments always go in to a function one at a time, one per curried call -- other than tuples (analogus to arrays for our purposes) that transport multiple values in a single argument.
+
+For example, in Haskell:
+
+```
+foo 1 2 3
+```
+
+This calls the `foo` function, and it passes in three values `1`, `2`, and `3`. But functions are automatically curried in Haskell, which means the JS equivalent of that would look like `foo(1)(2)(3)`. That's the same as the `curry(..)` I presented above.
+
+**Note:** In Haskell, `foo (1,2,3)` is not passing in those 3 values as three separate arguments, but a tuple as a single argument. To work, `foo` would need to be altered to handle a tuple in that argument position. As far as I can tell, there's no way to call `foo` only once and pass all three arguments. Each argument gets its own curried-call. Of course, the multiple calls is opaque to the Haskell developer, but it's more syntatically obvious to the JS developer.
+
+For these reasons, I think the earlier `curry(..)` that I demonstrated is a faithful adaptation.
+
+However, it's important to note that there's a looser definition used in most popular JavaScript FP libraries.
+
+Specifically, JS currying utilities typically allow you to specify multiple arguments for each curried-call. Revisiting our `sum(..)` example from before, this would look like:
+
+```js
+var curriedSum = looseCurry( sum, 5 );
+
+curriedSum( 1 )( 2, 3 )( 4, 5 );			// 15
+```
+
+There's a slight syntax savings of fewer `( )`, and an implied performance benefit of now having three function calls instead of five. But other than that, using `looseCurry(..)` is identical in end result to the narrower `curry(..)` definition from earlier. I would guess the convenience/performance factor is probably why frameworks allow multiple arguments. This seems mostly like a matter of taste.
+
+**Note:** The loose currying *does* give you the ability to send in more arguments than the arity (detected or specified). If you designed your function with optional/variadic arguments, that could be a benefit. For example, if you curry five arguments, looser currying still allows more than five arguments (`curriedSum(1)(2,3,4)(5,6)`), but narrower currying wouldn't support `curriedSum(1)(2)(3)(4)(5)(6)`.
+
+It's easy to adapt our currying implementation to this common looser definition:
+
+```js
+function looseCurry(fn,arity = fn.length) {
+	var args = [];
+
+	return function curried(...nextArgs) {
+		args = args.concat( nextArgs );
+
+		if (args.length >= arity) {
+			return fn( ...args );
+		}
+		else {
+			return curried;
+		}
+	};
+}
+```
+
+Now each curried-call accepts one or more arguments.
 
 ## All But One
 
