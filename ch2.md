@@ -144,6 +144,32 @@ Again, stop and re-read those code snippets to make sure you understand what's g
 
 **Note:** The second version has an extra layer of function wrapping involved. That may smell strange and unnecessary, but this is just one of those things in FP that you'll want to get really comfortable with. We'll be wrapping many layers of functions onto each other as we progress through the text. Remember, this is *function*al programming!
 
+Let's take a look at another example of the usefulness of partial application. Consider an `add(..)` function which takes two arguments and adds them together:
+
+```js
+function add(x,y) {
+	return x + y;
+}
+```
+
+Now, imagine we'd like take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility built into JS arrays.
+
+```js
+[1,2,3,4,5].map( function adder(val){
+	return add( 3, val );
+} );
+// [4,5,6,7,8]
+```
+
+**Note:** Don't worry if you haven't seen `map(..)` before; we'll cover it in much more detail later in the book. For now, just know that it loops over an array calling a function to produce new values for a new array.
+
+The reason we can't pass `add(..)` directly to `map(..)` is because the signature of `add(..)` doesn't match the mapping function that `map(..)` expects. That's where partial application can help us: we can adapt the signature of `add(..)` to something that will match.
+
+```js
+[1,2,3,4,5].map( partial( add, 3 ) );
+// [4,5,6,7,8]
+```
+
 ### `bind(..)`
 
 JavaScript has a built-in utility called `bind(..)`, which is available on all functions. It has two capabilities: presetting the `this` context and partially applying arguments.
@@ -221,7 +247,24 @@ var curriedGetCurrentUser = curriedGetPerson( { user: CURRENT_USER_ID } );
 curriedGetCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
-How about another example, this time adding numbers together one at a time:
+Remember our example from earlier about adding `3` to a each value in a list of numbers? Recall that currying is just a special case of partial application, so we could do that task with currying in almost the same way:
+
+```js
+[1,2,3,4,5].map( curry( add )( 3 ) );
+// [4,5,6,7,8]
+```
+
+The difference between the two? `partial(add,3)` vs `curry(add)(3)`. Why might you choose `curry(..)` over partial? It might be helpful in the case where you know ahead of time that `add(..)` is the function to be adapted, but the value `3` isn't known yet:
+
+```js
+var adder = curry( add );
+
+// later
+[1,2,3,4,5].map( adder( 3 ) );
+// [4,5,6,7,8]
+```
+
+How about another numbers example, this time adding a list of them together:
 
 ```js
 function sum(...args) {
@@ -235,18 +278,23 @@ function sum(...args) {
 sum( 1, 2, 3, 4, 5 );						// 15
 
 // now with currying:
+// (5 to indicate how many to wait for)
 var curriedSum = curry( sum, 5 );
 
 curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
 ```
 
+The advantage of currying here is being able to do something like `curriedSum(1)(2)(3)`, which returns a function. Then later call `fn(4)` to get yet another fn, and still later call `anotherfn(5)`, finally computing the `15` result.
+
+In JavaScript, both currying and partial application use closure to remember the arguments over time until all have been received, and then the original operation can be performed.
+
 ### Why Currying Or Partial Application?
 
 With either currying style (`sum(1)(2)(3)`) or partial application style (`sum(1,2)(3)`), the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we go this direction** when adopting FP? There's multiple layers to answering that question.
 
-The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your code base) when separate arguments are specified, whereas traditional function calls require all the arguments to be present all at once. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
+The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your code base) when and where separate arguments are specified, whereas traditional function calls require all the arguments to be present all at once. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
 
-Another layer to this answer, which applies most specifically to currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs 3 arguments, if curried, becomes a function that needs just one, three times. That kind of function will be a lot easier to work with when we start composing them. We'll tackle this later in the text.
+Another layer to this answer, which applies most specifically to currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs 3 arguments, if curried, becomes a function that needs just one, three times over. That kind of unary function will be a lot easier to work with when we start composing them. We'll tackle this later in the text.
 
 ### Currying More Than One Argument?
 
