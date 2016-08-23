@@ -214,17 +214,19 @@ How might we define a utility to do this currying? We're going to use some trick
 
 ```js
 function curry(fn,arity = fn.length) {
-	var args = [];
-
 	return function curried(nextArg) {
-		args.push( nextArg );
+		var args = [];
 
-		if (args.length >= arity) {
-			return fn( ...args );
-		}
-		else {
-			return curried;
-		}
+		return (function nextCurried(nextArg) {
+			args.push( nextArg );
+
+			if (args.length >= arity) {
+				return fn( ...args );
+			}
+			else {
+				return nextCurried;
+			}
+		})( nextArg );
 	};
 }
 ```
@@ -233,17 +235,18 @@ And for the ES6 `=>` fans:
 
 ```js
 var curry =
-	(fn, arity = fn.length, args = [], curried) =>
-		curried = nextArg => {
-			args.push( nextArg );
+	(fn, arity = fn.length) =>
+		(nextArg, args, nextCurried) =>
+			(args = [], nextCurried = nextArg => {
+				args.push( nextArg );
 
-			if (args.length >= arity) {
-				return fn( ...args );
-			}
-			else {
-				return curried;
-			}
-		};
+				if (args.length >= arity) {
+					return fn( ...args );
+				}
+				else {
+					return nextCurried;
+				}
+			})( nextArg );
 ```
 
 The strategy here is to keep the collected arguments received, one at a time from successive function calls to the returned inner `curried(..)` function, in the `args` array. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), just keep returning the `curried(..)` function to collect one more `nextArg` argument. Once we have the correct number of `args`, execute the original `fn(..)` function with them.
@@ -349,22 +352,24 @@ It's easy to adapt our currying implementation to this common looser definition:
 
 ```js
 function looseCurry(fn,arity = fn.length) {
-	var args = [];
-
 	return function curried(...nextArgs) {
-		args = args.concat( nextArgs );
+		var args = [];
 
-		if (args.length >= arity) {
-			return fn( ...args );
-		}
-		else {
-			return curried;
-		}
+		return (function nextCurried(...nextArgs) {
+			args = args.concat( nextArgs );
+
+			if (args.length >= arity) {
+				return fn( ...args );
+			}
+			else {
+				return nextCurried;
+			}
+		})( ...nextArgs );
 	};
 }
 ```
 
-Now each curried-call accepts one or more arguments.
+Now each curried-call accepts one or more arguments. We'll leave it as an exercise for the interested reader to define the ES6 `=>` version of `looseCurry(..)` similar to how we did it for `curry(..)` above.
 
 ## All But One
 
