@@ -368,9 +368,81 @@ function looseCurry(fn,arity = fn.length) {
 
 Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave it as an exercise for the interested reader to define the ES6 `=>` version of `looseCurry(..)` similar to how we did it for `curry(..)` earlier.
 
-## All But One
+## All For One
 
-// TODO: discuss `unary(..)` transform
+Imagine you're passing a function to a utility where it will send multiple arguments to your function. But you may only want to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
+
+We can design a simple utility that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
+
+```js
+function unary(fn) {
+	return function onlyOneArg(arg) {
+		return fn( arg );
+	};
+}
+
+// or the ES6 => arrow form
+var unary = fn => arg => fn(arg);
+```
+
+We saw the `map(..)` utility eariler. It calls the provided mapping function with three arguments: `value`, `index`, and `list`. If you want your mapping function to only receive one of these, like `value`, use the `unary(..)` operation:
+
+```js
+function unary(fn) {
+	return function onlyOneArg(arg) {
+		return fn( arg );
+	};
+}
+
+var adder = looseCurry( sum, 2 );
+
+// oops:
+[1,2,3,4,5].map( adder( 3 ) );
+// ["41,2,3,4,5", "61,2,3,4,5", "81,2,3,4,5", "101, ...
+
+// fixed with `unary(..)`:
+[1,2,3,4,5].map( unary( adder( 3 ) ) );
+// [4,5,6,7,8]
+```
+
+### One For One
+
+Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that simply takes one argument and does nothing but return it untouched. This is often referred to as the *identity* function.
+
+Consider:
+
+```js
+function identity(v) {
+	return v;
+}
+
+// ES6 => form:
+var identity = v => v;
+```
+
+We haven't talked about function composition, or `reduce(..)`, yet (I promise, we will!), but a place where `identity(..)` can be useful is when you need an initial value for function composition via a reduction:
+
+```js
+function composeLeft(fn1,fn2){
+	return function composed(v) {
+		return fn2( fn1( v ) );
+	};
+}
+
+var listOfOps = [
+	function add1(v) { return v + 1; },
+	function mul2(v) { return v * 2; },
+	function pow3(v) { return Math.pow( v, 3 ); }
+];
+
+var calc1 = listOfOps.reduce( composeLeft, identity );
+var calc2 = [].reduce( composeLeft, identity );
+
+calc1( 3 );				// 512
+calc2( 3 );				// 3
+```
+
+For `calc1(..)`, the `identity(..)` function receives the initial `3` and simply returns it back, so it can be passed into `add1(..)` function. For `calc2(..)`, where the array was empty, the value `3` passes straight through unchanged because of `identity(..)`.
 
 ## No Points
 
@@ -381,3 +453,5 @@ Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave
 Partial Application is a technique for reducing the arity -- expected number of arguments to a function -- by creating a new function where some of the arguments are preset.
 
 Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments.
+
+Operations like `unary(..)` and `identity(..)` are part of the base toolbox in FP.

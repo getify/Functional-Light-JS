@@ -14,5 +14,5 @@
 * Chapter 2: Managing Function Inputs
 	* Some Now, Some Later
 	* One At A Time
-	* All But One
+	* All For One
 	* No Points
