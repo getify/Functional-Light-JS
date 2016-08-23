@@ -146,14 +146,83 @@ Again, stop and re-read those code snippets to make sure you understand what's g
 
 ## One At A Time
 
-There's a special form of partial application where a function that expects multiple arguments is broken down into functions that take a single argument (arity: 1) and return another function that accepts the next argument.
+There's a special form of partial application where a function that expects multiple arguments is broken down into successive functions that each take a single argument (arity: 1) and return another function to accept the next argument.
 
 This technique is called currying.
 
+To illustrate, let's imagine we had a curried version of `ajax(..)` already created. This is how we'd use it:
 
+```js
+var curriedGetPerson = curriedAjax( "http://some.api/person" );
 
+var curriedGetCurrentUser = curriedGetPerson( { user: CURRENT_USER_ID } );
 
+curriedGetCurrentUser( function foundUser(user){ /* .. */ } );
+```
 
+Actually, that doesn't look too terribly different from what we saw earlier in the partial application discussion. That's what I meant by saying that currying is a special case of partial application.
 
+The main difference is that `curriedAjax(..)` will explicitly return a function (we call `curriedGetPerson(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
 
+If an original function expected 5 arguments, the curried form of that function would take just the first argument, and return a function to accept the second. That one would take just the second argument, and return a function for to accept the third. And so on.
 
+So currying unwinds a higher-arity function into a series of chained unary functions.
+
+How might we define a utility to do this currying? We're going to use some tricks from Chapter 1.
+
+```js
+function curry(fn,arity = fn.length) {
+	var args = [];
+
+	return function curried(nextArg) {
+		args.push( nextArg );
+
+		if (args.length >= arity) {
+			return fn( ...args );
+		}
+		else {
+			return curried;
+		}
+	};
+}
+```
+
+The strategy here is to keep the collected arguments received, one at a time from successive function calls to the returned inner `curried(..)` function, in the `args` array. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), just keep returning the `curried(..)` function to collect one more `nextArg` argument. Once we have the correct number of `args`, execute the original `fn(..)` function with them.
+
+By default, this approach relies on being able to inspect the `length` property of the to-be-curried function to know how many iterations of currying we'll need before we've collected all its expected arguments. If you use it against a function that doesn't have an accurate `length` -- like if it uses a parameter signature such as `...args` -- you'll need to pass the `arity` argument to set the expected length manually.
+
+Here's how we would use it for our earlier `ajax(..)` example:
+
+```js
+var curriedAjax = curry( ajax );
+
+// from here on, it's the same as before:
+
+var curriedGetPerson = curriedAjax( "http://some.api/person" );
+
+var curriedGetCurrentUser = curriedGetPerson( { user: CURRENT_USER_ID } );
+
+curriedGetCurrentUser( function foundUser(user){ /* .. */ } );
+```
+
+How about another example, this time with adding numbers together:
+
+```js
+function sum(...args) {
+	var sum = 0;
+	for (var i = 0; i < args.length; i++) {
+		sum += args[i];
+	}
+	return sum;
+}
+
+var curriedSum = curry( sum, 5 );
+
+curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
+```
+
+## Summary
+
+Partial Application is a technique for reducing the arity -- expected number of arguments to a function -- by creating a new function where some of the arguments are preset.
+
+Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments.
