@@ -77,7 +77,7 @@ As a side note, the FPer will often prefer the shorter `=>` arrow function synta
 
 ```js
 var partial =
-	(fn,...presetArgs) =>
+	(fn, ...presetArgs) =>
 		(...laterArgs) =>
 			fn( ...presetArgs, ...laterArgs );
 ```
@@ -227,6 +227,23 @@ function curry(fn,arity = fn.length) {
 		}
 	};
 }
+```
+
+And for the ES6 `=>` fans:
+
+```js
+var curry =
+	(fn, arity = fn.length, args = [], curried) =>
+		curried = nextArg => {
+			args.push( nextArg );
+
+			if (args.length >= arity) {
+				return fn( ...args );
+			}
+			else {
+				return curried;
+			}
+		};
 ```
 
 The strategy here is to keep the collected arguments received, one at a time from successive function calls to the returned inner `curried(..)` function, in the `args` array. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), just keep returning the `curried(..)` function to collect one more `nextArg` argument. Once we have the correct number of `args`, execute the original `fn(..)` function with them.
