@@ -214,20 +214,18 @@ How might we define a utility to do this currying? We're going to use some trick
 
 ```js
 function curry(fn,arity = fn.length) {
-	return function curried(nextArg) {
-		var args = [];
-
-		return (function nextCurried(nextArg) {
-			args.push( nextArg );
+	return (function nextCurried(prevArgs) {
+		return function curried(nextArg) {
+			var args = prevArgs.concat( nextArg );
 
 			if (args.length >= arity) {
 				return fn( ...args );
 			}
 			else {
-				return nextCurried;
+				return nextCurried( args );
 			}
-		})( nextArg );
-	};
+		};
+	})( [] );
 }
 ```
 
@@ -235,21 +233,22 @@ And for the ES6 `=>` fans:
 
 ```js
 var curry =
-	(fn, arity = fn.length) =>
-		(nextArg, args, nextCurried) =>
-			(args = [], nextCurried = nextArg => {
-				args.push( nextArg );
+	(fn, arity = fn.length, nextCurried) =>
+		(nextCurried = prevArgs =>
+			nextArg => {
+				var args = prevArgs.concat( nextArg );
 
 				if (args.length >= arity) {
 					return fn( ...args );
 				}
 				else {
-					return nextCurried;
+					return nextCurried( args );
 				}
-			})( nextArg );
+			}
+		)( [] );
 ```
 
-The strategy here is to keep the collected arguments received, one at a time from successive function calls to the returned inner `curried(..)` function, in the `args` array. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), just keep returning the `curried(..)` function to collect one more `nextArg` argument. Once we have the correct number of `args`, execute the original `fn(..)` function with them.
+The strategy here is to start a collection of arguments in `prevArgs` as an empty `[]` array, and add each received `nextArg` to that, calling the concatenation `args`. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), make and return another `curried(..)` function to collect the next `nextArg` argument, passing the running `args` collection along as `prevArgs`. Once we have enough `args`, execute the original `fn(..)` function with them.
 
 By default, this approach relies on being able to inspect the `length` property of the to-be-curried function to know how many iterations of currying we'll need before we've collected all its expected arguments. If you use it against a function that doesn't have an accurate `length` -- like if it uses a parameter signature such as `...args` -- you'll need to pass the `arity` argument to set the expected length manually.
 
@@ -348,28 +347,26 @@ There's a slight syntax savings of fewer `( )`, and an implied performance benef
 
 **Note:** The loose currying *does* give you the ability to send in more arguments than the arity (detected or specified). If you designed your function with optional/variadic arguments, that could be a benefit. For example, if you curry five arguments, looser currying still allows more than five arguments (`curriedSum(1)(2,3,4)(5,6)`), but narrower currying wouldn't support `curriedSum(1)(2)(3)(4)(5)(6)`.
 
-It's easy to adapt our currying implementation to this common looser definition:
+It's easy to adapt our previous currying implementation to this common looser definition:
 
 ```js
 function looseCurry(fn,arity = fn.length) {
-	return function curried(...nextArgs) {
-		var args = [];
-
-		return (function nextCurried(...nextArgs) {
-			args = args.concat( nextArgs );
+	return (function nextCurried(prevArgs) {
+		return function curried(...nextArgs) {
+			var args = prevArgs.concat( nextArgs );
 
 			if (args.length >= arity) {
 				return fn( ...args );
 			}
 			else {
-				return nextCurried;
+				return nextCurried( args );
 			}
-		})( ...nextArgs );
-	};
+		};
+	})( [] );
 }
 ```
 
-Now each curried-call accepts one or more arguments. We'll leave it as an exercise for the interested reader to define the ES6 `=>` version of `looseCurry(..)` similar to how we did it for `curry(..)` above.
+Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave it as an exercise for the interested reader to define the ES6 `=>` version of `looseCurry(..)` similar to how we did it for `curry(..)` earlier.
 
 ## All But One
 
