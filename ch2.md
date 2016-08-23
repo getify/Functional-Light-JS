@@ -5,7 +5,7 @@ In Chapter 1 "Function Inputs", we talked about the basics of function parameter
 
 I recommended in that first chapter that you try to design functions with a single parameter if at all possible. The fact is, this won't always be possible, and you won't always be in control of function signatures that you need to work with.
 
-We now want to turn our attention to more sophisticated and powerful patterns for wrangling function inputs in these occasions.
+We now want to turn our attention to more sophisticated and powerful patterns for wrangling function inputs in these scenarios.
 
 ## Some Now, Some Later
 
@@ -21,7 +21,7 @@ function ajax(url,data,callback) {
 
 Let's imagine you'd like to set up several API calls where the URLs are known upfront, but the data and the callback to handle the response won't be known until later.
 
-Of course, you can just defer making the `ajax(..)` until all the bits are known, and refer to some global constant for the URL at that time. But another way is to create a function reference that already has the `url` argument preset.
+Of course, you can just defer making the `ajax(..)` call until all the bits are known, and refer to some global constant for the URL at that time. But another way is to create a function reference that already has the `url` argument preset.
 
 What we're going to do is make a new function that still calls `ajax(..)` under the covers, and it manually sets the first argument to the API URL you care about, while waiting to accept the other two arguments later.
 
@@ -43,13 +43,13 @@ function getCurrentUser(cb) {
 }
 ```
 
-Once practice an FPer gets very used to is looking for patterns where we do the same sorts of things repeatedly, and trying to turn those actions into generic reusable utilities. As a matter of fact, I'm sure that's already the instinct for many of you readers, so that's not uniquely an FP thing. But it's unquestionably important for FP.
+One practice an FPer gets very used to is looking for patterns where we do the same sorts of things repeatedly, and trying to turn those actions into generic reusable utilities. As a matter of fact, I'm sure that's already the instinct for many of you readers, so that's not uniquely an FP thing. But it's unquestionably important for FP.
 
 To conceive such a utility for argument presetting, let's examine conceptually what's going on, not just looking at the manual implementations above.
 
 One way to articulate what's going on is that the `getOrder(data,cb)` function is a *partial application* of the `ajax(url,data,cb)` function. This terminology comes from the notion that arguments are *applied* to parameters at the function call-site. And as you can see, we're only applying some of the arguments upfront -- specifically the argument for the `url` parameter -- while leaving the rest to be applied later.
 
-To be a tiny bit more formal about this pattern, partial application is strictly a reduction in a function's arity -- remember, that's the number of expected parameter inputs. We reduced the original `ajax(..)` function's arity from 3 to 2 for the `getOrder(..)` function.
+To be a tiny bit more formal about this pattern, partial application is strictly a reduction in a function's arity; remember, that's the number of expected parameter inputs. We reduced the original `ajax(..)` function's arity from 3 to 2 for the `getOrder(..)` function.
 
 Let's invent a `partial(..)` utility:
 
