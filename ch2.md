@@ -308,9 +308,9 @@ For example, in Haskell:
 foo 1 2 3
 ```
 
-This calls the `foo` function, and it passes in three values `1`, `2`, and `3`. But functions are automatically curried in Haskell, which means the JS equivalent of that would look like `foo(1)(2)(3)`. That's the same as the `curry(..)` I presented above.
+This calls the `foo` function, and has the result of passing in three values `1`, `2`, and `3`. But functions are automatically curried in Haskell, which means each value goes in as a separate curried-call. The JS equivalent of that would look like `foo(1)(2)(3)`, which is the same style as the `curry(..)` I presented above.
 
-**Note:** In Haskell, `foo (1,2,3)` is not passing in those 3 values as three separate arguments, but a tuple as a single argument. To work, `foo` would need to be altered to handle a tuple in that argument position. As far as I can tell, there's no way to call `foo` only once and pass all three arguments. Each argument gets its own curried-call. Of course, the multiple calls is opaque to the Haskell developer, but it's more syntatically obvious to the JS developer.
+**Note:** In Haskell, `foo (1,2,3)` is not passing in those 3 values as three separate arguments, but a tuple as a single argument. To work, `foo` would need to be altered to handle a tuple in that argument position. As far as I can tell, there's no way to call `foo` only once and pass all three arguments. Each argument gets its own curried-call. Of course, the presence of multiple calls is opaque to the Haskell developer, but it's a lot more syntactically obvious to the JS developer.
 
 For these reasons, I think the earlier `curry(..)` that I demonstrated is a faithful adaptation.
 
