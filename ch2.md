@@ -241,6 +241,10 @@ curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
 
 // TODO: discuss `unary(..)` transform.
 
+## No Points
+
+// TODO: discuss point-free style
+
 ## Summary
 
 Partial Application is a technique for reducing the arity -- expected number of arguments to a function -- by creating a new function where some of the arguments are preset.
