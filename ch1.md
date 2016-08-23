@@ -15,9 +15,9 @@ Whatever your reason for reading this book, welcome to the party!
 
 We're going to approach FP from the ground up, and uncover the basic foundational principles that I believe formal FPers would admit are the scaffolding for everything they do. But for the most part we'll stay arms length away from any of the intimidating terminology or mathematical notation that can so easily frustrate learners.
 
-Functional Programming is **not just programming with functions.** Oh if only it was that easy, I could end the book right here! But in a way, the function *is* at the center of FP.
+Functional Programming is **not just programming with the keyword `function`.** Oh if only it was that easy, I could end the book right here! But importantly, the function really *is* at the center of FP. And it's how we use functions that makes our code *functional*.
 
-And yet, how sure are you that you know what is meant by *function*?
+But, how sure are you that you know what is meant by *function*?
 
 ## What Is A Function?
 
