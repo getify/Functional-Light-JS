@@ -474,7 +474,7 @@ We could also have solved this with `partialRight(parseInt,10)`, which creates a
 
 ### One For One
 
-Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that simply takes one argument and does nothing but return it untouched. This is often referred to as the *identity* function.
+Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that takes one argument and does nothing but return it untouched. This is often referred to as the *identity* function.
 
 Consider:
 
@@ -509,7 +509,7 @@ calc1( 3 );				// 512
 calc2( 3 );				// 3
 ```
 
-For `calc1(..)`, the `identity(..)` function receives the initial `3` and simply returns it back, so it can be passed into `add1(..)` function. For `calc2(..)`, where the array was empty, the value `3` passes straight through unchanged because of `identity(..)`.
+For `calc1(..)`, the `identity(..)` function receives the initial `3` and returns it back, so it can be passed into `add1(..)` function. For `calc2(..)`, where the array was empty, the value `3` passes straight through unchanged because of `identity(..)`.
 
 ## No Points
 
@@ -530,7 +530,7 @@ function double(x) {
 // [2,4,6,8,10]
 ```
 
-Can you see that `mapper(..)` and `double(..)` have the same (or compatible, anyway) signatures? The parameter ("point") `v` can directly map to the corresponding argument in the `double(..)` call. As such, the `mapper(..)` function wrapper is unnecessary. Let's simply with point-free style:
+Can you see that `mapper(..)` and `double(..)` have the same (or compatible, anyway) signatures? The parameter ("point") `v` can directly map to the corresponding argument in the `double(..)` call. As such, the `mapper(..)` function wrapper is unnecessary. Let's simplify with point-free style:
 
 ```js
 function double(x) {
@@ -691,7 +691,7 @@ function compose(...fns) {
 }
 ```
 
-`outputPersonName(..)` needs to be a function that takes a (object) value, passes it into `extractName(..)`, then passes that value to `output(..)`. Look again at that visual flow of data above to convince yourself that we can simply define it as:
+`outputPersonName(..)` needs to be a function that takes a (object) value, passes it into `extractName(..)`, then passes that value to `output(..)`. Look again at that visual flow of data above to convince yourself that we can define it as:
 
 ```
 var outputPersonName = compose( output, extractName );
