@@ -678,7 +678,7 @@ compose:
 finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```
 
-I know this may not make much sense right now, especially the right-to-left ordering, but just trust me for now. Here's one way to implement `compose(..)` using a loop and a running `result`:
+I know this may not make much sense, especially the right-to-left ordering, but just trust me for now. Here's one way to implement `compose(..)` using a loop and a running `result`:
 
 ```js
 function compose(...fns) {
@@ -691,7 +691,7 @@ function compose(...fns) {
 }
 ```
 
-`outputPersonName(..)` needs to be a function that takes a (object) value, passes it into `extractName(..)`, then passes that value to `output(..)`. Look again at that visual flow of data above to convince yourself that we can define it as:
+`outputPersonName(..)` needs to be a function that takes an (object) value, passes it into `extractName(..)`, then passes that value to `output(..)`. Look again at that visual flow of data above to convince yourself that we can define that as:
 
 ```
 var outputPersonName = compose( output, extractName );
@@ -713,13 +713,13 @@ getLastOrder( function orderFound(order){
 
 Phew, we're making good progress!
 
-Let's keep going and remove the `order` "point". The next step is to observe that `personId` can be extracted from `order` via `prop(..)`, just like we did with `name` on the `person` object:
+Let's keep going and remove the `order` "point". The next step is to observe that `personId` can be extracted from an object (like `order`) via `prop(..)`, just like we did with `name` on the `person` object:
 
 ```js
 var extractPersonId = partial( prop, "personId" );
 ```
 
-To construct the `{ id: .. }` object that needs to be passed to `processPerson(..)`, let's make another utility for wrapping a value in an object at a specified property name, kind of like the opposite of `prop(..)`. I'll call this utility `setProp(..)`:
+To construct the `{ id: .. }` object that needs to be passed to `processPerson(..)`, let's make another utility for wrapping a value in an object at a specified property name -- this is kind of like the opposite of `prop(..)`. I'll call this utility `setProp(..)`:
 
 ```js
 function setProp(name,value) {
@@ -761,9 +761,9 @@ getLastOrder( lookupPerson );
 
 Wow. Point-free.
 
-I think in this case, even though the steps to derive our final answer were a bit drawn out, the end result is quite a bit more readable code, because we've ended up explicitly calling out each step.
+I think in this case, even though the steps to derive our final answer were a bit drawn out, the end result is much more readable code, because we've ended up explicitly calling out each step.
 
-And even if you didn't like seeing/naming all those intermediate steps, you can preserve point-free but wire all those intermediate expressions together without any individual variables:
+And even if you didn't like seeing/naming all those intermediate steps, you can preserve point-free but wire the expressions together without individual variables:
 
 ```js
 partial( ajax, "http://some.api/order", { id: -1 } )
@@ -779,7 +779,7 @@ partial( ajax, "http://some.api/order", { id: -1 } )
 );
 ```
 
-Neat tricks, but I think it's less readable than the previous snippet with each operation as its own variable.
+Neat tricks for sure. But I think it's less readable than the previous snippet with each operation as its own variable.
 
 What do you think? Points or no points for you?
 
@@ -791,4 +791,4 @@ Currying is a special form of partial application where the arity is reduced to 
 
 Other important operations like `unary(..)`, `identity(..)`, and `prop(..)` are part of the base toolbox for FP.
 
-Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making simpler and easier to read code.
+Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making easier to read/understand code.
