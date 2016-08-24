@@ -14,6 +14,8 @@ function compose(...fns) {
 }
 ```
 
+// TODO: use reverse() and array destructuring here
+
 ```js
 function compose(...fns) {
 	if (fns.length == 2) {
@@ -32,3 +34,5 @@ function compose(...fns) {
 	}
 }
 ```
+
+// TODO: implement with `reduce(..)`
