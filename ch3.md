@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Chapter 3: Managing Function Inputs
 
-In Chapter 1 "Function Inputs", we talked about the basics of function parameters and arguments. We even looked at some syntactic tricks for easing their use such as the `...` operator and destructuring.
+In "Function Inputs" in Chapter 2, we talked about the basics of function parameters and arguments. We even looked at some syntactic tricks for easing their use such as the `...` operator and destructuring.
 
 I recommended in that first chapter that you try to design functions with a single parameter if at all possible. The fact is, this won't always be possible, and you won't always be in control of function signatures that you need to work with.
 
