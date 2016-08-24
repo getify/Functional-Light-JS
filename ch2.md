@@ -193,9 +193,15 @@ Recall that the signature for our Ajax function is: `ajax( url, data, cb )`. Wha
 ```js
 function reverseArgs(fn) {
 	return function argsReversed(...args) {
-		fn( ...args.reverse() );
+		return fn( ...args.reverse() );
 	};
 }
+
+// or the ES6 => arrow form
+var reverseArgs =
+	fn =>
+		(...args) =>
+			fn( ...args.reverse() );
 ```
 
 Now we can reverse the order of the `ajax(..)` arguments, so that we can then partially apply from the right rather than the left. To restore the expected order, we'll then reverse the partially applied function:
@@ -477,7 +483,7 @@ function identity(v) {
 	return v;
 }
 
-// ES6 => form:
+// or the ES6 => arrow form
 var identity = v => v;
 ```
 
