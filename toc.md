@@ -4,19 +4,20 @@
 
 * Foreword
 * Preface
-* Chapter 1: Functional Functions
+* Chapter 1: Why Functional Programming?
+* Chapter 2: Functional Functions
 	* What Is A Function?
 	* Function Input
 	* Function Output
 	* Functions Of Functions
 	* Syntax
 	* What's This?
-* Chapter 2: Managing Function Inputs
+* Chapter 3: Managing Function Inputs
 	* Some Now, Some Later
 	* One At A Time
 	* All For One
 	* No Points
-* Chapter 3: Reducing Side Effects
+* Chapter 4: Reducing Side Effects
 	* TODO
-* Chapter 4: Composing Functions
+* Chapter 5: Composing Functions
 	* TODO

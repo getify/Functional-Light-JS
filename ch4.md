@@ -1,5 +1,5 @@
 # Functional-Light JavaScript
-# Chapter 4: Composing Functions
+# Chapter 5: Composing Functions
 
 // TODO:
 

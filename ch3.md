@@ -1,4 +1,4 @@
 # Functional-Light JavaScript
-# Chapter 3: Reducing Side Effects
+# Chapter 4: Reducing Side Effects
 
 // TODO
