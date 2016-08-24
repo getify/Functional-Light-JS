@@ -909,7 +909,111 @@ I think most FPers are going to blink and wave off the concerns I've just presen
 
 ## What's This?
 
-// TODO: cover how FP typically avoids `this`-aware functions and why
+If you're not familiar with the `this` binding rules in JavaScript, I recommend you check out my "You Don't Know JS: this & Object Prototypes" book. For the purposes of this section, I'll assume you know how `this` gets determined for a function call (one of the four rules). But even if you're still fuzzy on *this*, the good news is we're going to conclude that you shouldn't be using `this` if you're trying to do FP.
+
+JavaScript `function`s have a `this` keyword that's automatically bound per function call. There's lots of ways to describe what it's for, but I prefer to say it provides an object context for the function to run against.
+
+`this` is an implicit parameter input for your function.
+
+Consider:
+
+```js
+function sum() {
+	return this.x + this.y;
+}
+
+var context = {
+	x: 1,
+	y: 2
+};
+
+sum.call( context );		// 3
+
+context.sum = sum;
+context.sum();				// 3
+
+var s = sum.bind( context );
+s();						// 3
+```
+
+Of course, if `this` can be input into a function implicitly, the same object context could be sent in as an explicit argument:
+
+```js
+function sum(ctx) {
+	return ctx.x + ctx.y;
+}
+
+var context = {
+	x: 1,
+	y: 2
+};
+
+sum( context );
+```
+
+Simpler. And this kind of code will be a lot easier to deal with in FP. It's much easier to wire multiple functions together, or use any of the other input wrangling techniques we will get into in the next chapter, when inputs are always explicit. Doing them with implicit inputs like `this` ranges from awkward to nearly-impossible depending on the scenario.
+
+There are other tricks we can leverage in a `this`-based system, like for example prototype-delegation (also covered in detail in the "this & Object Prototypes" book):
+
+```js
+var Auth = {
+	authorize() {
+		var credentials = this.username + ":" + this.password;
+		this.send( credentials, resp => {
+			if (resp.error) this.displayError( resp.error );
+			else this.displaySuccess();
+		} );
+	},
+	send(..) {
+		// ..
+	}
+};
+
+var Login = Object.assign( Object.create( Auth ), {
+	doLogin(user,pw) {
+		this.username = user;
+		this.password = pw;
+		this.authorize();
+	},
+	displayError(err) {
+		// ..
+	},
+	displaySuccess() {
+		// ..
+	}
+} );
+
+Login.doLogin( "fred", "123456" );
+```
+
+In case you're having trouble parsing what this code does: we have two separate objects `Login` and `Auth`, where `Login` performs prototype-delegation to `Auth`. Through delegation and the implicit `this` context sharing, these two objects virtually compose during the `this.authorize()` function call, so that properties/methods on `this` are dynamically shared with the `Auth.authorize(..)` function.
+
+There's a few reasons why *this* code doesn't fit with various principles of FP, but one of the obvious hitches is the implicit `this` sharing. We could be more explicit about it and keep code that was easier to push in the FP direction:
+
+```js
+// ..
+
+authorize(ctx) {
+	var credentials = ctx.username + ":" + ctx.password;
+	Auth.send( credentials, function onResp(resp) {
+		if (resp.error) ctx.displayError( resp.error );
+		else ctx.displaySuccess();
+	} );
+}
+
+// ..
+
+doLogin(user,pw) {
+	Auth.authorize( {
+		username: user,
+		password: pw
+	} );
+}
+
+// ..
+```
+
+From my perspective, the problem is not with using objects to organize behavior. It's that we're trying to use implicit input instead of being explicit about it. When I'm wearing my FP hat, I want to leave `this` stuff on the shelf.
 
 ## Summary
 
@@ -920,3 +1024,5 @@ But let's be clear what a function is. It's not just a collection of statements/
 Functions inside of functions can have closure over outer variables and remember them for later. This is one of the most important concepts in all of programming, and a fundamental foundation of FP.
 
 Be careful of anonymous functions, especially `=>` arrow functions. They're convenient to write, but they shift the cost from author to reader. The whole reason we're studying FP here is to write more readable code, so don't be so quick to jump on that bandwagon.
+
+Don't use `this`-aware functions. Just don't.
