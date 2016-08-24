@@ -565,9 +565,68 @@ As a matter of fact, not only can we achieve point-free with `unary(..)` here, w
 
 The key thing to look for is if you have a function with parameter(s) that is/are directly passed to an inner function call. In both the above examples, `mapper(..)` had the `v` parameter that was passed along to another function call. We were able to replace that layer of abstraction with a point-free expression using various FP operations like `unary(..)` and `partialRight(..)`.
 
+Here's another example:
+
+```js
+function printIf( msg, predicate ) {
+	if (predicate( msg )) {
+		console.log( msg );
+	}
+}
+
+function isShortEnough(str) {
+	return str.length <= 5;
+}
+
+var msg1 = "Hello";
+var msg2 = msg1 + " World";
+
+printIf( msg1, isShortEnough );			// Hello
+printIf( msg2, isShortEnough );
+```
+
+Now let's say you want to print a message only if it's long enough; in other words, if it's `!isShortEnough(..)`. Your first thought is probably this:
+
+```js
+function isLongEnough(str) {
+	return !isShortEnough( str );
+}
+
+printIf( msg1, isLongEnough );
+printIf( msg2, isLongEnough );			// Hello World
+```
+
+Easy enough... but "points" now! See how `str` is passed through? Without re-implementing the `str.length` check, can we refactor this code to point-free style?
+
+Let's define a `not(..)` negation operator:
+
+```js
+function not(predicate) {
+	return function negated(...args) {
+		return !predicate( ...args );
+	};
+}
+
+// or the ES6 => arrow form
+var not =
+	predicate =>
+		(...args) =>
+			!predicate( ...args );
+```
+
+Now let's use `not(..)` to alternately define `isLongEnough(..)` without "points":
+
+```js
+var isLongEnough = not( isShortEnough );
+
+printIf( msg2, isLongEnough );			// Hello World
+```
+
+Hopefully the FP practice of point-free coding is starting to make a little more sense. It'll take a lot of practice to train yourself to think this way naturally.
+
 ### Wrangling Points
 
-Let's practice with a scenario that's a fair bit more complex:
+Let's try a scenario that's a fair bit more complex:
 
 ```js
 var getPerson = partial( ajax, "http://some.api/person" );
