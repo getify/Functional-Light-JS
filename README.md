@@ -1,10 +1,10 @@
 # Functional-Light JavaScript (book)
 
-This book explores the core principles of functional programming (FP) that can be applied to JavaScript. But what makes this book different is that we approach these principles without all the heavy terminology. We look at the subset of FP that I call "Functional-Light Programming" (FlP) and apply it to JS.
+This book explores the core principles of functional programming (FP) that can be applied to JavaScript. But what makes this book different is that we approach these principles without all the heavy terminology. We look at the subset of FP that I call "Functional-Light Programming" (FLP) and apply it to JS.
 
 Let's face it: unless you're already a member of the FP cool kids club (I'm not!), a statement like, "a monad is just a monoid in the category of endofunctors", just doesn't mean anything useful to us.
 
-That's not to say the terms are meaning*less* or that FPrs are bad for using them. Once you graduate from Functional-Light, you'll probably want to study FP more formally, and you'll bathe in the depths of those terms.
+That's not to say the terms are meaning*less* or that FPrs are bad for using them. Once you graduate from Functional-Light, you'll probably want to study FP more formally, and you'll swim in the depths of those terms.
 
 But I want you to be able to apply some of the fundamentals of FP to your JavaScript *now*, because I believe it will help you write better, more *reason*able code.
 
