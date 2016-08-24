@@ -186,6 +186,50 @@ var getPerson = ajax.bind( null, "http://some.api/person" );
 
 That `null` just bugs me to no end.
 
+### Reversing Arguments
+
+Recall that the signature for our Ajax function is: `ajax( url, data, cb )`. What if we wanted to partially apply the `cb` but wait to specify `data` and `url` later? We could create a utility that wraps a function to reverse its argument order:
+
+```js
+function reverseArgs(fn) {
+	return function argsReversed(...args) {
+		fn( ...args.reverse() );
+	};
+}
+```
+
+Now we can reverse the order of the `ajax(..)` arguments, so that we can then partially apply from the right rather than the left. To restore the expected order, we'll then reverse the partially applied function:
+
+```js
+var cache = {};
+
+var cacheResult = reverseArgs(
+	partial( reverseArgs( ajax ), function onResult(obj){
+		cache[obj.id] = obj;
+	} )
+);
+
+// later:
+cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
+```
+
+Now, we can define a `partialRight(..)` which partially applies from the right, using this same reverse-partial apply-reverse trick:
+
+```js
+function partialRight( fn, ...args ) {
+	return reverseArgs(
+		partial( reverseArgs( fn ), ...args )
+	);
+}
+
+var cacheResult = partialRight( ajax, function onResult(obj){
+	cache[obj.id] = obj;
+});
+
+// later:
+cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
+```
+
 ## One At A Time
 
 There's a special form of partial application where a function that expects multiple arguments is broken down into successive functions that each take a single argument (arity: 1) and return another function to accept the next argument.
