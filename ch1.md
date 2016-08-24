@@ -396,7 +396,7 @@ console.log( x + y );
 
 Structuring the multiple values into an array (or object) and subsequently destructuring those values back into distinct assignments is a way to transparently handle multiple outputs for a function.
 
-**Tip:** I'd be remiss if I didn't suggest you take a moment to consider if a function needing multiple outputs could be refactored to avoid that, perhaps separated into two or more smaller functions? Sometimes that will be possible, sometimes not; you should at least consider it.
+**Tip:** I'd be remiss if I didn't suggest you take a moment to consider if a function needing multiple outputs could be refactored to avoid that, perhaps separated into two or more smaller functions? Sometimes that will be possible, sometimes not; you should at least consider it. You might also want to use generators in such cases.
 
 ### Early Returns
 
