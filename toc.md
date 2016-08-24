@@ -16,3 +16,5 @@
 	* One At A Time
 	* All For One
 	* No Points
+* Chapter 3: Composing Functions
+	* TODO

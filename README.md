@@ -18,7 +18,8 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 * [Preface](preface.md)
 * [Chapter 1: Functional Functions](ch1.md)
 * [Chapter 2: Managing Function Inputs](ch2.md)
-* Chapter 3: TODO
+* [Chapter 3: Composing Functions](ch3.md)
+* Chapter 4: TODO
 
 ## Publishing
 
