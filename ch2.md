@@ -449,6 +449,23 @@ var adder = looseCurry( sum, 2 );
 // [4,5,6,7,8]
 ```
 
+Another commonly cited example using `unary(..)` is:
+
+```js
+["1","2","3"].map( parseFloat );
+// [1,2,3]
+
+["1","2","3"].map( parseInt );
+// [1,NaN,NaN]
+
+["1","2","3"].map( unary( parseInt ) );
+// [1,2,3]
+```
+
+For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an index in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore this `index` argument.
+
+We could also have solved this with `partialRight(parseInt,10)`, which also creates a unary function where the `radix` argument has already been preset to `10`.
+
 ### One For One
 
 Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that simply takes one argument and does nothing but return it untouched. This is often referred to as the *identity* function.
