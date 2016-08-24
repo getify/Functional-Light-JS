@@ -470,7 +470,7 @@ Another commonly cited example using `unary(..)` is:
 
 For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an index in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore this `index` argument.
 
-We could also have solved this with `partialRight(parseInt,10)`, which also creates a unary function where the `radix` argument has already been preset to `10`.
+We could also have solved this with `partialRight(parseInt,10)`, which creates a unary function where the `radix` argument has already been preset to `10`.
 
 ### One For One
 
@@ -513,7 +513,216 @@ For `calc1(..)`, the `identity(..)` function receives the initial `3` and simply
 
 ## No Points
 
-// TODO: discuss point-free style
+There's a popular style of coding in the FP realm that aims to reduce some of the visual clutter by removing unnecessary parameter-argument mapping. This style is formally called tacit programming, or more commonly: point-free style. The term "point" here is referring to a function's parameter.
+
+**Warning:** Stop for a moment. Let's make sure we're careful not to take this discussion as an unbounded suggestion that you go overboard trying to be point-free in your FP code at all costs. This should be a technique for improving readability, when used in moderation. But as with most things in software development, you can definitely abuse it. If your code gets harder to understand because of the hoops you have to jump through to be point-free, stop. You won't win a blue ribbon just because you found some clever but esoteric way to remove another "point" from your code.
+
+Let's start with a simple example:
+
+```js
+function double(x) {
+	return x * 2;
+}
+
+[1,2,3,4,5].map( function mapper(v){
+	return double( v );
+} );
+// [2,4,6,8,10]
+```
+
+Can you see that `mapper(..)` and `double(..)` have the same (or compatible, anyway) signatures? The parameter ("point") `v` can directly map to the corresponding argument in the `double(..)` call. As such, the `mapper(..)` function wrapper is unnecessary. Let's simply with point-free style:
+
+```js
+function double(x) {
+	return x * 2;
+}
+
+[1,2,3,4,5].map( double );
+// [2,4,6,8,10]
+```
+
+Let's revisit an example from earlier:
+
+```js
+["1","2","3"].map( function mapper(v){
+	return parseInt( v );
+} );
+// [1,2,3]
+```
+
+In this example, `mapper(..)` is actually serving an important purpose, which is to discard the `index` argument that `map(..)` would pass in, because `parseInt(..)` would incorrectly interpret that value as a `radix` for the parsing. This was an example where `unary(..)` helps us out.
+
+As a matter of fact, not only can we achieve point-free with `unary(..)` here, we can alternately do so with the `partialRight(..)` utility:
+
+```js
+["1","2","3"].map( unary( parseInt ) );
+// [1,2,3]
+
+// or
+
+["1","2","3"].map( partialRight( parseInt, 10 ) );
+```
+
+The key thing to look for is if you have a function with parameter(s) that is/are directly passed to an inner function call. In both the above examples, `mapper(..)` had the `v` parameter that was passed along to another function call. We were able to replace that layer of abstraction with a point-free expression using various FP operations like `unary(..)` and `partialRight(..)`.
+
+### Wrangling Points
+
+Let's practice with a scenario that's a fair bit more complex:
+
+```js
+var getPerson = partial( ajax, "http://some.api/person" );
+var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
+
+getLastOrder( function orderFound(order){
+	getPerson( { id: order.personId }, function personFound(person){
+		output( person.name );
+	} );
+} );
+```
+
+The "points" we'd like to remove are the `order` and `person` parameter references.
+
+Let's start by trying to get the `person` "point" out of the `personFound(..)` function. To do so, let's first to define:
+
+```js
+function extractName(person) {
+	return person.name;
+}
+```
+
+But let's observe that this operation could instead be expressed in generic terms: extracting any property by name off of any object. Let's call such a utility `prop(..)`:
+
+```js
+function prop(name,obj) {
+	return obj[name];
+}
+
+var extractName = partial( prop, "name" );
+```
+
+**Note:** Don't miss that `extractName(..)` here hasn't actually extracted anything yet. We partially applied `prop(..)` to make a function that's waiting to extract the `"name"` property from whatever object we pass into it. We could also have specified `curry(prop)("name")`.
+
+Next, let's reduce our example's nested lookup calls to this:
+
+```js
+getLastOrder( function orderFound(order){
+	getPerson( { id: order.personId }, outputPersonName );
+} );
+```
+
+How can we define `outputPersonName(..)`?
+
+To do so, let's briefly introduce a utility called `compose(..)`; we'll come back to composition in much more detail later in the text. To visualize how it works, think about a flow of data through a series of unary functions that each take an input and return an output:
+
+```
+compose:
+finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
+```
+
+I know this may not make much sense right now, especially the right-to-left ordering, but just trust me for now. Here's one way to implement `compose(..)` using a loop and a running `result`:
+
+```js
+function compose(...fns) {
+	return function composed(result) {
+		while (fns.length > 0) {
+			result = fns.pop()( result );
+		}
+		return result;
+	};
+}
+```
+
+`outputPersonName(..)` needs to be a function that takes a (object) value, passes it into `extractName(..)`, then passes that value to `output(..)`. Look again at that visual flow of data above to convince yourself that we can simply define it as:
+
+```
+var outputPersonName = compose( output, extractName );
+```
+
+Put this together with the `getPerson(..)` call, using `partialRight(..)`:
+
+```js
+var processPerson = partialRight( getPerson, outputPersonName );
+```
+
+Now, let's reconstruct the nested lookups example:
+
+```js
+getLastOrder( function orderFound(order){
+	processPerson( { id: order.personId } );
+} );
+```
+
+Phew, we're making good progress!
+
+Let's keep going and remove the `order` "point". The next step is to observe that `personId` can be extracted from `order` via `prop(..)`, just like we did with `name` on the `person` object:
+
+```js
+var extractPersonId = partial( prop, "personId" );
+```
+
+To construct the `{ id: .. }` object that needs to be passed to `processPerson(..)`, let's make another utility for wrapping a value in an object at a specified property name, kind of like the opposite of `prop(..)`. I'll call this utility `setProp(..)`:
+
+```js
+function setProp(name,value) {
+	return {
+		[name]: value
+	};
+}
+
+var personData = partial( setProp, "id" );
+```
+
+To perform the lookup of a person from an `order` value, the conceptual flow of data through operations we need is:
+
+```
+processPerson <-- personData <-- extractPersonId <-- order
+```
+
+Just use `compose(..)` again:
+
+```js
+var lookupPerson = compose( processPerson, personData, extractPersonId );
+```
+
+And... that's it! Putting the whole example back together without any "points":
+
+```js
+var getPerson = partial( ajax, "http://some.api/person" );
+var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
+
+var extractName = partial( prop, "name" );
+var outputPersonName = compose( output, extractName );
+var processPerson = partialRight( getPerson, outputPersonName );
+var personData = partial( setProp, "id" );
+var extractPersonId = partial( prop, "personId" );
+var lookupPerson = compose( processPerson, personData, extractPersonId );
+
+getLastOrder( lookupPerson );
+```
+
+Wow. Point-free.
+
+I think in this case, even though the steps to derive our final answer were a bit drawn out, the end result is quite a bit more readable code, because we've ended up explicitly calling out each step.
+
+And even if you didn't like seeing/naming all those intermediate steps, you can preserve point-free but wire all those intermediate expressions together without any individual variables:
+
+```js
+partial( ajax, "http://some.api/order", { id: -1 } )
+(
+	compose(
+		partialRight(
+			partial( ajax, "http://some.api/person" ),
+			compose( output, partial( prop, "name" ) )
+		),
+		partial( setProp, "id" ),
+		partial( prop, "personId" )
+	)
+);
+```
+
+Neat tricks, but I think it's less readable than the previous snippet with each operation as its own variable.
+
+What do you think? Points or no points for you?
 
 ## Summary
 
@@ -521,4 +730,6 @@ Partial Application is a technique for reducing the arity -- expected number of 
 
 Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments.
 
-Operations like `unary(..)` and `identity(..)` are part of the base toolbox in FP.
+Other important operations like `unary(..)`, `identity(..)`, and `prop(..)` are part of the base toolbox for FP.
+
+Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making simpler and easier to read code.
