@@ -526,7 +526,7 @@ function forEach(list,fn) {
 	}
 }
 
-forEach( [1,2,3,4,5], function(val){
+forEach( [1,2,3,4,5], function each(val){
 	console.log( val );
 } );
 // 1 2 3 4 5
@@ -538,7 +538,7 @@ A higher-order function can also output another function, like:
 
 ```js
 function foo() {
-	var fn = function(msg){
+	var fn = function inner(msg){
 		console.log( msg );
 	};
 
@@ -554,7 +554,7 @@ f( "Hello!" );			// Hello!
 
 ```js
 function foo() {
-	var fn = function(msg){
+	var fn = function inner(msg){
 		console.log( msg );
 	};
 
@@ -578,7 +578,7 @@ Consider:
 
 ```js
 function foo(msg) {
-	var fn = function(){
+	var fn = function inner(){
 		console.log( msg );
 	};
 
@@ -600,7 +600,7 @@ Let's look at a few more examples of closure in action:
 function person(id) {
 	var randNumber = Math.random();
 
-	return function identify() {
+	return function identify(){
 		console.log( "I am " + id + ": " + randNumber );
 	};
 }
@@ -620,7 +620,7 @@ The access that closure enables is not restricted to only reading the variable's
 function runningCounter(start) {
 	var val = start;
 
-	return function current(increment = 1) {
+	return function current(increment = 1){
 		val = val + increment;
 		return val;
 	};
@@ -663,16 +663,16 @@ Of course, since functions are just values in JS, we can just as easily remember
 
 ```js
 function formatter(formatFn) {
-	return function(str) {
+	return function inner(str){
 		return formatFn( str );
 	};
 }
 
-var lower = formatter( function(v){
+var lower = formatter( function formatting(v){
 	return v.toLowerCase();
 } );
 
-var upperFirst = formatter( function(v){
+var upperFirst = formatter( function formatting(v){
 	return v[0].toUpperCase() + v.substr( 1 ).toLowerCase();
 } );
 
@@ -981,7 +981,7 @@ There's a few reasons why *this* code doesn't fit with various principles of FP,
 
 authorize(ctx) {
 	var credentials = ctx.username + ":" + ctx.password;
-	Auth.send( credentials, function onResp(resp) {
+	Auth.send( credentials, function onResp(resp){
 		if (resp.error) ctx.displayError( resp.error );
 		else ctx.displaySuccess();
 	} );
