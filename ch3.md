@@ -238,11 +238,19 @@ cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 
 ## One At A Time
 
-There's a special form of partial application where a function that expects multiple arguments is broken down into successive functions that each take a single argument (arity: 1) and return another function to accept the next argument.
+There's a technique similar to partial application, where a function that expects multiple arguments is broken down into successive chained functions that each take a single argument (arity: 1) and return another function to accept the next argument.
 
 This technique is called currying.
 
 To illustrate, let's imagine we had a curried version of `ajax(..)` already created. This is how we'd use it:
+
+```js
+curriedAjax( "http://some.api/person" )
+	( { user: CURRENT_USER_ID } )
+		( function foundUser(user){ /* .. */ } );
+```
+
+Perhaps splitting out each call helps understand what's going on better:
 
 ```js
 var curriedGetPerson = curriedAjax( "http://some.api/person" );
@@ -252,7 +260,9 @@ var curriedGetCurrentUser = curriedGetPerson( { user: CURRENT_USER_ID } );
 curriedGetCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
-Actually, that doesn't look too terribly different from what we saw earlier in the partial application discussion. That's what I meant by saying that currying is a special case of partial application.
+Instead of taking all the arguments at once (`ajax(..)`), or some of the arguments up-front (`partial(..)`) and some later, the `curriedAjax(..)` function gets one argument at a time, each in a separate function call.
+
+Currying is similar to partial application in that each successive curried call sort of partially applies another argument to the original function, until all arguments have been passed.
 
 The main difference is that `curriedAjax(..)` will explicitly return a function (we call `curriedGetPerson(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
 
