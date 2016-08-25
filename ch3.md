@@ -55,7 +55,7 @@ Let's invent a `partial(..)` utility:
 
 ```js
 function partial(fn,...presetArgs) {
-	return function partiallyApplied(...laterArgs) {
+	return function partiallyApplied(...laterArgs){
 		return fn( ...presetArgs, ...laterArgs );
 	};
 }
@@ -132,7 +132,7 @@ var getCurrentUser = function partiallyApplied(...laterArgs) {
 
 // version 2
 var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs) {
-	var getPerson = function innerPartiallyApplied(...innerLaterArgs) {
+	var getPerson = function innerPartiallyApplied(...innerLaterArgs){
 		return ajax( "http://some.api/person", ...innerLaterArgs );
 	};
 
@@ -192,7 +192,7 @@ Recall that the signature for our Ajax function is: `ajax( url, data, cb )`. Wha
 
 ```js
 function reverseArgs(fn) {
-	return function argsReversed(...args) {
+	return function argsReversed(...args){
 		return fn( ...args.reverse() );
 	};
 }
@@ -264,8 +264,8 @@ How might we define a utility to do this currying? We're going to use some trick
 
 ```js
 function curry(fn,arity = fn.length) {
-	return (function nextCurried(prevArgs) {
-		return function curried(nextArg) {
+	return (function nextCurried(prevArgs){
+		return function curried(nextArg){
 			var args = prevArgs.concat( nextArg );
 
 			if (args.length >= arity) {
@@ -397,12 +397,12 @@ There's a slight syntax savings of fewer `( )`, and an implied performance benef
 
 **Note:** The loose currying *does* give you the ability to send in more arguments than the arity (detected or specified). If you designed your function with optional/variadic arguments, that could be a benefit. For example, if you curry five arguments, looser currying still allows more than five arguments (`curriedSum(1)(2,3,4)(5,6)`), but narrower currying wouldn't support `curriedSum(1)(2)(3)(4)(5)(6)`.
 
-It's easy to adapt our previous currying implementation to this common looser definition:
+We can adapt our previous currying implementation to this common looser definition:
 
 ```js
 function looseCurry(fn,arity = fn.length) {
-	return (function nextCurried(prevArgs) {
-		return function curried(...nextArgs) {
+	return (function nextCurried(prevArgs){
+		return function curried(...nextArgs){
 			var args = prevArgs.concat( nextArgs );
 
 			if (args.length >= arity) {
@@ -418,6 +418,57 @@ function looseCurry(fn,arity = fn.length) {
 
 Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave it as an exercise for the interested reader to define the ES6 `=>` version of `looseCurry(..)` similar to how we did it for `curry(..)` earlier.
 
+### No Curry For Me, Please
+
+It may also be the case that you have a curried function that you'd like to sort of un-curry -- basically, to turn a function like `f(1)(2)(3)` back into a function like `g(1,2,3)`.
+
+There's a standard utility for this, (un)shockingly called `uncurry(..)`:
+
+```js
+function uncurry(fn) {
+	return function uncurried(...args){
+		var ret = fn;
+		for (let i = 0; i < args.length; i++) {
+			ret = ret( args[i] );
+		}
+		return ret;
+	};
+}
+
+// or the ES6 => arrow form
+var uncurry =
+	fn =>
+		(...args) => {
+			var ret = fn;
+			for (let i = 0; i < args.length; i++) {
+				ret = ret( args[i] );
+			}
+			return ret;
+		};
+```
+
+**Warning:** Don't just assume that `uncurry(curry(f))` has the same behavior as `f`. The uncurried function acts (mostly) the same as the original function if you pass as many arguments to it as the original function expected. However, if you pass fewer arguments, you still get back a partially curried function waiting for more arguments; this quirk is illustrated in the next snippet.
+
+```js
+function sum(...args) {
+	var sum = 0;
+	for (var i = 0; i < args.length; i++) {
+		sum += args[i];
+	}
+	return sum;
+}
+
+var curriedSum = curry( sum, 5 );
+var uncurriedSum = uncurry( curriedSum );
+
+curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
+
+uncurriedSum( 1, 2, 3, 4, 5 );				// 15
+uncurriedSum( 1, 2, 3 )( 4 )( 5 );			// 15
+```
+
+Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a curried function that comes out as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
+
 ## All For One
 
 Imagine you're passing a function to a utility where it will send multiple arguments to your function. But you may only want to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
@@ -426,7 +477,7 @@ We can design a simple utility that wraps a function call to ensure only one arg
 
 ```js
 function unary(fn) {
-	return function onlyOneArg(arg) {
+	return function onlyOneArg(arg){
 		return fn( arg );
 	};
 }
@@ -439,7 +490,7 @@ We saw the `map(..)` utility eariler. It calls the provided mapping function wit
 
 ```js
 function unary(fn) {
-	return function onlyOneArg(arg) {
+	return function onlyOneArg(arg){
 		return fn( arg );
 	};
 }
@@ -490,8 +541,8 @@ var identity = v => v;
 We haven't talked about function composition, or `reduce(..)`, yet (I promise, we will!), but a place where `identity(..)` can be useful is when you need an initial value for function composition via a reduction:
 
 ```js
-function composeLeft(fn1,fn2){
-	return function composed(v) {
+function composeLeft(fn1,fn2) {
+	return function composed(v){
 		return fn2( fn1( v ) );
 	};
 }
@@ -602,7 +653,7 @@ Let's define a `not(..)` negation operator:
 
 ```js
 function not(predicate) {
-	return function negated(...args) {
+	return function negated(...args){
 		return !predicate( ...args );
 	};
 }
@@ -614,7 +665,7 @@ var not =
 			!predicate( ...args );
 ```
 
-Now let's use `not(..)` to alternately define `isLongEnough(..)` without "points":
+Next, let's use `not(..)` to alternately define `isLongEnough(..)` without "points":
 
 ```js
 var isLongEnough = not( isShortEnough );
@@ -622,173 +673,81 @@ var isLongEnough = not( isShortEnough );
 printIf( msg2, isLongEnough );			// Hello World
 ```
 
-Hopefully the FP practice of point-free coding is starting to make a little more sense. It'll take a lot of practice to train yourself to think this way naturally.
+That's pretty good, isn't it? But we *could* keep going. The definition of the `printIf(..)` function can actually be refactored to be point-free itself.
 
-### Wrangling Points
-
-Let's try a scenario that's a fair bit more complex:
+We can express the `if` conditional part with a `when(..)` utility:
 
 ```js
-var getPerson = partial( ajax, "http://some.api/person" );
-var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
-
-getLastOrder( function orderFound(order){
-	getPerson( { id: order.personId }, function personFound(person){
-		output( person.name );
-	} );
-} );
-```
-
-The "points" we'd like to remove are the `order` and `person` parameter references.
-
-Let's start by trying to get the `person` "point" out of the `personFound(..)` function. To do so, let's first to define:
-
-```js
-function extractName(person) {
-	return person.name;
-}
-```
-
-But let's observe that this operation could instead be expressed in generic terms: extracting any property by name off of any object. Let's call such a utility `prop(..)`:
-
-```js
-function prop(name,obj) {
-	return obj[name];
-}
-
-var extractName = partial( prop, "name" );
-```
-
-**Note:** Don't miss that `extractName(..)` here hasn't actually extracted anything yet. We partially applied `prop(..)` to make a function that's waiting to extract the `"name"` property from whatever object we pass into it. We could also have specified `curry(prop)("name")`.
-
-Next, let's reduce our example's nested lookup calls to this:
-
-```js
-getLastOrder( function orderFound(order){
-	getPerson( { id: order.personId }, outputPersonName );
-} );
-```
-
-How can we define `outputPersonName(..)`?
-
-To do so, let's briefly introduce a utility called `compose(..)`; we'll come back to composition in much more detail later in the text. To visualize how it works, think about a flow of data through a series of unary functions that each take an input and return an output:
-
-```
-compose:
-finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
-```
-
-I know this may not make much sense, especially the right-to-left ordering, but just trust me for now. Here's one way to implement `compose(..)` using a loop and a running `result`:
-
-```js
-function compose(...fns) {
-	return function composed(result) {
-		while (fns.length > 0) {
-			result = fns.pop()( result );
+function when(predicate,fn) {
+	return function conditional(...args){
+		if (predicate( ...args )) {
+			return fn( ...args );
 		}
-		return result;
-	};
-}
-```
-
-`outputPersonName(..)` needs to be a function that takes an (object) value, passes it into `extractName(..)`, then passes that value to `output(..)`. Look again at that visual flow of data above to convince yourself that we can define that as:
-
-```
-var outputPersonName = compose( output, extractName );
-```
-
-Put this together with the `getPerson(..)` call, using `partialRight(..)`:
-
-```js
-var processPerson = partialRight( getPerson, outputPersonName );
-```
-
-Now, let's reconstruct the nested lookups example:
-
-```js
-getLastOrder( function orderFound(order){
-	processPerson( { id: order.personId } );
-} );
-```
-
-Phew, we're making good progress!
-
-Let's keep going and remove the `order` "point". The next step is to observe that `personId` can be extracted from an object (like `order`) via `prop(..)`, just like we did with `name` on the `person` object:
-
-```js
-var extractPersonId = partial( prop, "personId" );
-```
-
-To construct the `{ id: .. }` object that needs to be passed to `processPerson(..)`, let's make another utility for wrapping a value in an object at a specified property name -- this is kind of like the opposite of `prop(..)`. I'll call this utility `setProp(..)`:
-
-```js
-function setProp(name,value) {
-	return {
-		[name]: value
 	};
 }
 
-var personData = partial( setProp, "id" );
+// or the ES6 => form
+var when =
+	(predicate,fn) =>
+		(...args) =>
+			predicate( ...args ) ? fn( ...args ) : undefined;
 ```
 
-To perform the lookup of a person from an `order` value, the conceptual flow of data through operations we need is:
-
-```
-processPerson <-- personData <-- extractPersonId <-- order
-```
-
-Just use `compose(..)` again:
+Let's mix `when(..)` with a few other helper utilities we've seen earlier in this chapter, to make the point-free `printIf(..)`:
 
 ```js
-var lookupPerson = compose( processPerson, personData, extractPersonId );
-```
+// convenience to avoid any potential binding issue
+// with trying to use `console.log` as a function
+function output(msg) {
+	console.log( msg );
+}
 
-And... that's it! Putting the whole example back together without any "points":
-
-```js
-var getPerson = partial( ajax, "http://some.api/person" );
-var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
-
-var extractName = partial( prop, "name" );
-var outputPersonName = compose( output, extractName );
-var processPerson = partialRight( getPerson, outputPersonName );
-var personData = partial( setProp, "id" );
-var extractPersonId = partial( prop, "personId" );
-var lookupPerson = compose( processPerson, personData, extractPersonId );
-
-getLastOrder( lookupPerson );
-```
-
-Wow. Point-free.
-
-I think in this case, even though the steps to derive our final answer were a bit drawn out, the end result is much more readable code, because we've ended up explicitly calling out each step.
-
-And even if you didn't like seeing/naming all those intermediate steps, you can preserve point-free but wire the expressions together without individual variables:
-
-```js
-partial( ajax, "http://some.api/order", { id: -1 } )
-(
-	compose(
-		partialRight(
-			partial( ajax, "http://some.api/person" ),
-			compose( output, partial( prop, "name" ) )
-		),
-		partial( setProp, "id" ),
-		partial( prop, "personId" )
-	)
+var printIf = reverseArgs(
+	uncurry( partialRight( when, output ) )
 );
 ```
 
-Neat tricks for sure. But I think it's less readable than the previous snippet with each operation as its own variable.
+Here's how we did it: we partially-right-applied the `output` method as the second (`action`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string. A chain of two functions like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `predicate` and `str` arguments together. Lastly, we reverse those arguments to get back to the original `printIf(str,predicate)` signature.
+
+Here's the whole example put back together (assuming various utilities we've already detailed in this chapter are present):
+
+```js
+function output(msg) {
+	console.log( msg );
+}
+
+function isShortEnough(str) {
+	return str.length <= 5;
+}
+
+var isLongEnough = not( isShortEnough );
+
+var printIf = reverseArgs(
+	uncurry( partialRight( when, output ) )
+);
+
+var msg1 = "Hello";
+var msg2 = msg1 + " World";
+
+printIf( msg1, isShortEnough );			// Hello
+printIf( msg2, isShortEnough );
+
+printIf( msg1, isLongEnough );
+printIf( msg2, isLongEnough );			// Hello World
+```
+
+Hopefully the FP practice of point-free style coding is starting to make a little more sense. It'll still take a lot of practice to train yourself to think this way naturally. **And you'll still have to make judgement calls** as to whether point-free coding is worth it, as well as what extent will benefit your code's readability.
 
 What do you think? Points or no points for you?
+
+**Note:** Still want more practice with point-free style coding? We'll revisit this technique in "Revisiting Points" in Chapter 4, combined with new-found knowledge of function composition.
 
 ## Summary
 
 Partial Application is a technique for reducing the arity -- expected number of arguments to a function -- by creating a new function where some of the arguments are preset.
 
-Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments.
+Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments. You can also undo a currying.
 
-Other important operations like `unary(..)`, `identity(..)`, and `prop(..)` are part of the base toolbox for FP.
+Other important operations like `unary(..)` and `identity(..)` are part of the base toolbox for FP.
 
 Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making easier to read/understand code.
