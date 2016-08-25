@@ -17,7 +17,7 @@
 	* One At A Time
 	* All For One
 	* No Points
-* Chapter 4: Reducing Side Effects
+* Chapter 4: Composing Functions
 	* TODO
-* Chapter 5: Composing Functions
+* Chapter 5: Reducing Side Effects
 	* TODO
