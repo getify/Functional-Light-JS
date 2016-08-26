@@ -533,11 +533,9 @@ For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an 
 
 We could also have solved this with `partialRight(parseInt,10)`, which creates a unary function where the `radix` argument has already been preset to `10`.
 
-### One For One
+### One On One
 
-Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that takes one argument and does nothing but return it untouched. This is often referred to as the *identity* function.
-
-Consider:
+Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that takes one argument and does nothing but return the value untouched:
 
 ```js
 function identity(v) {
@@ -548,29 +546,47 @@ function identity(v) {
 var identity = v => v;
 ```
 
-We haven't talked about function composition, or `reduce(..)`, yet (I promise, we will!), but a place where `identity(..)` can be useful is when you need an initial value for function composition via a reduction:
+This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
+
+For example, imagine you'd like split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (covered in detail later in the text) with `identity(..)` as the predicate:
 
 ```js
-function composeLeft(fn1,fn2) {
-	return function composed(v){
-		return fn2( fn1( v ) );
+var words = "   Now is the time for all...  ".split( /\s|\b/ );
+words;
+// ["","Now","is","the","time","for","all","...",""]
+
+words.filter( identity );
+// ["Now","is","the","time","for","all","..."]
+```
+
+Since `identity(..)` simply returns the value passed to it, JS coerces each value into either `true` or `false`, and that decides to keep or exclude each value in the final array.
+
+### Unchanging One
+
+Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function just returns the value. One such API is the `then(..)` method on JS Promises. Many claim that ES6 `=>` arrow functions are the "solution". But there's an FP utility that's perfectly suited for the task:
+
+```js
+function constant(v) {
+	return function value(){
+		return v;
 	};
 }
 
-var listOfOps = [
-	function add1(v) { return v + 1; },
-	function mul2(v) { return v * 2; },
-	function pow3(v) { return Math.pow( v, 3 ); }
-];
-
-var calc1 = listOfOps.reduce( composeLeft, identity );
-var calc2 = [].reduce( composeLeft, identity );
-
-calc1( 3 );				// 512
-calc2( 3 );				// 3
+// or the ES6 => form
+var constant = v => () => v;
 ```
 
-For `calc1(..)`, the `identity(..)` function receives the initial `3` and returns it back, so it can be passed into `add1(..)` function. For `calc2(..)`, where the array was empty, the value `3` passes straight through unchanged because of `identity(..)`.
+With this tidy little utility, we can solve our `then(..)` annoyance:
+
+```js
+p1.then( foo ).then( _=>p2 ).then( bar );
+
+// vs
+
+p1.then( foo ).then( constant( p2 ) ).then( bar );
+```
+
+**Warning:** Although the `_=>p2` arrow function is shorter than `constant(p2)`, resist the temptation to use it. The function is returning a value from outside of itself, which is worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
 
 ## No Points
 
@@ -758,6 +774,6 @@ Partial Application is a technique for reducing the arity -- expected number of 
 
 Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments. You can also undo a currying.
 
-Other important operations like `unary(..)` and `identity(..)` are part of the base toolbox for FP.
+Other important operations like `unary(..)`, `identity(..)`, and `constant(..)` are part of the base toolbox for FP.
 
 Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making easier to read/understand code.
