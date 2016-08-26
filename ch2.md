@@ -889,9 +889,9 @@ people.map( person =>
 
 The case for excitement over `=>` in the FP world is primarily that it follows almost exactly from the mathematical notation for functions, especially around FP languages like Haskell. The shape of `=>` arrow function syntax communicates mathematically.
 
-Digging even further, I'd suggest that the argument in favor of `=>` is that by using much lighter-weight syntax, we reduce the vidual boundaries between functions which helps let us use simple function expressions much like we'd use lazy expressions -- another favorite of the FPer.
+Digging even further, I'd suggest that the argument in favor of `=>` is that by using much lighter-weight syntax, we reduce the visual boundaries between functions which lets us use simple function expressions much like we'd use lazy expressions -- another favorite of the FPer.
 
-I think most FPers are going to blink and wave off the concerns I've just presented. They love anonymous functions and they love saving on syntax. But like I said before: you decide.
+I think most FPers are going to blink and wave off these concerns. They love anonymous functions and they love saving on syntax. But like I said before: you decide.
 
 ## What's This?
 
