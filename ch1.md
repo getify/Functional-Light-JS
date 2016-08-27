@@ -80,6 +80,7 @@ Some other blogs/authors/content you should check out:
 * [James A Forbes](https://james-forbes.com/)
 * [James Longster](https://github.com/jlongster)
 * [André Staltz](http://staltz.com/)
+* [Functional Programming Jargon](https://github.com/hemanth/functional-programming-jargon#functional-programming-jargon)
 
 ### Libraries
 
