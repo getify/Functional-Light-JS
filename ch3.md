@@ -645,9 +645,15 @@ The key thing to look for is if you have a function with parameter(s) that is/ar
 Here's another example:
 
 ```js
+// convenience to avoid any potential binding issue
+// with trying to use `console.log` as a function
+function output(txt) {
+	console.log( txt );
+}
+
 function printIf( msg, predicate ) {
 	if (predicate( msg )) {
-		console.log( msg );
+		output( msg );
 	}
 }
 
@@ -722,18 +728,14 @@ var when =
 Let's mix `when(..)` with a few other helper utilities we've seen earlier in this chapter, to make the point-free `printIf(..)`:
 
 ```js
-// convenience to avoid any potential binding issue
-// with trying to use `console.log` as a function
-function output(msg) {
-	console.log( msg );
-}
-
 var printIf = reverseArgs(
 	uncurry( partialRight( when, output ) )
 );
 ```
 
-Here's how we did it: we partially-right-applied the `output` method as the second (`action`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string. A chain of two functions like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `predicate` and `str` arguments together. Lastly, we reverse those arguments to get back to the original `printIf(str,predicate)` signature.
+Here's how we did it: we partially-right-applied the `output` method as the second (`action`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
+
+A chain of multiple (two) function calls like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `predicate` and `str` arguments together. Lastly, we reverse those arguments to get back to the original `printIf(str,predicate)` signature.
 
 Here's the whole example put back together (assuming various utilities we've already detailed in this chapter are present):
 
