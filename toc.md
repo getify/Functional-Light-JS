@@ -31,6 +31,8 @@
 	* TODO
 * Chapter 8: Recursion
 	* TODO
+* Chapter 9: Putting It All Together
+	* TODO
 * Appendix A: Fusion & Transducing
 * Appendix B: The Monad Simplified
 * Appendix C: FP Libraries
