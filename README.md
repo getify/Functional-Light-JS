@@ -20,8 +20,14 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 * [Chapter 2: Functional Functions](ch2.md)
 * [Chapter 3: Managing Function Inputs](ch3.md)
 * [Chapter 4: Composing Functions](ch4.md)
-* [Chapter 5: Reducing Side Effects](ch5.md)
-* Chapter 6: TODO
+* Chapter 5: Reducing Side Effects
+* Chapter 6: Value Immutability
+* Chapter 7: List Operations
+* Chapter 8: Recursion
+* Chapter 9: Putting It All Together
+* Appendix A: Fusion & Transducing
+* Appendix B: The Monad Simplified
+* Appendix C: FP Libraries
 
 ## Publishing
 
