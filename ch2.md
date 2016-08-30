@@ -61,7 +61,7 @@ foo( a, a * 2 );
 
 `a` and `a * 2` (actually, the result of that expression, `6`) are the *arguments* to the `foo(..)` call. `x` and `y` are the *parameters* that receive the argument values (`3` and `6`, respectively).
 
-**Note:** In JavaScript, there's no requirement that the number of *arguments* matches the number of *parameters*. If you pass more *arguments* than you have declared *parameters* to receive them, the values pass in just fine untouched. There's a few different ways to access them, including the deprecated `arguments` object you may have heard of before. If you pass fewer *arguments* than the declared *parameters*, each unaccounted-for parameter simply acts as an "undefined" variable, meaning it's present and available in the scope of the function, but just has the empty `undefined` value.
+**Note:** In JavaScript, there's no requirement that the number of *arguments* matches the number of *parameters*. If you pass more *arguments* than you have declared *parameters* to receive them, the values pass in just fine untouched. These values can be accessed in a few different ways, including the deprecated `arguments` object you may have heard of before. If you pass fewer *arguments* than the declared *parameters*, each unaccounted-for parameter simply acts as an "undefined" variable, meaning it's present and available in the scope of the function, but just has the empty `undefined` value.
 
 ### Counting Inputs
 
@@ -118,7 +118,7 @@ foo( 3, 4 );
 
 As of ES5, `arguments` is deprecated. It'll almost certainly never be removed -- in JS we "never" break backwards-compatibility -- but it's strongly suggested for a whole range of reasons that you avoid using it whenever possible.
 
-However, I'm going to suggest to you that `arguments.length`, and only that, is OK to keep using for those cases where you need to care about the passed number of arguments. There's talk that a future version of JS will restore the ability to determine length of arguments list without `arguments.length`; if that happens, then we can fully get rid of `arguments`.
+However, I'm going to suggest to you that `arguments.length`, and only that, is OK to keep using for those cases where you need to care about the passed number of arguments. A feature added in a future version of JS might restore the ability to determine length of arguments list without `arguments.length`; if that happens, then we can fully get rid of `arguments`.
 
 Be warned: **never** access arguments positionally, like `arguments[1]`.
 
@@ -183,7 +183,7 @@ var arr = [ 1, 2, 3, 4, 5 ];
 foo( ...arr );						// 4
 ```
 
-There's our new friend `...`, but here it's used not in the parameter list but in the argument list. It has the opposite behavior in this context. In a parameter list, we said it *gathered* arguments together. In an argument list, it *spreads* them out. So the contents of `arr` are actually spread out as individual arguments to the `foo(..)` call. See how that's different from just passing in a reference to the whole `arr` array?
+Our new friend `...` is used, but not just in the parameter list; it's also in the argument list at the call-sie. It has the opposite behavior in this context. In a parameter list, we said it *gathered* arguments together. In an argument list, it *spreads* them out. So the contents of `arr` are actually spread out as individual arguments to the `foo(..)` call. See how that's different from just passing in a reference to the whole `arr` array?
 
 By the way, values and multiple `...` spreadings can be interleaved, as you see fit:
 
@@ -218,7 +218,7 @@ foo( null );			// null
 foo( 0 );				// 0
 ```
 
-**Note:** We won't cover it here in any more detail, but the default value expression is lazy meaning it's not evaluated unless and until needed. Also, it can be any valid JS expression, even a function call. There's lots of cool tricks you can do with that capability. For example, you could declare `x = required()` in your parameter list, and in the `required()` function simply `throw "This argument is required."` to make sure someone always calls your function with that argument/parameter specified.
+**Note:** We won't cover it here in any more detail, but the default value expression is lazy meaning it's not evaluated unless and until needed. Also, it can be any valid JS expression, even a function call. Many cool tricks are possible with this capability. For example, you could declare `x = required()` in your parameter list, and in the `required()` function simply `throw "This argument is required."` to make sure someone always calls your function with that argument/parameter specified.
 
 Another ES6 trick we can use with our parameters is called "destructuring". We'll only glance briefly at it because this topic is fantastically more complex than we have space to cover here. But again, refer to my "ES6 & Beyond" book for lots more info.
 
@@ -515,7 +515,7 @@ This implicit function output has a special name in the FP world: side effects. 
 
 ## Functions Of Functions
 
-Obviously, functions can receive and return values of any type. There's a special term for when a function receives or returns one or more other function values: higher-order function.
+Obviously, functions can receive and return values of any type. A function that receives or returns one or more other function values has the special name: higher-order function.
 
 Consider:
 
@@ -861,7 +861,7 @@ The keyword `function` is gone, so is `return`, the `( )` parentheses, the `{ }`
 
 But there's another thing we omitted. Did you spot it? The `getPreferredName` function name.
 
-That's right; `=>` arrow functions are syntatically anonymous. There's no way to directly provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values as arguments won't get any assistance in that way.
+That's right; `=>` arrow functions are lexically anonymous; there's no way to syntatically provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values as arguments won't get any assistance in that way.
 
 If `person.nicknames` isn't defined for some reason, an exception will be thrown, meaning this `(anonymous function)` will be at the top of the stack trace. Ugh.
 
@@ -897,7 +897,7 @@ I think most FPers are going to blink and wave off these concerns. They love ano
 
 If you're not familiar with the `this` binding rules in JavaScript, I recommend you check out my "You Don't Know JS: this & Object Prototypes" book. For the purposes of this section, I'll assume you know how `this` gets determined for a function call (one of the four rules). But even if you're still fuzzy on *this*, the good news is we're going to conclude that you shouldn't be using `this` if you're trying to do FP.
 
-JavaScript `function`s have a `this` keyword that's automatically bound per function call. There's lots of ways to describe what it's for, but I prefer to say it provides an object context for the function to run against.
+JavaScript `function`s have a `this` keyword that's automatically bound per function call. The `this` keyword can be described in many different ways, but I prefer to say it provides an object context for the function to run against.
 
 `this` is an implicit parameter input for your function.
 
@@ -974,7 +974,7 @@ Login.doLogin( "fred", "123456" );
 
 In case you're having trouble parsing what this code does: we have two separate objects `Login` and `Auth`, where `Login` performs prototype-delegation to `Auth`. Through delegation and the implicit `this` context sharing, these two objects virtually compose during the `this.authorize()` function call, so that properties/methods on `this` are dynamically shared with the `Auth.authorize(..)` function.
 
-There's a few reasons why *this* code doesn't fit with various principles of FP, but one of the obvious hitches is the implicit `this` sharing. We could be more explicit about it and keep code that was easier to push in the FP direction:
+*This* code doesn't fit with various principles of FP for a variety of reasons, but one of the obvious hitches is the implicit `this` sharing. We could be more explicit about it and keep code that was easier to push in the FP direction:
 
 ```js
 // ..
