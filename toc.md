@@ -22,7 +22,10 @@
 	* All For One
 	* No Points
 * Chapter 4: Composing Functions
-	* TODO
+	* Output To Input
+	* Reordered Composition
+	* Not Just Abstraction
+	* Revisiting Points
 * Chapter 5: Reducing Side Effects
 	* TODO
 * Chapter 6: Value Immutability

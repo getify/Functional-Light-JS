@@ -248,6 +248,117 @@ Of course, you can also `curry(..)` a composition, though because of right-to-le
 
 **Note:** Since `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity: `curry( compose, 3 )`.
 
+### Alternate Implementations
+
+While you may very well never implement your own `compose(..)` to use in production, and rather just use a library's implementation as provided, I've found that understanding how it works under the covers actually helps solidify general FP concepts very well.
+
+So let's examine some different implementation options for `compose(..)`. We'll also see there are some pros/cons to each implementation, especially performance.
+
+We'll be looking at the `reduce(..)` utility in detail later in the text, but for now, just know that it reduces a list (array) to a single finite value. It's like a fancy loop.
+
+For example, if you did an addition-reduction across the list of numbers `[1,2,3,4,5,6]`, you'd be looping over them adding them together as you go. The reduction would add `1` to `2`, and add that result to `3`, and then add that result to `4`, and so on, resulting in the final summation: `21`.
+
+The original version of `compose(..)` uses a loop and eagerly (aka, immediately) calculates the result of one call to pass into the next call. We can do that same thing with `reduce(..)`:
+
+```js
+function compose(...fns) {
+	return function composed(result){
+		return fns.reverse().reduce( function reducer(result,fn){
+			return fn( result );
+		}, result );
+	};
+}
+
+// or the ES6 => form
+var compose = (...fns) =>
+	result =>
+		fns.reverse().reduce(
+			(result,fn) =>
+				fn( result )
+			, result
+		);
+```
+
+Notice that the `reduce(..)` looping happens each time the final `composed(..)` function is run, and that each intermediate `result(..)` is passed along to the next iteration as the input to the next call.
+
+The advantage of this implementation is that the code is more concise and also that it uses a well-known FP construct: `reduce(..)`. And the performace of this implementation is also similar to the original `for`-loop version.
+
+However, this implementation is limited in that the outer composed function (aka, the first function in the composition) can only receive a single argument. Most other implementations pass along all arguments to that first call. If every function in the composition is unary, this is no big deal. But if you need to pass multiple arguments to that first call, you'd want a different implementation.
+
+To fix that first call single-argument limitation, we can still use `reduce(..)` but produce a lazy-evaluation function wrapping:
+
+```js
+function compose(...fns) {
+	return fns.reverse().reduce( function reducer(fn1,fn2){
+		return function composed(...args){
+			return fn2( fn1( ...args ) );
+		};
+	} );
+}
+
+// or the ES6 => form
+var compose =
+	(...fns) =>
+		fns.reverse().reduce( (fn1,fn2) =>
+			(...args) =>
+				fn2( fn1( ...args ) )
+		);
+```
+
+Notice that we return the result of the `reduce(..)` call directly, which is itself a function, not a computed result. *That* function lets us pass in as many arguments as we want, passing them all down the line to the first function call in the composition, then bubbling up each result through each subsequent call.
+
+Instead of calculating the running result as passing it along as the `reduce(..)` looping proceeds, this implementation runs the `reduce(..)` looping **once** up front, at composition time, and defers all the function call calculations -- referred to as lazy calculation. Each partial result of the reduction is a successively more wrapped function.
+
+When you call the final composed function and provide one or more arguments, all the levels of the big nested function, from the inner most call to the outer, are executed in succession (not via a loop).
+
+The performance characteristics will potentially be different than in the previous `reduce(..)`-based implementation. Here, `reduce(..)` only once to produce a big composed function, and then this composed function call simply executes all its nested functions. In the former version, `reduce(..)` would be run every time.
+
+Your mileage may vary on which implementation is better, but keep in mind that this latter implementation isn't limited in argument count the way the former one is.
+
+We could also define `compose(..)` using recursion. The recursive definition for `compose(fn1,fn2, .. fnN)` would look like:
+
+```
+compose( compose(fn1,fn2, .. fnN-1), fnN );
+```
+
+**Note:** We will cover recursion in deep detail in a later chapter, so if this approach seems confusing, feel free to skip it for now and come back later after having read that chapter.
+
+Here's how we implement	`compose(..)` with recursion:
+
+```js
+function compose(...fns) {
+	// pull off the last two arguments
+	var [ fn1, fn2, ...rest ] = fns.reverse();
+
+	var composedFn = function composed(...args){
+		return fn2( fn1( ...args ) );
+	};
+
+	if (rest.length == 0) return composedFn;
+
+	return compose( ...rest.reverse(), composedFn );
+}
+
+// or the ES6 => form
+var compose =
+	(...fns) => {
+		// pull off the last two arguments
+		var [ fn1, fn2, ...rest ] = fns.reverse();
+
+		var composedFn =
+			(...args) =>
+				fn2( fn1( ...args ) );
+
+		if (rest.length == 0) return composedFn;
+
+		return compose( ...rest.reverse(), composedFn );
+	};
+```
+
+I think the benefit of a recursive implementation is mostly conceptual. I personally find it much easier to think about a repetitive action in recursive terms instead of in a loop where I have to track the running result, so I prefer the code to express it that way.
+
+Others will find the recursive approach quite a bit more daunting to mentally juggle. I invite you to make your own evaluations.
+
 ## Reordered Composition
 
 We talked earlier about the right-to-left ordering of standard `compose(..)` implementations. The advantage is in listing the arguments (functions) in the same order they'd appear if doing the composition manually. The disadvantage is they're listed in the reverse order that they execute, which can be confusing.
@@ -272,35 +383,11 @@ function pipe() {
 
 // TODO
 
+## Not Just Abstraction
 
-**********
+It might seem like the purpose of composition, either manually or with a `compose(..)` utility, is DRY (don't repeat yourself) abstraction. But let's more carefully examine.
 
-// TODO: use reverse() and array destructuring here
-
-```js
-function compose(...fns) {
-	if (fns.length == 2) {
-		return compose2( fns[0], fns[1] );
-	}
-
-	return compose(
-		...fns.slice( 0, fns.length - 2),
-		compose2( ...fns.slice( fns.length - 2 ) )
-	);
-
-	function compose2(fn1,fn2) {
-		return function composed(...args){
-			return fn1( fn2( ...args ) );
-		};
-	}
-}
-```
-
-// TODO: implement with `reduce(..)`
-
-**********
-
-
+// TODO
 
 ## Revisiting Points
 
