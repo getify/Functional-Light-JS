@@ -307,11 +307,11 @@ var compose =
 
 Notice that we return the result of the `reduce(..)` call directly, which is itself a function, not a computed result. *That* function lets us pass in as many arguments as we want, passing them all down the line to the first function call in the composition, then bubbling up each result through each subsequent call.
 
-Instead of calculating the running result as passing it along as the `reduce(..)` looping proceeds, this implementation runs the `reduce(..)` looping **once** up front, at composition time, and defers all the function call calculations -- referred to as lazy calculation. Each partial result of the reduction is a successively more wrapped function.
+Instead of calculating the running result and passing it along as the `reduce(..)` looping proceeds, this implementation runs the `reduce(..)` looping **once** up front at composition time, and defers all the function call calculations -- referred to as lazy calculation. Each partial result of the reduction is a successively more wrapped function.
 
 When you call the final composed function and provide one or more arguments, all the levels of the big nested function, from the inner most call to the outer, are executed in succession (not via a loop).
 
-The performance characteristics will potentially be different than in the previous `reduce(..)`-based implementation. Here, `reduce(..)` only once to produce a big composed function, and then this composed function call simply executes all its nested functions. In the former version, `reduce(..)` would be run every time.
+The performance characteristics will potentially be different than in the previous `reduce(..)`-based implementation. Here, `reduce(..)` only runs once to produce a big composed function, and then this composed function call simply executes all its nested functions each call. In the former version, `reduce(..)` would be run for every call.
 
 Your mileage may vary on which implementation is better, but keep in mind that this latter implementation isn't limited in argument count the way the former one is.
 
