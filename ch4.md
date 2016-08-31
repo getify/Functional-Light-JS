@@ -423,6 +423,15 @@ function prop(name,obj) {
 	return obj[name];
 }
 
+// or the ES6 => form
+var prop =
+	(name,obj) =>
+		obj[name];
+```
+
+To make an `extractName(..)` that pulls a `"name"` property off an object:
+
+```
 var extractName = partial( prop, "name" );
 ```
 
@@ -481,6 +490,15 @@ function setProp(name,value) {
 	};
 }
 
+// or the ES6 => form
+var setProp =
+	(name,value) =>
+		({ [name]: value });
+```
+
+Just as we did with `prop(..)` to make `extractName(..)`, we'll partially apply `setProp(..)` to build a function `personData(..)` that makes our data object:
+
+```js
 var personData = partial( setProp, "id" );
 ```
 
