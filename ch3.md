@@ -561,7 +561,35 @@ words.filter( identity );
 
 Since `identity(..)` simply returns the value passed to it, JS coerces each value into either `true` or `false`, and that decides to keep or exclude each value in the final array.
 
-**Note:** Another unary function that can be used as the predicate in the previous example is JS's own `Boolean(..)` function, which explicitly coerces the values to `true` or `false`.
+**Tip:** Another unary function that can be used as the predicate in the previous example is JS's own `Boolean(..)` function, which explicitly coerces the values to `true` or `false`.
+
+Another example of using `identity(..)` is as a default function in place of a transformation:
+
+```js
+function output(msg,formatFn = identity) {
+	msg = formatFn( msg );
+	console.log( msg );
+}
+
+function upper(txt) {
+	return txt.toUpperCase();
+}
+
+output( "Hello World", upper );		// HELLO WORLD
+output( "Hello World" );			// Hello World
+```
+
+If `output(..)` didn't have a default for `formatFn`, we could bring our earlier friend `partialRight(..)`:
+
+```js
+var specialOutput = partialRight( output, upper );
+var simpleOutput = partialRight( output, identity );
+
+specialOutput( "Hello World" );		// HELLO WORLD
+simpleOutput( "Hello World" );		// Hello World
+```
+
+You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered later in the text.
 
 ### Unchanging One
 
@@ -588,7 +616,7 @@ p1.then( foo ).then( _=>p2 ).then( bar );
 p1.then( foo ).then( constant( p2 ) ).then( bar );
 ```
 
-**Warning:** Although the `_=>p2` arrow function is shorter than `constant(p2)`, resist the temptation to use it. The function is returning a value from outside of itself, which is worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
+**Warning:** Although the `_=>p2` arrow function version is shorter than `constant(p2)`, resist the temptation to use it. The function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
 
 ## No Points
 
@@ -770,7 +798,7 @@ Hopefully the FP practice of point-free style coding is starting to make a littl
 
 What do you think? Points or no points for you?
 
-**Note:** Still want more practice with point-free style coding? We'll revisit this technique in "Revisiting Points" in Chapter 4, combined with new-found knowledge of function composition.
+**Note:** Still want more practice with point-free style coding? We'll revisit this technique in "Revisiting Points" in Chapter 4, based on new-found knowledge of function composition.
 
 ## Summary
 
