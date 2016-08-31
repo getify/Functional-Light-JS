@@ -438,9 +438,11 @@ The standard utility for this is (un)shockingly called `uncurry(..)`:
 function uncurry(fn) {
 	return function uncurried(...args){
 		var ret = fn;
+
 		for (let i = 0; i < args.length; i++) {
 			ret = ret( args[i] );
 		}
+
 		return ret;
 	};
 }
@@ -450,9 +452,11 @@ var uncurry =
 	fn =>
 		(...args) => {
 			var ret = fn;
+
 			for (let i = 0; i < args.length; i++) {
 				ret = ret( args[i] );
 			}
+
 			return ret;
 		};
 ```
@@ -493,7 +497,10 @@ function unary(fn) {
 }
 
 // or the ES6 => arrow form
-var unary = fn => arg => fn(arg);
+var unary =
+	fn =>
+		arg =>
+			fn( arg );
 ```
 
 We saw the `map(..)` utility eariler. It calls the provided mapping function with three arguments: `value`, `index`, and `list`. If you want your mapping function to only receive one of these, like `value`, use the `unary(..)` operation:
@@ -543,7 +550,9 @@ function identity(v) {
 }
 
 // or the ES6 => arrow form
-var identity = v => v;
+var identity =
+	v =>
+		v;
 ```
 
 This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
@@ -603,7 +612,10 @@ function constant(v) {
 }
 
 // or the ES6 => form
-var constant = v => () => v;
+var constant =
+	v =>
+		() =>
+			v;
 ```
 
 With this tidy little utility, we can solve our `then(..)` annoyance:
