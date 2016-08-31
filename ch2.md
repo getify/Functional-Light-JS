@@ -183,7 +183,7 @@ var arr = [ 1, 2, 3, 4, 5 ];
 foo( ...arr );						// 4
 ```
 
-Our new friend `...` is used, but not just in the parameter list; it's also in the argument list at the call-sie. It has the opposite behavior in this context. In a parameter list, we said it *gathered* arguments together. In an argument list, it *spreads* them out. So the contents of `arr` are actually spread out as individual arguments to the `foo(..)` call. See how that's different from just passing in a reference to the whole `arr` array?
+Our new friend `...` is used, but not just in the parameter list; it's also used in the argument list at the call-site. It has the opposite behavior in this context. In a parameter list, we said it *gathered* arguments together. In an argument list, it *spreads* them out. So the contents of `arr` are actually spread out as individual arguments to the `foo(..)` call. See how that's different from just passing in a reference to the whole `arr` array?
 
 By the way, values and multiple `...` spreadings can be interleaved, as you see fit:
 
