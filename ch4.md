@@ -363,7 +363,7 @@ Others will find the recursive approach quite a bit more daunting to mentally ju
 
 We talked earlier about the right-to-left ordering of standard `compose(..)` implementations. The advantage is in listing the arguments (functions) in the same order they'd appear if doing the composition manually. The disadvantage is they're listed in the reverse order that they execute, which can be confusing.
 
-The reverse ordering, where you compose from left-to-right, has a common name: `pipe(..)`:
+The reverse ordering, composing from left-to-right, has a common name: `pipe(..)`:
 
 ```js
 function pipe() {
@@ -391,7 +391,7 @@ It might seem like the purpose of composition, either manually or with a `compos
 
 ## Revisiting Points
 
-Now that we've covered composition -- a trick that will be immensely helpful in many areas of FP -- in detail in this chapter, let's revisit point-free style from Chapter 3 with a scenario that's a fair bit more complex to refactor:
+Now that we've covered composition -- a trick that will be immensely helpful in many areas of FP, let's revisit point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
 
 ```js
 // given: ajax( url, data, cb )
@@ -426,7 +426,7 @@ function prop(name,obj) {
 var extractName = partial( prop, "name" );
 ```
 
-**Note:** Don't miss that `extractName(..)` here hasn't actually extracted anything yet. We partially applied `prop(..)` to make a function that's waiting to extract the `"name"` property from whatever object we pass into it. We could also have specified `curry(prop)("name")`.
+**Note:** Don't miss that `extractName(..)` here hasn't actually extracted anything yet. We partially applied `prop(..)` to make a function that's waiting to extract the `"name"` property from whatever object we pass into it. We could also have done it with `curry(prop)("name")`.
 
 Next, let's reduce our example's nested lookup calls to this:
 
@@ -484,7 +484,7 @@ function setProp(name,value) {
 var personData = partial( setProp, "id" );
 ```
 
-To use `processPerson(..)` to perform the lookup of a person from a received `order` value, the conceptual flow of data through operations we need is:
+To use `processPerson(..)` to perform the lookup of a person attached to an `order` value, the conceptual flow of data through operations we need is:
 
 ```
 processPerson <-- personData <-- extractPersonId <-- order
