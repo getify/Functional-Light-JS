@@ -773,7 +773,7 @@ function findPropIn(propName,obj) {
 }
 ```
 
-```
+```js
 // async recursion:
 setTimeout( function waitForIt(){
 	// does `it` exist yet?
@@ -784,7 +784,7 @@ setTimeout( function waitForIt(){
 }, 100 );
 ```
 
-```
+```js
 // event handler unbinding
 document.getElementById( "onceBtn" )
 	.addEventListener( "click", function handleClick(evt){
@@ -803,7 +803,7 @@ Moreover, even in simple cases with one-liner functions, naming them tends to ma
 people.map( function getPreferredName(person){
 	return person.nicknames[0] || person.firstName;
 } )
-..
+// ..
 ```
 
 The function name `getPreferredName(..)` tells the reader something about what the mapping operation is intending to do that is not entirely obvious from just its code. This name label helps the code be more readable.
@@ -850,7 +850,7 @@ Compare:
 people.map( function getPreferredName(person){
 	return person.nicknames[0] || person.firstName;
 } )
-..
+// ..
 
 people.map( person => person.nicknames[0] || person.firstName );
 ```
@@ -950,7 +950,7 @@ var Auth = {
 			else this.displaySuccess();
 		} );
 	},
-	send(..) {
+	send(/* .. */) {
 		// ..
 	}
 };
