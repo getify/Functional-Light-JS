@@ -224,7 +224,7 @@ Now, we can define a `partialRight(..)` which partially applies from the right, 
 ```js
 function partialRight( fn, ...args ) {
 	return reverseArgs(
-		partial( reverseArgs( fn ), ...args )
+		partial( reverseArgs( fn ), ...args.reverse() )
 	);
 }
 
@@ -763,7 +763,7 @@ var printIf = reverseArgs(
 );
 ```
 
-Here's how we did it: we partially-right-applied the `output` method as the second (`action`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
+Here's how we did it: we right-partially applied the `output` method as the second (`action`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
 
 A chain of multiple (two) function calls like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `predicate` and `str` arguments together. Lastly, we reverse those arguments to get back to the original `printIf(str,predicate)` signature.
 
