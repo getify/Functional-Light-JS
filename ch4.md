@@ -363,10 +363,12 @@ Others will find the recursive approach quite a bit more daunting to mentally ju
 
 We talked earlier about the right-to-left ordering of standard `compose(..)` implementations. The advantage is in listing the arguments (functions) in the same order they'd appear if doing the composition manually. The disadvantage is they're listed in the reverse order that they execute, which can be confusing.
 
-The reverse ordering, composing from left-to-right, has a common name: `pipe(..)`:
+The reverse ordering, composing from left-to-right, has a common name: `pipe(..)`. This name is said to come from Unix/Linux land, where multiple programs are strung together by "pipe"ing (`|` operator) the output of the first one in as the input of the second, and so on (i.e., `ls -la | grep "foo" | less`).
+
+`pipe(..)` is identical to `compose(..)` except it runs through the list in left-to-right order:
 
 ```js
-function pipe() {
+function pipe(...fns) {
 	return function piped(result){
 		var list = fns.slice();
 
@@ -381,7 +383,43 @@ function pipe() {
 }
 ```
 
-// TODO
+In fact, let's just define `pipe(..)` as the arguments-reversal of `compose(..)`:
+
+```js
+var pipe = reverseArgs( compose );
+```
+
+That was easy!
+
+Recall this example from general composition earlier:
+
+```js
+var biggerWords = compose( skipShortWords, unique, words );
+```
+
+To express that with `pipe(..)`, we just reverse the order we list them in:
+
+```js
+var biggerWords = pipe( words, unique, skipShortWords );
+```
+
+The advantage of `pipe(..)` is that it lists the functions in order of execution, which can sometimes reduce reader confusion. It may be simpler to see `pipe(words,unique,skipShortWords)` and read that we do `words(..)` first, then `unique(..)`, and finally `skipShortWords(..)`.
+
+`pipe(..)` is also handy if you're in a situation where you want to partially apply the first function(s). Earlier we did that with right-partial application of `compose(..)`.
+
+Compare:
+
+```js
+var filterWords = partialRight( compose, unique, words );
+
+// vs
+
+var filterWords = partial( pipe, unique, words );
+```
+
+As you may recall from `partialRight(..)`'s definition in Chapter 3, it uses `reverseArgs(..)` under the covers, just as our `pipe(..)` now does. So we get the same result either way.
+
+The slight performance advantage to `pipe(..)` is that since we're not trying to preserve the right-to-left argument order of `compose(..)` by doing a right-partial application, using `pipe(..)` we don't need to reverse the argument order back, like we do inside `partialRight(..)`. So `partial(pipe, ..)` is a little better than `partialRight(compose, ..)`.
 
 ## Not Just Abstraction
 
