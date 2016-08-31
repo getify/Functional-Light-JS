@@ -161,10 +161,13 @@ And we can implement such a general `compose(..)` utility like this:
 ```js
 function compose(...fns) {
 	return function composed(result){
-		while (fns.length > 0) {
+		// copy the array of functions
+		var list = fns.slice();
+
+		while (list.length > 0) {
 			// take the last function off the end of the list
 			// and execute it
-			result = fns.pop()( result );
+			result = list.pop()( result );
 		}
 
 		return result;
@@ -175,10 +178,12 @@ function compose(...fns) {
 var compose =
 	(...fns) =>
 		result => {
-			while (fns.length > 0) {
+			var list = fns.slice();
+
+			while (list.length > 0) {
 				// take the last function off the end of the list
 				// and execute it
-				result = fns.pop()( result );
+				result = list.pop()( result );
 			}
 
 			return result;
@@ -252,10 +257,12 @@ The reverse ordering, where you compose from left-to-right, has a common name: `
 ```js
 function pipe() {
 	return function piped(result){
-		while (fns.length > 0) {
+		var list = fns.slice();
+
+		while (list.length > 0) {
 			// take the first function from the list
 			// and execute it
-			result = fns.shift()( result );
+			result = list.shift()( result );
 		}
 
 		return result;
