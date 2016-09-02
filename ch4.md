@@ -430,18 +430,18 @@ For example, consider this (obviously contrived) code:
 ```js
 function saveComment(txt) {
 	if (txt != "") {
-		comments[comments.length - 1]( txt );
+		comments[comments.length - 1] = txt;
 	}
 }
 
 function trackEvent(evt) {
-	if (!(evt.name in events)) {
+	if (evt.name !== undefined) {
 		events[evt.name] = evt;
 	}
 }
 ```
 
-Both of these utilities are storing a value in a data source. That's the generality. The specialty is that one of them sticks the value at the end of an array, while the other sets the value in a property name location of an object.
+Both of these utilities are storing a value in a data source. That's the generality. The specialty is that one of them sticks the value at the end of an array, while the other sets the value at a property name of an object.
 
 So let's abstract:
 
@@ -457,7 +457,7 @@ function saveComment(txt) {
 }
 
 function trackEvent(evt) {
-	if (!(evt.name in events)) {
+	if (evt.name !== undefined) {
 		storeData( events, evt.name, evt );
 	}
 }
@@ -472,24 +472,34 @@ DRY strives to have only one definition in a program for any given task. An alte
 Abstraction can be taken too far. Consider:
 
 ```js
-function conditionallyStoreData(checkCondition,store,location,value) {
-	if (checkCondition) {
+function conditionallyStoreData(store,location,value,checkFn) {
+	if (checkFn( value, store, location )) {
 		store[location] = value;
 	}
 }
 
+function notEmpty(val) { return val != ""; }
+
+function isUndefined(val) { return val === undefined; }
+
+function isPropUndefined(val,obj,prop) {
+	return isUndefined( obj[prop] );
+}
+
 function saveComment(txt) {
-	conditionallyStoreData( txt != "", comments, comments.length - 1, txt );
+	conditionallyStoreData( comments, comments.length - 1, txt, notEmpty );
 }
 
 function trackEvent(evt) {
-	conditionallyStoreData( !(evt.name in events), events, evt.name, evt );
+	conditionallyStoreData( events, evt.name, evt, isPropUndefined );
 }
 ```
 
-In an effort to DRY and avoid repeating an `if` statement, we moved the `if` statement into the general abstraction and passed along a `boolean` value computed separately by each specialization. This code is more DRY but to an overkill extent. Programmers should be careful to apply the appropriate levels of abstraction to each part of their program, no more, no less.
+In an effort to DRY and avoid repeating an `if` statement, we moved the conditional into the general abstraction. We also assumed that we may have checks for non-empty strings or non-`undefined` values elsewhere in the program, so we might as well DRY those out, too!
 
-Regarding our greater discussion of function composition in this chapter, it might seem like its purpose is this kind of DRY abstraction. But let's not jump to that conclusion, because I think composition actually serves a more important purpose in our code.
+This code *is* more DRY, but to an overkill extent. Programmers must be careful to apply the appropriate levels of abstraction to each part of their program, no more, no less.
+
+Regarding our greater discussion of function composition in this chapter, it might seem like its benefit is this kind of DRY abstraction. But let's not jump to that conclusion, because I think composition actually serves a more important purpose in our code.
 
 Moreover, **composition is helpful even if there's only one occurrence of something** (no repetition to DRY out).
 
