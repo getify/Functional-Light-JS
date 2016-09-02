@@ -489,7 +489,9 @@ function trackEvent(evt) {
 
 In an effort to DRY and avoid repeating an `if` statement, we moved the `if` statement into the general abstraction and passed along a `boolean` value computed separately by each specialization. This code is more DRY but to an overkill extent. Programmers should be careful to apply the appropriate levels of abstraction to each part of their program, no more, no less.
 
-Returning to our bigger discussion of composition in this chapter, it might seem like its purpose is this kind of DRY abstraction. But let's more carefully examine, because I think composition additionally serves a more important purpose in our code. As a matter of fact, **composition is helpful even if there's only one occurrence of something** (no repetition to DRY out).
+Regarding our greater discussion of function composition in this chapter, it might seem like its purpose is this kind of DRY abstraction. But let's not jump to that conclusion, because I think composition actually serves a more important purpose in our code.
+
+Moreover, **composition is helpful even if there's only one occurrence of something** (no repetition to DRY out).
 
 Aside from generalization vs specialization, I think there's another more useful definition for abstraction, as revealed by this quote:
 
@@ -529,11 +531,13 @@ var [ a ,,, b ] = getData();
 
 The *what* is assigning the first value of the array to `a` and the fourth value to `b`. The *how* is getting a reference to the array (`tmp`) and manually referencing indexes `0` and `3` in assignments to `a` and `b`, respectively.
 
-Does the array destructuring *hide* the assignment? Depends on your perspective. I'm asserting that it simply separates the *what* from the *how*. The JS engine still does the assignments, but it prevents you from having to be distracted by *how* it's done. Instead, you read `[ a ,,, b ] = ..` and can see the pattern telling you *what* will happen. **Array destructuring is an example of declarative abstraction.**
+Does the array destructuring *hide* the assignment? Depends on your perspective. I'm asserting that it simply separates the *what* from the *how*. The JS engine still does the assignments, but it prevents you from having to be distracted by *how* it's done.
+
+Instead, you read `[ a ,,, b ] = ..` and can see the assignment pattern merely telling you *what* will happen. Array destructuring is an example of declarative abstraction.
 
 ### Composition As Abstraction
 
-What's all this have to do with function composition? Done properly, function composition is also declarative abstraction.
+What's all this have to do with function composition? Function composition is also declarative abstraction.
 
 Recall the `shorterWords(..)` example from earlier. Let's compare an imperative and declarative definition for it:
 
