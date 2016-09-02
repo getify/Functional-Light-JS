@@ -414,22 +414,174 @@ var filterWords = partialRight( compose, unique, words );
 
 // vs
 
-var filterWords = partial( pipe, unique, words );
+var filterWords = partial( pipe, words, unique );
 ```
 
 As you may recall from `partialRight(..)`'s definition in Chapter 3, it uses `reverseArgs(..)` under the covers, just as our `pipe(..)` now does. So we get the same result either way.
 
 The slight performance advantage to `pipe(..)` is that since we're not trying to preserve the right-to-left argument order of `compose(..)` by doing a right-partial application, using `pipe(..)` we don't need to reverse the argument order back, like we do inside `partialRight(..)`. So `partial(pipe, ..)` is a little better than `partialRight(compose, ..)`.
 
-## Not Just Abstraction
+## Abstraction
 
-It might seem like the purpose of composition, either manually or with a `compose(..)` utility, is DRY (don't repeat yourself) abstraction. But let's more carefully examine.
+Abstraction is often defined as pulling out the generality between two or more tasks. The general part is defined once, so as to avoid repetition. To perform each task's specialization, the general part is parameterized.
 
-// TODO
+For example, consider this (obviously contrived) code:
+
+```js
+function saveComment(txt) {
+	if (txt != "") {
+		comments[comments.length - 1]( txt );
+	}
+}
+
+function trackEvent(evt) {
+	if (!(evt.name in events)) {
+		events[evt.name] = evt;
+	}
+}
+```
+
+Both of these utilities are storing a value in a data source. That's the generality. The specialty is that one of them sticks the value at the end of an array, while the other sets the value in a property name location of an object.
+
+So let's abstract:
+
+```js
+function storeData(store,location,value) {
+	store[location] = value;
+}
+
+function saveComment(txt) {
+	if (txt != "") {
+		storeData( comments, comments.length - 1, txt );
+	}
+}
+
+function trackEvent(evt) {
+	if (!(evt.name in events)) {
+		storeData( events, evt.name, evt );
+	}
+}
+```
+
+The general task of referencing a property on an object (or array, thanks to JS's convenient operator overloading of `[ ]`) and setting its value is abstracted into its own function `storeData(..)`. While this utility only has a single line of code right now, one could envision other general behavior that was common across both tasks, such as generating a unique numeric ID or storing a timestamp with the value.
+
+If we repeat the common general behavior in multiple places, we run the maintenance risk of changing some instances but forgetting to change others. There's a principle at play in this kind of abstraction, often referred to as DRY (don't repeat yourself).
+
+DRY strives to have only one definition in a program for any given task. An alternate quip to motivate DRY coding is that programmers are just generally lazy and don't want to do unnecessary work.
+
+Abstraction can be taken too far. Consider:
+
+```js
+function conditionallyStoreData(checkCondition,store,location,value) {
+	if (checkCondition) {
+		store[location] = value;
+	}
+}
+
+function saveComment(txt) {
+	conditionallyStoreData( txt != "", comments, comments.length - 1, txt );
+}
+
+function trackEvent(evt) {
+	conditionallyStoreData( !(evt.name in events), events, evt.name, evt );
+}
+```
+
+In an effort to DRY and avoid repeating an `if` statement, we moved the `if` statement into the general abstraction and passed along a `boolean` value computed separately by each specialization. This code is more DRY but to an overkill extent. Programmers should be careful to apply the appropriate levels of abstraction to each part of their program, no more, no less.
+
+Returning to our bigger discussion of composition in this chapter, it might seem like its purpose is this kind of DRY abstraction. But let's more carefully examine, because I think composition additionally serves a more important purpose in our code. As a matter of fact, **composition is helpful even if there's only one occurrence of something** (no repetition to DRY out).
+
+Aside from generalization vs specialization, I think there's another more useful definition for abstraction, as revealed by this quote:
+
+> ... abstraction is a process by which the programmer associates a name with a potentially complicated program fragment, which can then be thought of in terms of its purpose of function, rather than in terms of how that function is achieved. By hiding irrelvant details, abstraction reduces conceptual complexity, making it possible for the programmer to focus on a manageable subset of the program text at any particular time.
+>
+> http://web.cs.mun.ca/~ulf/pld/substance.html
+
+The point this quote makes is that abstraction -- generally, pulling out some piece of code into its own function -- serves the primary purpose of separating apart two pieces of functionality so that each piece can be focused on independent of the other.
+
+Note that abstraction in this sense is not intended to *hide* details, as if to treat things as black boxes. That notion is more closely associated with the programming principle of encapsulation. **We're not abstracting to hide, but to separate to improve focus**.
+
+Recall that at the outset of this text I described the goal of FP as creating more readable, understandable code. One effective way of doing that is untangling complected -- read: tightly braided, as in strands of rope -- code into separate, simpler -- read: loosely bound -- pieces of code. In that way, the reader isn't distracted by the details of one part while looking for the details of the other part.
+
+Our higher goal is not to implement something only once, as it is with the DRY mindset. As a matter of fact, sometimes we'll actually repeat ourselves in code. Instead, we seek to implement separate things, separately. We're trying to improve focus, because that improves readability.
+
+Another way of describing this goal is with imperative vs declarative programming style. Imperative code is primarily concerned with explicitly stating *how* to accomplish a task. Declarative code states *what* the outcome should be, and leaves the implementation to some other responsibility.
+
+In other words, declarative code abstracts the *what* from the *how*. Typically declarative coding is favored in readability over imperative, though no program (except of course machine code 1's and 0's) is ever entirely one or the other. The programmer must seek balance between them.
+
+ES6 added many syntactic affordances that transform old imperative operations into newer declarative forms. Perhaps one of the clearest is destructuring. Destructuring is a pattern for assignment that describes how a compound value (object, array) is taken apart into its constituent values.
+
+Here's an example of array destructuring:
+
+```js
+function getData() {
+	return [1,2,3,4,5];
+}
+
+// imperative
+var tmp = getData();
+var a = tmp[0];
+var b = tmp[3];
+
+// declarative
+var [ a ,,, b ] = getData();
+```
+
+The *what* is assigning the first value of the array to `a` and the fourth value to `b`. The *how* is getting a reference to the array (`tmp`) and manually referencing indexes `0` and `3` in assignments to `a` and `b`, respectively.
+
+Does the array destructuring *hide* the assignment? Depends on your perspective. I'm asserting that it simply separates the *what* from the *how*. The JS engine still does the assignments, but it prevents you from having to be distracted by *how* it's done. Instead, you read `[ a ,,, b ] = ..` and can see the pattern telling you *what* will happen. **Array destructuring is an example of declarative abstraction.**
+
+### Composition As Abstraction
+
+What's all this have to do with function composition? Done properly, function composition is also declarative abstraction.
+
+Recall the `shorterWords(..)` example from earlier. Let's compare an imperative and declarative definition for it:
+
+```js
+// imperative
+function shorterWords(text) {
+	return skipLongWords( unique( words( text ) ) );
+}
+
+// declarative
+var shorterWords = compose( skipLongWords, unique, words );
+```
+
+The declarative form focuses on the *what* -- these 3 functions pipe data from a string to a list of shorter words -- and leaves the *how* to the internals of `compose(..)`.
+
+In a bigger sense, the `shorterWords = compose(..)` line explains the *how* for defining a `shorterWords(..)` utility, leaving this declarative line somewhere else in the code to focus only on the *what*:
+
+```js
+shorterWords( text );
+```
+
+Composition abstracts getting a list of shorter words from the steps it takes to do that.
+
+By contrast, what if we hadn't used composition abstraction?
+
+```js
+var wordsFound = words( text );
+var uniqueWordsFound = unique( wordsFound );
+var shorterWords = skipLongWords( uniqueWordsFound );
+
+shorterWords( text );
+```
+
+Or even:
+
+```js
+skipLongWords( unique( words( text ) ) )( text );
+```
+
+Either of these two versions demonstrates a more imperative style as opposed to the prior declarative style. The reader's focus in those two snippets is inextricably tied to the *how* and less on the *what*.
+
+Function composition isn't just about saving code with DRY. Even if the usage of `shorterWords(..)` only occurs in one place -- so there's no repetition to avoid! -- separating the *how* from the *what* still improves our code.
+
+Composition is a powerful tool for abstraction that transforms imperative code into more readable declarative code.
 
 ## Revisiting Points
 
-Now that we've covered composition -- a trick that will be immensely helpful in many areas of FP, let's revisit point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
+Now that we've thoroughly covered composition -- a trick that will be immensely helpful in many areas of FP, let's watch it in action by revisiting point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
 
 ```js
 // given: ajax( url, data, cb )

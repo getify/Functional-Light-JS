@@ -24,7 +24,7 @@
 * Chapter 4: Composing Functions
 	* Output To Input
 	* Reordered Composition
-	* Not Just Abstraction
+	* Abstraction
 	* Revisiting Points
 * Chapter 5: Reducing Side Effects
 	* TODO
