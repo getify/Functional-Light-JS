@@ -57,6 +57,14 @@ I know many FPers who believe that the formalism itself helps learning. But I pe
 
 So this book aims to introduce the concepts that I believe FP is built on, but come at it by easing you up the cliff rather than throwing you straight at it to figure out how to climb as you go.
 
+## YAGNI
+
+> Reminder, any extensibility point that’s never used isn’t just wasted effort, it’s likely to also get in your way as well
+>
+> Jeremy D. Miller @jeremydmiller 2/20/15
+>
+> https://twitter.com/jeremydmiller/status/568797862441586688
+
 ## Resources
 
 I have drawn on a great many different resources to be able to compose this text. I believe you too may benefit from them, so I wanted to take a moment to talk about them.

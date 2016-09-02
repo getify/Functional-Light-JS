@@ -8,6 +8,7 @@
 	* Confidence
 	* Communication
 	* Take
+	* YAGNI
 	* Resources
 * Chapter 2: Functional Functions
 	* What Is A Function?
