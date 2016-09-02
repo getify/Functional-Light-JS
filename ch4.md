@@ -576,15 +576,13 @@ By contrast, what if we hadn't used composition abstraction?
 ```js
 var wordsFound = words( text );
 var uniqueWordsFound = unique( wordsFound );
-var shorterWords = skipLongWords( uniqueWordsFound );
-
-shorterWords( text );
+skipLongWords( uniqueWordsFound );
 ```
 
 Or even:
 
 ```js
-skipLongWords( unique( words( text ) ) )( text );
+skipLongWords( unique( words( text ) ) );
 ```
 
 Either of these two versions demonstrates a more imperative style as opposed to the prior declarative style. The reader's focus in those two snippets is inextricably tied to the *how* and less on the *what*.
