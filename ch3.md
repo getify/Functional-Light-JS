@@ -236,6 +236,29 @@ var cacheResult = partialRight( ajax, function onResult(obj){
 cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 ```
 
+This implementation of `partialRight(..)` does not guarantee that a specific parameter will be receive a specific partially-applied value; it only ensures that the right-partially applied value(s) appear as the right-most argument(s) passed to the original function.
+
+For example:
+
+```js
+function foo(x,y,z) {
+	var rest = [].slice.call( arguments, 3 );
+	console.log( x, y, z, rest );
+}
+
+var f = partialRight( foo, "z:last" );
+
+f( 1, 2 );			// 1 2 "z:last" []
+
+f( 1 );				// 1 "z:last" undefined []
+
+f( 1, 2, 3 );		// 1 2 3 ["z:last"]
+
+f( 1, 2, 3, 4 );	// 1 2 3 [4,"z:last"]
+```
+
+The value `"z:last"` is only applied to the `z` parameter in the case where `f(..)` is called with exactly two arguments (matching `x` and `y` parameters). In all other cases, the `"z:last"` will just be the right-most argument, however many arguments precede it.
+
 ## One At A Time
 
 Let's examine a technique similar to partial application, where a function that expects multiple arguments is broken down into successive chained functions that each take a single argument (arity: 1) and return another function to accept the next argument.
@@ -536,9 +559,7 @@ Another commonly cited example using `unary(..)` is:
 // [1,2,3]
 ```
 
-For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an index in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore this `index` argument.
-
-We could also have solved this with `partialRight(parseInt,10)`, which creates a unary function where the `radix` argument has already been preset to `10`.
+For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an `index` in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is not mistaken as the `radix`.
 
 ### One On One
 
@@ -669,20 +690,16 @@ Let's revisit an example from earlier:
 // [1,2,3]
 ```
 
-In this example, `mapper(..)` is actually serving an important purpose, which is to discard the `index` argument that `map(..)` would pass in, because `parseInt(..)` would incorrectly interpret that value as a `radix` for the parsing. This was an example where `unary(..)` helps us out.
-
-As a matter of fact, not only can we achieve point-free with `unary(..)` here, we can alternately do so with the `partialRight(..)` utility:
+In this example, `mapper(..)` is actually serving an important purpose, which is to discard the `index` argument that `map(..)` would pass in, because `parseInt(..)` would incorrectly interpret that value as a `radix` for the parsing. This was an example where `unary(..)` helps us out:
 
 ```js
 ["1","2","3"].map( unary( parseInt ) );
 // [1,2,3]
-
-// or
-
-["1","2","3"].map( partialRight( parseInt, 10 ) );
 ```
 
-The key thing to look for is if you have a function with parameter(s) that is/are directly passed to an inner function call. In both the above examples, `mapper(..)` had the `v` parameter that was passed along to another function call. We were able to replace that layer of abstraction with a point-free expression using various FP operations like `unary(..)` and `partialRight(..)`.
+The key thing to look for is if you have a function with parameter(s) that is/are directly passed to an inner function call. In both the above examples, `mapper(..)` had the `v` parameter that was passed along to another function call. We were able to replace that layer of abstraction with a point-free expression using `unary(..)`.
+
+**Warning:** You might have been tempted, as I was, to try `map(partialRight(parseInt,10))` to right-partially apply the `10` value as the `radix`. However, as we saw earlier, `partialRight(..)` only guarantees that `10` will be the last argument passed in, not that it will be specifically the second argument. Since `map(..)` itself passes three arguments (`value`, `index`, `arr`) to its mapping function, the `10` value would just be the fourth argument to `parseInt(..)`; it only pays attention to the first two.
 
 Here's another example:
 
