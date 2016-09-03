@@ -55,15 +55,31 @@ I call the less formal practice herein "Functional-Light Programming" because I 
 
 I know many FPers who believe that the formalism itself helps learning. But I personally think there's a very definite cliff where that only becomes true once you reach a certain comfort with the formalism. If you happen to already have a math background or even some flavors of CS experience, this may come more naturally to you. But some of us don't, and no matter how hard we try, the formalism keeps getting in the way.
 
-So this book aims to introduce the concepts that I believe FP is built on, but come at it by easing you up the cliff rather than throwing you straight at it to figure out how to climb as you go.
+So this book introduces the concepts that I believe FP is built on, but comes at it by nudging you up the cliff wall rather than throwing you straight at it to figure out how to climb as you go.
 
 ## YAGNI
+
+If you've been around programming for very long, chances are you've heard the phrase "YAGNI" before: "You Ain't Gonna Need It". This principle primarily comes from extreme programming, and stresses the high risk and cost of building a feature before it's needed.
+
+Sometimes we guess we'll need a feature in the future, build it now believing it'll be easier to do as we build other stuff, then realize we guessed wrong and the feature wasn't needed, or needed to be quite different. Other times we guess right, but build a feature too early, and suck up time from the features that are genuinely needed now; we incur an opportunity cost in diluting our energy.
+
+YAGNI challenges us to remember: even if it's counter intuitive in a situation, we often should postpone building something until it's presently needed. We often exaggerate our mental estimates of the future refactoring cost to add it later when it is needed.
+
+As it applies to functional programming, I would give this admonition: there will be plenty of interesting and compelling patterns discussed in this text, but just because you find some pattern exciting to apply, it may not necessarily be appropriate to do so.
+
+This is where I will differ from many more formal FPers, when I say that just because you *can* FP something doesn't mean you *should* FP it. Moreover, there are many ways to slice a problem, and even though you may have learned a more sophisticated approach that is more "future-proof" to maintenance and extensibility, a simpler FP pattern might be more than sufficient in that spot.
+
+Generally, I'd recommend to seek balance in what you code, and to be conservative in your application of FP concepts as you get the hang of things. Default to the YAGNI principle in deciding if a certain pattern or abstraction will help that part of the code be more readable or if it's just introducing more clever sophistication that isn't (yet) warranted.
 
 > Reminder, any extensibility point that’s never used isn’t just wasted effort, it’s likely to also get in your way as well
 >
 > Jeremy D. Miller @jeremydmiller 2/20/15
 >
 > https://twitter.com/jeremydmiller/status/568797862441586688
+
+Remember, every single line of code you write, has a reader cost associated with it. That reader may be another team member, or even your future self. Neither of those readers will be impressed with overly clever unnecessary sophistication to show off FP prowess.
+
+The best code will be the code that is most readable in the future because it strikes exactly the right balance between what it can/should be (idealism) and what it must be (pragmatism).
 
 ## Resources
 
