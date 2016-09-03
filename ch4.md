@@ -23,6 +23,8 @@ functionValue <-- unary <-- adder <-- 3
 
 `3` is the input to `adder(..)`. The output of `adder(..)` is the input to `unary(..)`. The output of `unary(..)` is `functionValue`. This is called the composition of `unary(..)` and `adder(..)`.
 
+Think of this flow of data like a conveyor belt in a candy factory, where each operation is step in the process of making, wrapping, and packing a piece of candy. We'll use the candy factory metaphor to explain what composition is.
+
 Let's examine composition in action one step at a time. Consider these two utilitites you might have in your program:
 
 ```js
@@ -65,15 +67,21 @@ wordsUsed;
 // "input","second"]
 ```
 
-We name the array output of `words(..)` as `wordsFound`. The input of `unique(..)` is also an array, so we can pass the `wordsFound` into it. But let's now skip the intermediate `wordsFound` variable, and just use the two function calls together:
+We name the array output of `words(..)` as `wordsFound`. The input of `unique(..)` is also an array, so we can pass the `wordsFound` into it.
+
+This is like one machine in the candy factory assembly line taking as "input" the liquid chocolate, and its "output" being a block of cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut of piece of chocolate. And so on.
+
+But let's now skip the intermediate step (the `wordsFound` variable in the above snippet), and just use the two function calls together:
 
 ```js
 var wordsUsed = unique( words( text ) );
 ```
 
+We've taken the two machines in the chocolate factory and hooked up the output valve of the first one to the input valve of the second one. There's no intermediate time where the block of chocolate rumbles down a conveyor belt from one machine to the next; it comes out of one and immediately into the next.
+
 **Note:** Though we typically read the function calls right-to-left, `unique(..)` and then `words(..)`, the order of operations will actually be inner-to-outer; `words(..)` will run first and then `unique(..)`. Later we'll talk about a pattern that reverses the order of execution to follow our natural left-to-right reading.
 
-What if we now decided this new compound lego -- the pairing of `words(..)` and `unique(..)` in that specific order of execution -- is something we'd like to use in various other parts of our application? We could define a utility function that combined them:
+What if we now decided the pairing of `words(..)` and `unique(..)` in that specific order of execution -- like a compound lego -- is something we'd like to use in various other parts of our application? We could define a utility function that combined them:
 
 ```js
 function uniqueWords(str) {
@@ -86,6 +94,8 @@ function uniqueWords(str) {
 ```
 wordsUsed <-- unique <-- words <-- text
 ```
+
+Now our candy factory has made a new single machine that takes in melted chocolate and spits out ready-to-wrap chocolate candies; it does both steps at once. That's composition.
 
 It may seem like `<-- unique <-- words` is the only order these two functions can be composed. But we could actually compose them in the opposite order to create a utility with a bit of a different purpose:
 
@@ -156,7 +166,9 @@ If we can define the composition of two functions, we can just keep going to sup
 finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```
 
-And we can implement such a general `compose(..)` utility like this:
+What we're suggesting is that the candy factory got rid of the conveyor belt and all the separate machines, and made a single machine that could do all the steps at once. Put in melted chocolate on one side, out pops wrapped and bagged candy on the other side. It's Willy Wonka's dream!
+
+We can implement a general `compose(..)` utility like this:
 
 ```js
 function compose(...fns) {
