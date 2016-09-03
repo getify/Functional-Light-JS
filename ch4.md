@@ -768,4 +768,10 @@ This snippet is less verbose for sure, but I think it's less readable than the p
 
 ## Summary
 
-Composition is cool.
+Function composition is a pattern for defining a function that routes the output of one function call into another function call, and its output to another, and so on.
+
+Because JS functions can only return single values, the pattern essentially dictates that all functions in the composition (except perhaps the first called) need to be unary, taking only a single input from the output of the previous.
+
+Instead of listing out each step as a discrete call in our code, function composition using a utility like `compose(..)` abstracts that implementation detail so the code is more readable, allowing us to focus on *what* the composition will be used to accomplish, not *how* it will be performed.
+
+Composition is one of the most important tools that underpins most of the rest of FP.
