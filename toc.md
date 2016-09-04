@@ -28,7 +28,8 @@
 	* Abstraction
 	* Revisiting Points
 * Chapter 5: Reducing Side Effects
-	* TODO
+	* Effects On The Side, Please
+	* Pure
 * Chapter 6: Value Immutability
 	* TODO
 * Chapter 7: List Operations
