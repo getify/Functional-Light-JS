@@ -113,7 +113,7 @@ To aid readability, all of the causes that will contribute to determining the ef
 
 #### Fixed State
 
-Does that mean the `foo(..)` function cannot reference any lexical identifier from outside itself?
+Does avoiding side causes mean the `foo(..)` function cannot reference any lexical identifier from outside itself?
 
 Consider this code:
 
@@ -131,9 +131,9 @@ foo( 3 );			// 9
 
 It's clear that for both `foo(..)` and `bar(..)`, the only direct cause is the `x` parameter. But what about the `bar(x)` call? `bar` is just an identifier, and in JS it's not even a constant by default. The `foo(..)` function is relying on the value of `bar` -- here it's a reference to the `bar(..)` function -- as one of its causes.
 
-So is this program relying on side causes?
+So is this program relying on a side cause?
 
-I say no. Even though it is *possible* to overwrite the `bar` identifier's value with some other function, I am not doing so in this code, nor is it a common practice or precedent to do so. For all intents and purposes, my functions are constants (never reassigned).
+I say no. Even though it is *possible* to overwrite the `bar` variable's value with some other function, I am not doing so in this code, nor is it a common practice or precedent to do so. For all intents and purposes, my functions are constants (never reassigned).
 
 Consider:
 
@@ -153,11 +153,13 @@ Two observations will help us answer that question in a reasonable way:
 
 1. Think about every call you might ever make to `foo(3)`. Will it always return that `9.424..` value? **Yes.** Every single time. If you give it the same input (`x`), it will always return the same output.
 
-2. Could you replace every usage of `PI` with its immediate value, and could the program run **exactly** the same as it did before? **Yes.**
+2. Could you replace every usage of `PI` with its immediate value, and could the program run **exactly** the same as it did before? **Yes.** There's no part of this program that relies on being able to change the value of `PI` -- indeed since it's a `const`, it cannot be reassigned -- so the `PI` variable here is only for readability/maintenance sake. Its value can be inlined without any change in program behavior.
 
-My conclusion: `PI` here is not a violation of the spirit of minimizing/avoiding side effects (causes). Nor is the `bar(x)` call in the previous snippet.
+My conclusion: `PI` here is not a violation of the spirit of minimizing/avoiding side effects (or causes). Nor is the `bar(x)` call in the previous snippet.
 
 In both cases, `PI` and `bar` are not part of the state of the program. They're fixed, non-reassignable ("constant") references. If they don't change throughout the program, we don't have to worry about tracking them as changing state. As such, they don't harm our readability.
+
+**Note:** The use of `const` above does not, in my opinion, add anything to the case that `PI` is absolved as a side cause; `var PI` would lead to the same conclusion. The lack of reassigning `PI` is what matters, not the inability to do so. We'll discuss `const` in a later chapter.
 
 ### Idempotence
 
@@ -182,6 +184,8 @@ Referential Transparency.
 
 ## Summary
 
-Side effects are bad because they make your code much harder to understand. Pure functions are how we avoid side effects.
+Side effects are harmful to code readability and quality because they make your code much harder to understand. Side effects are also one of the most common *causes* of bugs in programs, because juggling them is hard.
 
-Prefer pure functions in as many places as that's practical. Collect impure functions side effects together as much as possible, so that it's easier to identify and audit the most likely culprits of bugs when the arise.
+Pure functions are how we avoid side effects. A pure function is one that always returns the same output given the same input, and has no side causes or side effects.
+
+No program can be entirely free of side effects. But prefer pure functions in as many places as that's practical. Collect impure functions side effects together as much as possible, so that it's easier to identify and audit the most likely culprits of bugs when they arise.
