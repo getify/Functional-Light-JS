@@ -172,7 +172,7 @@ Programming:
 
 * `obj.x = 2`
 
-## Pure
+## Pure Bliss
 
 No side effects!
 
@@ -181,6 +181,10 @@ A pure function is idempotent in the programming sense, but not necessarily idem
 ### There Or Not
 
 Referential Transparency.
+
+## Purifying
+
+What can you do if you have an impure function that you cannot refactor to be pure?
 
 ## Summary
 
