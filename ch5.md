@@ -157,9 +157,100 @@ Two observations will help us answer that question in a reasonable way:
 
 My conclusion: `PI` here is not a violation of the spirit of minimizing/avoiding side effects (or causes). Nor is the `bar(x)` call in the previous snippet.
 
-In both cases, `PI` and `bar` are not part of the state of the program. They're fixed, non-reassignable ("constant") references. If they don't change throughout the program, we don't have to worry about tracking them as changing state. As such, they don't harm our readability.
+In both cases, `PI` and `bar` are not part of the state of the program. They're fixed, non-reassignable ("constant") references. If they don't change throughout the program, we don't have to worry about tracking them as changing state. As such, they don't harm our readability. And they cannot be the source of bugs related to variables changing in unexpected ways.
 
-**Note:** The use of `const` above does not, in my opinion, add anything to the case that `PI` is absolved as a side cause; `var PI` would lead to the same conclusion. The lack of reassigning `PI` is what matters, not the inability to do so. We'll discuss `const` in a later chapter.
+**Note:** The use of `const` above does not, in my opinion, make the case that `PI` is absolved as a side cause; `var PI` would lead to the same conclusion. The lack of reassigning `PI` is what matters, not the inability to do so. We'll discuss `const` in a later chapter.
+
+### Side Bugs
+
+The scenarios where side causes and side effects can lead to bugs are as varied as the programs in existence. But let's examine a scenario to illustrate these hazards, in hopes that they help us recognize similar mistakes in our own programs.
+
+Consider:
+
+```js
+var users = {};
+var userOrders = {};
+
+function fetchUserData(userId) {
+	ajax( "http://some.api/user/" + userId, function onUserData(userData){
+		users[userId] = userData;
+	} );
+}
+
+function fetchOrders(userId) {
+	ajax( "http://some.api/orders/" + userId, function onOrders(orders){
+		for (let i = 0; i < orders.length; i++) {
+			// keep a reference to latest order for each user
+			users[userId].latestOrder = orders[i];
+			orders[orders[i].orderId] = orders[i];
+		}
+	} );
+}
+
+function deleteOrder(orderId) {
+	var user = users[ orders[orderId].userId ];
+	var isLatestOrder = (orders[orderId] == user.latestOrder);
+
+	// deleting the latest order for a user?
+	if (isLatestOrder) {
+		hideLatestOrderDisplay();
+	}
+
+	ajax( "http://some.api/delete/order/" + orderId, function onDelete(success){
+		if (success) {
+			// deleted the latest order for a user?
+			if (isLatestOrder) {
+				user.latestOrder = null;
+			}
+
+			orders[orderId] = null;
+		}
+		else if (isLatestOrder) {
+			showLatestOrderDisplay();
+		}
+	} );
+}
+```
+
+I bet for some of you readers one of the potential bugs here is fairly obvious. If the callback `onOrders(..)` runs before the `onUserData(..)` callback, it will attempt to add a `latestOrder` property to a value (the `userData` object at `users[userId]`) that's not yet been set.
+
+So one form of "bug" that can occur with logic that relies on side causes/effects is the race condition of two different operations (async or not!) that we expect to run in a certain order but under some cases may run in a different order. There are strategies for ensuring the order of operations, and it's fairly obvious that order is critical in that case.
+
+Another more subtle bug can bite us here. Did you spot it?
+
+Consider this order of calls:
+
+```js
+fetchUserData( 123 );
+onUserData(..);
+fetchOrders( 123 );
+onOrders(..);
+
+// later
+
+fetchOrders( 123 );
+deleteOrder( 456 );
+onOrders(..);
+onDelete(..);
+```
+
+There's a delay in time between when we set `isLatestOrder` and when we use it to decide if we should empty the `latestOrder` property of the user data object in `users`. During that delay, the `onOrders(..)` callback fires, which can potentially change which order value that user's `latestOrder` reference points to. When `onDelete(..)` subsequently fires, it will assume it still needs to unset the `latestOrder` reference.
+
+Now the data (state) might be out of sync. `latestOrder` will be unset, when potentially it should have stayed pointing at a newer order that came in to `onOrders(..)`.
+
+The worst part of this kind of bug is that you don't get an error like we did with the other bug. We just simply have state that is incorrect, and our application's behavior is "gracefully" broken.
+
+The sequencing dependency between `fetchUserData(..)` and `fetchOrders(..)` is fairly obvious, and straightforwardly addressed. But it's far less clear that there's a potential sequencing dependency between `fetchOrders(..)` and `deleteOrder(..)`. These two seem to be more independent. And ensuring that their order is preserved is more tricky, because you don't know in advance (before the results from `fetchOrders(..)`) whether that sequencing really must be enforced.
+
+Yes, you can recompute an `isLatestOrder` once `deleteOrder(..)` fires. But now you have a different problem: your UI state can be out of sync.
+
+If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call `showLatestOrderDisplay()`, but only if the new `latestOrder` has in fact been set. So you'll need to track at least two states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
+
+All of these hassles are because we decided to structure our code with side causes/effects on a shared set of state.
+
+Functional programmers detest these sorts of side cause/effect bugs because of how much it hurts our ability read, reason about, validate, and trust the code. That's why they take the advice to avoid side causes/effects so seriously.
+
+There are multiple different strategies for avoiding/fixing these kinds of problems. We'll talk about some later in this chapter, and others in later chapters. I'll say one thing for certain: **writing with side causes/effects is often of our normal default** so avoiding them is going to require careful and intentional effort.
 
 ### Idempotence
 

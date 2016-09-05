@@ -29,7 +29,8 @@
 	* Revisiting Points
 * Chapter 5: Reducing Side Effects
 	* Effects On The Side, Please
-	* Pure
+	* Pure Bliss
+	* Purifying
 * Chapter 6: Value Immutability
 	* TODO
 * Chapter 7: List Operations
