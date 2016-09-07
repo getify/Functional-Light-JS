@@ -266,7 +266,7 @@ There are multiple different strategies for avoiding/fixing side causes/effects.
 
 If you must make side effect changes to state, one class of operations that's useful for limiting the potential trouble is idempotence. If your update of a value is idempotent, then data will be resilient to the case where you might have multiple such updates from different side effect sources.
 
-The definition of idempotency is a little confusing; mathematicians use a slightly different meaning than programmers typically do. However, both perspectives are useful for the functional programmer.
+The definition of idempotence is a little confusing; mathematicians use a slightly different meaning than programmers typically do. However, both perspectives are useful for the functional programmer.
 
 First, let's give a counter example that is neither mathematically nor programmingly idempotent:
 
@@ -315,7 +315,7 @@ String( x ) === String( String( x ) );				// true
 Boolean( y ) === Boolean( Boolean( y ) );			// true
 ```
 
-Earlier in the text, we explored a common FP tool that fulfills this form of idempotency:
+Earlier in the text, we explored a common FP tool that fulfills this form of idempotence:
 
 ```js
 identity( 3 ) === identity( identity( 3 ) );	// true
@@ -367,7 +367,7 @@ That perspective fits more with our observations about side effects, because it'
 
 This idempotence-style is often cited for HTTP operations (verbs) such as GET or PUT. If an HTTP REST API is properly following the specification guidance for idempotence, PUT is defined as an update operation that fully replaces a resource. As such, a client could either send a PUT request once or multiple times (with the same data), and the server would have the same resultant state regardless.
 
-Thinking about this in more concrete terms with programming, let's examine some side effect operations for their idempotency (or not):
+Thinking about this in more concrete terms with programming, let's examine some side effect operations for their idempotence (or not):
 
 ```js
 // idempotent:
@@ -416,8 +416,8 @@ What can you do if you have an impure function that you cannot refactor to be pu
 
 ## Summary
 
-Side effects are harmful to code readability and quality because they make your code much harder to understand. Side effects are also one of the most common *causes* of bugs in programs, because juggling them is hard.
+Side effects are harmful to code readability and quality because they make your code much harder to understand. Side effects are also one of the most common *causes* of bugs in programs, because juggling them is hard. Idempotence is a strategy for restricting side effects by essentially creating one-time-only operations.
 
-Pure functions are how we avoid side effects. A pure function is one that always returns the same output given the same input, and has no side causes or side effects.
+Pure functions are how we avoid side effects. A pure function is one that always returns the same output given the same input, and has no side causes or side effects. Referential transparency is the notion that a pure function's call could be replaced with its output and the program would not have its behavior altered.
 
 No program can be entirely free of side effects. But prefer pure functions in as many places as that's practical. Collect impure functions side effects together as much as possible, so that it's easier to identify and audit the most likely culprits of bugs when they arise.
