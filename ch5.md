@@ -234,23 +234,25 @@ onOrders(..);
 onDelete(..);
 ```
 
-There's a delay in time between when we set `isLatestOrder` and when we use it to decide if we should empty the `latestOrder` property of the user data object in `users`. During that delay, the `onOrders(..)` callback fires, which can potentially change which order value that user's `latestOrder` reference points to. When `onDelete(..)` subsequently fires, it will assume it still needs to unset the `latestOrder` reference.
+Do you see the interleaving of `fetchOrders(..)` / `onOrders(..)` with the `deleteOrder(..)` / `onDelete(..)` pair? That potential sequencing exposes a weird condition with our side causes/effects of state management.
 
-Now the data (state) might be out of sync. `latestOrder` will be unset, when potentially it should have stayed pointing at a newer order that came in to `onOrders(..)`.
+There's a delay in time (because of the callback) between when we set the `isLatestOrder` flag and when we use it to decide if we should empty the `latestOrder` property of the user data object in `users`. During that delay, if `onOrders(..)` callback fires, it can potentially change which order value that user's `latestOrder` references. When `onDelete(..)` then fires, it will assume it still needs to unset the `latestOrder` reference.
 
-The worst part of this kind of bug is that you don't get an error like we did with the other bug. We just simply have state that is incorrect, and our application's behavior is "gracefully" broken.
+The bug: the data (state) *might* now be out of sync. `latestOrder` will be unset, when potentially it should have stayed pointing at a newer order that came in to `onOrders(..)`.
+
+The worst part of this kind of bug is that you don't get a program-crashing exception like we did with the other bug. We just simply have state that is incorrect; our application's behavior is "silently" broken.
 
 The sequencing dependency between `fetchUserData(..)` and `fetchOrders(..)` is fairly obvious, and straightforwardly addressed. But it's far less clear that there's a potential sequencing dependency between `fetchOrders(..)` and `deleteOrder(..)`. These two seem to be more independent. And ensuring that their order is preserved is more tricky, because you don't know in advance (before the results from `fetchOrders(..)`) whether that sequencing really must be enforced.
 
-Yes, you can recompute an `isLatestOrder` once `deleteOrder(..)` fires. But now you have a different problem: your UI state can be out of sync.
+Yes, you can recompute the `isLatestOrder` flag once `deleteOrder(..)` fires. But now you have a different problem: your UI state can be out of sync.
 
 If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call `showLatestOrderDisplay()`, but only if a new `latestOrder` has in fact been set. So you'll need to track at least three states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
 
 All of these hassles are because we decided to structure our code with side causes/effects on a shared set of state.
 
-Functional programmers detest these sorts of side cause/effect bugs because of how much it hurts our ability read, reason about, validate, and trust the code. That's why they take the advice to avoid side causes/effects so seriously.
+Functional programmers detest these sorts of side cause/effect bugs because of how much it hurts our ability read, reason about, validate, and ultimately **trust** the code. That's why they take the principle to avoid side causes/effects so seriously.
 
-There are multiple different strategies for avoiding/fixing these kinds of problems. We'll talk about some later in this chapter, and others in later chapters. I'll say one thing for certain: **writing with side causes/effects is often of our normal default** so avoiding them is going to require careful and intentional effort.
+There are multiple different strategies for avoiding/fixing side causes/effects. We'll talk about some later in this chapter, and others in later chapters. I'll say one thing for certain: **writing with side causes/effects is often of our normal default** so avoiding them is going to require careful and intentional effort.
 
 ### Idempotence
 
