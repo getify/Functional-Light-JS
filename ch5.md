@@ -161,6 +161,14 @@ In both cases, `PI` and `bar` are not part of the state of the program. They're 
 
 **Note:** The use of `const` above does not, in my opinion, make the case that `PI` is absolved as a side cause; `var PI` would lead to the same conclusion. The lack of reassigning `PI` is what matters, not the inability to do so. We'll discuss `const` in a later chapter.
 
+### I/O Effects
+
+It may not have been terribly obvious yet, but the most common (and essentially unavoidable) form of side cause/effect is I/O (input/output). A program with no I/O is totally pointless, because its work cannot be observed in any way. Useful programs must at a minimum have output, and many also need input. Input is a side cause and output is a side effect.
+
+The typical input for the browser JS programmer is user events (mouse, keyboard) and for output is the DOM. If you work more in Node.js, you may more likely receive input from, and send output to, the file system, network connections, and/or the `stdin`/`stdout` streams.
+
+As a matter of fact, these sources can be both input and output, both cause and effect. Take the DOM, for example. We update (side effect) a DOM element to show text or an image to the user, but the current state of the DOM is an implicit input (side cause) to those operations as well.
+
 ### Side Bugs
 
 The scenarios where side causes and side effects can lead to bugs are as varied as the programs in existence. But let's examine a scenario to illustrate these hazards, in hopes that they help us recognize similar mistakes in our own programs.
@@ -254,16 +262,143 @@ Functional programmers detest these sorts of side cause/effect bugs because of h
 
 There are multiple different strategies for avoiding/fixing side causes/effects. We'll talk about some later in this chapter, and others in later chapters. I'll say one thing for certain: **writing with side causes/effects is often of our normal default** so avoiding them is going to require careful and intentional effort.
 
-### Idempotence
+## Once Is Enough, Thanks
 
-Mathematical:
+If you must make side effect changes to state, one class of operations that's useful for limiting the potential trouble is idempotence. If your update of a value is idempotent, then data will be resilient to the case where you might have multiple such updates from different side effect sources.
 
-* `abs(..)`
-* type conversions
+The definition of idempotency is a little confusing; mathematicians use a slightly different meaning than programmers typically do. However, both perspectives are useful for the functional programmer.
 
-Programming:
+First, let's give a counter example that is neither mathematically nor programmingly idempotent:
 
-* `obj.x = 2`
+```js
+function updateCounter(obj) {
+	if (obj.count < 10) {
+		obj.count++;
+		return true;
+	}
+
+	return false;
+}
+```
+
+This function mutates an object via reference by incrementing `obj.count`, so it produces a side effect on that object. If `updateCounter(o)` is called multiple times -- while `o.count` is less than `10`, that is -- the program state changes each time. Also, the output of `updateCounter(..)` is a boolean, which is not suitable to feed back into a subsequent call of `updateCounter(..)`.
+
+### Mathematic Idempotence
+
+From the mathematical point of view, idempotence means an operation whose output won't ever change after the first call, if you feed that output back into the operation over and over again. In other words, `foo(x)` would produce the same output as `foo(foo(x))`, `foo(foo(foo(x)))`, etc.
+
+A typical mathematic example is `Math.abs(..)` (absolute value). `Math.abs(-2)` is `2`, which is the same result as `Math.abs(Math.abs(Math.abs(Math.abs(-2))))`. Utilities like `Math.min(..)`, `Math.max(..)`, `Math.round(..)`, `Math.floor(..)` and `Math.ceil(..)` are also idempotent.
+
+Some custom mathematical operations we could define with this same characteristic:
+
+```js
+function toPower0(x) {
+	return Math.pow( x, 0 );
+}
+
+function snapUp3(x) {
+	return x - (x % 3) + (x % 3 > 0 && 3);
+}
+
+toPower0( 3 ) == toPower0( toPower0( 3 ) );			// true
+
+snapUp3( 3.14 ) == snapUp3( snapUp3( 3.14 ) );		// true
+```
+
+Mathematical-style idempotence is **not** restricted to mathematic operations. Another place we can illustrate this form of idempotence is with JavaScript primitive type coercions:
+
+```js
+var x = 42, y = "hello";
+
+String( x ) === String( String( x ) );				// true
+
+Boolean( y ) === Boolean( Boolean( y ) );			// true
+```
+
+Earlier in the text, we explored a common FP tool that fulfills this form of idempotency:
+
+```js
+identity( 3 ) === identity( identity( 3 ) );	// true
+```
+
+Certain string operations are also naturally idempotent, such as:
+
+```js
+function upper(x) {
+	return x.toUpperCase();
+}
+
+function lower(x) {
+	return x.toLowerCase();
+}
+
+var str = "Hello World";
+
+upper( str ) == upper( upper( str ) );				// true
+
+lower( str ) == lower( lower( str ) );				// true
+```
+
+We can even design more sophisticated string formatting operations in an idempotent way, such as:
+
+```js
+function currency(val) {
+	var num = parseFloat(
+		String( val ).replace( /[^\d.-]+/g, "" )
+	);
+	var sign = (num < 0) ? "-" : "";
+	return `${sign}$${Math.abs( num ).toFixed( 2 )}`;
+}
+
+currency( -3.1 );									// "-$3.10"
+
+currency( -3.1 ) == currency( currency( -3.1 ) );	// true
+```
+
+`currency(..)` illustrates an important technique: in some cases the developer can take extra steps to normalize an input/output operation to ensure the operation is idempotent where it normally wouldn't be.
+
+Wherever possible, restricting side effects to idempotent operations is much better than unrestricted updates.
+
+### Programming Idempotence
+
+The programming-oriented definition for idempotence is similar, but less formal. Instead of requiring `f(x) === f(f(x))`, this view of idempotence is just that `f(x);` results in the same program behavior as `f(x); f(x);`. In other words, the result of calling `f(x)` subsequent times after the first call doesn't change anything.
+
+That perspective fits more with our observations about side effects, because it's more likely that such an `f(..)` operation creates an idempotent side effect rather than necessarily returning an idempotent output value.
+
+This idempotence-style is often cited for HTTP operations (verbs) such as GET or PUT. If an HTTP REST API is properly following the specification guidance for idempotence, PUT is defined as an update operation that fully replaces a resource. As such, a client could either send a PUT request once or multiple times (with the same data), and the server would have the same resultant state regardless.
+
+Thinking about this in more concrete terms with programming, let's examine some side effect operations for their idempotency (or not):
+
+```js
+// idempotent:
+obj.count = 2;
+a[a.length - 1] = 42;
+person.name = upper( person.name );
+
+// non-idempotent:
+obj.count++;
+a[a.length] = 42;
+person.lastUpdated = Date.now();
+```
+
+Remember: the notion of idempotence here is that each idempotent operation (like `obj.count = 2`) could be repeated multiple times and not change the program operation beyond the first update. The non-idempotent operations change the state each time.
+
+What about DOM updates?
+
+```js
+var hist = document.getElementById( "orderHistory" );
+
+// idempotent:
+hist.orderHistory.innerHTML = order.historyText;
+
+// non-idempotent:
+var update = document.createTextNode( order.latestUpdate );
+hist.orderHistory.appendChild( update );
+```
+
+The key difference illustrated here is that the idempotent update replaces the DOM element's content. The current state of the DOM element is irrelevant, because it's unconditionally overwritten. The non-idempotent operation adds content to the element; implicitly, the current state of the DOM element is part of computing the next state.
+
+It won't always be possible to define your operations on data in an idempotent way, but if you can, it will definitely help reduce the chances that your side effects will crop up to break your expectations when you least expect it.
 
 ## Pure Bliss
 

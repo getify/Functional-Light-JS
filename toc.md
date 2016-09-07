@@ -29,6 +29,7 @@
 	* Revisiting Points
 * Chapter 5: Reducing Side Effects
 	* Effects On The Side, Please
+	* Once Is Enough, Thanks
 	* Pure Bliss
 	* Purifying
 * Chapter 6: Value Immutability
