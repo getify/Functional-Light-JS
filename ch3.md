@@ -276,11 +276,11 @@ curriedAjax( "http://some.api/person" )
 Perhaps splitting out each call helps understand what's going on better:
 
 ```js
-var curriedGetPerson = curriedAjax( "http://some.api/person" );
+var personFetcher = curriedAjax( "http://some.api/person" );
 
-var curriedGetCurrentUser = curriedGetPerson( { user: CURRENT_USER_ID } );
+var getCurrentUser = personFetcher( { user: CURRENT_USER_ID } );
 
-curriedGetCurrentUser( function foundUser(user){ /* .. */ } );
+getCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
 Instead of taking all the arguments at once (`ajax(..)`), or some of the arguments up-front (`partial(..)`) and some later, the `curriedAjax(..)` function gets one argument at a time, each in a separate function call.
@@ -340,13 +340,11 @@ Here's how we would use it for our earlier `ajax(..)` example:
 ```js
 var curriedAjax = curry( ajax );
 
-// from here on, it's the same as before:
+var personFetcher = curriedAjax( "http://some.api/person" );
 
-var curriedGetPerson = curriedAjax( "http://some.api/person" );
+var getCurrentUser = personFetcher( { user: CURRENT_USER_ID } );
 
-var curriedGetCurrentUser = curriedGetPerson( { user: CURRENT_USER_ID } );
-
-curriedGetCurrentUser( function foundUser(user){ /* .. */ } );
+getCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
 Remember our example from earlier about adding `3` to a each value in a list of numbers? Recall that currying is just a special case of partial application, so we could do that task with currying in almost the same way:
