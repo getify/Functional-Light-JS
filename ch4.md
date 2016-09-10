@@ -5,9 +5,11 @@ By now, I hope you're feeling much more comfortable with what it means to use fu
 
 A functional programmer sees every function in their program like a little simple lego piece. They recognize the blue 2x2 brick at a glance, and know exactly how it works and what they can do with it. As they go about building a bigger complex lego model, as they need each next piece, they already have an instinct for which of their many spare pieces to grab.
 
-But sometimes you take the blue 2x2 brick and the gray 4x1 brick and put them together in a certain way, and you realize, "that's a useful piece that I need often". So now you've come up with a new "piece", a combination of two other pieces, and you can reach for that kind of piece now anytime you need it. It's more effective to recognize and use this compound blue-gray L-brick thing where it's needed than to separately think about the two constitutent bricks each time.
+But sometimes you take the blue 2x2 brick and the gray 4x1 brick and put them together in a certain way, and you realize, "that's a useful piece that I need often".
 
-Functions come in a variety of shapes and sizes. And we can define a certain combination of them to make a new composite function that will be handy in various parts of the program. This process of using functions together is called composition.
+So now you've come up with a new "piece", a combination of two other pieces, and you can reach for that kind of piece now anytime you need it. It's more effective to recognize and use this compound blue-gray L-brick thing where it's needed than to separately think about assembling the two individual bricks each time.
+
+Functions come in a variety of shapes and sizes. And we can define a certain combination of them to make a new compound function that will be handy in various parts of the program. This process of using functions together is called composition.
 
 ## Output To Input
 
@@ -23,7 +25,7 @@ functionValue <-- unary <-- adder <-- 3
 
 `3` is the input to `adder(..)`. The output of `adder(..)` is the input to `unary(..)`. The output of `unary(..)` is `functionValue`. This is called the composition of `unary(..)` and `adder(..)`.
 
-Think of this flow of data like a conveyor belt in a candy factory, where each operation is step in the process of making, wrapping, and packing a piece of candy. We'll use the candy factory metaphor to explain what composition is.
+Think of this flow of data like a conveyor belt in a candy factory, where each operation is step in the process of making, wrapping, and packing a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
 
 Let's examine composition in action one step at a time. Consider these two utilitites you might have in your program:
 
@@ -69,19 +71,29 @@ wordsUsed;
 
 We name the array output of `words(..)` as `wordsFound`. The input of `unique(..)` is also an array, so we can pass the `wordsFound` into it.
 
-This is like one machine in the candy factory assembly line taking as "input" the liquid chocolate, and its "output" being a block of cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut of piece of chocolate. And so on.
+In the candy factory assembly line, the first machine takes as "input" the melted chocolate, and its "output" is a chunk of formed and cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut-up of piece of chocolate candy. Next, a machine on the line takes small pieces of chocolate candy from the conveyor belt and outputs wrapped candies ready to bag and ship.
 
-But let's now skip the intermediate step (the `wordsFound` variable in the above snippet), and just use the two function calls together:
+The candy factory is fairly successful with this process, but as with all businesses, management keeps searching for ways to grow.
+
+To keep up with demand for more candy production, they decide to take out the conveyor belt contraption and just stack all three machines on top of each other, so that the output valve of one is connected directly to the input valve of the one below it. There's no longer sprawling wasted space where a chunk of chocolate slowly and noisly rumbles down a conveyor belt from the first machine to the second.
+
+This innovation saves a lot of room on the factory floor, so management is happy they'll get to make more candy each day!
+
+The code equivalent of this improved candy factory configuration is to skip the intermediate step (the `wordsFound` variable in the earlier snippet), and just use the two function calls together:
 
 ```js
 var wordsUsed = unique( words( text ) );
 ```
 
-We've taken the two machines in the chocolate factory and hooked up the output valve of the first one to the input valve of the second one. There's no intermediate time where the block of chocolate rumbles down a conveyor belt from one machine to the next; it comes out of one and immediately into the next.
+**Note:** Though we typically read the function calls left-to-right -- `unique(..)` and then `words(..)` -- the order of operations will actually be more right-to-left, or inner-to-outer. `words(..)` will run first and then `unique(..)`. Later we'll talk about a pattern that matches the order of execution to our natural left-to-right reading.
 
-**Note:** Though we typically read the function calls right-to-left, `unique(..)` and then `words(..)`, the order of operations will actually be inner-to-outer; `words(..)` will run first and then `unique(..)`. Later we'll talk about a pattern that reverses the order of execution to follow our natural left-to-right reading.
+The stacked machines are working fine, but it's kind of clunky to have the wires hanging out all over the place. The more of these machine-stacks they create, the more cluttered the factory floor gets. And the effort to assemble and maintain all these machine stacks is awfully time intensive.
 
-What if we now decided the pairing of `words(..)` and `unique(..)` in that specific order of execution -- like a compound lego -- is something we'd like to use in various other parts of our application? We could define a utility function that combined them:
+One morning, an engineer at the candy factory has a great idea. She figures that it'd be much more efficient if she made an outer box to hide all the wires; on the inside, all three of the machines are hooked up together, and on the outside everything is now neat and tidy. On one side of this fancy new machine is a valve to pour in melted chocolate and on the other is a valve that spits out wrapped chocolate candies. Brilliant!
+
+This single compound machine is much easier to move around and install wherever the factory needs it. The workers on the factory floor are even happier because they don't need to fidget with buttons and dials on three individual machines anymore; they quickly prefer using the single fancy machine.
+
+Relating back to the code: we now realize that the pairing of `words(..)` and `unique(..)` in that specific order of execution -- think: compound lego -- is something we could use in several other parts of our application. So, let's define a compound function that combines them:
 
 ```js
 function uniqueWords(str) {
@@ -95,48 +107,20 @@ function uniqueWords(str) {
 wordsUsed <-- unique <-- words <-- text
 ```
 
-Now our candy factory has made a new single machine that takes in melted chocolate and spits out ready-to-wrap chocolate candies; it does both steps at once. That's composition.
+You certainly get it by now: the unfolding revolution in candy factory design is function composition.
 
-It may seem like `<-- unique <-- words` is the only order these two functions can be composed. But we could actually compose them in the opposite order to create a utility with a bit of a different purpose:
+### Machine Maker
 
-```js
-function letters(str) {
-	return words( unique( str ) );
-}
+The candy factory is humming along nicely, and thanks to all the saved space, they now have plenty of room to try out making new kinds of candies. Building on the earlier success, management is keen to keep inventing new fancy compound machines for their growing candy assortment.
 
-var chars = letters( "How are you Henry?" );
-chars;
-// ["h","o","w","a","r","e","y","u","n"]
-```
+But the factory engineers struggle to keep up, because each time a new kind of fancy compound machine needs to be made, they spend quite a bit of time making the new outer box and fitting the individual machines into it.
 
-This works because the `words(..)` utility, for value type safety sake, coerces its input to a string using `String(..)`. So the array that `unique(..)` returns becomes the string `"H,o,w, ,a,r,e,y,u,n,?"`, and then `words(..)` processes it into the `chars` array shown.
+So the factory engineers contact an industrial machine vendor for help. They're amazed to find out that this vendor offers a machine-making machine! As incredible as it sounds, they get a machine that can take some of the factory's smaller machines -- the chocolate cutting one, for example -- and wire them altogether automatically, even wrapping the nice clean bigger box around them. This is surely going to make the candy factory really take off!
 
-Admittedly, this is a slightly contrived example. But the point is that function compositions are not always unidirectional. Sometimes we put the gray brick on top of the blue brick, and sometimes we put the blue brick on top.
-
-### General Composition
-
-Recall from earlier:
+Back to code land, let's consider a utility called `compose2(..)` that creates a composition of two functions automatically, exactly the same way we did manually:
 
 ```js
-function uniqueWords(str) {
-	return unique( words( str ) );
-}
-```
-
-This definition works, but it may not be ideal to define it that way. As we saw in "No Points" in Chapter 3, it's not point-free, because of the `str` parameter-to-argument passing.
-
-We could observe that the general form of the composition in `uniqueWords(..)` looks like this:
-
-```js
-function composed(origValue) {
-	return fn2( fn1( origValue ) );
-}
-```
-
-So let's define a helper utility for composing any two functions in this same way:
-
-```js
-function compose(fn2,fn1) {
+function compose2(fn2,fn1) {
 	return function composed(origValue){
 		return fn2( fn1( origValue ) );
 	};
@@ -148,17 +132,37 @@ var compose =
 		origValue => fn2( fn1( origValue ) );
 ```
 
-Now, here's a point-free definition of `uniqueWords(..)`:
-
-```js
-var uniqueWords = compose( unique, words );
-```
-
 Did you notice that we defined the parameter order as `fn2,fn1`, and furthermore that it's the second function listed (aka `fn1` parameter name) that runs first, then the first function listed (`fn2`)? In other words, the functions compose from right-to-left.
 
 That may seem like a strange choice, but there are some reasons for it. Most typical FP libraries define their `compose(..)` to work right-to-left in terms of ordering, so we're sticking with that convention.
 
-But why? I think the easiest explanation (but perhaps not the most historically accurate) is that we're listing them to match the order they are written if done manually, or rather the order we encounter them when reading from left-to-right. `unique(words(str))` has them in the order `unique,words`, so we make our `compose(..)` utility take them in that order, too.
+But why? I think the easiest explanation (but perhaps not the most historically accurate) is that we're listing them to match the order they are written if done manually, or rather the order we encounter them when reading from left-to-right.
+
+`unique(words(str))` lists the functions in the left-to-right order `unique,words`, so we make our `compose2(..)` utility accept them in that order, too. Now, the more efficient definition of the candy making machine is:
+
+```js
+var uniqueWords = compose2( unique, words );
+```
+
+### Composition Variation
+
+It may seem like the `<-- unique <-- words` combination is the only order these two functions can be composed. But we could actually compose them in the opposite order to create a utility with a bit of a different purpose:
+
+```js
+var letters = compose2( words, unique );
+
+var chars = letters( "How are you Henry?" );
+chars;
+// ["h","o","w","a","r","e","y","u","n"]
+```
+
+This works because the `words(..)` utility, for value-type safety sake, first coerces its input to a string using `String(..)`. So the array that `unique(..)` returns -- now the input to `words(..)` -- becomes the string `"H,o,w, ,a,r,e,y,u,n,?"`, and then the rest of the behavior in `words(..)` processes that string into the `chars` array.
+
+Admittedly, this is a slightly contrived example. But the point is that function compositions are not always unidirectional. Sometimes we put the gray brick on top of the blue brick, and sometimes we put the blue brick on top.
+
+The candy factory better be careful if they try to feed the wrapped candies into the machine that mixes and cools the chocolate!
+
+### General Composition
 
 If we can define the composition of two functions, we can just keep going to support composing any number of functions. The general data visualization flow for any number of functions being composed looks like this:
 
@@ -166,7 +170,7 @@ If we can define the composition of two functions, we can just keep going to sup
 finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```
 
-What we're suggesting is that the candy factory got rid of the conveyor belt and all the separate machines, and made a single machine that could do all the steps at once. Put in melted chocolate on one side, out pops wrapped and bagged candy on the other side. It's Willy Wonka's dream!
+Now the candy factory is using a machine that can take any number of separate smaller machines and spit out a big fancy machine that does everything in order. That's one heck of a candy operation. It's Willy Wonka's dream!
 
 We can implement a general `compose(..)` utility like this:
 
@@ -234,9 +238,9 @@ wordsUsed;
 // "function","input","second"]
 ```
 
-Let's recall `partialRight(..)` from Chapter 3 to do something more interesting with composition. We can build a right-partial application of `compose(..)` itself, pre-specifying the second and third arguments (`unique(..)` and `words(..)`, respectively); we'll call it `filterWords(..)` (see below).
+Now, let's recall `partialRight(..)` from Chapter 3 to do something more interesting with composition. We can build a right-partial application of `compose(..)` itself, pre-specifying the second and third arguments (`unique(..)` and `words(..)`, respectively); we'll call it `filterWords(..)` (see below).
 
-Then, we can complete the composition multiple times by calling `filterWords(..)`, but with different first-arguments for each:
+Then, we can complete the composition multiple times by calling `filterWords(..)`, but with different first-arguments respectively:
 
 ```js
 // uses a `<= 4` check instead of the `> 4` check
@@ -258,7 +262,7 @@ shorterWords( text );
 
 Of course, you can also `curry(..)` a composition, though because of right-to-left execution, you might more often want to curry `reverseArgs(compose)` rather than just `compose(..)` itself.
 
-**Note:** Since `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity: `curry( compose, 3 )`.
+**Note:** Since `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity: `curry(.. , 3)`.
 
 ### Alternate Implementations
 
@@ -373,7 +377,9 @@ Others will find the recursive approach quite a bit more daunting to mentally ju
 
 ## Reordered Composition
 
-We talked earlier about the right-to-left ordering of standard `compose(..)` implementations. The advantage is in listing the arguments (functions) in the same order they'd appear if doing the composition manually. The disadvantage is they're listed in the reverse order that they execute, which can be confusing.
+We talked earlier about the right-to-left ordering of standard `compose(..)` implementations. The advantage is in listing the arguments (functions) in the same order they'd appear if doing the composition manually.
+
+The disadvantage is they're listed in the reverse order that they execute, which could be confusing. It was also more awkward to have to use `partialRight(compose, ..)` to pre-specify the *first* function(s) to execute in the composition.
 
 The reverse ordering, composing from left-to-right, has a common name: `pipe(..)`. This name is said to come from Unix/Linux land, where multiple programs are strung together by "pipe"ing (`|` operator) the output of the first one in as the input of the second, and so on (i.e., `ls -la | grep "foo" | less`).
 
@@ -395,7 +401,7 @@ function pipe(...fns) {
 }
 ```
 
-In fact, let's just define `pipe(..)` as the arguments-reversal of `compose(..)`:
+In fact, we could just define `pipe(..)` as the arguments-reversal of `compose(..)`:
 
 ```js
 var pipe = reverseArgs( compose );
@@ -417,7 +423,7 @@ var biggerWords = pipe( words, unique, skipShortWords );
 
 The advantage of `pipe(..)` is that it lists the functions in order of execution, which can sometimes reduce reader confusion. It may be simpler to see `pipe(words,unique,skipShortWords)` and read that we do `words(..)` first, then `unique(..)`, and finally `skipShortWords(..)`.
 
-`pipe(..)` is also handy if you're in a situation where you want to partially apply the first function(s). Earlier we did that with right-partial application of `compose(..)`.
+`pipe(..)` is also handy if you're in a situation where you want to partially apply the *first* function(s) that execute. Earlier we did that with right-partial application of `compose(..)`.
 
 Compare:
 
