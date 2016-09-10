@@ -106,7 +106,29 @@ else if (fn.length == 3) {
 
 **Tip:** The `length` property of a function is read-only and it's determined at the time you declare the function. It should be thought of as essentially a piece of metadata that describes something about the intended usage of the function.
 
-What about counting the number of arguments a function receives? This used to be trivial, but now the situation is slightly more complicated. In the original version(s) of JavaScript, each function had an `arguments` object (array-like) that held a reference to each of the arguments passed in. You could then inspect the `length` property of `arguments` to figure out how many were actually passed.
+One gotcha to be aware of is that certain kinds of parameter list variations -- specifically, default can make the `length` property of the function report something different than you'd expect. Don't worry, we'll explain each of these (ES6-introduced) features later in this chapter:
+
+```js
+function foo(x,y = 2) {
+	// ..
+}
+
+function bar(x,...args) {
+	// ..
+}
+
+function baz( {a,b} ) {
+	// ..
+}
+
+foo.length;				// 1
+bar.length;				// 1
+baz.length;				// 1
+```
+
+If you use either of these forms of parameters, be aware that your function's `length` value may surprise you.
+
+So, what about counting the number of arguments a function receives? This used to be trivial, but now the situation is slightly more complicated. Each function has an `arguments` object (array-like) available that holds a reference to each of the arguments passed in. You can then inspect the `length` property of `arguments` to figure out how many were actually passed:
 
 ```js
 function foo(x,y,z) {
@@ -116,7 +138,7 @@ function foo(x,y,z) {
 foo( 3, 4 );
 ```
 
-As of ES5, `arguments` is deprecated. It'll almost certainly never be removed -- in JS we "never" break backwards-compatibility -- but it's strongly suggested for a whole range of reasons that you avoid using it whenever possible.
+As of ES5, `arguments` is deprecated. It'll almost certainly never be removed -- in JS we "never" break backwards-compatibility no matter how convenient that may be -- but it's strongly suggested for several reasons that you avoid using it whenever possible.
 
 However, I'm going to suggest to you that `arguments.length`, and only that, is OK to keep using for those cases where you need to care about the passed number of arguments. A feature added in a future version of JS might restore the ability to determine length of arguments list without `arguments.length`; if that happens, then we can fully get rid of `arguments`.
 
