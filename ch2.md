@@ -39,6 +39,10 @@ You're probably most used to thinking of functions as general procedures. What i
 
 But a function specifically takes input(s), and definitely always has a `return` value.
 
+For a quick comparison:
+**procedure**: may or may not have inputs and may or may not `return` output value.
+**function**: will take input(s) and always `return` output value.
+
 So the first observation I'd make about functional programming is that **you should be using functions as much as possible**, and not procedures. As much as possible, all your functions should take input(s) and return output(s). Why? The answer to that will have many levels of meaning that we'll uncover throughout this book.
 
 ## Function Input
@@ -175,7 +179,7 @@ foo( 1, 2, 3, 4 );		// 1 2 3 [ 4 ]
 foo( 1, 2, 3, 4, 5 );	// 1 2 3 [ 4, 5 ]
 ```
 
-So, if you *really* want to be design a function that can account for an arbitrary number of arguments to be passed in, use `...args` (or whatever name you like) on the end. Now, you'll have a real, non-deprecated, non-yucky array to access those argument values from.
+So, if you *really* want to design a function that can account for an arbitrary number of arguments to be passed in, use `...args` (or whatever name you like) on the end. Now, you'll have a real, non-deprecated, non-yucky array to access those argument values from.
 
 Just pay attention to the fact that the value `4` is at position `0` of that `args`, not position `3`. And its `length` value won't include those three `1`, `2`, and `3` values. Do the math.
 
@@ -961,7 +965,7 @@ sum( context );
 
 Simpler. And this kind of code will be a lot easier to deal with in FP. It's much easier to wire multiple functions together, or use any of the other input wrangling techniques we will get into in the next chapter, when inputs are always explicit. Doing them with implicit inputs like `this` ranges from awkward to nearly-impossible depending on the scenario.
 
-There are other tricks we can leverage in a `this`-based system, like for example prototype-delegation (also covered in detail in the "this & Object Prototypes" book):
+There are other tricks we can leverage in a `this`-based system, like, for example, prototype-delegation (also covered in detail in the "this & Object Prototypes" book):
 
 ```js
 var Auth = {
