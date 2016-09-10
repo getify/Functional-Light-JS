@@ -43,10 +43,12 @@ foo( 3 );
 
 This program has the exact same outcome. But there's a very big difference. The cause and the effect are disjoint. The effect is indirect. The setting of `y` in this way is what we call a side effect.
 
+**Note:** When a function makes a reference to a variable outside itself, this is called a free variable. Not all free variable references will be bad, but we'll want to be very careful with them.
+
 What if I gave you a reference to call a function `bar(..)` that you cannot see the code for, but I told you that it had no such indirect side effects, only an explicit `return` value effect?
 
 ```js
-bar( 4 );	// 42
+bar( 4 );			// 42
 ```
 
 Because you know that the internals of `bar(..)` do not create any side effects, you can now reason about any `bar(..)` call like this one in a much more straightforward way. But if you didn't know that `bar(..)` had no side effects, to understand the outcome of calling it, you'd have to go read and dissect all of its logic. This is extra mental tax burden for the reader.
@@ -83,7 +85,7 @@ If `foo()`, `bar()`, and `baz()` were all free of side effects, they could not a
 
 ### Hidden Causes
 
-Outputs, changes in state, are the most commonly cited manifestation of side effects. But another readability-endangering practice is what some refer to as side causes. Consider:
+Outputs, changes in state, are the most commonly cited manifestation of side effects. But another readability-harming practice is what some refer to as side causes. Consider:
 
 ```js
 function foo(x) {
@@ -113,7 +115,7 @@ To aid readability, all of the causes that will contribute to determining the ef
 
 #### Fixed State
 
-Does avoiding side causes mean the `foo(..)` function cannot reference any lexical identifier from outside itself?
+Does avoiding side causes mean the `foo(..)` function cannot reference any free variables?
 
 Consider this code:
 
@@ -129,11 +131,11 @@ function bar(x) {
 foo( 3 );			// 9
 ```
 
-It's clear that for both `foo(..)` and `bar(..)`, the only direct cause is the `x` parameter. But what about the `bar(x)` call? `bar` is just an identifier, and in JS it's not even a constant by default. The `foo(..)` function is relying on the value of `bar` -- here it's a reference to the `bar(..)` function -- as one of its causes.
+It's clear that for both `foo(..)` and `bar(..)`, the only direct cause is the `x` parameter. But what about the `bar(x)` call? `bar` is just an identifier, and in JS it's not even a constant (non-reassignable variable) by default. The `foo(..)` function is relying on the value of `bar` -- a variable that references the second function -- as a free variable.
 
 So is this program relying on a side cause?
 
-I say no. Even though it is *possible* to overwrite the `bar` variable's value with some other function, I am not doing so in this code, nor is it a common practice or precedent to do so. For all intents and purposes, my functions are constants (never reassigned).
+I say no. Even though it is *possible* to overwrite the `bar` variable's value with some other function, I am not doing so in this code, nor is it a common practice of mine or precedent to do so. For all intents and purposes, my functions are constants (never reassigned).
 
 Consider:
 
@@ -147,7 +149,9 @@ function foo(x) {
 foo( 3 );			// 9.424776000000001
 ```
 
-How about now? Is `PI` a side cause of `foo(..)`?
+**Note:** JavaScript has `Math.PI` built-in, so we're only using the `PI` example in this text as a convenient illustration. In practice, always use `Math.PI` instead of defining your own!
+
+How about the above code snippet? Is `PI` a side cause of `foo(..)`?
 
 Two observations will help us answer that question in a reasonable way:
 
@@ -402,9 +406,194 @@ It won't always be possible to define your operations on data in an idempotent w
 
 ## Pure Bliss
 
-No side effects!
+A function with no side causes/effects is called a pure function. Indeed, a pure function is idempotent in the programming sense, since it cannot have any side effects. However, pure functions are not necessarily idempotent in the mathematical sense, because they don't have to return a value that would be suitable for feeding back in as their own input.
 
-A pure function is idempotent in the programming sense, but not necessarily idempotent in the mathematical sense.
+Consider:
+
+```js
+function add(x,y) {
+	return x + y;
+}
+```
+
+All the inputs (`x` and `y`) and outputs (`return ..`) are direct and not associated as free variables. `add(..)` is pure.
+
+But as we discussed earlier, that does not mean a pure function can't reference any free variables, as is commonly claimed; it just means that those free variables aren't side causes.
+
+Some examples:
+
+```js
+const PI = 3.141592;
+
+function circleArea(radius) {
+	return PI * radius * radius;
+}
+
+function cylinderVolume(radius,height) {
+	return height * circleArea( radius );
+}
+```
+
+`circleArea(..)` references the free variable `PI`, but it's a constant so it's not a side cause. `cylinderVolume(..)` references the free variable `circleArea`, which is also not a side cause because this program treats it as, in effect, a constant reference to its function value. Both these functions are pure.
+
+Another example where a function can still be pure but reference free variables is with closure:
+
+```js
+function unary(fn) {
+	return function onlyOneArg(arg){
+		return fn( arg );
+	};
+}
+```
+
+`unary(..)` itself is clearly pure -- its only input is `fn` and its only output is the `return`ed function -- but what about the inner function `onlyOneArg(..)`, which closes over the free variable `fn`?
+
+It's still pure because `fn` never changes. In fact, we have full confidence in that fact because lexically speaking, those few lines are the only ones that could possibly reassign `fn`.
+
+**Note:** `fn` is a reference to a function object, which is by default a mutable value. Somewhere else in the program *could* for example add a property to this function object, which technically "changes" the value (mutation, not reassignment). However, since we're not relying on anything about `fn` other than our ability to call it, and it's not possible to affect the callability of a function value, `fn` is still effectively unchanging for our reasoning purposes; it cannot be a side cause.
+
+Another common way to articulate a function's purity is if we know that given the same input(s), it always produces the same output. If you pass `3` to `circleArea(..)`, it will always output the same result (`28.274328`).
+
+If a function can produce a different output each time it's given the same inputs, it is impure. Even if such a function always `return`s the same value, if it produces an indirect output side effect, the program state is changed each time it's called; this is impure.
+
+Impure functions are undesirable because they make all of their calls harder to reason about. A pure function's call is perfectly predictable. When you see multiple `circleArea(3)` calls in your code, you won't have to spend any extra effort to figure out what its output will be *each time*.
+
+### Purely Relative
+
+We have to be very careful when talking about a function being pure. JavaScript's dynamic value nature makes it all too easy to have non-obvious side causes/effects.
+
+Consider:
+
+```js
+function rememberNumbers(nums) {
+	return function caller(fn){
+		return fn( nums );
+	};
+}
+
+var list = [1,2,3,4,5];
+
+var simpleList = rememberNumbers( list );
+```
+
+`simpleList(..)` looks like a pure function, as it's a reference to the inner function `caller(..)`, which just closes over the free variable `nums`. However, there's multiple ways that `simpleList(..)` can actually turn out to be impure.
+
+First, our assertion of purity is based on the array value (referenced both by `list` and `nums`) never changing:
+
+```js
+function median(nums) {
+	return (nums[0] + nums[nums.length - 1]) / 2;
+}
+
+simpleList( median );		// 3
+
+// ..
+
+list.push( 6 );
+
+// ..
+
+simpleList( median );		// 3.5
+```
+
+When we mutate the array, the `simpleList(..)` call changes its output. So, is `simpleList(..)` pure or impure? Depends on your perspective. It's pure for a given set of assumptions. It could be pure in any program that didn't have the `list.push(6)` mutation.
+
+We could guard against this kind of impurity by altering the definition of `rememberNumbers(..)`. One approach is to duplicate the `nums` array:
+
+```js
+function rememberNumbers(nums) {
+	// make a copy of the array
+	nums = nums.slice();
+
+	return function caller(fn){
+		return fn( nums );
+	};
+}
+```
+
+But an even trickier hidden side effect could be lurking:
+
+```js
+var list = [1,2,3,4,5];
+
+// make `list[0]` be a getter with a side effect
+Object.defineProperty(
+	list,
+	0,
+	{
+		get: function(){
+			console.log( "[0] was accessed!" );
+			return 1;
+		}
+	}
+);
+
+var simpleList = rememberNumbers( list );
+// [0] was accessed!
+```
+
+A perhaps more robust option is to change the signature of `rememberNumbers(..)` to not receive an array in the first place, but rather the numbers as individual arguments:
+
+```js
+function rememberNumbers(...nums) {
+	return function caller(fn){
+		return fn( nums );
+	};
+}
+
+var simpleList = rememberNumbers( ...list );
+// [0] was accessed!
+```
+
+The two `...`s have the effect of copying `list` into `nums` instead of passing it by reference.
+
+**Note:** The console message side effect here comes not from `rememberNumbers(..)` but from the `...list` spreading. So in this case, both `rememberNumbers(..)` and `simpleList(..)` are pure.
+
+But what if the mutation is even harder to spot? Composition of a pure function with an impure function **always** produces an impure function. If we pass an impure function into the otherwise pure `simpleList(..)`, it's now impure:
+
+```js
+// yes, a silly contrived example :)
+function firstValue(nums) {
+	return nums[0];
+}
+
+function lastValue(nums) {
+	return firstValue( nums.reverse() );
+}
+
+simpleList( lastValue );	// 5
+
+list;						// [1,2,3,4,5] -- OK!
+
+simpleList( lastValue );	// 1
+```
+
+**Note:** Despite `reverse()` looking safe (like other array methods in JS) in that it returns a reversed array, it actually mutates the array rather than creating a new one.
+
+We need a more robust definition of `rememberNumbers(..)` to guard against the `fn(..)` mutating its closed over `nums` via reference:
+
+```js
+function rememberNumbers(...nums) {
+	return function caller(fn){
+		// send in a copy!
+		return fn( nums.slice() );
+	};
+}
+```
+
+So is `simpleList(..)` reliably pure yet!? **Nope.** :(
+
+We're only guarding against side effects we can control (mutating by reference). Any function we pass that has other side effects will have poluted the purity of `simpleList(..)`:
+
+```js
+simpleList( function impureIO(nums){
+	console.log( nums.length );
+} );
+```
+
+In fact, there's no way to define `rememberNumbers(..)` to make a perfectly-pure `simpleList(..)` function.
+
+Purity is about confidence. But we have to admit that in many cases, **any confidence we feel is actually relative to the context** of our program and what we know about it. In practice (in JavaScript) the question of function purity is not about being absolutely pure or not, but about a range of confidence in its purity. The more pure, the better.
 
 ### There Or Not
 
