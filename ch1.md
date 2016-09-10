@@ -21,7 +21,7 @@ What do I mean by trust? I mean that you can verify, by reading, not just runnin
 
 I believe the techniques that form the foundation of FP are designed from the mindset of having far more confidence over our programs just by reading them. Someone who understands FP, and who diligently uses it in their programs, will write code that they can read and verify, by the principles they have already proven to be true, that the program will do what they want.
 
-It is my hope that you will begin to develop more confidence in the code you write, and that these functional-light programming principles will be carry you in that direction.
+It is my hope that you will begin to develop more confidence in the code you write, and that these functional-light programming principles will carry you in that direction.
 
 ## Communication
 
