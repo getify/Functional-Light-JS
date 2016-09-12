@@ -373,7 +373,7 @@ How about another numbers example, this time adding a list of them together:
 ```js
 function sum(...args) {
 	var sum = 0;
-	for (var i = 0; i < args.length; i++) {
+	for (let i = 0; i < args.length; i++) {
 		sum += args[i];
 	}
 	return sum;
@@ -491,7 +491,7 @@ var uncurry =
 ```js
 function sum(...args) {
 	var sum = 0;
-	for (var i = 0; i < args.length; i++) {
+	for (let i = 0; i < args.length; i++) {
 		sum += args[i];
 	}
 	return sum;
