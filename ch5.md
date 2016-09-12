@@ -595,9 +595,180 @@ In fact, there's no way to define `rememberNumbers(..)` to make a perfectly-pure
 
 Purity is about confidence. But we have to admit that in many cases, **any confidence we feel is actually relative to the context** of our program and what we know about it. In practice (in JavaScript) the question of function purity is not about being absolutely pure or not, but about a range of confidence in its purity. The more pure, the better.
 
-### There Or Not
+## There Or Not
 
-Referential Transparency.
+So far, we've defined function purity both as a function without side causes/effects and as a function that, given the same input(s), always produces the same output. These are just two different ways of looking at the same characteristics.
+
+But a third way of looking at function purity, and perhaps the most widely accepted definition, is that a pure function has referential transparency.
+
+Referential transparency is the assertion that a function call could be replaced by its output value, and the overall program behavior wouldn't change. In other words, it would be impossible to tell from the program's execution whether the function call was made or its return value was inlined in place of the function call.
+
+From the perspective of referential transparency, both of these programs have identical behavior as they are built with pure functions:
+
+```js
+function calculateAverage(list) {
+	var sum = 0;
+	for (let i = 0; i < list.length; i++) {
+		sum += list[i];
+	}
+	return sum / list.length;
+}
+
+var nums = [1,2,4,7,11,16,22];
+
+var avg = calculateAverage( nums );
+
+console.log( "The average is:", avg );		// The average is: 9
+```
+
+```js
+function calculateAverage(list) {
+	var sum = 0;
+	for (let i = 0; i < list.length; i++) {
+		sum += list[i];
+	}
+	return sum / list.length;
+}
+
+var nums = [1,2,4,7,11,16,22];
+
+var avg = 9;
+
+console.log( "The average is:", avg );		// The average is: 9
+```
+
+The only difference between these two snippets is that in the latter one, we skipped the `calculateAverage(nums)` call and just inlined its ouput (`9`). Since the rest of the program behaves identically, `calculateAverage(..)` has referential transparency, and is thus a pure function.
+
+### Mentally Transparent
+
+The suggestion that a referentially transparent pure function *can be* replaced with its output does not mean that it *should be*. Far from it.
+
+The reasons we build functions into our programs instead of using pre-computed magic constants is not just about responding to changing data, but also about readability with proper abstractions, etc. The function call to calculate the average of that list of numbers makes that part of the program more readable than the line that just assigns the value explicitly. It tells the story to the reader of where `avg` comes from, what it means, etc.
+
+What we're really suggesting with referential transparency is that as you're reading a program, once you've mentally computed what a function call's output is, you no longer need to think about what that exact function call is doing when you see it in code.
+
+That result becomes kinda like a mental `const` declaration, which as you're reading you can transparently swap in and not spend any more mental energy working out.
+
+Hopefully the importance of this characteristic of a pure function is obvious. We're trying to make our programs more readable. One way we can do that is give the reader assistance in skipping over the unnecessary stuff so they can focus on the necessary stuff.
+
+The reader shouldn't need to keep re-computing some outcome that isn't going to change (and doesn't need to). If you make it a pure function with referential transparency, they won't have to.
+
+### Not So Transparent?
+
+What about a function that has a side effect, but this side effect isn't ever observed or relied upon anywhere else in the program? Does that function still have referential transparency?
+
+Here's one:
+
+```js
+function calculateAverage(list) {
+	sum = 0;
+	for (let i = 0; i < list.length; i++) {
+		sum += list[i];
+	}
+	return sum / list.length;
+}
+
+var sum, nums = [1,2,4,7,11,16,22];
+
+var avg = calculateAverage( nums );
+```
+
+Did you spot it?
+
+`sum` is an outer free variable that `calculateAverage(..)` uses to do its work. But, every time we call `calculateAverage(..)` with the same list, we're going to get `9` as the output. And this program couldn't be distinguished in terms of behavior from a program that replaced the `calculateAverage(nums)` call with the value `9`. No other part of the program cares about the `sum` variable, so it's an unobserved side effect.
+
+Is a side cause/effect that's unobserved like this tree?
+
+> If a tree falls in the forest, but no one is around to hear it, does it still make a sound?
+
+By the narrowest definition of referential transparency, I think you'd have to say `calculateAverage(..)` is still a pure function. But as we're trying to not just be academic in our study, but balanced with pragmatism, I think this conclusion needs more perspective. Let's explore.
+
+#### Performance Effects
+
+Often times, you'll find these kind of side-effects-that-go-unobserved being used to optimize the performance of an operation. For example:
+
+```js
+var cache = [];
+
+function specialNumber(n) {
+	// if we've already calculated this special number,
+	// skip the work and just return it from the cache
+	if (cache[n] !== undefined) {
+		return cache[n];
+	}
+
+	var x = 1, y = 1;
+
+	for (let i = 1; i <= n; i++) {
+		x += i % 2;
+		y += i % 3;
+	}
+
+	cache[n] = (x * y) / (n + 1);
+
+	return cache[n];
+}
+
+specialNumber( 6 );				// 4
+specialNumber( 42 );			// 22
+specialNumber( 1E6 );			// 500001
+specialNumber( 987654321 );		// 493827162
+```
+
+This silly `specialNumber(..)` algorithm is deterministic and thus pure from the definition that it always gives the same output for the same input. It's also pure from the referential transparency perspective -- replace any call to `specialNumber(42)` with `22` and the end result of the program is the same.
+
+However, the function has to do quite a bit of work to calculate some of the bigger numbers, especially the `987654321` input. If we needed to get that particular special number multiple times throughout our program, the `cache`ing of the result means that subsequent calls are far more efficient.
+
+**Note:** An interesting thing to ponder: is the heat produced by the CPU while performing any given operation an unavoidable side effect of even the most pure functions/programs? What about just the CPU time delay as it spends time on a pure operation before it can do another one?
+
+Don't be so quick to assume that you could just run the `specialNumber(987654321)` calculation once and manually stick that result in some variable / constant. Programs are often highly modularized and globally accessible scopes are not usually the way you want to go around sharing state between those independent pieces. Having `specialNumber(..)` do its own caching (even though it happens to be using a global variable to do so!) is a more preferable abstraction of that state sharing.
+
+The point is that if `specialNumber(..)` is the only part of the program that accesses and updates the `cache` side cause/effect, the referential transparency perspective observably holds true, and this might be seen as an acceptable pragmatic "cheat" of the pure function ideal.
+
+But should it?
+
+Typically, this sort of performance optimization side effecting is done by hiding the caching of results so they *cannot* be observed by any other part of the program. This process is referred to as memoization. I always think of that word as "memorization"; I have no idea if that's even remotely where it comes from, but it certainly helps me understand the concept better.
+
+Consider:
+
+```js
+var specialNumber = (function memoization(){
+	var cache = [];
+
+	return function specialNumber(n) {
+		// if we've already calculated this special number,
+		// skip the work and just return it from the cache
+		if (cache[n] !== undefined) {
+			return cache[n];
+		}
+
+		var x = 1, y = 1;
+
+		for (let i = 1; i <= n; i++) {
+			x += i % 2;
+			y += i % 3;
+		}
+
+		cache[n] = (x * y) / (n + 1);
+
+		return cache[n];
+	};
+})();
+```
+
+We've contained the `cache` side causes/effects of `specialNumber(..)` inside the scope of the `memoization()` IIFE, so now we're sure that no other parts of the program *can* observe them, not just that they *don't* observe them.
+
+That last sentence may seem like a subtle point, but actually I think it might be **the most important point of the entire chapter**. Read it again.
+
+Back to this philosophical musing:
+
+> If a tree falls in the forest, but no one is around to hear it, does it still make a sound?
+
+Going with the metaphor, what I'm getting at is: whether the sound is made or not, it would be better if we never create a scenario where the tree can fall without us being around; we'll always hear the sound when a tree falls.
+
+The purpose of reducing side causes/effects is not per se to have a program where they aren't observed, but to design a program where fewer of them are possible, because this makes the code easier to reason about. A program with side causes/effects that *happen* to not be observed is not nearly as effective in this goal as a program that *cannot* observe them.
+
+If side causes/effect can happen, the writer and reader must mentally juggle them. Make it so they can't happen, and both writer and reader will find more confidence over what can and cannot happen in any part.
 
 ## Purifying
 
@@ -607,6 +778,8 @@ What can you do if you have an impure function that you cannot refactor to be pu
 
 Side effects are harmful to code readability and quality because they make your code much harder to understand. Side effects are also one of the most common *causes* of bugs in programs, because juggling them is hard. Idempotence is a strategy for restricting side effects by essentially creating one-time-only operations.
 
-Pure functions are how we avoid side effects. A pure function is one that always returns the same output given the same input, and has no side causes or side effects. Referential transparency is the notion that a pure function's call could be replaced with its output and the program would not have its behavior altered.
+Pure functions are how we avoid side effects. A pure function is one that always returns the same output given the same input, and has no side causes or side effects. Referential transparency further states that -- more as a mental exercise than a literal action -- a pure function's call could be replaced with its output and the program would not have altered behavior.
+
+Refactoring an impure function to be pure is the best option. But if that's not possible, try encapsulating the side causes/effects, or creating a pure interface against them.
 
 No program can be entirely free of side effects. But prefer pure functions in as many places as that's practical. Collect impure functions side effects together as much as possible, so that it's easier to identify and audit the most likely culprits of bugs when they arise.
