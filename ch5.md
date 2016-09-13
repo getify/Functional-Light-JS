@@ -735,7 +735,7 @@ Consider:
 var specialNumber = (function memoization(){
 	var cache = [];
 
-	return function specialNumber(n) {
+	return function specialNumber(n){
 		// if we've already calculated this special number,
 		// skip the work and just return it from the cache
 		if (cache[n] !== undefined) {
@@ -774,12 +774,221 @@ If side causes/effect can happen, the writer and reader must mentally juggle the
 
 What can you do if you have an impure function that you cannot refactor to be pure?
 
+You need to figure what kind of side causes/effects the function has. It may be that the side causes/effects come variously from lexical free variables, mutations-by-reference, or even `this` binding. We'll look at approaches that address each of these scenarios.
+
+### Containing Effects
+
+If the nature of the concerned side causes/effects is with lexical free variables, and you have the option to modify the surrounding code, you can encapsulate them using scope.
+
+Recall:
+
+```js
+var users = {};
+
+function fetchUserData(userId) {
+	ajax( "http://some.api/user/" + userId, function onUserData(userData){
+		users[userId] = userData;
+	} );
+}
+```
+
+One option for purifying this code is to create a wrapper around both the variable and the impure function. Essentially, the wrapper has to receive as input "the entire universe" of state it can operate on.
+
+```js
+function safer_fetchUserData(userId,users) {
+	// simple, naive ES6+ shallow object copy, could also
+	// be done w/ various libs or frameworks
+	users = Object.assign( {}, users );
+
+	fetchUserData( userId );
+
+	// return the copied state
+	return users;
+
+
+	// ***********************
+
+	// original untouched impure function:
+	function fetchUserData(userId) {
+		ajax( "http://some.api/user/" + userId, function onUserData(userData){
+			users[userId] = userData;
+		} );
+	}
+}
+```
+
+Both `userId` and `users` are input for the original `fetchUserData`, and `users` is also output. The `safer_fetchUserData(..)` takes both of these inputs, and returns `users`. To make sure we're not creating a side effect on the outside when `users` is mutated, we make a local copy of `users`.
+
+This technique has limited usefulness mostly because if you cannot modify a function itself to be pure, you're not that likely to be able to modify its surrounding code either. However, it's helpful to explore it if possible, as it's the simplest of our fixes.
+
+### Covering Up Effects
+
+Many times you will be unable to modify the code to encapsulate the lexical free variables inside the scope of a wrapper function. For example, the impure function may be in a third-party file that you do not control, containing something like:
+
+```js
+var nums = [];
+var smallCount = 0;
+var largeCount = 0;
+
+function generateMoreRandoms(count) {
+	for (let i = 0; i < count; i++) {
+		let num = Math.random();
+
+		if (num >= 0.5) {
+			largeCount++;
+		}
+		else {
+			smallCount++;
+		}
+
+		nums.push( num );
+	}
+}
+```
+
+The brute-force strategy is to create an interface function to interact with that performs the following steps:
+
+1. capture the to-be-affected current states
+2. set initial input states
+3. run the impure function
+4. capture the side effect states
+5. restore the original states
+6. return the captured side effect states
+
+```js
+function safer_generateMoreRandoms(count,initial) {
+	// (1) save original state
+	var orig = {
+		nums,
+		smallCount,
+		largeCount
+	};
+
+	// (2) setup initial pre-side effects state
+	nums = initial.nums.slice();
+	smallCount = initial.smallCount;
+	largeCount = initial.largeCount;
+
+	// (3) beware impurity!
+	generateMoreRandoms( count );
+
+	// (4) capture side effect state
+	var sides = {
+		nums,
+		smallCount,
+		largeCount
+	};
+
+	// (5) restore original state
+	nums = orig.nums;
+	smallCount = orig.smallCount;
+	largeCount = orig.largeCount;
+
+	// (6) expose side effect state directly as output
+	return sides;
+}
+```
+
+And to use `safer_generateMoreRandoms(..)`:
+
+```js
+var initialStates = {
+	nums: [0.3, 0.4, 0.5],
+	smallCount: 2,
+	largeCount: 1
+};
+
+safer_generateMoreRandoms( 5, initialStates );
+// { nums: [0.3,0.4,0.5,0.8510024448959794,0.04206799238...
+
+nums;			// []
+smallCount;		// 0
+largeCount;		// 0
+```
+
+That's a lot of manual work to avoid a few side causes/effects; it'd be a lot easier if we just didn't have them in the first place. But if we have no choice, this extra effort is well worth it to avoid surprises in our programs.
+
+**Note:** This technique really only works when you're dealing with synchronous code. Asynchronous code can't reliably be managed with this approach because it can't prevent surprises if other parts of the program access/modify the state variables in the interim.
+
+### Evading Effects
+
+When the nature of the side effect to be dealt with is a mutation of a direct input value (object, array, etc) via reference, we can again create an interface function to interact with instead of the original impure function.
+
+Consider:
+
+```js
+function handleInactiveUsers(userList,dateCutoff) {
+	for (let i = 0; i < userList.length; i++) {
+		if (userList[i].lastLogin == null) {
+			// remove the user from the list
+			userList.splice( i, 1 );
+			i--;
+		}
+		else if (userList[i].lastLogin < dateCutoff) {
+			userList[i].inactive = true;
+		}
+	}
+}
+```
+
+Both the `userList` array itself, plus the objects in it, are mutated. One strategy to protect against these side effects is to do a deep (well, just not shallow) copy first:
+
+```js
+function safer_handleInactiveUsers(userList,dateCutoff) {
+	// make a copy of both the list and its user objects
+	let copiedUserList = userList.map( function mapper(user){
+		// copy a `user` object
+		return Object.assign( {}, user );
+	} );
+
+	// call the original function with the copy
+	handleInactiveUsers( copiedUserList, dateCutoff );
+
+	// expose the mutated list as a direct output
+	return copiedUserList;
+}
+```
+
+The success of this technique will be dependent on the thoroughness of the *copy* you make of the value. Using `userList.slice()` would not work here, since that only creates a shallow copy of the `userList` array itself. Each element of the array is an object that needs to be copied, so we need to take extra care. Of course, if those objects have objects inside them (they might!), the copying needs to be even more robust.
+
+#### `this` Revisited
+
+Another variation of the via-reference side cause/effect is with `this`-aware functions having `this` as an implicit input. See "What's This" in Chapter 2 for more info on why the `this` keyword is problematic for FPers.
+
+Consider:
+
+```js
+var ids = {
+	prefix: "_",
+	generate() {
+		return this.prefix + Math.random();
+	}
+};
+```
+
+Our strategy is similar to the previous section's discussion: create an interface function that forces the `generate()` function to use a predictable `this` context:
+
+```js
+function safer_generate(context) {
+	return ids.generate.call( context );
+}
+
+// *********************
+
+safer_generate( { prefix: "foo" } );
+// "foo0.8988802158307285"
+```
+
+These strategies are in no way fool-proof; the safest protection against side causes/effects is to not do them. But if you're trying to improve the readability and confidence level of your program, reducing the side causes/effects wherever possible is a huge step forward.
+
+Essentially, we're not really eliminating side causes/effects, but rather containing and limiting them, so that more of our code is verifiable and reliable. If we later run into program bugs, we know it's most likely that the parts of our code still using side causes/effects hold the culprits.
+
 ## Summary
 
 Side effects are harmful to code readability and quality because they make your code much harder to understand. Side effects are also one of the most common *causes* of bugs in programs, because juggling them is hard. Idempotence is a strategy for restricting side effects by essentially creating one-time-only operations.
 
-Pure functions are how we avoid side effects. A pure function is one that always returns the same output given the same input, and has no side causes or side effects. Referential transparency further states that -- more as a mental exercise than a literal action -- a pure function's call could be replaced with its output and the program would not have altered behavior.
+Pure functions are how we best avoid side effects. A pure function is one that always returns the same output given the same input, and has no side causes or side effects. Referential transparency further states that -- more as a mental exercise than a literal action -- a pure function's call could be replaced with its output and the program would not have altered behavior.
 
-Refactoring an impure function to be pure is the best option. But if that's not possible, try encapsulating the side causes/effects, or creating a pure interface against them.
+Refactoring an impure function to be pure is the preferred option. But if that's not possible, try encapsulating the side causes/effects, or creating a pure interface against them.
 
 No program can be entirely free of side effects. But prefer pure functions in as many places as that's practical. Collect impure functions side effects together as much as possible, so that it's easier to identify and audit the most likely culprits of bugs when they arise.
