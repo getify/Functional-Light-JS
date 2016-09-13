@@ -236,7 +236,7 @@ var cacheResult = partialRight( ajax, function onResult(obj){
 cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 ```
 
-This implementation of `partialRight(..)` does not guarantee that a specific parameter will be receive a specific partially-applied value; it only ensures that the right-partially applied value(s) appear as the right-most argument(s) passed to the original function.
+This implementation of `partialRight(..)` does not guarantee that a specific parameter will receive a specific partially-applied value; it only ensures that the right-partially applied value(s) appear as the right-most argument(s) passed to the original function.
 
 For example:
 
