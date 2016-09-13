@@ -2,6 +2,8 @@
 
 This book explores the core principles of functional programming (FP) that can be applied to JavaScript. But what makes this book different is that we approach these principles without all the heavy terminology. We look at the subset of FP that I call "Functional-Light Programming" (FLP) and apply it to JS.
 
+**Note:** Despite the word "Light" in the title, I do not consider or recommend this book as a "beginner", "easy", or "intro" book to the topic. This book is rigorous and full of detail, and expects a solid foundation of JS knowledge before diving in. "Light" means limited in scope, but instead of being more broad, this book goes much deeper into each topic than you typically find in other FP-JavaScript books.
+
 Let's face it: unless you're already a member of the FP cool kids club (I'm not!), a statement like, "a monad is just a monoid in the category of endofunctors", just doesn't mean anything useful to us.
 
 That's not to say the terms are meaning*less* or that FPrs are bad for using them. Once you graduate from Functional-Light, you'll probably want to study FP more formally, and you'll swim in the depths of those terms.
@@ -53,13 +55,7 @@ I also have several JS training courses available in on-demand video format. I t
 
 Any contributions you make to this effort **are of course greatly appreciated**.
 
-Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. If there's any doubt or if you think that a word/phrase is used confusingly, before submitting a PR, open an issue to ask about it.
-
-However, if you choose to contribute content (not just typo corrections) to this repo, you agree that you're giving me a non-exclusive license to use that content for the book, as I (and any future publisher) deem appropriate. You probably guessed that already, but I just have to make sure the lawyers are happy by explicitly stating it.
-
-This book will go through official editing eventually, and typos will likely all be caught at that stage. As such, **typos are not a big concern of mine for now**. If you're going to PR for typo fixes, please be measured in doing so by collecting several small changes into a single PR (in separate commits).
-
-Also, if you have any questions or concerns, please make sure to search the issues (both open and closed!) first, to keep the churn of issues to a minimum. I want to keep my focus on writing the book as much as possible.
+But **PLEASE** read the [Contributions Guidelines](CONTRIBUTING.md) carefully before submitting a PR.
 
 ## License & Copyright
 
