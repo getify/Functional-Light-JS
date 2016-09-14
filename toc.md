@@ -34,13 +34,10 @@
 	* There Or Not
 	* Purifying
 * Chapter 6: Value Immutability
-	* TODO
 * Chapter 7: List Operations
-	* TODO
 * Chapter 8: Recursion
-	* TODO
-* Chapter 9: Putting It All Together
-	* TODO
+* Chapter 9: Functional Async
+* Chapter 10: Putting It All Together
 * Appendix A: Fusion & Transducing
 * Appendix B: The Monad Simplified
 * Appendix C: FP Libraries
