@@ -35,7 +35,7 @@ You probably know by experience that an awful lot of your time spent "coding" is
 
 Did you know that researchers who've studied this topic say that 70% of the time we spend maintaining code is just spent reading it to understand it? I find that shocking. 70%. No wonder the global average for a programmer's lines of code written per day is around 5. We spend the other 7 hours and 30 minutes of the day just reading the code to figure out where those 5 lines should go!
 
-I think we should focs a lot -- a LOT! -- more on the readability of our code. Like, a lot more. And by the way, readability is not about least number of characters. Readability is actually most affected by familiarity (yes, that's been studied, too).
+I think we should focus a lot -- a LOT! -- more on the readability of our code. Like, a lot more. And by the way, readability is not about least number of characters. Readability is actually most affected by familiarity (yes, that's been studied, too).
 
 So, if we are going to spend more time concerned with making code that will be more readable and understandable, FP turns out to be a really handy pattern in that effort. The principles of FP are well established, deeply studied and vetted, and provably verifiable.
 
