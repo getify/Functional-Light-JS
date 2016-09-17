@@ -165,6 +165,16 @@ In both cases, `PI` and `bar` are not part of the state of the program. They're 
 
 **Note:** The use of `const` above does not, in my opinion, make the case that `PI` is absolved as a side cause; `var PI` would lead to the same conclusion. The lack of reassigning `PI` is what matters, not the inability to do so. We'll discuss `const` in a later chapter.
 
+#### Randomness
+
+You may never have considered it before, but randomness is impure. A function that uses `Math.random()` can never be pure, because you cannot ensure/predict its output based on its input. So any code that generates unique random IDs/etc will by definition be considered reliant on your program's side causes.
+
+In computing, we use what's called pseudo-random algorithms for generation. Turns out true randomness is pretty hard, so we just kinda fake it with complex algorithms that produce values that seem observably random. These algorithms calculate long streams of numbers, but the secret is, the sequence is actually predictable if you know the starting point. This starting point is referred to as a seed.
+
+Some languages let you specify the seed value for the random number generation. If you always specify the same seed, you'll always get the same sequence of outputs from subsequent "random number" generations. This is incredibly useful for testing purposes, for example, but incredibly dangerous for real world application usage.
+
+In JS, the randomness of `Math.random()` calculated is based on an indirect input, because you cannot specify the seed. As such, we have to treat built-in random number generation as an impure side cause.
+
 ### I/O Effects
 
 It may not have been terribly obvious yet, but the most common (and essentially unavoidable) form of side cause/effect is I/O (input/output). A program with no I/O is totally pointless, because its work cannot be observed in any way. Useful programs must at a minimum have output, and many also need input. Input is a side cause and output is a side effect.
