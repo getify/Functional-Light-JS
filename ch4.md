@@ -25,7 +25,11 @@ functionValue <-- unary <-- adder <-- 3
 
 `3` is the input to `adder(..)`. The output of `adder(..)` is the input to `unary(..)`. The output of `unary(..)` is `functionValue`. This is called the composition of `unary(..)` and `adder(..)`.
 
-Think of this flow of data like a conveyor belt in a candy factory, where each operation is step in the process of making, wrapping, and packing a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
+<p align="center">
+	<img src="fig2.png">
+</p>
+
+Think of this flow of data like a conveyor belt in a candy factory, where each operation is a step in the process of making, slicing, and wrapping a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
 
 Let's examine composition in action one step at a time. Consider these two utilitites you might have in your program:
 
@@ -71,7 +75,9 @@ wordsUsed;
 
 We name the array output of `words(..)` as `wordsFound`. The input of `unique(..)` is also an array, so we can pass the `wordsFound` into it.
 
-In the candy factory assembly line, the first machine takes as "input" the melted chocolate, and its "output" is a chunk of formed and cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut-up of piece of chocolate candy. Next, a machine on the line takes small pieces of chocolate candy from the conveyor belt and outputs wrapped candies ready to bag and ship.
+Back to the candy factory assembly line: the first machine takes as "input" the melted chocolate, and its "output" is a chunk of formed and cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut-up of piece of chocolate candy. Next, a machine on the line takes small pieces of chocolate candy from the conveyor belt and outputs wrapped candies ready to bag and ship.
+
+<img src="fig3.png" align="right" width="70" hspace="20">
 
 The candy factory is fairly successful with this process, but as with all businesses, management keeps searching for ways to grow.
 
@@ -89,7 +95,9 @@ var wordsUsed = unique( words( text ) );
 
 The stacked machines are working fine, but it's kind of clunky to have the wires hanging out all over the place. The more of these machine-stacks they create, the more cluttered the factory floor gets. And the effort to assemble and maintain all these machine stacks is awfully time intensive.
 
-One morning, an engineer at the candy factory has a great idea. She figures that it'd be much more efficient if she made an outer box to hide all the wires; on the inside, all three of the machines are hooked up together, and on the outside everything is now neat and tidy. On one side of this fancy new machine is a valve to pour in melted chocolate and on the other is a valve that spits out wrapped chocolate candies. Brilliant!
+<img src="fig4.png" align="left" width="130" hspace="20">
+
+One morning, an engineer at the candy factory has a great idea. She figures that it'd be much more efficient if she made an outer box to hide all the wires; on the inside, all three of the machines are hooked up together, and on the outside everything is now neat and tidy. On the top of this fancy new machine is a valve to pour in melted chocolate and on the bottom is a valve that spits out wrapped chocolate candies. Brilliant!
 
 This single compound machine is much easier to move around and install wherever the factory needs it. The workers on the factory floor are even happier because they don't need to fidget with buttons and dials on three individual machines anymore; they quickly prefer using the single fancy machine.
 
@@ -115,7 +123,11 @@ The candy factory is humming along nicely, and thanks to all the saved space, th
 
 But the factory engineers struggle to keep up, because each time a new kind of fancy compound machine needs to be made, they spend quite a bit of time making the new outer box and fitting the individual machines into it.
 
-So the factory engineers contact an industrial machine vendor for help. They're amazed to find out that this vendor offers a machine-making machine! As incredible as it sounds, they get a machine that can take some of the factory's smaller machines -- the chocolate cutting one, for example -- and wire them altogether automatically, even wrapping the nice clean bigger box around them. This is surely going to make the candy factory really take off!
+So the factory engineers contact an industrial machine vendor for help. They're amazed to find out that this vendor offers a machine-making machine! As incredible as it sounds, they get a machine that can take a couple of the factory's smaller machines -- the chocolate cooling one and the cutting one, for example -- and wire them together automatically, even wrapping the nice clean bigger box around them. This is surely going to make the candy factory really take off!
+
+<p align="center">
+	<img src="fig5.png" width="300">
+</p>
 
 Back to code land, let's consider a utility called `compose2(..)` that creates a composition of two functions automatically, exactly the same way we did manually:
 
@@ -170,7 +182,11 @@ If we can define the composition of two functions, we can just keep going to sup
 finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```
 
-Now the candy factory is using a machine that can take any number of separate smaller machines and spit out a big fancy machine that does everything in order. That's one heck of a candy operation. It's Willy Wonka's dream!
+<p align="center">
+	<img src="fig6.png" width="300">
+</p>
+
+Now the candy factory owns the best machine of all: a machine that can take any number of separate smaller machines and spit out a big fancy machine that does every step in order. That's one heck of a candy operation. It's Willy Wonka's dream!
 
 We can implement a general `compose(..)` utility like this:
 
@@ -260,9 +276,11 @@ shorterWords( text );
 // ["to","two","pass","the","of","call","as"]
 ```
 
-Of course, you can also `curry(..)` a composition, though because of right-to-left execution, you might more often want to curry `reverseArgs(compose)` rather than just `compose(..)` itself.
+Take a moment to consider what the right-partial application on `compose(..)` gives us. It allows us to specify ahead of time the first step(s) of a composition, and then create specialized variations of that composition with different subsequent steps (`biggerWords(..)` and `shorterWords(..)`). This is one of the most powerful tricks of FP!
 
-**Note:** Since `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity: `curry(.. , 3)`.
+You can also `curry(..)` a composition instead of partial application, though because of right-to-left ordering, you might more often want to `curry( reverseArgs(compose), ..)` rather than just `curry( compose, ..)` itself.
+
+**Note:** Since `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity like `curry(.. , 3)`.
 
 ### Alternate Implementations
 
