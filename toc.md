@@ -34,6 +34,10 @@
 	* There Or Not
 	* Purifying
 * Chapter 6: Value Immutability
+	* Value To Value
+	* Reassignment
+	* Performance
+	* Treatment
 * Chapter 7: List Operations
 * Chapter 8: Recursion
 * Chapter 9: Functional Async
