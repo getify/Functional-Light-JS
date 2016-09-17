@@ -25,11 +25,11 @@ functionValue <-- unary <-- adder <-- 3
 
 `3` is the input to `adder(..)`. The output of `adder(..)` is the input to `unary(..)`. The output of `unary(..)` is `functionValue`. This is called the composition of `unary(..)` and `adder(..)`.
 
+Think of this flow of data like a conveyor belt in a candy factory, where each operation is a step in the process of cooling, cutting, and wrapping a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
+
 <p align="center">
 	<img src="fig2.png">
 </p>
-
-Think of this flow of data like a conveyor belt in a candy factory, where each operation is a step in the process of making, slicing, and wrapping a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
 
 Let's examine composition in action one step at a time. Consider these two utilitites you might have in your program:
 
@@ -117,7 +117,7 @@ wordsUsed <-- unique <-- words <-- text
 
 You certainly get it by now: the unfolding revolution in candy factory design is function composition.
 
-### Machine Maker
+### Machine Making
 
 The candy factory is humming along nicely, and thanks to all the saved space, they now have plenty of room to try out making new kinds of candies. Building on the earlier success, management is keen to keep inventing new fancy compound machines for their growing candy assortment.
 
@@ -139,7 +139,7 @@ function compose2(fn2,fn1) {
 }
 
 // or the ES6 => form
-var compose =
+var compose2 =
 	(fn2,fn1) =>
 		origValue => fn2( fn1( origValue ) );
 ```
@@ -343,7 +343,7 @@ Notice that we return the result of the `reduce(..)` call directly, which is its
 
 Instead of calculating the running result and passing it along as the `reduce(..)` looping proceeds, this implementation runs the `reduce(..)` looping **once** up front at composition time, and defers all the function call calculations -- referred to as lazy calculation. Each partial result of the reduction is a successively more wrapped function.
 
-When you call the final composed function and provide one or more arguments, all the levels of the big nested function, from the inner most call to the outer, are executed in succession (not via a loop).
+When you call the final composed function and provide one or more arguments, all the levels of the big nested function, from the inner most call to the outer, are executed in reverse succession (not via a loop).
 
 The performance characteristics will potentially be different than in the previous `reduce(..)`-based implementation. Here, `reduce(..)` only runs once to produce a big composed function, and then this composed function call simply executes all its nested functions each call. In the former version, `reduce(..)` would be run for every call.
 
@@ -629,7 +629,7 @@ Composition is a powerful tool for abstraction that transforms imperative code i
 
 ## Revisiting Points
 
-Now that we've thoroughly covered composition -- a trick that will be immensely helpful in many areas of FP, let's watch it in action by revisiting point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
+Now that we've thoroughly covered composition -- a trick that will be immensely helpful in many areas of FP -- let's watch it in action by revisiting point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
 
 ```js
 // given: ajax( url, data, cb )
