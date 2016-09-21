@@ -1,5 +1,7 @@
 # Functional-Light JavaScript (book)
 
+<a href="https://igg.me/at/fljs"><img src="https://cloud.githubusercontent.com/assets/150330/18719908/644f7630-7ff7-11e6-92d9-4abc3cf2b4a9.png" border=0 vspace=20><br><big><strong>Please Support my Indiegogo Crowdfunding Campaign!</strong></big></a>
+
 This book explores the core principles of functional programming (FP) that can be applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
 
 **Note:** Despite the word "Light" in the title, I do not consider or recommend this book as a "beginner", "easy", or "intro" book on the topic. This book is rigorous and full of gritty detail; it expects a solid foundation of JS knowledge before diving in. "Light" means limited in scope; instead of being more broad, this book goes much deeper into each topic than you typically find in other FP-JavaScript books.
