@@ -34,6 +34,7 @@
 	* There Or Not
 	* Purifying
 * Chapter 6: Value Immutability
+	* Primitive Immutability
 	* Value To Value
 	* Reassignment
 	* Performance

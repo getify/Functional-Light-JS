@@ -7,6 +7,70 @@ If programming-style idempotence is about defining a value change operation so t
 
 Let's now explore value immutability, the notion that we use only values in our programs that cannot be changed.
 
+## Primitive Immutability
+
+Values of the primitive types (`number`, `string`, `boolean`, `null`, and `undefined`) are already immutable; there's nothing you can do to change them.
+
+```js
+// invalid, and also makes no sense
+2 = 2.5;
+```
+
+However, JS does have an peculiar behavior which seems like it allows mutating such primitive type values: "boxing". When you access a property on certain primitive type values -- specifically `number`, `string`, and `boolean` -- under the covers JS automatically wraps (aka "boxes") the value in its object counterpart (`Number`, `String`, and `Boolean`, respectively).
+
+Consider:
+
+```js
+var x = 2;
+
+x.length = 4;
+
+x;				// 2
+x.length;		// undefined
+```
+
+Numbers do not normally have a `length` property available, so the `x.length = 4` setting is trying to add a new property, and it silently fails (or is ignored/discarded, depending on your point-of-view); `x` continues to hold the simple primitive `2` number.
+
+But the fact that JS allows the `x.length = 4` statement to run at all can seem troubling, if for no other reason than its potential confusion to readers. The good news is, if you use strict mode (`"use strict";`), such a statement will throw an error.
+
+What if you try to mutate the explicitly-boxed object representation of such a value?
+
+```js
+var x = new Number( 2 );
+
+// works fine
+x.length = 4;
+```
+
+`x` in this snippet is holding a reference to an object, so custom properties can be added and changed without issue.
+
+The immutability of simple primitives like `number`s probably seems fairly obvious. But what about `string` values? JS developers have a very common misconception that strings are like arrays and can thus be changed. JS syntax even hints at them being "array like" with the `[ ]` access operator. However, strings are also immutable.
+
+```js
+var s = "hello";
+
+s[1];				// "e"
+s[1] = "E";
+s.length = 10;
+
+s;					// "hello"
+```
+
+Despite being able to access `s[1]` like it's an array, JS strings are not real arrays. Setting `s[1] = "E"` and `s.length = 10` both silently fail, just as `x.length = 4` did above. In strict mode, these assignments will fail, because both the `1` property and the `length` property are read-only on this primitive `string` value.
+
+Interestingly, even the boxed `String` object value will act (mostly) immutable as it will throw errors in strict mode if you change existing properties:
+
+```js
+"use strict";
+
+var s = new String( "hello" );
+
+s[1] = "E";			// error
+s.length = 10;		// error
+
+s.foo = 42;			// OK
+```
+
 ## Value To Value
 
 We'll unpack this idea more throughout the chapter, but just to start with a clear understanding in mind: value immutability does not mean we can't have values change over the course of our program. It also doesn't mean that our variables can't hold different values. These are all common misconceptions about value immutability.
@@ -218,7 +282,7 @@ This is important because it makes reasoning about our code much easier when we 
 
 ## Performance
 
-Whenever we start asserting that we should create new values instead of mutating existing ones, the obvious next question is: what does that mean for performance? If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory, the old values (if de-referenced) are getting garbage collected, which is even more CPU burn.
+Whenever we start creating new values (arrays, objects, etc) instead of mutating existing ones, the obvious next question is: what does that mean for performance? If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory, the old values (if de-referenced) are getting garbage collected, which is even more CPU burn.
 
 // TODO
 
