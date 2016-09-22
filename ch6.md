@@ -145,9 +145,7 @@ Consider:
 var x = 2;
 ```
 
-The value `2` is unchangeable. It's what we call a primitive in JS. There's no way to change or redefine what `2` means. It means the numeric `2` in base-10, always and forever.
-
-If I change that code to this:
+Like we discussed in the previous section, the value `2` is an unchangeable (immutable) primitive. If I change that code to:
 
 ```js
 const x = 2;
@@ -168,7 +166,7 @@ But again, we're not changing anything about the value. We're attempting to reas
 To prove that `const` has nothing to do with the nature of the value, consider:
 
 ```js
-const x = [2];
+const x = [ 2 ];
 ```
 
 Is the array a constant? **No.** `x` is a constant because it cannot be reassigned. But this later line is totally OK:
@@ -179,7 +177,7 @@ x[0] = 3;
 
 Why? Because the array is still totally mutable, even though `x` is a constant.
 
-The confusion around `const` and "constant" only dealing with assignments and not value semantics is a long and dirty story. It seems a high degree of developers in just about every language that has a `const` stumble over the same sorts of confusions. Java in fact deprecated `const` and introduced a new keyword `final` just to separate itself from the confusion over "constant" semantics.
+The confusion around `const` and "constant" only dealing with assignments and not value semantics is a long and dirty story. It seems a high degree of developers in just about every language that has a `const` stumble over the same sorts of confusions. Java in fact deprecated `const` and introduced a new keyword `final` at least in part to separate itself from the confusion over "constant" semantics.
 
 Setting aside the confusion detractions, what importance does `const` hold for the FPer, if not to have anything to do with creating an immutable value?
 
