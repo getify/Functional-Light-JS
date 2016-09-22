@@ -50,6 +50,7 @@ The immutability of simple primitives like `number`s probably seems fairly obvio
 var s = "hello";
 
 s[1];				// "e"
+
 s[1] = "E";
 s.length = 10;
 
@@ -68,7 +69,9 @@ var s = new String( "hello" );
 s[1] = "E";			// error
 s.length = 10;		// error
 
-s.foo = 42;			// OK
+s[42] = "?";		// OK
+
+s;					// "hello"
 ```
 
 ## Value To Value
@@ -104,7 +107,9 @@ The importance of an immutable value can be seen if you do something like this:
 
 ```js
 var arr = [1,2,3];
+
 foo( arr );
+
 console.log( arr[0] );
 ```
 
@@ -114,7 +119,9 @@ We already saw a cheat in the previous chapter to avoid such a surprise:
 
 ```js
 var arr = [1,2,3];
+
 foo( arr.slice() );			// ha! a copy!
+
 console.log( arr[0] );		// 1
 ```
 
@@ -272,7 +279,9 @@ Recall the protection example from earlier:
 
 ```js
 var arr = [1,2,3];
+
 foo( Object.freeze( arr ) );
+
 console.log( arr[0] );			// 1
 ```
 
