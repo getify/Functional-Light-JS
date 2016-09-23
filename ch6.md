@@ -137,7 +137,7 @@ How would you describe what a "constant" is? Think about that for a moment befor
 
 Some of you may have conjured descriptions like, "a value that can't change", "a variable that can't be changed", etc. These are all approximately in the neighborhood, but not quite at the right house. The precise definition we should use for a constant is: a variable that cannot be reassigned.
 
-This nitpicking is actually really important, because it points out that a constant actually has nothing to do with the value, except to say that whatever value a constant holds, that variable cannot be reassigned to any other value. But it says nothing about the nature of the value itself.
+This nitpicking is really important, because it clarifies that a constant actually has nothing to do with the value, except to say that whatever value a constant holds, that variable cannot be reassigned to any other value. But it says nothing about the nature of the value itself.
 
 Consider:
 
@@ -145,7 +145,7 @@ Consider:
 var x = 2;
 ```
 
-Like we discussed in the previous section, the value `2` is an unchangeable (immutable) primitive. If I change that code to:
+Like we discussed earlier, the value `2` is an unchangeable (immutable) primitive. If I change that code to:
 
 ```js
 const x = 2;
@@ -185,9 +185,9 @@ Setting aside the confusion detractions, what importance does `const` hold for t
 
 The use of `const` tells the reader of your code that *that* variable will not be reassigned. As a signal of intent, `const` is often highly lauded as a welcome addition to JavaScript and universal improvement in code readability.
 
-In my opinion, this is all hype; there's no substance to these claims. I see only the mildest of faint benefit in signaling your intent in this way. And when you match that up against decades of precedent around confusion about it implying value immutability, I don't think `const` comes even close to carrying its own weight.
+In my opinion, this is mostly hype; there's not much substance to these claims. I see only the mildest of faint benefit in signaling your intent in this way. And when you match that up against decades of precedent around confusion about it implying value immutability, I don't think `const` comes even close to carrying its own weight.
 
-To back up my assertion, let's take a reality check. `const` creates block scoped variables, meaning those variables only exist in that one localized block:
+To back up my assertion, let's take a reality check. `const` creates a block scoped variable, meaning that variable only exists in that one localized block:
 
 ```js
 // lots of code
@@ -203,13 +203,15 @@ To back up my assertion, let's take a reality check. `const` creates block scope
 
 Typically, blocks are considered best designed to be only a few lines long. If you have blocks of more than say 10 lines, most developers will advise you to refactor. So `const x = 2` only applies to those next 9 lines of code at most.
 
-No other part of the program can ever affect the assignment of `x`. Period. I say that program has basically the same magnitude of readability as this one:
+No other part of the program can ever affect the assignment of `x`. **Period.**
+
+My claims is: that program has basically the same magnitude of readability as this one:
 
 ```js
 // lots of code
 
 {
-	var x = 2;
+	let x = 2;
 
 	// a few lines of code
 }
@@ -217,9 +219,9 @@ No other part of the program can ever affect the assignment of `x`. Period. I sa
 // lots of code
 ```
 
-If you look at the next few lines of code after `var x = 2;`, you'll be able to easily tell that `x` is not in fact reassigned. That to me is a **much stronger signal** -- actually not reassigning it -- than the use of some confusable `const` declaration to say "won't reassign it".
+If you look at the next few lines of code after `let x = 2;`, you'll be able to easily tell that `x` is not in fact reassigned. That to me is a **much stronger signal** -- actually not reassigning it -- than the use of some confusable `const` declaration to say "won't reassign it".
 
-Moreover, let's consider what this code is likely to communicate to a reader for the first time:
+Moreover, let's consider what this code is likely to communicate to a reader at first glance:
 
 ```js
 const magicNums = [1,2,3,4];
@@ -227,7 +229,7 @@ const magicNums = [1,2,3,4];
 // ..
 ```
 
-Isn't it at least possible that the reader of your code will assume (wrongly) that your intent is to never mutate the array? That seems like a reasonable inference to me. Imagine their confusion if you do in fact allow the array value referenced by `magicNums` to be mutated. That will create quite a surprise, won't it!?
+Isn't it at least possible (probable?) that the reader of your code will assume (wrongly) that your intent is to never mutate the array? That seems like a reasonable inference to me. Imagine their confusion if you do in fact allow the array value referenced by `magicNums` to be mutated. That will create quite a surprise, won't it!?
 
 Worse, what if you intentionally mutate `magicNums` in some way that turns out to not be obvious to the reader? Later in the code, they see a usage of `magicNums` and assume (again, wrongly) that it's still `[1,2,3,4]` because they read your intent as, "not gonna change this".
 
@@ -241,11 +243,11 @@ In this light, I see `const` as actually making our efforts to adhere to FP hard
 const PI = 3.141592;
 ```
 
-The value `3.141592` is already immutable, and I'm clearly signaling, "this `PI` will be used as stand-in placeholder for this literal value." To me, that's what `const` is good for. And to be frank, I don't use many of those kinds of declarations in my typical coding.
+The value `3.141592` is already immutable, and I'm clearly signaling, "this `PI` will always be used as stand-in placeholder for this literal value." To me, that's what `const` is good for. And to be frank, I don't use many of those kinds of declarations in my typical coding.
 
-I've written and seen a lot of JavaScript, and I just think it's an imagined problem that our bugs come from accidental reassignment.
+I've written and seen a lot of JavaScript, and I just think it's an imagined problem that very many of our bugs come from accidental reassignment.
 
-The thing we need to worry about is not whether our variables get reassigned, but **whether our values get mutated**. Why? Because values are portable, lexical assignments are not. You can pass an array to a function, and it can be changed without you realizing it. But you cannot have a reassignment happen unexpectedly by some other part of your program.
+The thing we need to worry about is not whether our variables get reassigned, but **whether our values get mutated**. Why? Because values are portable; lexical assignments are not. You can pass an array to a function, and it can be changed without you realizing it. But you cannot have a reassignment happen unexpectedly caused by some other part of your program.
 
 ### It's Freezing In Here
 
@@ -255,7 +257,7 @@ There's a cheap and simple way to turn a mutable object/array/function into an "
 var x = Object.freeze( [2] );
 ```
 
-The `Object.freeze(..)` utility goes through all the properties/indices of an object/array and marks them as read-only, so they themselves cannot be reassigned. It's sorta like declaring properties with a `const`, actually! It also marks the properties as non-reconfigurable, and it marks the object/array itself as non-extensible (no new properties can be added). In effect, it makes the top level of the object immutable.
+The `Object.freeze(..)` utility goes through all the properties/indices of an object/array and marks them as read-only, so they cannot be reassigned. It's sorta like declaring properties with a `const`, actually! `Object.freeze(..)` also marks the properties as non-reconfigurable, and it marks the object/array itself as non-extensible (no new properties can be added). In effect, it makes the top level of the object immutable.
 
 Top level only, though. Be careful!
 
@@ -269,27 +271,29 @@ x[0] = 42;
 x[2][0] = 42;
 ```
 
-`Object.freeze(..)` is referred to as shallow immutability. You'll have to walk the entire object/array structure manually and apply `Object.freeze(..)` to each sub-object/array if you want a deeply immutable value.
+`Object.freeze(..)` provides shallow, naive immutability. You'll have to walk the entire object/array structure manually and apply `Object.freeze(..)` to each sub-object/array if you want a deeply immutable value.
 
 But contrasted with `const` which can confuse you into thinking you're getting an immutable value when you aren't, `Object.freeze(..)` *actually* gives you an immutable value.
 
 Recall the protection example from earlier:
 
 ```js
-var arr = [1,2,3];
+var arr = Object.freeze( [1,2,3] );
 
-foo( Object.freeze( arr ) );
+foo( arr );
 
 console.log( arr[0] );			// 1
 ```
 
 Now `arr[0]` is quite reliably `1`.
 
-This is important because it makes reasoning about our code much easier when we know we can trust that a value doesn't change when passed somewhere that we do not see or control.
+This is so important because it makes reasoning about our code much easier when we know we can trust that a value doesn't change when passed somewhere that we do not see or control.
 
 ## Performance
 
-Whenever we start creating new values (arrays, objects, etc) instead of mutating existing ones, the obvious next question is: what does that mean for performance? If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory, the old values (if de-referenced) are getting garbage collected, which is even more CPU burn.
+Whenever we start creating new values (arrays, objects, etc) instead of mutating existing ones, the obvious next question is: what does that mean for performance?
+
+If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory, the old values (if de-referenced) are getting garbage collected, which is even more CPU burn. And is that an acceptable trade-off?
 
 // TODO
 
