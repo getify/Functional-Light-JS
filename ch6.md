@@ -101,6 +101,22 @@ This means we can calculate the new state of `[1,2,3,4]` and be fully in control
 
 The array that `arr` references is actually mutable. We just chose not to mutate it, so we practiced the spirit of value immutability.
 
+We can use the copy-instead-of-mutate strategy for objects, too. Consider:
+
+```js
+function updateLastLogin(user) {
+	var newUserRecord = Object.assign( {}, user );
+	newUserRecord.lastLogin = Date.now();
+	return newUserRecord;
+}
+
+var user = {
+	// ..
+};
+
+user = updateLastLogin( user );
+```
+
 ### Non-Local
 
 The importance of an immutable value can be seen if you do something like this:
@@ -157,7 +173,6 @@ It's true that this later line will fail with an error:
 
 ```js
 // try to change `x`, fingers crossed!
-
 x = 3;		// Error!
 ```
 
@@ -293,9 +308,53 @@ This is so important because it makes reasoning about our code much easier when 
 
 Whenever we start creating new values (arrays, objects, etc) instead of mutating existing ones, the obvious next question is: what does that mean for performance?
 
-If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory, the old values (if de-referenced) are getting garbage collected, which is even more CPU burn. And is that an acceptable trade-off?
+If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory, the old values (if no longer referenced) are being garbage collected; That's even more CPU burn.
 
-// TODO
+Is that an acceptable trade-off? It depends. No discussion or optimization of code performance should happen **without context.**
+
+If you have a single state change that happens once (or even a couple of times) in the whole life of the program, throwing away an old array/object for a new one is almost certainly not a concern. The churn we're talking about will be so small -- probably mere microseconds at most -- as to have no practical effect on the performance of your application. Compared to the minutes or hours you will save not having to track down and fix a bug related to unexpected value mutation, there's not even a contest here.
+
+Then again, if such an operation is going to occur frequently, or specifically happen in a *critical path* of your application, then performance -- consider both performance and memory! -- is a totally valid concern.
+
+Think about a data structure like an array that you want to be able to make changes to, but have each change behave implicitly as if a new array value was created. How could you accomplish this without actually creating a new array each time?
+
+What if your special array data structure stored the original value but then tracked each change made as a delta from the previous version. Imagine using it like this:
+
+```js
+var state = specialArray( 1, 2, 3, 4 );
+
+var newState = state.set( 42, "meaning of life" );
+
+state.get( 2 );						// 3
+state.get( 42 );					// undefined
+
+newState.get( 2 );					// 3
+newState.get( 42 );					// "meaning of life"
+
+newState.slice( 1, 3 );				// [2,3,4]
+```
+
+This `specialArray(..)` data structure internally keeps track of each `set(..)` operation as a *diff* of the original array, so we're not reallocating memory for the original values (`1`, `2`, `3`, and `4`) when we add the `"meaning of life"` value. But `state` and `newState` point at different versions of the data structure, which means we've preserved the immutability semantic.
+
+Inventing your own performance-optimized data structures would be an interesting challenge. But pragmatically, you probably should just use a library that already does this. One great option is **Immutable.js** (http://facebook.github.io/immutable-js).
+
+For example, the above `specialArray` example could instead be done with an `Immutable.List`:
+
+```js
+var state = Immutable.List.of( 1, 2, 3, 4 );
+
+var newState = state.set( 42, "meaning of life" );
+
+state.get( 2 );						// 3
+state.get( 42 );					// undefined
+
+newState.get( 2 );					// 3
+newState.get( 42 );					// "meaning of life"
+
+newState.toArray.slice( 1, 3 );		// [2,3,4]
+```
+
+A library like Immutable.js is very useful if you need data structures that are performance optimized. For simple usages where the changes are few or infrequent, I think I'd recommend sticking with the built-in `Object.freeze(..)` approach discussed earlier.
 
 ## Treatment
 
