@@ -316,14 +316,20 @@ If you have a single state change that happens once (or even a couple of times) 
 
 Then again, if such an operation is going to occur frequently, or specifically happen in a *critical path* of your application, then performance -- consider both performance and memory! -- is a totally valid concern.
 
-Think about a data structure like an array that you want to be able to make changes to, but have each change behave implicitly as if a new array value was created. How could you accomplish this without actually creating a new array each time?
+Think about a specialized data structure that's like an array, but that you want to be able to make changes to and have each change behave implicitly as if the result was a new array. How could you accomplish this without actually creating a new array each time? Such a special array data structure could store the original value and then track each change made as a delta from the previous version.
 
-What if your special array data structure stored the original value but then tracked each change made as a delta from the previous version. Imagine using it like this:
+Internally, it might be like a linked-list tree of object references where each node in the tree represents a mutation of the original value. Actually, this is conceptually similar to how **git** version control works.
+
+// TODO: image visualization of the tree
+
+Imagine using this hypothetical specialized array data structure like this:
 
 ```js
 var state = specialArray( 1, 2, 3, 4 );
 
 var newState = state.set( 42, "meaning of life" );
+
+state === newState;					// false
 
 state.get( 2 );						// 3
 state.get( 42 );					// undefined
@@ -334,16 +340,18 @@ newState.get( 42 );					// "meaning of life"
 newState.slice( 1, 3 );				// [2,3,4]
 ```
 
-This `specialArray(..)` data structure internally keeps track of each `set(..)` operation as a *diff* of the original array, so we're not reallocating memory for the original values (`1`, `2`, `3`, and `4`) when we add the `"meaning of life"` value. But `state` and `newState` point at different versions of the data structure, which means we've preserved the immutability semantic.
+The `specialArray(..)` data structure would internally keep track of each mutation operation (like `set(..)`) as a *diff*, so it won't have to reallocate memory for the original values (`1`, `2`, `3`, and `4`) just to add the `"meaning of life"` value to the list. But importantly, `state` and `newState` point at different versions of the array value, so **the value immutability semantic is preserved.**
 
-Inventing your own performance-optimized data structures would be an interesting challenge. But pragmatically, you probably should just use a library that already does this. One great option is **Immutable.js** (http://facebook.github.io/immutable-js).
+Inventing your own performance-optimized data structures is an interesting challenge. But pragmatically, you should probably use a library that already does this well. One great option is **Immutable.js** (http://facebook.github.io/immutable-js), which provides a variety of data structures, including `List` (like array) and `Map` (like object).
 
-For example, the above `specialArray` example could instead be done with an `Immutable.List`:
+Consider the above `specialArray` example but using `Immutable.List`:
 
 ```js
 var state = Immutable.List.of( 1, 2, 3, 4 );
 
 var newState = state.set( 42, "meaning of life" );
+
+state === newState;					// false
 
 state.get( 2 );						// 3
 state.get( 42 );					// undefined
@@ -351,10 +359,12 @@ state.get( 42 );					// undefined
 newState.get( 2 );					// 3
 newState.get( 42 );					// "meaning of life"
 
-newState.toArray.slice( 1, 3 );		// [2,3,4]
+newState.toArray().slice( 1, 3 );	// [2,3,4]
 ```
 
-A library like Immutable.js is very useful if you need data structures that are performance optimized. For simple usages where the changes are few or infrequent, I think I'd recommend sticking with the built-in `Object.freeze(..)` approach discussed earlier.
+A powerful library like Immutable.js employs very sophisticated performance optimizations. Handling all the details and corner-cases manually without such a library would be quite difficult.
+
+When changes to a value are few or infrequent and performance is less of a concern, I'd recommend the lighter-weight solution, sticking with built-in `Object.freeze(..)` as discussed earlier.
 
 ## Treatment
 
