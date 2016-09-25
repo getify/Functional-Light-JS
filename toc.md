@@ -40,9 +40,13 @@
 	* Performance
 	* Treatment
 * Chapter 7: List Operations
+	* Map
+	* Filter
+	* Reduce
+	* Fusion
 * Chapter 8: Recursion
 * Chapter 9: Functional Async
 * Chapter 10: Putting It All Together
-* Appendix A: Fusion & Transducing
+* Appendix A: Transducing
 * Appendix B: The Monad Simplified
 * Appendix C: FP Libraries
