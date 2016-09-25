@@ -76,9 +76,9 @@ s;					// "hello"
 
 ## Value To Value
 
-We'll unpack this idea more throughout the chapter, but just to start with a clear understanding in mind: value immutability does not mean we can't have values change over the course of our program. It also doesn't mean that our variables can't hold different values. These are all common misconceptions about value immutability.
+We'll unpack this idea more throughout the chapter, but just to start with a clear understanding in mind: value immutability does not mean we can't have values change over the course of our program. A program without changing state is not a very interesting one! It also doesn't mean that our variables can't hold different values. These are all common misconceptions about value immutability.
 
-Value immutability means that *when* we need to change the state in our program, we must create a new value rather than mutate an existing value.
+Value immutability means that *when* we need to change the state in our program, we must create and track a new value rather than mutate an existing value.
 
 For example:
 
@@ -370,8 +370,59 @@ When changes to a value are few or infrequent and performance is less of a conce
 
 What if we receive a value to our function and we're not sure if it's mutable or immutable? Is it ever OK to just go ahead and try to mutate it? **No.** As we asserted at the beginning of this chapter, we should treat all received values as immutable -- to avoid side effects and remain pure -- regardless of whether they are or not.
 
-// TODO
+Recall this example from earlier:
+
+```js
+function updateLastLogin(user) {
+	var newUserRecord = Object.assign( {}, user );
+	newUserRecord.lastLogin = Date.now();
+	return newUserRecord;
+}
+```
+
+This implementation treats `user` as a value that should not be mutated; whether it *is* immutable or not is irrelevant to reading this part of the code. Contrast that with this implementation:
+
+```js
+function updateLastLogin(user) {
+	user.lastLogin = Date.now();
+	return user;
+}
+```
+
+That version is a lot easier to write, and even performs better. But not only does this approach make `updateLastLogin(..)` impure, it also mutates a value in a way that makes both the reading of this code, as well as the places it's used, more complicated.
+
+**We should treat `user` as immutable**, always, because at this point of reading the code we do not know where the value comes from, or what potential issues we may cause if we mutate it.
+
+Nice examples of this approach can be seen in various built-in methods of the JS array, such as `concat(..)` and `slice(..)`:
+
+```js
+var arr = [1,2,3,4,5];
+
+var arr2 = arr.concat( 6 );
+
+arr;					// [1,2,3,4,5]
+arr2;					// [1,2,3,4,5,6]
+
+var arr3 = arr2.slice( 1 );
+
+arr2;					// [1,2,3,4,5,6]
+arr3;					// [2,3,4,5,6]
+```
+
+Other array prototype methods that treat the value instance as immutable and return a new array instead of mutating: `map(..)` and `filter(..)`. The `reduce(..)` / `reduceRight(..)` utilities also avoid mutating the instance, though they also don't by default return a new array.
+
+Unfortunately, for historical reasons, quite a few other array methods are impure mutators of their instance: `splice(..)`, `pop(..)`, `push(..)`, `shift(..)`, `unshift(..)`, `reverse(..)`, `sort(..)`, and `fill(..)`.
+
+It should not be seen as *forbidden* to use these kinds utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
+
+Be disciplined and always treat *received values* as immutable, whether they are or not. That effort will improve the readability and trustability of your code.
 
 ## Summary
 
-The importance of value immutability is less in the inability to change a value, and more in the discipline to treat a value as immutable regardless.
+Value immutability is not about unchanging values. It's about creating and tracking new values as the state of the program changes, rather than mutating existing values. This approach leads to more confidence in reading the code, because we limit the places where our state can change in ways we don't readily see or expect.
+
+`const` declarations (constants) are commonly mistaken for their ability to signal intent and enforce immutability. In reality, `const` has basically nothing to do with value immutability, and its usage will likely create more confusion than it solves. Instead, `Object.freeze(..)` provides a nice built-in way of setting shallow value immutability on an array or object. In many cases, this will be sufficient.
+
+For performance sensitive parts of the program, or in cases where changes happen frequently, creating a new array or object (especially if it contains lots of data) is undesirable, for both processsing and memory concerns. In these cases, using immutable data structures from a library like **Immutable.js** is probably the best idea.
+
+The importance of value immutability on code readability is less in the inability to change a value, and more in the discipline to treat a value as immutable.
