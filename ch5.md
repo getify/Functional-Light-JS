@@ -416,9 +416,7 @@ It won't always be possible to define your operations on data in an idempotent w
 
 ## Pure Bliss
 
-A function with no side causes/effects is called a pure function. Indeed, a pure function is idempotent in the programming sense, since it cannot have any side effects. However, pure functions are not necessarily idempotent in the mathematical sense, because they don't have to return a value that would be suitable for feeding back in as their own input.
-
-Consider:
+A function with no side causes/effects is called a pure function. A pure function is idempotent in the programming sense, since it cannot have any side effects. Consider:
 
 ```js
 function add(x,y) {
@@ -426,9 +424,25 @@ function add(x,y) {
 }
 ```
 
-All the inputs (`x` and `y`) and outputs (`return ..`) are direct and not associated as free variables. `add(..)` is pure.
+All the inputs (`x` and `y`) and outputs (`return ..`) are direct; there are no free variable references. Calling `add(3,4)` multiple times would be indistinguishable from only calling it once. `add(..)` is pure and programming-style idempotent.
 
-But as we discussed earlier, that does not mean a pure function can't reference any free variables, as is commonly claimed; it just means that those free variables aren't side causes.
+However, not all pure functions are idempotent in the mathematical sense, because they don't have to return a value that would be suitable for feeding back in as their own input. Consider:
+
+```js
+function calculateAverage(list) {
+	var sum = 0;
+	for (let i = 0; i < list.length; i++) {
+		sum += list[i];
+	}
+	return sum / list.length;
+}
+
+calculateAverage( [1,2,4,7,11,16,22] );			// 9
+```
+
+The output `9` is not an array, so you cannot pass it back in: `calculateAverage(calculateAverage( .. ))`.
+
+As we discussed earlier, a pure function *can* reference free variables, as long as those free variables aren't side causes.
 
 Some examples:
 
@@ -462,11 +476,11 @@ It's still pure because `fn` never changes. In fact, we have full confidence in 
 
 **Note:** `fn` is a reference to a function object, which is by default a mutable value. Somewhere else in the program *could* for example add a property to this function object, which technically "changes" the value (mutation, not reassignment). However, since we're not relying on anything about `fn` other than our ability to call it, and it's not possible to affect the callability of a function value, `fn` is still effectively unchanging for our reasoning purposes; it cannot be a side cause.
 
-Another common way to articulate a function's purity is if we know that given the same input(s), it always produces the same output. If you pass `3` to `circleArea(..)`, it will always output the same result (`28.274328`).
+Another common way to articulate a function's purity is: **given the same input(s), it always produces the same output.** If you pass `3` to `circleArea(..)`, it will always output the same result (`28.274328`).
 
-If a function can produce a different output each time it's given the same inputs, it is impure. Even if such a function always `return`s the same value, if it produces an indirect output side effect, the program state is changed each time it's called; this is impure.
+If a function *can* produce a different output each time it's given the same inputs, it is impure. Even if such a function always `return`s the same value, if it produces an indirect output side effect, the program state is changed each time it's called; this is impure.
 
-Impure functions are undesirable because they make all of their calls harder to reason about. A pure function's call is perfectly predictable. When you see multiple `circleArea(3)` calls in your code, you won't have to spend any extra effort to figure out what its output will be *each time*.
+Impure functions are undesirable because they make all of their calls harder to reason about. A pure function's call is perfectly predictable. When some reading the code sees multiple `circleArea(3)` calls, they won't have to spend any extra effort to figure out what its output will be *each time*.
 
 ### Purely Relative
 
@@ -651,17 +665,17 @@ The only difference between these two snippets is that in the latter one, we ski
 
 ### Mentally Transparent
 
-The suggestion that a referentially transparent pure function *can be* replaced with its output does not mean that it *should be*. Far from it.
+The notion that a referentially transparent pure function *can be* replaced with its output does not mean that it *should literally be* replaced. Far from it.
 
-The reasons we build functions into our programs instead of using pre-computed magic constants is not just about responding to changing data, but also about readability with proper abstractions, etc. The function call to calculate the average of that list of numbers makes that part of the program more readable than the line that just assigns the value explicitly. It tells the story to the reader of where `avg` comes from, what it means, etc.
+The reasons we build functions into our programs instead of using pre-computed magic constants are not just about responding to changing data, but also about readability with proper abstractions, etc. The function call to calculate the average of that list of numbers makes that part of the program more readable than the line that just assigns the value explicitly. It tells the story to the reader of where `avg` comes from, what it means, etc.
 
-What we're really suggesting with referential transparency is that as you're reading a program, once you've mentally computed what a function call's output is, you no longer need to think about what that exact function call is doing when you see it in code.
+What we're really suggesting with referential transparency is that as you're reading a program, once you've mentally computed what a pure function call's output is, you no longer need to think about what that exact function call is doing when you see it in code, especially if it appears multiple times.
 
 That result becomes kinda like a mental `const` declaration, which as you're reading you can transparently swap in and not spend any more mental energy working out.
 
-Hopefully the importance of this characteristic of a pure function is obvious. We're trying to make our programs more readable. One way we can do that is give the reader assistance in skipping over the unnecessary stuff so they can focus on the necessary stuff.
+Hopefully the importance of this characteristic of a pure function is obvious. We're trying to make our programs more readable. One way we can do that is give the reader less work, by providing assistance to skip over the unnecessary stuff so they can focus on the important stuff.
 
-The reader shouldn't need to keep re-computing some outcome that isn't going to change (and doesn't need to). If you make it a pure function with referential transparency, they won't have to.
+The reader shouldn't need to keep re-computing some outcome that isn't going to change (and doesn't need to). If you make define a pure function with referential transparency, they won't have to.
 
 ### Not So Transparent?
 
@@ -831,9 +845,13 @@ Both `userId` and `users` are input for the original `fetchUserData`, and `users
 
 This technique has limited usefulness mostly because if you cannot modify a function itself to be pure, you're not that likely to be able to modify its surrounding code either. However, it's helpful to explore it if possible, as it's the simplest of our fixes.
 
+Regardless of whether this will be a practical technique for refactoring to pure functions, the more important take-away is that function purity only need be skin deep. That is, the **purity of a function is judged from the outside**, regardless of what goes on inside. As long as a function's usage behaves pure, it is pure. Inside a pure function, impure techniques can be used -- in moderation! -- for a variety of reasons, including most commonly, for performance. It's not necessarily, as they say, "turtles all the way down".
+
+Be very careful, though. Any part of the program that's impure, even if it's wrapped with and only ever used via a pure function, is a potential source of bugs and confusion for readers of the code. The overall goal is to reduce side effects wherever possible, not just hide them.
+
 ### Covering Up Effects
 
-Many times you will be unable to modify the code to encapsulate the lexical free variables inside the scope of a wrapper function. For example, the impure function may be in a third-party file that you do not control, containing something like:
+Many times you will be unable to modify the code to encapsulate the lexical free variables inside the scope of a wrapper function. For example, the impure function may be in a third-party library file that you do not control, containing something like:
 
 ```js
 var nums = [];
@@ -856,7 +874,7 @@ function generateMoreRandoms(count) {
 }
 ```
 
-The brute-force strategy is to create an interface function to interact with that performs the following steps:
+The brute-force strategy to *quarantine* the side causes/effects when using this utility in the rest of our program is to create an interface function that performs the following steps:
 
 1. capture the to-be-affected current states
 2. set initial input states
