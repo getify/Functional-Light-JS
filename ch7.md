@@ -49,7 +49,48 @@ Reduce is a combination operation. Reduce is the swiss army knife of FP.
 
 ## Advanced List Operations
 
-// TODO: `zip(..)`, `flatten(..)`, etc
+Now that we feel comfortable with the foundational list operations `map(..)`, `filter(..)`, and `reduce(..)`, let's look at a few more-sophisticated operations you may find useful in various situations. These are all utilities you'll find in various FP libraries.
+
+### Flatten
+
+From time to time, you may have (or produce through some other operations) an array that's not just a flat list of values, but with nested arrays, such as:
+
+```js
+[ [1, 2, 3], 4, 5, [6, [7, 8]] ]
+```
+
+What if you'd like to transform it into:
+
+```js
+[ 1, 2, 3, 4, 5, 6, 7, 8 ]
+```
+
+The operation we're looking for is typically called `flatten(..)`, and it could be implemented like this using our swiss army knife `reduce(..)`:
+
+```js
+function flatten(arr) {
+	return arr.reduce( function reducer(list,v){
+		return list.concat( Array.isArray( v ) ? flatten( v ) : v );
+	}, [] );
+}
+
+// or the ES6 => form
+var flatten =
+	arr =>
+		arr.reduce(
+			(list,v) =>
+				list.concat( Array.isArray( v ) ? flatten( v ) : v )
+		, [] );
+```
+
+To use it with an array of arrays (of any nested depth):
+
+```js
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
+// [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+```
+
+// TODO: `merge(..)`, `zip(..)`, etc
 
 ## Looking For Lists
 
