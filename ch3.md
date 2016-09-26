@@ -222,9 +222,9 @@ cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 Now, we can define a `partialRight(..)` which partially applies from the right, using this same reverse-partial apply-reverse trick:
 
 ```js
-function partialRight( fn, ...args ) {
+function partialRight( fn, ...presetArgs ) {
 	return reverseArgs(
-		partial( reverseArgs( fn ), ...args.reverse() )
+		partial( reverseArgs( fn ), ...presetArgs.reverse() )
 	);
 }
 
