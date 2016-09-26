@@ -43,6 +43,7 @@
 	* Map
 	* Filter
 	* Reduce
+	* Advanced List Operations
 	* Looking For Lists
 	* Fusion
 * Chapter 8: Recursion

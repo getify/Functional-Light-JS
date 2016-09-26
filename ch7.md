@@ -47,6 +47,10 @@ Reduce is a combination operation. Reduce is the swiss army knife of FP.
 
 // TODO
 
+## Advanced List Operations
+
+// TODO: `zip(..)`, `flatten(..)`, etc
+
 ## Looking For Lists
 
 So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can star to shine: modeling an imperative series of statements with declarative list operations.
