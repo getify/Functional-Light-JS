@@ -43,6 +43,7 @@
 	* Map
 	* Filter
 	* Reduce
+	* Looking For Lists
 	* Fusion
 * Chapter 8: Recursion
 * Chapter 9: Functional Async

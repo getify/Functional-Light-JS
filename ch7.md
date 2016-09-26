@@ -47,6 +47,111 @@ Reduce is a combination operation. Reduce is the swiss army knife of FP.
 
 // TODO
 
+## Looking For Lists
+
+So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can star to shine: modeling an imperative series of statements with declarative list operations.
+
+Let's first consider this base example:
+
+```js
+var getSessionId = partial( prop, "sessId" );
+var getUserId = partial( prop, "uId" );
+
+var session, sessionId, user, userId, orders;
+
+session = getCurrentSession();
+if (session != null) sessionId = getSessionId( sessionId );
+if (sessionId != null) user = lookupUser( sessionId );
+if (user != null) userId = getUserId( user );
+if (userId != null) orders = lookupOrders( userId );
+if (orders != null) processOrders( orders );
+```
+
+First, let's observe that the five variable declarations and the running series of `if` conditionals guarding the function calls are effectively one big composition of these six calls `getCurrentSession()`, `getSessionId(..)`, `lookupUser(..)`, `getUserId(..)`, `lookupOrders(..)`, and `processOrders(..)`. Ideally, we'd like to get rid of all these variable declarations and imperative conditionals.
+
+Unfortunately, the `compose(..)` / `pipe(..)` utilties we explored in Chapter 4 don't by themselves offer a convenient way to express the `!= null` conditionals in the composition. Let's define a utility to help:
+
+```js
+var guard =
+	fn =>
+		arg =>
+			arg != null ? fn( arg ) : arg;
+```
+
+**Note:** We're going to use ES6 `=>` form for the rest of this refactoring, just to keep things concise.
+
+This `guard(..)` utility lets us map the five conditional-guarded functions:
+
+```js
+[ getSessionId, lookupUser, getUserId, lookupOrders, processOrders ]
+.map( guard )
+```
+
+The result of this mapping is an array of functions that are ready to compose (actually, pipe, in this listed order). We could spread this array to `pipe(..)`, but since we're already doing list operations, let's do it with a `reduce(..)`, using the session value from `getCurrentSession()` as the initial value:
+
+```js
+.reduce(
+	(result,nextFn) => nextFn( result )
+	, getCurrentSession()
+)
+```
+
+Next, let's observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
+
+```js
+[ "sessId", "uId" ].map( propName => partial( prop, propName ) )
+```
+
+But to use these, we'll need to interleave them with the other three functions (`lookupUser(..)`, `lookupOrders(..)`, and `processOrders(..)`) to get the array of five functions to guard / compose as discussed above.
+
+To do the interleaving, let's split the task into two steps. The first step will use `reduce(..)` (our swiss army knife, remember!?) to "insert" `lookupUser(..)` in between the `getSessionId(..)` and `getUserId(..)` functions in an array:
+
+```js
+.reduce(
+	(list,fn) => list.reverse().concat( fn )
+	, [ lookupUser ]
+)
+```
+
+Then we'll concatenate `lookupOrders(..)` and `processOrders(..)` onto the end of the running functions array:
+
+```js
+.concat( lookupOrders, processOrders )
+```
+
+To review, the generated list of five functions is expressed as:
+
+```js
+[ "sessId", "uId" ].map( propName => partial( prop, propName ) )
+.reduce(
+	(list,fn) => list.reverse().concat( fn )
+	, [ lookupUser ]
+)
+.concat( lookupOrders, processOrders )
+```
+
+Finally, to put it all together, take this list of functions and tack on the guarding and composition from earlier:
+
+```js
+[ "sessId", "uId" ].map( propName => partial( prop, propName ) )
+.reduce(
+	(list,fn) => list.reverse().concat( fn )
+	, [ lookupUser ]
+)
+.concat( lookupOrders, processOrders )
+.map( guard )
+.reduce(
+	(result,nextFn) => nextFn( result )
+	, getCurrentSession()
+);
+```
+
+Gone are all the imperative variable declarations and conditionals, and in their place we have clean and declarative list operations chained together.
+
+If this version is harder for you read right now than the original, don't worry. The original is unquestionably the more common imperative form you're familiar with. Part of your evolution to become a functional programmer is to develop a recognition of FP patterns such as list operations. Over time, these will jump out of the code more readily as your sense of code readability shifts to declarative style.
+
+Before we leave this topic, let's take a reality check: the example here is heavily contrived. Not all code segments will be straightforwardly modeled as list operations. The pragmatic take-away is to develop the instinct to look for these opportunities, but not get too hung up on code acrobatics; some improvement is better than none. Always step back and ask if you're **improving or harming** code readability.
+
 ## Fusion
 
 Imagine this scenario:
