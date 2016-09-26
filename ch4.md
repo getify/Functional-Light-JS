@@ -141,7 +141,8 @@ function compose2(fn2,fn1) {
 // or the ES6 => form
 var compose2 =
 	(fn2,fn1) =>
-		origValue => fn2( fn1( origValue ) );
+		origValue =>
+			fn2( fn1( origValue ) );
 ```
 
 Did you notice that we defined the parameter order as `fn2,fn1`, and furthermore that it's the second function listed (aka `fn1` parameter name) that runs first, then the first function listed (`fn2`)? In other words, the functions compose from right-to-left.
