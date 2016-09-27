@@ -92,9 +92,213 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 
 // TODO: `merge(..)`, `zip(..)`, etc
 
+## Method vs. Standalone
+
+A common source of frustration for FPers in JavaScript is unifying their strategy for working with utilities when some of them are provided as standalone functions -- think about the various FP utilities we've derived in previous chapters -- and others are methods of the array prototype -- like the ones we've seen in this chapter.
+
+The pain of this problem becomes more evident when you consider combining multiple operations:
+
+```js
+[1,2,3,4,5]
+.filter( isOdd )
+.map( double )
+.reduce( sum, 0 );					// 18
+
+// vs.
+
+reduce(
+	map(
+		filter( [1,2,3,4,5], isOdd ),
+		double
+	),
+	sum,
+	0
+);									// 18
+```
+
+Both API styles accomplish the same task, but they have very different ergonomics. Many FPers will prefer the latter to the former, but the former is unquestionably more common in JavaScript. One thing specifically that's disliked about the latter is the nesting of the calls. The preference for the method chain style -- typically called a fluent API style, as in jQuery and other tools -- is that it's compact/concise and it reads in declarative top-down order.
+
+The visual order for that manual composition of the standalone style is neither strictly left-to-right (top-to-bottom) nor right-to-left (bottom-to-top); it's inner-to-outer, which harms the readability.
+
+Automatic composition normalizes the reading order as right-to-left (bottom-to-top) for both styles. So, to explore the implications of the form differences, let's examine composition specifically; it seems like it should be straightforward, but it's a little awkward in both cases.
+
+### Composing Method Chains
+
+The array methods receive the implicit `this` argument, so despite their appearance, they can't be treated as unary; that makes composition more awkward. To cope, we'll first need a `this`-aware version of `partial(..)`:
+
+```js
+function partialThis(fn,...presetArgs) {
+	return function partiallyApplied(...laterArgs){
+		return fn.apply( this, [...presetArgs, ...laterArgs] );
+	};
+}
+
+// or the ES6 => form
+var partialThis =
+	(fn,...presetArgs) =>
+		function partiallyApplied(...laterArgs){
+			return fn.apply( this, [...presetArgs, ...laterArgs] );
+		};
+```
+
+We'll also need a version of `compose(..)` that calls each of the partially applied methods in the context of the chain -- the input value it's being "passed" (via implicit `this`) from the previous step:
+
+```js
+function composeChainedMethods(...fns) {
+	return function composed(result){
+		return fns.reduceRight( function reducer(result,fn){
+			return fn.call( result );
+		}, result );
+	};
+}
+
+// or the ES6 => form
+var composeChainedMethods =
+	(...fns) =>
+		result =>
+			fns.reduceRight(
+				(result,fn) =>
+					fn.call( result )
+				, result
+			);
+```
+
+And using these two `this`-aware utilities together:
+
+```js
+composeChainedMethods(
+   partialThis( [].reduce, sum, 0 ),
+   partialThis( [].map, double ),
+   partialThis( [].filter, isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+**Note:** The three `[].XYZ`-style references are grabbing references to the generic `Array.prototype.*` methods without repeating `Array.prototype` each time; this is done by creating a throwaway `[]` empty array value to access a method reference. This is just a shorthand cheat for shorter code.
+
+### Composing Standalone Utilities
+
+Standalone `compose(..)`-style composition of these utilities doesn't need all the `this` contortions, which is its most favorable argument.
+
+But standalone style suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application:
+
+```js
+compose(
+	partialRight( reduce, sum, 0 )
+	partialRight( map, double )
+	partialRight( filter, isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+However, if `filter(..)`, `map(..)`, and `reduce(..)` are alternately defined to receive the array last instead of first, and are curried, the composition flows a bit nicer:
+
+```js
+compose(
+	reduce( sum )( 0 ),
+	map( double ),
+	filter( isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+The cleanliness of this approach is in part why FPers prefer the standalone utility style instead of instance methods. But your mileage may vary.
+
+### Adapting Methods To Standalones
+
+If you prefer to work with only standalone utilities, you can straightforwardly define standalone adaptations of the array methods.
+
+```js
+function filter(arr,predicateFn) {
+	return arr.filter( predicateFn );
+}
+
+function map(arr,mapperFn) {
+	return arr.map( mapperFn );
+}
+
+function reduce(arr,reducerFn,initialValue) {
+	return arr.reduce( reducerFn, initialValue );
+}
+```
+
+You might have spotted the common pattern across these three; can we generate these standalone adaptations with a utility? Yes. While we're at it, let's swap the `arr` argument to the right and `curry(..)` the generated function, to make composition easier:
+
+```js
+function unmethodify(methodName,argCount) {
+	return curry( function standalone(...args){
+		var arr = args.pop();
+		return arr[methodName]( ...args );
+	}, argCount );
+}
+
+// or the ES6 => form
+var unmethodify =
+	(methodName,argCount) =>
+		curry(
+			(...args) => {
+				var arr = args.pop();
+				return arr[methodName]( ...args );
+			}
+			, argCount
+		);
+```
+
+And to use this utility:
+
+```js
+var filter = unmethodify( "filter" );
+var map = unmethodify( "map" );
+var reduce = unmethodify( "reduce" );
+
+compose(
+	reduce( sum )( 0 ),
+	map( double ),
+	filter( isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+### Adapting Standalones To Methods
+
+If you prefer to work with only array methods, you have two choices. You can:
+
+1. Extend the built-in `Array.prototype` with additional methods.
+2. Adapt the standalone utility to work as a reducer function and pass it to the `reduce(..)` instance method.
+
+**Don't do (1).** It's never a good idea to extend built-in natives like `Array.prototype` -- unless you define a subclass of `Array`, but that's beyond our discussion scope here. In an effort to discourage bad practices, we won't go any further into this approach.
+
+Let's **focus on (2)** instead. Recall the `flatten(..)` standalone utility we defined earlier:
+
+```js
+function flatten(arr) {
+	return arr.reduce( function reducer(list,v){
+		return list.concat( Array.isArray( v ) ? flatten( v ) : v );
+	}, [] );
+}
+```
+
+Let's pull out the inner `reducer(..)` function as the standalone utility (and adapt it to work without the outer `flatten(..)`):
+
+```js
+function flattenReducer(list,v) {
+	return list.concat(
+		Array.isArray( v ) ? v.reduce( flattenReducer, [] ) : v
+	);
+}
+```
+
+Now, we can use this utility in a method chain via `reduce(..)`:
+
+```js
+[ [1, 2, 3], 4, 5, [6, [7, 8]] ]
+.reduce( flattenReducer, [] )
+// ..
+```
+
 ## Looking For Lists
 
-So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can star to shine: modeling an imperative series of statements with declarative list operations.
+So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can start to shine: modeling an imperative series of statements with declarative list operations.
 
 Let's first consider this base example:
 

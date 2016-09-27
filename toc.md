@@ -44,6 +44,7 @@
 	* Filter
 	* Reduce
 	* Advanced List Operations
+	* Method vs. Standalone
 	* Looking For Lists
 	* Fusion
 * Chapter 8: Recursion
