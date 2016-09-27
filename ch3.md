@@ -299,7 +299,7 @@ How might we define a utility to do this currying? We're going to use some trick
 function curry(fn,arity = fn.length) {
 	return (function nextCurried(prevArgs){
 		return function curried(nextArg){
-			var args = prevArgs.concat( nextArg );
+			var args = prevArgs.concat( [nextArg] );
 
 			if (args.length >= arity) {
 				return fn( ...args );
@@ -319,7 +319,7 @@ var curry =
 	(fn, arity = fn.length, nextCurried) =>
 		(nextCurried = prevArgs =>
 			nextArg => {
-				var args = prevArgs.concat( nextArg );
+				var args = prevArgs.concat( [nextArg] );
 
 				if (args.length >= arity) {
 					return fn( ...args );
