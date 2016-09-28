@@ -93,9 +93,9 @@ var unique =
 		, [] );
 ```
 
-There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
+**Note:** There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
 
-However we implement `unique(..)`, its usage nicely produces a new list with no duplicates:
+`unique(..)` nicely produces a new list with no duplicates:
 
 ```js
 unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
@@ -143,11 +143,58 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 
 ### Zip
 
-So far, the list operations we've examined... // TODO
+So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of the input lists into sub-lists, called `zip(..)`:
+
+```js
+zip( [1,3,5,7,9], [2,4,6,8,10] );
+// [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], [ 7, 8 ], [ 9, 10 ] ]
+```
+
+Values `1` and `2` were selected into the sub-list `[1,2]`, then `3` and `4` into `[3,4]`, etc.
+
+To implement `zip(..)`:
+
+```js
+function zip(...lists) {
+	// TODO
+}
+```
 
 ### Merge
 
-If two lists are zipped together... // TODO
+Merging multiple lists by interleaving values from each source looks like this:
+
+```js
+merge( [1,3,5,7,9], [2,4,6,8,10] );
+// [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+```
+
+It may not be immediately obvious, but this is effectively the same result as if you `flatten(..)` the result of `zip(..)`:
+
+```js
+zip( [1,3,5,7,9], [2,4,6,8,10] );
+// [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], [ 7, 8 ], [ 9, 10 ] ]
+
+flatten( [ [1,2], [3,4], [5,6], [7,8], [9,10] ] );
+// [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+
+flatten( zip( [1,3,5,7,9], [2,4,6,8,10] ) );
+// [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+```
+
+So, `merge(..)` is a simple composition:
+
+```
+var merge = compose( flatten, zip );
+```
+
+But we can also implement `merge(..)` directly for better performance:
+
+```js
+function merge(...lists) {
+	// TODO
+}
+```
 
 ## Method vs. Standalone
 
