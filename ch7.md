@@ -51,6 +51,57 @@ Reduce is a combination operation. Reduce is the swiss army knife of FP.
 
 Now that we feel comfortable with the foundational list operations `map(..)`, `filter(..)`, and `reduce(..)`, let's look at a few more-sophisticated operations you may find useful in various situations. These are all utilities you'll find in various FP libraries.
 
+### Unique
+
+Filtering a list to include only unique values, based on `indexOf(..)` searching ( which uses `===` strict equality comparision):
+
+```js
+function unique(arr) {
+	return arr.filter( function firstFound(v,idx){
+		return arr.indexOf( v ) == idx;
+	} );
+}
+
+// or the ES6 => form
+var unique =
+	arr =>
+		arr.filter(
+			(v,idx) =>
+				arr.indexOf( v ) == idx
+		);
+```
+
+This technique works by observing that we should only include the first occurrence of an item from `arr` into the new list; when running left-to-right, this will only be true if its `idx` position is the same as the `indexOf(..)` found position.
+
+Another way to implement `unique(..)` is to run through `arr` and include an item into a new (initially empty) list if that item cannot already be found in the new list. For that processing, we use `reduce(..)`:
+
+```js
+function unique(arr) {
+	return arr.reduce( function firstFound(list,v){
+		if (list.indexOf( v ) == -1) list.push( v );
+		return list;
+	}, [] );
+}
+
+// or the ES6 => form
+var unique =
+	arr =>
+		arr.reduce(
+			(list,v) =>
+				list.indexOf( v ) == -1 ?
+					( list.push( v ), list ) : list
+		, [] );
+```
+
+There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
+
+However we implement `unique(..)`, its usage nicely produces a new list with no duplicates:
+
+```js
+unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
+// [1, 4, 7, 3, 9, 2, 6, 0, 5]
+```
+
 ### Flatten
 
 From time to time, you may have (or produce through some other operations) an array that's not just a flat list of values, but with nested arrays, such as:
@@ -90,7 +141,13 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 ```
 
-// TODO: `merge(..)`, `zip(..)`, etc
+### Zip
+
+So far, the list operations we've examined... // TODO
+
+### Merge
+
+If two lists are zipped together... // TODO
 
 ## Method vs. Standalone
 
@@ -298,9 +355,9 @@ Now, we can use this utility in a method chain via `reduce(..)`:
 
 ## Looking For Lists
 
-So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can start to shine: modeling an imperative series of statements with declarative list operations.
+So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can start to shine: modeling an imperative series of statements declaratively.
 
-Let's first consider this base example:
+Consider this base example:
 
 ```js
 var getSessionId = partial( prop, "sessId" );
