@@ -47,6 +47,7 @@
 	* Method vs. Standalone
 	* Looking For Lists
 	* Fusion
+	* Beyond Lists
 * Chapter 8: Recursion
 * Chapter 9: Functional Async
 * Chapter 10: Putting It All Together

@@ -536,6 +536,293 @@ words
 // [ "MR", "JONES", "ISNT", "RESPONS...", "FOR", "THIS", "DISASTER" ]
 ```
 
+## Beyond Lists
+
+So far we've been discussing operations in the context of the list (array) data structure; it's by far the most common scenario you encounter them. But in a more general sense, these operations can be performed against any collection of values.
+
+Just as we said earlier that array's `map(..)` adapts a single-value operation to all its values, any data structure can provide a `map(..)` operation to do the same. Likewise, it can implement `filter(..)`, `reduce(..)`, or any other operation that makes sense for working with the data structure's values.
+
+The important part to maintain in the spirit of FP is that these operators must behave according to value immutability, meaning that they must return a new data structure rather than mutating the existing one.
+
+Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has two references to other nodes (binary trees), typically referred to as *left* and *right* child trees. Each node holds one value of the overall data structure.
+
+<p align="center">
+	<img src="fig7.png" width="250">
+</p>
+
+For ease of illustration, we'll make our binary tree a binary search tree (BST). However, the operations we'll identify work the same for any regular non-BST binary tree.
+
+**Note:** A binary search tree is a general binary tree with a special constraint on the relationship of values in the tree to each other. Each value of nodes on the left side of a tree is less than the value of the node at the root of that tree, which in turn is less than each value of nodes in the right side of the tree. The notion of "less than" is relative to the kind of data stored; it can be numerical for numbers, lexicographic for strings, etc. BSTs are useful because they make searching for a value in the tree straightforward and more efficient, using a recursive binary search algorithm.
+
+To make a binary tree node object, let's use this factory function:
+
+```js
+function BinaryTree(value,parent,left,right) {
+	return { value, parent, left, right };
+}
+```
+
+For convenience, we make each node store the `left` and `right` child trees as well as a reference to its own `parent` node.
+
+Let's now define a BST of names of common produce (fruits, vegetables):
+
+```js
+var banana = BinaryTree( "banana" );
+var apple = banana.left = BinaryTree( "apple", banana );
+var cherry = banana.right = BinaryTree( "cherry", banana );
+var apricot = apple.right = BinaryTree( "apricot", apple );
+var avocado = apricot.right = BinaryTree( "avocado", apricot );
+var cantelope = cherry.left = BinaryTree( "cantelope", cherry );
+var cucumber = cherry.right = BinaryTree( "cucumber", cherry );
+var grape = cucumber.right = BinaryTree( "grape", cucumber );
+```
+
+In this particular tree structure, `banana` is the root node; this tree could have been set up with nodes in different locations, but still had a BST with the same traversal.
+
+Our tree looks like:
+
+<p align="center">
+	<img src="fig8.svg" width="450">
+</p>
+
+There are multiple ways to traverse a binary tree to process its values. If it's a BST (our's is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
+
+For convenience, let's define a `forEach(..)` method that visits a binary tree in the same manner as an array:
+
+```js
+// in-order traversal
+BinaryTree.forEach = function forEach(node,visitFn){
+	if (node) {
+		if (node.left) {
+			forEach( node.left, visitFn );
+		}
+		visitFn( node );
+		if (node.right) {
+			forEach( node.right, visitFn );
+		}
+	}
+};
+```
+
+**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We'll cover recursion in more detail in a later chapter, where we'll cover recursion in that chapter.
+
+Use `forEach(..)` to print out values from the tree:
+
+```js
+BinaryTree.forEach( banana, function each(node){
+	console.log( node.value );
+} );
+// apple apricot avocado banana cantelope cherry cucumber grape
+
+// visit only `cherry`-rooted subtree
+BinaryTree.forEach( cherry, function each(node){
+	console.log( node.value );
+} );
+// cantelope cherry cucumber grape
+```
+
+To operate on our binary tree data structure using FP patterns, let's start by defining a `map(..)`:
+
+```js
+BinaryTree.map = function map(node,mapperFn) {
+	if (node) {
+		let newNode = mapperFn( node );
+		newNode.parent = node.parent;
+		newNode.left = node.left ? map( node.left, mapperFn ) : undefined;
+		newNode.right = node.right ? map( node.right, mapperFn ): undefined;
+
+		if (newNode.left) {
+			newNode.left.parent = newNode;
+		}
+		if (newNode.right) {
+			newNode.right.parent = newNode;
+		}
+
+		return newNode;
+	}
+};
+```
+
+You might have assumed we'd `map(..)` only the node `value` properties, but in general we might actually want to map the tree nodes themselves. So, the `mapperFn(..)` is passed the whole node being visited, and it expects to receive a new `BinaryTree(..)` node back, with the transformation applied. If you just return the same node, this operation will mutate your tree and quite possibly cause unexpected results!
+
+Let's map our tree to a list of produce with all uppercase names:
+
+```js
+var BANANA = BinaryTree.map(
+	banana,
+	function upper(node){
+		return BinaryTree( node.value.toUpperCase() );
+	}
+);
+
+BinaryTree.forEach( BANANA, function each(node) {
+	console.log( node.value );
+} );
+// APPLE APRICOT AVOCADO BANANA CANTELOPE CHERRY CUCUMBER GRAPE
+```
+
+`BANANA` is a different tree (with all different nodes) than `banana`, just like calling `map(..)` on an array returns a new array. Just like arrays of other objects/arrays, if `node.value` itself references some object/array, you'll also need to handle manually copying it in the mapper function if you want deeper immutability.
+
+How about `reduce(..)`? Same basic process: do an in-order traversal of the tree nodes. One usage would be to `reduce(..)` our tree to an array of its values, which would be useful in further adapting other typical list operations. Or we can `reduce(..)` our tree to a string concatenation of all its produce names.
+
+We'll mimic the behavior of the array `reduce(..)`, which makes passing the `initialValue` argument optional. This algorithm is a little trickier, but still manageable:
+
+```js
+BinaryTree.reduce = function reduce(node,reducerFn,initialValue) {
+	if (node) {
+		let result;
+
+		if (arguments.length < 3) {
+			if (node.left) {
+				result = reduce( node.left, reducerFn );
+			}
+			else {
+				return node.right ?
+					reduce( node.right, reducerFn, node ) :
+					node;
+			}
+		}
+		else {
+			result = node.left ?
+				reduce( node.left, reducerFn, initialValue ) :
+				initialValue;
+		}
+
+		result = reducerFn( result, node );
+		result = node.right ?
+			reduce( node.right, reducerFn, result ) :
+			result;
+		return result;
+	}
+
+	return initialValue;
+};
+```
+
+Let's use `reduce(..)` to make our shopping list:
+
+```js
+BinaryTree.reduce(
+	banana,
+	function pick(result,node){
+		return result.concat( node.value );
+	},
+	[]
+);
+// [ "apple", "apricot", "avocado", "banana", "cantelope"
+//   "cherry", "cucumber", "grape" ]
+```
+
+Finally, let's consider `filter(..)` for our tree. This algorithm is trickiest so far because it effectively (not actually) involves removing nodes from the tree, which requires handling several corner cases. Don't get intimiated by the implementation, though. Just skip over it for now, if you prefer, and focus on how we use it instead.
+
+```js
+BinaryTree.filter = function filter(node,predicateFn) {
+	if (node) {
+		let newNode;
+		let newLeft = node.left ?
+			filter(node.left,predicateFn) :
+			undefined;
+		let newRight = node.right ?
+			filter(node.right,predicateFn) :
+			undefined;
+
+		if (predicateFn( node )) {
+			newNode = BinaryTree(
+				node.value,
+				node.parent,
+				newLeft,
+				newRight
+			);
+			if (newLeft) {
+				newLeft.parent = newNode;
+			}
+			if (newRight) {
+				newRight.parent = newNode;
+			}
+		}
+		else {
+			if (newLeft) {
+				if (newRight) {
+					newNode = BinaryTree(
+						undefined,
+						node.parent,
+						newLeft,
+						newRight
+					);
+					newLeft.parent = newRight.parent = newNode;
+
+					if (newRight.left) {
+						let minRightNode = newRight;
+						while (minRightNode.left) {
+							minRightNode = minRightNode.left;
+						}
+
+						newNode.value = minRightNode.value;
+
+						if (minRightNode.right) {
+							minRightNode.parent.left =
+								minRightNode.right;
+							minRightNode.right.parent =
+								minRightNode.parent;
+						}
+						else {
+							minRightNode.parent.left = undefined;
+						}
+
+						minRightNode.right =
+							minRightNode.parent = undefined;
+					}
+					else {
+						newNode.value = newRight.value;
+						newNode.right = newRight.right;
+						if (newRight.right) {
+							newRight.right.parent = newNode;
+						}
+					}
+				}
+				else {
+					return newLeft;
+				}
+			}
+			else {
+				return newRight;
+			}
+		}
+
+		return newNode;
+	}
+};
+```
+
+The majority of this code listing is dedicated to handling the shifting of node parent/child references if a node is "removed" (filtered out) of the duplicated tree structure.
+
+As an example to illustrate using `filter(..)`, let's narrow our produce tree down to only vegetables:
+
+```js
+var vegetables = [ "asparagus", "avocado", "brocolli", "carrot",
+	"celery", "corn", "cucumber", "lettuce", "potato", "squash",
+	"zucchini" ];
+
+var whatToBuy = BinaryTree.filter(
+	banana,
+	function onlyVegetables(node){
+		return vegetables.indexOf( node.value ) != -1;
+	}
+);
+
+// shopping list
+BinaryTree.reduce(
+	whatToBuy,
+	function pick(result,node){
+		return result.concat( node.value );
+	},
+	[]
+);
+// [ "avocado", "cucumber" ]
+```
+
+You will likely use most of the list operations from this chapter in the context of simple list data structures. But now we've seen that the concepts apply to whatever data structures and operations you might need. That's a powerful expression of how FP can be widely applied to many different application scenarios!
+
 ## Summary
 
 Three common and powerful list operations:
