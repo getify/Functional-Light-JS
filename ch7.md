@@ -134,7 +134,9 @@ var flatten =
 		, [] );
 ```
 
-To use it with an array of arrays (of any nested depth):
+**Note:** This implementation choice relies on recursion to handle the nesting of lists. More on recursion in a later chapter.
+
+To use `flatten(..)` with an array of arrays (of any nested depth):
 
 ```js
 flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
@@ -143,33 +145,45 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 
 ### Zip
 
-So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of the input lists into sub-lists, called `zip(..)`:
+So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of two input lists into sub-lists, called `zip(..)`:
 
 ```js
 zip( [1,3,5,7,9], [2,4,6,8,10] );
 // [ [ 1, 2 ], [ 3, 4 ], [ 5, 6 ], [ 7, 8 ], [ 9, 10 ] ]
 ```
 
-Values `1` and `2` were selected into the sub-list `[1,2]`, then `3` and `4` into `[3,4]`, etc.
+Values `1` and `2` were selected into the sub-list `[1,2]`, then `3` and `4` into `[3,4]`, etc. The definition of `zip(..)` requires a value from each of the two lists. If the two lists are of different lengths, the selection of values will continue until the shorter list has been exhausted, with the extra values in the other list ignored.
 
-To implement `zip(..)`:
+An implementation of `zip(..)`:
 
 ```js
-function zip(...lists) {
-	// TODO
+function zip(list1,list2) {
+	var zipped = [];
+	list1 = list1.slice();
+	list2 = list2.slice();
+
+	while (list1.length > 0 && list2.length > 0) {
+		zipped.push( [ list1.shift(), list2.shift() ] );
+	}
+
+	return zipped;
 }
 ```
 
+The `list1.slice()` and `list2.slice()` calls ensure `zip(..)` is pure by not causing side effects with the received array references.
+
+**Note:** There are some decidedly un-FP things going on in this implementation. There's an imperative `while`-loop and mutations of lists with both `shift()` and `push(..)`. Earlier in the book, I asserted that it's reasonable for pure functions to use impure behavior inside them (usually for performance), as long as the effects are fully self-contained. This implementation is safely pure.
+
 ### Merge
 
-Merging multiple lists by interleaving values from each source looks like this:
+Merging two lists by interleaving values from each source looks like this:
 
 ```js
-merge( [1,3,5,7,9], [2,4,6,8,10] );
+mergeLists( [1,3,5,7,9], [2,4,6,8,10] );
 // [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
 ```
 
-It may not be immediately obvious, but this is effectively the same result as if you `flatten(..)` the result of `zip(..)`:
+It may not be obvious, but this result seems similar to what we get if we compose `flatten(..)` and `zip(..)`:
 
 ```js
 zip( [1,3,5,7,9], [2,4,6,8,10] );
@@ -178,23 +192,62 @@ zip( [1,3,5,7,9], [2,4,6,8,10] );
 flatten( [ [1,2], [3,4], [5,6], [7,8], [9,10] ] );
 // [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
 
+// composed:
 flatten( zip( [1,3,5,7,9], [2,4,6,8,10] ) );
 // [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
 ```
 
-So, `merge(..)` is a simple composition:
+However, recall that `zip(..)` only selects values until the shorter of two lists is exhausted, ignoring the leftover values; merging two lists would most naturally retain those extra values. Also, `flatten(..)` works recursively on nested lists, but you might expect list-merging to only work shallowly, keeping nested lists.
 
-```
-var merge = compose( flatten, zip );
-```
-
-But we can also implement `merge(..)` directly for better performance:
+So, let's define a `mergeLists(..)` that works more like we'd expect:
 
 ```js
-function merge(...lists) {
-	// TODO
+function mergeLists(list1,list2) {
+	var merged = [];
+	list1 = list1.slice();
+	list2 = list2.slice();
+
+	while (list1.length > 0 || list2.length > 0) {
+		if (list1.length > 0) {
+			merged.push( list1.shift() );
+		}
+		if (list2.length > 0) {
+			merged.push( list2.shift() );
+		}
+	}
+
+	return merged;
 }
 ```
+
+**Note:** Various FP libraries don't define a `mergeLists(..)` but instead define a `merge(..)` that merges properties of two objects; the results of `merge(..)` will differ from our `mergeLists(..)`.
+
+Alternatively, here's a couple of options to implement the list merging as a reducer:
+
+```js
+// via @rwaldron
+var mergeReducer =
+	(merged,v,idx) =>
+		(merged.splice( idx * 2, 0, v ), merged);
+
+
+// via @WebReflection
+var mergeReducer =
+	(merged,v,idx) =>
+		merged
+			.slice( 0, idx * 2 )
+			.concat( v, merged.slice( idx * 2 ) );
+```
+
+And using it:
+
+```js
+[1,3,5,7,9]
+.reduce( mergeReducer, [2,4,6,8,10] );
+// [1,2,3,4,5,6,7,8,9,10]
+```
+
+**Tip:** We'll use the `mergeReducer(..)` trick later in the chapter.
 
 ## Method vs. Standalone
 
@@ -457,13 +510,18 @@ Next, let's observe that `getSessionId(..)` and `getUserId(..)` can be expressed
 
 But to use these, we'll need to interleave them with the other three functions (`lookupUser(..)`, `lookupOrders(..)`, and `processOrders(..)`) to get the array of five functions to guard / compose as discussed above.
 
-To do the interleaving, let's split the task into two steps. The first step will use `reduce(..)` (our swiss army knife, remember!?) to "insert" `lookupUser(..)` in between the `getSessionId(..)` and `getUserId(..)` functions in an array:
+To do the interleaving, we can model this as list merging. Recall `mergeReducer(..)` from earlier in the chapter:
 
 ```js
-.reduce(
-	(list,fn) => list.reverse().concat( fn )
-	, [ lookupUser ]
-)
+var mergeReducer =
+	(merged,v,idx) =>
+		(merged.splice( idx * 2, 0, v ), merged);
+```
+
+We can use `reduce(..)` (our swiss army knife, remember!?) to "insert" `lookupUser(..)` in the array between the generated `getSessionId(..)` and `getUserId(..)` functions, by merging two lists:
+
+```js
+.reduce( mergeReducer, [ lookupUser ] )
 ```
 
 Then we'll concatenate `lookupOrders(..)` and `processOrders(..)` onto the end of the running functions array:
@@ -476,10 +534,7 @@ To review, the generated list of five functions is expressed as:
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
-.reduce(
-	(list,fn) => list.reverse().concat( fn )
-	, [ lookupUser ]
-)
+.reduce( mergeReducer, [ lookupUser ] )
 .concat( lookupOrders, processOrders )
 ```
 
@@ -487,10 +542,7 @@ Finally, to put it all together, take this list of functions and tack on the gua
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
-.reduce(
-	(list,fn) => list.reverse().concat( fn )
-	, [ lookupUser ]
-)
+.reduce( mergeReducer, [ lookupUser ] )
 .concat( lookupOrders, processOrders )
 .map( guard )
 .reduce(
