@@ -559,6 +559,30 @@ Before we leave this topic, let's take a reality check: the example here is heav
 
 ## Fusion
 
+As you roll FP list operations into more of your thinking about code, you'll likely start seeing very quickly chains that combine behavior like:
+
+```js
+..
+.filter(..)
+.map(..)
+.reduce(..)
+```
+
+And more often than not, you're also probably going to end up with chains with multiple adjacent instances of each operation, like:
+
+```js
+.filter(..)
+.filter(..)
+.map(..)
+.map(..)
+.map(..)
+.reduce(..)
+```
+
+The good news is these chains are declarative and it's easy to read the specific steps that will happen, in order. The downside is that each of these operations loops over the entire list, meaning performance can suffer unnecessarily, especially if the list is longer.
+
+Fusion deals with combining adjacent operators to reduce the number of times the list is iterated over. We'll focus here on collapsing adjacent `map(..)`s as it's the most straightforward to explain.
+
 Imagine this scenario:
 
 ```js
@@ -571,7 +595,9 @@ function upper(str) {
 }
 
 function elide(str) {
-	if (str.length > 10) return str.substr( 0, 7 ) + "...";
+	if (str.length > 10) {
+		return str.substr( 0, 7 ) + "...";
+	}
 	return str;
 }
 
@@ -587,6 +613,40 @@ words
 .map( elide );
 // [ "MR", "JONES", "ISNT", "RESPONS...", "FOR", "THIS", "DISASTER" ]
 ```
+
+Think about each value that goes through this flow of transformations. The first value in the `words` list starts out as `"Mr."`, becomes `"Mr"`, then `"MR"`, and then passes through `elide(..)` unchanged. Another piece of data flows: `"responsible"` -> `"responsible"` -> `"RESPONSIBLE"` -> `"RESPONS..."`.
+
+In other words, you could think of these data transformations like this:
+
+```js
+elide( upper( removeInvalidChars( "Mr." ) ) );
+// "MR"
+
+elide( upper( removeInvalidChars( "responsible" ) ) );
+// "RESPONS..."
+```
+
+Did you catch the point? We can express the three separate steps of the adjacent `map(..)` calls as a composition of the transformers, since they are all unary functions and each returns the value that's suitable as input to the next. We can fuse the mapper functions using `compose(..)`, and then pass the composed function to a single `map(..)` call:
+
+```js
+words
+.map(
+	compose( elide, upper, removeInvalidChars )
+);
+// [ "MR", "JONES", "ISNT", "RESPONS...", "FOR", "THIS", "DISASTER" ]
+```
+
+This is another case where `pipe(..)` can be a more convenient form of composition, for its ordering readability:
+
+```js
+words
+.map(
+	pipe( removeInvalidChars, upper, elide )
+);
+// [ "MR", "JONES", "ISNT", "RESPONS...", "FOR", "THIS", "DISASTER" ]
+```
+
+What about fusing two or more `filter(..)` predicate functions? Typically treated as unary functions, they seem suitable for composition. But the wrinkle is they each return a different kind of value (`boolean`) than the next one would want as input. Fusing adjacent `reduce(..)` calls is also possible, but reducers are not unary so that's a bit more challenging; we need more sophisticated tricks to pull this kind of fusion off. We'll cover these advanced techniques in Appendix A "Transducing".
 
 ## Beyond Lists
 
