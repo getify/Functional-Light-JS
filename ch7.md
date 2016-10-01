@@ -23,8 +23,6 @@ map: transformation for each value
 
 map: projection from one list to another
 
-map: adapt a function from a single value to a data structure it doesn't know how to handle (map array, map tree, etc)
-
 map: event handler for each value
 
 # Filter
@@ -41,11 +39,41 @@ Reduce is a combination operation. Reduce is the swiss army knife of FP.
 
 ### Map As Reduce
 
-// TODO
+The `map(..)` operation is iterative in its nature, so it can also be represented as a reduction (`reduce(..)`). The trick is to realize that the `initialValue` of `reduce(..)` can be itself an (empty) array, in which case the result of a reduction can be another list!
+
+```js
+function double(v) { return v * 2; }
+
+[1,2,3,4,5].map( double );
+// [2,4,6,8,10]
+
+[1,2,3,4,5].reduce( function reducer(list,v){
+	list.push( double( v ) );
+	return list;
+}, [] );
+// [2,4,6,8,10]
+```
+
+Implementing `map(..)` with `reduce(..)` is not on its surface an obvious step or even an improvement. However, this ability will be a crucial recognition for more advanced techniques like those we'll cover in Appendix A "Transducing".
 
 ### Filter As Reduce
 
-// TODO
+Just as `map(..)` can be done with `reduce(..)`, so can `filter(..)`:
+
+```js
+function isOdd(v) { return v % 2 == 1; }
+
+[1,2,3,4,5].filter( isOdd );
+// [1,3,5]
+
+[1,2,3,4,5].reduce( function reducer(list,v){
+	if (isOdd( v )) list.push( v );
+	return list;
+}, [] );
+// [1,3,5]
+```
+
+Again, you'll see this trick again in Appendix A "Transducing".
 
 ## Advanced List Operations
 
