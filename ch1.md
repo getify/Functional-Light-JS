@@ -41,7 +41,7 @@ So, if we are going to spend more time concerned with making code that will be m
 
 If we use FP principles, I believe we will create code that is easier to reason about. Once we know these principles, they will be recognizable and familiar in the code, meaning we'll spend less time figuring that part out when we read a piece of code. Our focus will be spent on how all the well-known, established lego pieces are assembled, not on what those lego pieces mean.
 
-FP is one of the most useful tools for writing readable code. *That* is why it's so important.
+FP (at least, without all the terminology weighing it down) is one of the most effective tools for writing readable code. *That* is why it's so important.
 
 ## Take
 
@@ -123,4 +123,4 @@ Appendix C illustrates some of these libraries using various examples from the t
 
 ## Summary
 
-This is Functional-Light JavaScript (FLP). The goal is to learn to communicate with our code but not suffocate under mountains of notation or terminology to get there. Welcome to the party!
+This is Functional-Light JavaScript. The goal is to learn to communicate with our code but not suffocate under mountains of notation or terminology to get there. I hope this book jumpstarts your journey!
