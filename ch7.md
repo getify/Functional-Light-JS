@@ -31,6 +31,10 @@ map: projection from one list to another
 
 map: event handler for each value
 
+<p align="center">
+	<img src="fig9.svg" width="400">
+</p>
+
 # Filter
 
 Imagine I bring an empty basket with me to the grocery store, and I visit the fruit section. There's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one-by-one, and I end up with my basket full of just the apples and oranges.
@@ -39,13 +43,27 @@ Let's say we call this process *filtering*. Would you more naturally describe my
 
 Depending on your perspective, filter is either exclusionary or inclusionary. This conceptual mish-mash is unfortunate.
 
+<p align="center">
+	<img src="fig10.svg" width="400">
+</p>
+
 ## Reduce
 
 While `map(..)` and `filter(..)` produce new lists, typically this third operator (`reduce(..)`) combines (aka "reduces") the values of a list down to a single finite (non-list) value, like a number or string. However, later in this chapter, we'll look at how you can push `reduce(..)` to use it in more advanced ways. `reduce(..)` is one of the most important FP tools; it's like a swiss army all-in-one knife with all its usefulness.
 
 A combination/reduction is abstractly defined as taking two values and making them into one value. Just like with mapping and filtering, the manner of the combination is entirely up to you, and generally dependent on the types of values in the list. For example, numbers will typically be combined through arithmetic, strings through concatenation, and functions through composition.
 
-Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list; alternately, you can omit the `initialValue` in which case the first value of the list will be the `initialValue` and the combining will start with the second value in the list.
+Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list, cascading down through each of the rest of the values in the list. That looks like this:
+
+<p align="center">
+	<img src="fig11.svg" width="400">
+</p>
+
+Alternately, you can omit the `initialValue` in which case the first value of the list will act in place of the `initialValue` and the combining will start with the second value in the list, like this:
+
+<p align="center">
+	<img src="fig12.svg" width="400">
+</p>
 
 **Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
 
