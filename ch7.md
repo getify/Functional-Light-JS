@@ -32,7 +32,7 @@ map: projection from one list to another
 map: event handler for each value
 
 <p align="center">
-	<img src="fig9.svg" width="400">
+	<img src="fig9.png" width="400">
 </p>
 
 # Filter
@@ -44,7 +44,7 @@ Let's say we call this process *filtering*. Would you more naturally describe my
 Depending on your perspective, filter is either exclusionary or inclusionary. This conceptual mish-mash is unfortunate.
 
 <p align="center">
-	<img src="fig10.svg" width="400">
+	<img src="fig10.png" width="400">
 </p>
 
 ## Reduce
@@ -56,13 +56,13 @@ A combination/reduction is abstractly defined as taking two values and making th
 Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list, cascading down through each of the rest of the values in the list. That looks like this:
 
 <p align="center">
-	<img src="fig11.svg" width="400">
+	<img src="fig11.png" width="400">
 </p>
 
 Alternately, you can omit the `initialValue` in which case the first value of the list will act in place of the `initialValue` and the combining will start with the second value in the list, like this:
 
 <p align="center">
-	<img src="fig12.svg" width="400">
+	<img src="fig12.png" width="400">
 </p>
 
 **Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
@@ -807,7 +807,7 @@ In this particular tree structure, `banana` is the root node; this tree could ha
 Our tree looks like:
 
 <p align="center">
-	<img src="fig8.svg" width="450">
+	<img src="fig8.png" width="450">
 </p>
 
 There are multiple ways to traverse a binary tree to process its values. If it's a BST (our's is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
