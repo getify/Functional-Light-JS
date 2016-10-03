@@ -35,6 +35,33 @@ map: event handler for each value
 	<img src="fig9.png" width="400">
 </p>
 
+To implement `map(..)`:
+
+```js
+function map(arr,mapperFn) {
+	var newList = [];
+
+	for (let idx = 0; i < arr.length; i++) {
+		newList.push(
+			mapperFn( arr[i], idx, arr )
+		);
+	}
+
+	return newList;
+}
+```
+
+Notice that `mapperFn(..)` is naturally passed the list item to map/transform, but also an `idx` and `arr`. We're doing that to keep consistency with the built-in array `map(..)`. These extra pieces of information can be very useful in some cases.
+
+But in other cases, you may want to use a `mapperFn(..)` that only the list item should be passed to, because the extra arguments might change its behavior. In "All For One" in Chapter 3, we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed).
+
+Recall the example from Chapter 3 about limiting `parseInt(..)` to a single argument to be used safely as a `mapperFn(..)`:
+
+```js
+map( ["1","2","3"], unary( parseInt ) );
+// [1,2,3]
+```
+
 ## Filter
 
 Imagine I bring an empty basket with me to the grocery store to visit the fruit section; there's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one-by-one, and I walk away with a basket full of just the apples and oranges.
