@@ -19,7 +19,7 @@ By chaining and/or composing list operations together, the intermediate results 
 
 **Note:** More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. My advice on `=>` from Chapter 2 holds for general coding.
 
-# Map
+## Map
 
 // TODO
 
@@ -35,17 +35,139 @@ map: event handler for each value
 	<img src="fig9.png" width="400">
 </p>
 
-# Filter
+## Filter
 
-Imagine I bring an empty basket with me to the grocery store, and I visit the fruit section. There's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one-by-one, and I end up with my basket full of just the apples and oranges.
+Imagine I bring an empty basket with me to the grocery store to visit the fruit section; there's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one-by-one, and I walk away with a basket full of just the apples and oranges.
 
-Let's say we call this process *filtering*. Would you more naturally describe my action as starting with an empty basket and **filtering in** (selecting, including) only the apples and oranges, or starting with the full display of fruits and **filtering out** (skipping, excluding) the bananas as my basket is filled with fruit?
+Let's say we call this process *filtering*. Would you more naturally describe my shopping as starting with an empty basket and **filtering in** (selecting, including) only the apples and oranges, or starting with the full display of fruits and **filtering out** (skipping, excluding) the bananas as my basket is filled with fruit?
 
-Depending on your perspective, filter is either exclusionary or inclusionary. This conceptual mish-mash is unfortunate.
+If you cook spaghetti in a pot of water, and then pour it into a strainer (aka filter) over the sink, are you filtering in the spaghetti or filtering out the water? If you put coffee grounds into a filter and make a cup of coffee, did you filter in the coffee into your cup, or filter out the coffee grounds? Does your view of filtering depend on whether the stuff you want is "kept" in the filter or passes through the filter?
+
+What about on airline / hotel websites, when you specify options to "filter your results"? Are you filtering in the results that match your criteria, or are you filtering out everything that doesn't match? Think carefully: this example might have a different semantic than the previous ones.
+
+Depending on your perspective, filter is either exclusionary or inclusionary. This conceptual conflation is unfortunate.
+
+I think the most common interpretation of filtering -- outside of programming, anyway -- is that you filter out unwanted stuff. Unfortunately, in programming, we have essentially flipped this semantic to be more like filtering in wanted stuff.
+
+The `filter(..)` list operation takes a function to decide if each value in the original array should be in the new array or not. This function needs to return `true` if a value should make it, and `false` if it should be skipped. A function that returns `true` / `false` for this kind of decision making goes by the special name: predicate function.
+
+If you think of `true` as being as a positive signal, the definition of `filter(..)` is that you are saying "keep" (to filter in) a value rather than saying "discard" (to filter out) a value. To use `filter(..)` as an exclusionary action, you have to twist your brain to think of positively signaling an exclusion by returning `false`, and passively letting a value pass through by returning `true`.
+
+The reason this semantic mismatch matters is because of how you will likely name the function used as `predicateFn(..)`, and what that means for the readability of code. We'll come back to this point shortly.
+
+Here's how to visualize a `filter(..)` operation across a list of values:
 
 <p align="center">
 	<img src="fig10.png" width="400">
 </p>
+
+To implement `filter(..)`:
+
+```js
+function filter(arr,predicateFn) {
+	var newList = [];
+
+	for (let idx = 0; idx < arr.length; idx++) {
+		if (predicateFn( arr[idx], idx, arr )) {
+			newList.push( arr[idx] );
+		}
+	}
+
+	return newList;
+}
+```
+
+Notice that just like `mapperFn(..)` before, `predicateFn(..)` is passed not only the value but also the `idx` and `arr`. Use `unary(..)` to limit its arguments as necessary.
+
+So, let's consider a function like this:
+
+```js
+var whatToCallIt = v => v % 2 == 1;
+```
+
+This predicate function uses `v % 2 == 1` to return `true` or `false`. The effect here is that an odd number will return `true`, and an even number will return `false`. So, what should we call this function? A natural name might be:
+
+```js
+var isOdd = v => v % 2 == 1;
+```
+
+Consider how you might use `isOdd(..)` with a simple value check somewhere in your code:
+
+```js
+var midIdx;
+
+if (isOdd( list.length )) {
+	midIdx = (list.length + 1) / 2;
+}
+else {
+	midIdx = list.length / 2;
+}
+```
+
+Makes sense, right? But, let's consider using it with the built-in array `filter(..)` to filter a list of values:
+
+```js
+[1,2,3,4,5].filter( isOdd );
+// [1,3,5]
+```
+
+If you described the `[1,3,5]` result, would you say, "I filtered out the even numbers", or would you say "I filtered in the odd numbers"? I think the former is a more natural way of describing it. But the code reads the opposite. The code reads, almost literally, that we "filtered (in) for each number that is odd".
+
+I personally find this semantic confusing. There's no question there's plenty of precedent for experienced developers. But if you just start with a fresh slate, this expression of the logic seems kinda like not speaking without a double negative -- aka, speaking with a double negative.
+
+We could make this easier by renaming the function from `isOdd(..)` to `isEven(..)`:
+
+```js
+var isEven = v => v % 2 == 1;
+
+[1,2,3,4,5].filter( isEven );
+// [1,3,5]
+```
+
+Yay! But that function makes no sense with its name, in that it returns `false` when it's even:
+
+```js
+isEven( 2 );		// false
+```
+
+Yuck.
+
+Recall that in "No Points" in Chapter 3, we defined a `not(..)` operator that negates a predicate function. Consider:
+
+```js
+var isEven = not( isOdd );
+
+isEven( 2 );		// true
+```
+
+But we can't use *this* `isEven(..)` with `filter(..)` the way it's currently defined, because our logic will be reversed; we'll end up with evens, not odds. We'd need to do:
+
+```js
+[1,2,3,4,5].filter( not( isEven ) );
+// [1,3,5]
+```
+
+That defeats the whole purpose, though, so let's not do that. Instead, to clear up all this confusion, let's define a `filterOut(..)` that actually **filters out** values by internally negating the predicate check. While we're at it, we'll alias `filterIn(..)` to the existing `filter(..)`:
+
+```js
+var filterIn = filter;
+
+function filterOut(arr,predicateFn) {
+	return filterIn( arr, not( predicateFn ) );
+}
+```
+
+Now we can use whichever filtering makes most sense at any point in our code:
+
+```js
+isOdd( 3 );								// true
+isEven( 2 );							// true
+
+filterIn( [1,2,3,4,5], isOdd );			// [1,3,5]
+filterOut( [1,2,3,4,5], isEven );		// [1,3,5]
+```
+
+I think using `filterIn(..)` and `filterOut(..)` will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
 
 ## Reduce
 
@@ -138,7 +260,7 @@ fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
 
 `pipeReducer(..)` is unfortunately not point-free (see "No Points" in Chapter 3), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
 
-In "All For One" in Chapter 3, we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed). It might be handy to have a `binary(..)` that does something similar but limits to two arguments, for reducer functions:
+Earlier we talked about using `unary(..)` to limit a `mapperFn(..)` or `predicateFn(..)` to just a single argument. It might be handy to have a `binary(..)` that does something similar but limits to two arguments, for a `reducerFn(..)` function:
 
 ```js
 var binary =
