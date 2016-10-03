@@ -136,7 +136,32 @@ fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
 fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
-Unlike `map(..)` and `filter(..)` whose order of passing through the array wouldn't actually matter, `reduce(..)` definitely uses left-to-right processing. If you want to reduce right-to-left, JavaScript provides a `reduceRight(..)`, with all other behaviors the same as `reduce(..)`.
+`pipeReducer(..)` is unfortunately not point-free (see "No Points" in Chapter 3), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
+
+In "All For One" in Chapter 3, we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed). It might be handy to have a `binary(..)` that does something similar but limits to two arguments, for reducer functions:
+
+```js
+var binary =
+	fn =>
+		(arg1,arg2) =>
+			fn( arg1, arg2 );
+```
+
+Using `binary(..)`, our previous example is a little cleaner:
+
+```js
+var pipeReducer = binary( pipe );
+
+var fn =
+	[3,17,6,4]
+	.map( v => n => v * n )
+	.reduce( pipeReducer );
+
+fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
+fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
+```
+
+Unlike `map(..)` and `filter(..)` whose order of passing through the array wouldn't actually matter, `reduce(..)` definitely uses left-to-right processing. If you want to reduce right-to-left, JavaScript provides a `reduceRight(..)`, with all other behaviors the same as `reduce(..)`:
 
 ```js
 var hyphenate = (str,char) => str + "-" + char;
@@ -147,6 +172,8 @@ var hyphenate = (str,char) => str + "-" + char;
 ["a","b","c"].reduceRight( hyphenate );
 // "c-b-a"
 ```
+
+Where `reduce(..)` works left-to-right and thus acts naturally like `pipe(..)` in composing functions, `reduceRight(..)`'s right-to-left ordering is natural for performing a `compose(..)`-like operation.
 
 ### Map As Reduce
 
