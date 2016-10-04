@@ -40,6 +40,7 @@
 	* Performance
 	* Treatment
 * Chapter 7: List Operations
+	* Non-FP List Processing
 	* Map
 	* Filter
 	* Reduce

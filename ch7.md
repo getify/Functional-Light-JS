@@ -17,19 +17,50 @@ But there's something **even more important to grasp**. With imperative code, ea
 
 By chaining and/or composing list operations together, the intermediate results are tracked implicitly and largely protected from these hazards.
 
-**Note:** More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. My advice on `=>` from Chapter 2 holds for general coding.
+**Note:** More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my advice on `=>` from Chapter 2 still applies for general coding.
+
+## Non-FP List Processing
+
+As a quick preamble to our discussion in this chapter, I want to call out a few operations which may seem related to JavaScript arrays and FP list operations, but which aren't. These operations will not be covered here, because they are not consistent with general FP best practices:
+
+* `forEach(..)`
+* `some(..)`
+* `every(..)`
+
+`forEach(..)` is an iteration helper, but it's designed for each function call to operate with side effects; you can probably guess why that's not an endorsed FP list operation for our discussion!
+
+`some(..)` and `every(..)` do encourage the use of pure functions (specifically, predicate functions like `filter(..)` does), but they inevitably reduce a list to a `true` / `false` result, essentially like a search or matching. These two utilities don't really fit the mold of how we want to model our code with FP, so we're going to skip covering them here.
 
 ## Map
 
-// TODO
+We'll start our exploration of FP list operations with one of the most basic and fundamental: `map(..)`.
 
-map: perform an operation across multiple values
+A mapping is a transformation from one value to another value. For example, if you start with the number `2` and you multiply it by `3`, you have mapped it to `6`. It's important to note that we're not talking about mapping transformation as implying *in-place* mutation or reassignment; rather mapping transformation projects a new value from one location to the other.
 
-map: transformation for each value
+In other words:
 
-map: projection from one list to another
+```js
+var x = 2, y;
 
-map: event handler for each value
+// transformation / projection
+y = x * 3;
+
+// mutation / reassignment
+x = x * 3;
+```
+
+If we define a function for this multiplying by `3`, that function acts as a mapping (transformer) function:
+
+```js
+var multipleBy3 = v => v * 3;
+
+var x = 2, y;
+
+// transformation / projection
+y = multiplyBy3( x );
+```
+
+We can naturally extend mapping from a single value transformation to a collection of values. `map(..)` is an operation that transforms all the values of a list as it projects them to a new list:
 
 <p align="center">
 	<img src="fig9.png" width="400">
@@ -61,6 +92,75 @@ Recall the example from Chapter 3 about limiting `parseInt(..)` to a single argu
 map( ["1","2","3"], unary( parseInt ) );
 // [1,2,3]
 ```
+
+JavaScript provides the `map(..)` utility built-in on arrays, making it very convenient to use as part of a chain of operations on a list.
+
+**Note:** The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in "What's This?" in Chapter 2, `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support this `this` feature.
+
+Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here's some other examples of mapping operations. We can use `map(..)` to transform a list of functions a list of their return values:
+
+```js
+var one = () => 1;
+var two = () => 2;
+var three = () => 3;
+
+[one,two,three].map( fn => fn() );
+// [1,2,3]
+```
+
+Or we can first transform a list of functions by composing each of them with another function, and then execute them:
+
+```js
+var increment = v => ++v;
+var decrement = v => --v;
+var square = v => v * v;
+
+var double = v => v * 2;
+
+[increment,decrement,square]
+.map( fn => compose( fn, double ) )
+.map( fn => fn( 3 ) );
+// [7,5,36]
+```
+
+Something interesting to observe about `map(..)`: we typically would assume that the list is processed left-to-right, but there's nothing about the concept of `map(..)` that really requires that. Each transformation is supposed to be independent of every other transformation.
+
+Mapping in a general sense could even been parallelized in an environment that supports that, which for a large list could drastically improve performance. We don't see JavaScript actually doing that because there's nothing that requires you to pass a pure function as `mapperFn(..)`, even though you **really ought to**. If you were to pass an impure function and JS were to run different calls in different orders, it would quickly cause havoc.
+
+Even though theoretically mapping is independent, JS has to assume that it's not. That's a bummer.
+
+### Sync vs Async
+
+The list operations we're discussing in this chapter all operate synchronously on a list of values that are all already present; `map(..)` as conceived here is an eager oepration. But another way of thinking about the mapper function is as an event handler which is invoked for each new value encountered in the list.
+
+Imagine something fictional like this:
+
+```js
+var newArr = arr.map();
+
+arr.addEventListener( "value", multiplyBy3 );
+```
+
+Now, any time a value is added to `arr`, the `multiplyBy3(..)` event handler -- mapper function -- is called with the value, and its transformation is added to `newArr`.
+
+What we're hinting at is that arrays, and the array operations we perform on them, are the eager synchronous versions, whereas these same operations can also be modeled lazily over a "list" that receives its values over time. We'll dive into this topic in a later chapter.
+
+### Mapping vs Eaching
+
+Some advocate using `map(..)` as a general form of `forEach(..)`-iteration, where essentially the value received is passed through untouched, but then some side-effect can be performed:
+
+```js
+[1,2,3,4,5]
+.map( function mapperFn(v){
+	console.log( v );
+	return v;
+} )
+..
+```
+
+The reason this technique can seem useful is that the `map(..)` returns the array so you can keep chaining more operations after it; the return value of `forEach(..)` is `undefined`. However, I think you should avoid using `map(..)` in this way, because it's a net confusion to use a core FP operation in a decidedly un-FP way.
+
+You've heard the old addage about using the right tool for the right job, right? Hammer for a nail, screwdriver for a screw, etc. This is slightly different: it's use the right tool *in the right way*. A hammer is meant to be swung in your hand; if you instead hold it in your mouth and try to hammer the nail, you're not gonna be very effective.
 
 ## Filter
 
@@ -106,13 +206,15 @@ function filter(arr,predicateFn) {
 
 Notice that just like `mapperFn(..)` before, `predicateFn(..)` is passed not only the value but also the `idx` and `arr`. Use `unary(..)` to limit its arguments as necessary.
 
-So, let's consider a function like this:
+Just as with `map(..)`, `filter(..)` is provided as a built-in utility on JS arrays.
+
+Let's consider a predicate function like this:
 
 ```js
 var whatToCallIt = v => v % 2 == 1;
 ```
 
-This predicate function uses `v % 2 == 1` to return `true` or `false`. The effect here is that an odd number will return `true`, and an even number will return `false`. So, what should we call this function? A natural name might be:
+This function uses `v % 2 == 1` to return `true` or `false`. The effect here is that an odd number will return `true`, and an even number will return `false`. So, what should we call this function? A natural name might be:
 
 ```js
 var isOdd = v => v % 2 == 1;
@@ -174,7 +276,11 @@ But we can't use *this* `isEven(..)` with `filter(..)` the way it's currently de
 // [1,3,5]
 ```
 
-That defeats the whole purpose, though, so let's not do that. Instead, to clear up all this confusion, let's define a `filterOut(..)` that actually **filters out** values by internally negating the predicate check. While we're at it, we'll alias `filterIn(..)` to the existing `filter(..)`:
+That defeats the whole purpose, though, so let's not do that. We're just going in circles.
+
+### Filtering-Out & Filtering-In
+
+To clear up all this confusion, let's define a `filterOut(..)` that actually **filters out** values by internally negating the predicate check. While we're at it, we'll alias `filterIn(..)` to the existing `filter(..)`:
 
 ```js
 var filterIn = filter;
@@ -231,7 +337,7 @@ Expressed in JavaScript using the built-in `reduce(..)` method on arrays:
 // 2250
 ```
 
-A standalone implementation of `reduce(..)` might look like this:
+But a standalone implementation of `reduce(..)` might look like this:
 
 ```js
 function reduce(arr,reducerFn,initialValue) {
@@ -1190,4 +1296,8 @@ Three common and powerful list operations:
 * `filter(..)`: selects or excludes values as it projects them to a new list.
 * `reduce(..)`: combines values in a list to produce some other (usually but not always non-list) value.
 
-Fusion uses function composition techniques to consolidate multiple adjacent `map(..)` calls, `filter(..)` calls, or `reduce(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
+Other more advanced operations that can be very useful in processing lists: `unique(..)`, `flatten(..)`, and `merge(..)`.
+
+Fusion uses function composition techniques to consolidate multiple adjacent `map(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
+
+Lists are typically visualized as arrays, but can be generalized as any data structure that represents/produces an ordered collection of values. As such, all these "list operations" are actually "data structure operations".
