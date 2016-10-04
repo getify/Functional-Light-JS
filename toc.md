@@ -50,6 +50,7 @@
 	* Fusion
 	* Beyond Lists
 * Chapter 8: Recursion
+	* Definition
 * Chapter 9: Functional Async
 * Chapter 10: Putting It All Together
 * Appendix A: Transducing

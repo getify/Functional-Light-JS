@@ -27,7 +27,7 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 * [Chapter 5: Reducing Side Effects](ch5.md)
 * [Chapter 6: Value Immutability](ch6.md)
 * [Chapter 7: List Operations](ch7.md)
-* Chapter 8: Recursion
+* [Chapter 8: Recursion](ch8.md)
 * Chapter 9: Functional Async
 * Chapter 10: Putting It All together
 * Appendix A: Transducing
