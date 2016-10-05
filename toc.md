@@ -51,6 +51,8 @@
 	* Beyond Lists
 * Chapter 8: Recursion
 	* Definition
+	* Recursion As Notation
+	* Stack
 * Chapter 9: Functional Async
 * Chapter 10: Putting It All Together
 * Appendix A: Transducing
