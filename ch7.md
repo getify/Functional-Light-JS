@@ -546,6 +546,105 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 // [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
 ```
 
+You might like to limit the recursive flattening to a certain depth. We can handle this by adding an optional `depth` limit argument to the implementaiton:
+
+```js
+var flatten =
+	(arr,depth = Infinity) =>
+		arr.reduce(
+			(list,v) =>
+				list.concat(
+					depth > 0 ?
+						(depth > 1 && Array.isArray( v ) ?
+							flatten( v, depth - 1 ) :
+							v
+						) :
+						[v]
+				)
+		, [] );
+```
+
+Illustrating the results with different flattening depths:
+
+```js
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 0 );
+// [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 1 );
+// [0,1,2,3,4,[5,6,7],[8,[9,[10,[11,12],13]]]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 2 );
+// [0,1,2,3,4,5,6,7,8,[9,[10,[11,12],13]]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 3 );
+// [0,1,2,3,4,5,6,7,8,9,[10,[11,12],13]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 4 );
+// [0,1,2,3,4,5,6,7,8,9,10,[11,12],13]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 5 );
+// [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
+```
+
+#### Mapping, Then Flattening
+
+One of the most common usages of `flatten(..)` behavior is when you've mapped a list of elements where each transformed value from the original list is now itself a list of values. For example:
+
+```js
+var firstNames = [
+	{ name: "Jonathan", variations: [ "John", "Jon", "Jonny" ] },
+	{ name: "Stephanie", variations: [ "Steph", "Stephy" ] },
+	{ name: "Frederick", variations: [ "Fred", "Freddy" ] }
+];
+
+firstNames
+.map( entry => [entry.name].concat( entry.variations ) );
+// [ ["Jonathan","John","Jon","Jonny"], ["Stephanie","Steph","Stephy"],
+//   ["Frederick","Fred","Freddy"] ]
+```
+
+If we want a single dimension list with all the names:
+
+```js
+flatten(
+	firstNames
+	.map( entry => [entry.name].concat( entry.variations ) )
+);
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
+//  "Fred","Freddy"]
+```
+
+The disadvantages of doing the `map(..)` and `flatten(..)` as separate steps are primarily around performance; this approach processes the list twice. FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) that does the mapping and flattening combined, where each mapping is flattened after transformation.
+
+```js
+flatMap( firstNames, entry => [entry.name].concat( entry.variations ) );
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
+//  "Fred","Freddy"]
+```
+
+The basic implementation of `flatMap(..)` with both steps done separately:
+
+```js
+var flatMap =
+	(arr,mapperFn) =>
+		flatten( arr.map( mapperFn ), 1 );
+```
+
+**Note:** We use `1` for the depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
+
+To perform better, though, we can combine the operations manually, using `reduce(..)`:
+
+```js
+var flatMap =
+	(arr,mapperFn) =>
+		arr.reduce(
+			(list,v) =>
+				list.concat( mapperFn( v ) )
+		, [] );
+```
+
+While there's some convenience and performance gained with this approach, there may very well be times when you need other operations like `filter(..)`ing mixed in, in which case doing the `map(..)` and `flatten(..)` separately might be more called for.
+
 ### Zip
 
 So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of two input lists into sub-lists, called `zip(..)`:
@@ -593,7 +692,7 @@ zip( [1,3,5,7,9], [2,4,6,8,10] );
 // [ [1,2], [3,4], [5,6], [7,8], [9,10] ]
 
 flatten( [ [1,2], [3,4], [5,6], [7,8], [9,10] ] );
-// [1,2,3,4,5,6,7,8,9,10 ]
+// [1,2,3,4,5,6,7,8,9,10]
 
 // composed:
 flatten( zip( [1,3,5,7,9], [2,4,6,8,10] ) );
@@ -940,18 +1039,19 @@ As you roll FP list operations into more of your thinking about code, you'll lik
 ..
 .filter(..)
 .map(..)
-.reduce(..)
+.reduce(..);
 ```
 
 And more often than not, you're also probably going to end up with chains with multiple adjacent instances of each operation, like:
 
 ```js
+..
 .filter(..)
 .filter(..)
 .map(..)
 .map(..)
 .map(..)
-.reduce(..)
+.reduce(..);
 ```
 
 The good news is these chains are declarative and it's easy to read the specific steps that will happen, in order. The downside is that each of these operations loops over the entire list, meaning performance can suffer unnecessarily, especially if the list is longer.
