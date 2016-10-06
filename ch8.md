@@ -52,7 +52,7 @@ Let's visualize what happens with this function when we call `foo( 16 )`:
 
 In step 2, `x / 2` produces `8`, and that's passed in as the argument so a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
 
-But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these four sub-steps:
+But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
 
 <p align="center">
 	<img src="fig14.png" width="850">
@@ -78,11 +78,109 @@ function isEven(v) {
 }
 ```
 
-## Recursion As Notation
+## Declarative Recursion
 
-Mathematicians use the **Σ** symbol as a placeholder to represent the summation of a list of numbers. The primary reason they do that is because it's more cumbersome (and less readable!) if they're working with more complex formulas and they have to write out the summation manually, like `1 + 3 + 5 + 7 + 9 + ..`. This is declarative math!
+Mathematicians use the **Σ** symbol as a placeholder to represent the summation of a list of numbers. The primary reason they do that is because it's more cumbersome (and less readable!) if they're working with more complex formulas and they have to write out the summation manually, like `1 + 3 + 5 + 7 + 9 + ..`. Using the notation is declarative math!
 
-Recursion is declarative for algorithms in the same sense that **Σ** is declarative for mathematics.
+Recursion is declarative for algorithms in the same sense that **Σ** is declarative for mathematics. Recursion expresses that a problem solution exists, but doesn't necessarily require the reader of the code to understand how that solution works. Let's consider two approaches to finding the highest even number passed as an argument:
+
+```js
+function maxEven(...nums) {
+	var num = -Infinity;
+
+	for (let i = 0; i < nums.length; i++) {
+		if (nums[i] % 2 == 0 && nums[i] > num) {
+			num = nums[i];
+		}
+	}
+
+	if (num !== -Infinity) {
+		return num;
+	}
+}
+```
+
+This implementation is not intractable, but it's also not readily apparent what its nuances are. How obvious is it that `maxEven()`, `maxEven(1)`, and `maxEven(1,13)` all return `undefined`? Is it quickly clear why the final `if` statement is necessary?
+
+Let's instead consider a recursive approach, to compare. We could notate the recursion this way:
+
+```
+maxEven(nums):
+	maxEven( nums.0, maxEven( ...nums.1 ) )
+```
+
+In other words, we can define the max-even of a list of numbers as the max-even of the first number compared to the max-even of the rest of the numbers. For example:
+
+```
+maxEven( 1, 10, 3, 2 ):
+	maxEven( 1, maxEven( 10, maxEven( 3, maxEven( 2 ) ) )
+```
+
+To implement this recursive definition in JS, one approach is:
+
+```js
+function maxEven(num1,...restNums) {
+	var maxRest = restNums.length > 0 ?
+			maxEven( ...restNums ) :
+			undefined;
+
+	return (num1 % 2 != 0 || num1 < maxRest) ?
+		maxRest :
+		num1;
+}
+```
+
+So what advantages does this approach have?
+
+First off, the signature is a little different than before. I intentionally called out `num1` as the first argument name, collecting the rest of the arguments into `restNums`. But why? We could just have collected them all into a single `nums` array and then referred to `nums[0]`.
+
+This function signature is an intentional hint at the recursive definition. It reads like this:
+
+```
+maxEven(...nums):
+	maxEven(num1,...restNums):
+		maxEven( num1, maxEven(...restNums) )
+```
+
+When we can make the recursive definition more apparent even in the function signature, we improve the declarativeness of the function. And if we can then mirror the recursive definition from the signature to the function body, it gets even better.
+
+But I'd say the most obvious improvement is that the distraction of the imperativeness of the `for`-loop is suppressed. All The looping logic is abstracted into the recursive call stack, so that part doesn't clutter the code. We're free then to focus on the logic of finding a max-even by comparing two numbers at a time.
+
+Mentally, what's happening is similar to when a mathematician uses a **Σ** summation in a larger equation. We're saying, "the max-even of the rest of the list is calculated by `maxEven(...restNums)`, so we'll just assume that part and move on."
+
+Additionally, we reinforce that notion with the `restNums.length > 0` guard, because if there are no more numbers to consider, the natural result is that `maxRest` would have to be `undefined`. We don't need to devote any extra mental attention to that part of the reasoning. In addition, the base condition (no more numbers to consider) is clear in this usage.
+
+Next, we turn our attention to checking `num1` against `maxRest` -- the main logic of the algorithm is how to determine a max-even from two numbers. If `num1` is not even (`num1 % 2 != 0`), or it's less than `maxRest`, then `maxRest` *has* to be `return`ed, even if it's `undefined`. Otherwise, `num1` is the answer.
+
+The case I'm making is that this reasoning about an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; in other words, it's **more declarative** than the `for`-loop with `-Infinity` approach.
+
+**Tip:** We should point out that another (perhaps better!) way to model this besides manual iteration or recursion would be with list operations like we discussed in Chapter 7. The list of numbers could first be `filter(..)`ed to include only evens, and then finding the max is a `reduce(..)` that simply compares two numbers and returns the bigger of the two. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
+
+Here's another recursion example: calculating the depth of a binary tree. The depth of a binary tree is defined as the longest path down (either left or right) the nodes through the tree. Another way to define that is recursively: the depth of a tree at any node is 1 (the current node) plus the greater of depths of either its left or right child trees:
+
+```
+depth(node):
+	1 + max( depth( node.left ), depth( node.right ) )
+```
+
+Translating that to a recursive function:
+
+```js
+function depth(node) {
+	if (node) {
+		let depthLeft = depth( node.left );
+		let depthRight = depth( node.right );
+		return 1 +
+			(depthLeft > depthRight ? depthLeft : depthRight);
+	}
+
+	return 0;
+}
+```
+
+I'm not going to list out the imperative form of this algorithm, but trust me, it's a lot messier and more imperative. This recursive approach is nicely and gracefully declarative. It follows the recursive definition of the algorithm very closely with very little distraction.
+
+Not all problems are cleanly recursive. This is not some silver bullet that you should try to apply broadly. But recursion can be very effective at evolving the expression of a problem from imperative to more declarative.
 
 ## Stack
 
