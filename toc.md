@@ -53,6 +53,7 @@
 	* Definition
 	* Declarative Recursion
 	* Stack
+	* Rearranging Recursion
 * Chapter 9: Functional Async
 * Chapter 10: Putting It All Together
 * Appendix A: Transducing
