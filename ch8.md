@@ -273,7 +273,65 @@ Not all problems are cleanly recursive. This is not some silver bullet that you 
 
 ## Stack
 
-// TODO
+Let's revisit the `isOdd(..)` / `isEven(..)` recursion from earlier:
+
+```js
+function isOdd(v) {
+	if (v === 0) return false;
+	return isEven( Math.abs( v ) - 1 );
+}
+
+function isEven(v) {
+	if (v === 0) return true;
+	return isOdd( Math.abs( v ) - 1 );
+}
+```
+
+In most browsers, if you try this you'll get an error:
+
+```js
+isOdd( 33333 );			// RangeError: Maximum call stack size exceeded
+```
+
+What's going on with this error? The engine throws this error because it's trying to protect your program from running the system out of memory. To explain that, we need to peek a little below the hood at what's going on in the JS engine when function calls happen.
+
+Each function call sets aside a small chunk of memory called a stack frame. The stack frame holds certain important information about the current state of processing statements in a function, including the values in any variables. The reason this information needs to be stored in memory (in a stack frame) is because the function may call out to another function, which pauses the current function. When the other function finishes, the engine needs to resume the exact state from when it was paused.
+
+When the second function call starts, it needs a stack frame as well, bringing the count to 2. If that function calls another, we need a third stack frame. And so on. The word "stack" speaks to the notion that each time a function is called from the previous one, the next frame is *stacked* on top. When a function call finishes, its frame is popped off the stack.
+
+Consider this program:
+
+```js
+function foo() {
+	var z = "foo!";
+}
+
+function bar() {
+	var y = "bar!";
+	foo();
+}
+
+function baz() {
+	var x = "baz!";
+	bar();
+}
+
+baz();
+```
+
+Visualizing this program's stack frame step by step:
+
+<p align="center">
+	<img src="fig15.png" width="600">
+</p>
+
+**Note:** If there are five sequential function calls, where each one finishes before the next one starts, that doesn't stack frames up, because each function call finishes and removes its frame from the stack before the next one is added.
+
+OK, so a little bit of memory is needed for each function call. No big deal under most normal program conditions, right? But it quickly becomes a big deal once you introduce recursion. While you'd almost certainly never stack thousands (or even hundreds!) of calls of different functions together in the same call stack, you'll easily see tens of thousands or more recursively calls stacked up.
+
+
+
+
 
 ### Proper Tail Calls (PTC)
 
