@@ -75,16 +75,20 @@ function isPrime(num,divisor = 2){
 }
 ```
 
+This prime checking basically works by trying each integer from `2` up to the square root of the `num` being checked, to see if any of them divide evenly (`%` mod returning `0`) into the number. If any do, it's not a prime. Otherwise, it must be prime. The `divisor + 1` uses the recursion to iterate through each possible `divisor` value.
+
 One of the most famous examples of recursion is calculating a Fibonacci number, where the sequence is defined as:
 
 ```
-Fib( 0 ): 0
-Fib( 1 ): 1
-Fib( n ):
-	Fib( n - 2 ) + Fib( n - 1 )
+fib( 0 ): 0
+fib( 1 ): 1
+fib( n ):
+	fib( n - 2 ) + fib( n - 1 )
 ```
 
-Expressed directly in code:
+**Note:** The first several numbers of this sequence are: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... Each number is the addition of the previous two numbers in the sequence.
+
+The definition of fibonacci expressed directly in code:
 
 ```js
 function fib(n) {
@@ -152,9 +156,9 @@ function sum(total,...nums) {
 
 // vs
 
-function sum(total,...nums) {
-	if (nums.length == 0) return total;
-	return total + sum( ...nums );
+function sum(num1,...nums) {
+	if (nums.length == 0) return num1;
+	return num1 + sum( ...nums );
 }
 ```
 
@@ -277,11 +281,182 @@ Not all problems are cleanly recursive. This is not some silver bullet that you 
 
 ## Rearranging Recursion
 
-// TODO
+If you want to use recursion but your problem set could grow enough eventually to exceed the stack limit of the JS engine, you're going to need to rearrange your recursive calls to take advantage of PTC (or avoid nested calls entirely). There are several refactoring strategies that can help, but there are of course tradeoffs to be aware of.
+
+As a word of caution, always keep in mind that code readability is our overall most important goal. If recursion along with some combination of these following strategies results in harder to read/understand code, **don't use recursion**; find another more readable approach.
 
 ### Replacing The Stack
 
-// TODO
+The main problem with recursion is its memory usage, keeping around the stack frames to track the state of a function call while it dispatches to the next recursive call iteration. If we can figure out how to rearrange our usage of recursion so that the stack frame doesn't need to be kept, then we can express recursion with PTC and take advantage of the JS engine's optimized handling of tail calls.
+
+Let's recall the summation example from earlier:
+
+```js
+function sum(num1,...nums) {
+	if (nums.length == 0) return num1;
+	return num1 + sum( ...nums );
+}
+```
+
+This isn't in PTC form because after the recursive call to `sum(...nums)` is finished, the `total` variable is added to that result. So, the stack frame has to be preserved to keep track of the `total` partial result while the rest of the recursion proceeds.
+
+The key recognition point for this refactoring strategy is that we could remove our dependence on the stack by doing the addition *now* instead of *after*, and then forward-passing that partial result as an argument to the recursive call. In other words, instead of keeping `total` in the current function's stack frame, push it into the stack frame of the next recursive call; that frees up the current stack frame to be removed/reused.
+
+To start, we could alter the signature our `sum(..)` function to have a new first parameter as the partial result:
+
+```js
+function sum(result,num1,...nums) {
+	// ..
+}
+```
+
+Now, we should pre-calculate the addition of `result` and `num1`, and pass that along:
+
+```js
+"use strict";
+
+function sum(result,num1,...nums) {
+	result = result + num1;
+	if (nums.length == 0) return result;
+	return sum( result, ...nums );
+}
+```
+
+Now our `sum(..)` is in PTC form! Yay!
+
+But the downside is we now have altered the signature of the function that makes using it stranger. The caller essentially has to pass `0` as the first argument ahead of the rest of the numbers they want to sum.
+
+```js
+sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
+```
+
+That's unfortunate.
+
+Typically, people will solve this by naming their awkward-signature recursive function differently, then defining an interface function that hides the awkwardness:
+
+```js
+"use strict";
+
+function sumRec(result,num1,...nums) {
+	result = result + num1;
+	if (nums.length == 0) return result;
+	return sumRec( result, ...nums );
+}
+
+function sum(...nums) {
+	return sumRec( /*initialResult=*/0, ...nums );
+}
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+That's better. Still unfortunate that we've now created multiple functions instead of just one. Sometimes you'll see developers "hide" the recursive function as an inner function, like this:
+
+```js
+"use strict";
+
+function sum(...nums) {
+	return sumRec( /*initialResult=*/0, ...nums );
+
+	function sumRec(result,num1,...nums) {
+		result = result + num1;
+		if (nums.length == 0) return result;
+		return sumRec( result, ...nums );
+	}
+}
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+The downside here is that we'll recreate that inner `sumRec(..)` function each time the outer `sum(..)` is called. So, we can go back to them being side-by-side functions, but hide them both inside an IIFE, and expose just the one we want to:
+
+```js
+"use strict";
+
+var sum = (function IIFE(){
+
+	return function sum(...nums) {
+		return sumRec( /*initialResult=*/0, ...nums );
+	}
+
+	function sumRec(result,num1,...nums) {
+		result = result + num1;
+		if (nums.length == 0) return result;
+		return sumRec( result, ...nums );
+	}
+
+})();
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+OK, we've got PTC and we've got a nice clean signature for our `sum(..)` that doesn't require the caller to know about our implementation details. Yay!
+
+But... wow, our simple recursive function has a lot more noise now. The readability has definitely been reduced. That's unfortunate to say the least. Sometimes, that's just the best we can do.
+
+Luckily, in some other cases, like the present one, there's a better way. Let's reset back to this version:
+
+```js
+"use strict";
+
+function sum(result,num1,...nums) {
+	result = result + num1;
+	if (nums.length == 0) return result;
+	return sum( result, ...nums );
+}
+
+sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
+```
+
+What you might observe is that `result` is a number just like `num1`, which means that we can always treat the first number in our list as our running total; that includes even the first call. All we need is to rename those params to make this clear:
+
+```js
+"use strict";
+
+function sum(num1,num2,...nums) {
+	num1 = num1 + num2;
+	if (nums.length == 0) return num1;
+	return sum( num1, ...nums );
+}
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+Awesome. That's much better, huh!? I think this pattern achieves a good balance between declarative/reasonable and performant.
+
+Let's try refactoring with PTC once more, revisitng our earlier `maxEven(..)` (currently not PTC). We'll observe that similar to keeping the sum as the first argument, we can narrow the list of numbers one at a time, keeping the first argument as the highest even we've come across thus far.
+
+For clarity, the algorithm strategy (similar to what we discussed earlier) we might use:
+
+1. Start by comparing the first two numbers, `num1` and `num2`.
+2. Is `num1` even, and is `num1` greater than `num2`? If so, keep `num1`.
+3. If `num2` is even, keep it (store in `num1`).
+4. Otherwise, fall back to `undefined` (store in `num1`).
+5. If there are more `nums` consider, recursively compare them to `num1`.
+6. Finally, just return whatever value is left in `num1`.
+
+Our code can follow these steps almost exactly closely:
+
+```js
+"use strict";
+
+function maxEven(num1,num2,...nums) {
+	num1 =
+		(num1 % 2 == 0 && !(maxEven( num2 ) > num1)) ?
+			num1 :
+			(num2 % 2 == 0 ? num2 : undefined);
+
+	return nums.length == 0 ?
+		num1 :
+		maxEven( num1, ...nums )
+}
+```
+
+**Note:** The first `maxEven(..)` call is not in PTC position, but since it only passes in `num2`, it only recurses just that one level then returns right back out; this is only a trick to avoid repeating the `%` logic. As such, this call won't increase the growth of the recursive stack, any more than if that call was to an entirely different function. The second `maxEven(..)` call is the legitimate recursive call, and it is in fact in PTC position, meaning our stack won't grow as the recursion proceeds.
+
+It should be repeated that this example is only to illustrate the approach to moving recursion to the PTC form to optimize the stack (memory) usage. The more direct way to express a max-even algorithm might indeed be a filtering of the `nums` list for evens first, followed then by a max bubbling or even a sort.
+
+Refactoring recursion into PTC is admittedly a little intrusive on the simple declarative form, but it still gets the job done reasonably. Unfortunately, some kinds of recursion won't work well even with an interface function, so we'll need different strategies.
 
 ### Continuation Passing Style (CPS)
 
