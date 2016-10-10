@@ -582,14 +582,36 @@ Refactoring recursion into PTC is admittedly a little intrusive on the simple de
 
 ### Continuation Passing Style (CPS)
 
-// TODO
+In JavaScript, the word *continuation* is often used to mean a function callback that specifies the next step(s) to execute after a certain function finishes its work. Organizing code so that each function receives another function to execute at its end, is referred to as Continuation Passing Style (CPS).
+
+Some forms of recursion cannot practically be refactored to pure PTC, especially multiple recursion. Recall the `fib(..)` function earlier, and even the mutual recursion form we derived. In both cases, there are multiple recursive calls, which effectively defeats PTC memory optimizations.
+
+However, you perform the first recursive call, and wrap the subsequent recursive calls in a continuation function to pass into that first call. Even though this would mean ultimately many more functions will need to be executed in the stack, as long all of them, continuations included, are in PTC form, stack memory usage will not grow unbounded.
+
+We could do this for `fib(..)`:
 
 ```js
-function fib(n,c = v => v) {
-	if (n <= 1) return c( n );
-	return fib( n - 2, v => fib( n - 1, w => c( v + w ) ) );
+function fib(n,cont = identity) {
+	if (n <= 1) return cont( n );
+	return fib(
+		n - 2,
+		n2 => fib(
+			n - 1,
+			n1 => cont( n2 + n1 )
+		)
+	);
 }
 ```
+
+Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our `identity(..)` utility from Chapter 3; remember, it simply returns whatever is passed to it.
+
+Morever, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
+
+Perhaps this will help mentally sort out what's going on: just like in the previous discussion when we passed partial results along instead of returning them back after the recursive stack, we're doing the same here, but each step gets wrapped in a continuation, which defers its computation. That trick allows us to perform multiple steps where each is in PTC form.
+
+In static languages, CPS is often an opportunity the compiler can automatically identify and rearrange code to take advantage of. Unfortunately, that doesn't really apply to the nature of JS.
+
+In JavaScript, you'd likely need to write the CPS form yourself. It's clunkier, for sure; the declarative notation-like form has certainly been obscured. But overall, this form is still more declarative than the `for`-loop imperative implementation.
 
 ### Trampolines
 
