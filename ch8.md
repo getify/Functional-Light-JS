@@ -591,6 +591,8 @@ However, you perform the first recursive call, and wrap the subsequent recursive
 We could do this for `fib(..)`:
 
 ```js
+"use strict";
+
 function fib(n,cont = identity) {
 	if (n <= 1) return cont( n );
 	return fib(
@@ -617,7 +619,52 @@ In JavaScript, you'd likely need to write the CPS form yourself. It's clunkier, 
 
 ### Trampolines
 
-// TODO
+Where CPS creates continuations and passes them along, another technique for alleviating memory pressure is called trampolines. In this style of code, CPS-like continuations are created, but instead of passed in, they are shallowly returned.
+
+Instead of functions calling functions, the stack never goes beyond depth of one, because each function just returns the next function that should be called. A loop simply keeps running each returned function until there are no more functions to run.
+
+One advantage with trampolines is you aren't limited to environments that support PTC; another is that each function call is regular, not PTC optimized, so it may run quicker.
+
+Let's sketch that a `trampoline(..)` utility in code:
+
+```js
+function trampoline(fn) {
+	return function trampolined(...args) {
+		var result = fn( ...args );
+
+		while (typeof result == "function") {
+			result = result();
+		}
+
+		return result;
+	}
+}
+```
+
+As long as a function is returned, the loop keeps going, executing that function and capturing its return, then checking its type. Once a non-function comes back, the trampoline assumes the function calling is complete, and just gives back the value.
+
+Because each continuation needs to return another continuation, we likely we'll need to use the earlier trick of forward-passing the partial result as an argument. Here's how we could use this utility with our earlier example of summation of a list of numbers:
+
+```js
+var sum = trampoline(
+	function sum(num1,num2,...nums) {
+		num1 = num1 + num2;
+		if (nums.length == 0) return num1;
+		return () => sum( num1, ...nums );
+	}
+);
+
+var xs = [];
+for (let i=0; i<20000; i++) {
+	xs.push( i );
+}
+
+sum( ...xs );					// 199990000
+```
+
+The downside is that a trampoline requires you to wrap your recursive function in the trampoline driving function; moreover, just like CPS, closures are created for each continuation. However, unlike CPS, each continuation function returned runs and finishes right away, so the engine won't have to accumulate a growing amount of closure memory while the call stack depth of the problem is exhausted.
+
+Beyond execution and memory performance, the advantage of trampolines over CPS is that they're less intrusive on the declarative recursion form, in that you don't have to change the function signature to receive a continuation function argument. Trampolines are not ideal, but they can be effective in your balancing act between imperative looping code and declarative recursion.
 
 ## Summary
 
