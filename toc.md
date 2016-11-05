@@ -56,7 +56,7 @@
 	* Rearranging Recursion
 * Chapter 9: Functional Async
 	* Time As State
-	* Lazy vs Eager
+	* Eager vs Lazy
 * Chapter 10: Putting It All Together
 * Appendix A: Transducing
 * Appendix B: The Humble Monad
