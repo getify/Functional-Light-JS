@@ -74,9 +74,51 @@ That *something* is the same kind of time complexity logic we discussed with the
 
 A promise represents a single (future) value in a time-independent manner. Moreover, extracting the value from a promise is the asynchronous form of the synchronous assiginment (via `=`) of an immediate value. In other words, a promise spreads an `=` assignment operation out over time, but in a trustable (time-independent) fashion.
 
-We'll now explore how we similarly can spread the synchronous FP operations from earlier in this book asynchronously over time.
+We'll now explore how we similarly can spread various synchronous FP operations from earlier in this book asynchronously over time.
 
 ## Eager vs Lazy
+
+Eager and lazy in the realm of computer science aren't compliments or insults, but rather ways to describe whether an operation will finish right away or finish over time.
+
+The FP operations that we've seen in this text can be characterized as eager because they operate synchronously (right now) on a discrete value or list of values.
+
+For example:
+
+```js
+var a = [1,2,3]
+
+var b = a.map( v => v * 2 );
+
+b;			// [2,4,6]
+```
+
+This mapping is eager because it operates on all the values in the `a` array at that moment, and produces a new array we call `b`. If you later modify `a`, for example adding a new value to the end of it, nothing will change about the contents of `b`. That's eager FP.
+
+But what would it look like to have a lazy FP operation? Consider something like this:
+
+```js
+var a = [];
+
+var b = mapLazy( a, v => v * 2 );
+
+a.push( 1 );
+
+a[0];		// 1
+b[0];		// 2
+
+a.push( 2 );
+
+a[1];		// 2
+b[1];		// 4
+```
+
+The `mapLazy(..)` we've imagined here essentially "listens" to the `a` array, and every time a new value is added to the end of it (with `push(..)`), it runs the `v => v * 2` mapping function and pushes the transformed value to the `b` array.
+
+Consider the benefits of being able to pair an `a` and `b` together, where any time you put a value into `a`, it's transformed and projected to `b`. That's the same kind of declarative FP power out of a `map(..)` operation, but now it can be stretched over time; you don't have to know all the values of `a` to set up the mapping.
+
+**Note:** The implementation of `mapLazy(..)` has not been shown because this is a fictional illustration, not a real operation. To accomplish this kind of lazy operation pairing between `a` and `b`, these values will need to be smarter than simple arrays.
+
+### Observables
 
 // TODO
 
