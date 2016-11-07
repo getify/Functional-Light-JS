@@ -142,7 +142,9 @@ But this fictional `SmarterArray` is different; it assumes that values may come 
 
 Also, we don't really need to keep values in `a` or `b` once they've been handled; this special kind of array only holds a value only as long as its needed. So these arrays don't strictly grow in memory usage over time, an important characteristic of lazy data structures and operations. In fact, it's less like an array and more like a buffer.
 
-Since we won't necessarily know when a new value has arrived in `a`, another key thing we need to support is to be able to listen to `b` to be notified when new values are made available. We could imagine a listener like this:
+A normal array is eager in that it holds all of its values right now. A "lazy array" is an array where the values will come in over time.
+
+Since we won't necessarily know when a new value has arrived in `a`, another key thing we need is to be able to listen to `b` to be notified when new values are made available. We could imagine a listener like this:
 
 ```js
 b.listen( function onValue(v){
@@ -192,7 +194,77 @@ From the perspective of `b` (the consumer), we do not know or care when/where th
 
 The *time* relationship between `a` and `b` is declarative, not imperative.
 
-The value of organizing such operations-over-time this way may not feel particularly effective yet. To illustrate the benefits, let's compare to how this same sort of behavior could have be expressed imperatively.
+The value of organizing such operations-over-time this way may not feel particularly effective yet. To illustrate the benefits, let's compare to how this same sort of behavior could have be expressed imperatively:
+
+```js
+// producer:
+
+var a = {
+	onValue(v){
+		b.onValue( v );
+	}
+};
+
+setInterval( function everySecond(){
+	a.onValue( Math.random() );
+}, 1000 );
+
+
+// **************************
+// consumer:
+
+var b = {
+	map(v){
+		return v * 2;
+	},
+	onValue(v){
+		v = this.map( v );
+		console.log( v );
+	}
+};
+```
+
+It may seem rather subtle, but there's a important difference between this more-imperative version of the code and the previous more-declarative version, aside from `b.onValue(..)` needing to call `this.map(..)` itself. In the former snippet, `b` pulls from `a`, but in the latter snippet, `a` pushes to `b`. In other words, compare `b = a.map(..)` to `b.onValue(v)`.
+
+In the latter imperative snippet, it's not clear (readability wise) from the consumer's perspective where the `v` values are coming from. Moreover, the imperative hard coding of `b.onValue(..)` in the mix of the producer `a`'s logic is a bit of a violation of concerns. That can make it harder to reason about producer and consumer independently.
+
+By contrast, in the former snippet, `b = a.map(..)` declares that `b`'s values are seeded from `a`, and treats `a` as abstract event stream data source that we don't have to concern ourselves with at that moment. We *declare* that any value that comes from `a` into `b` will go through the `map(..)` operation as specified.
+
+### More Than Map
+
+For convenience, we've illustrated this notion of pairing `a` and `b` together over time via a one-to-one `map(..)`ing. But many of our other FP operations could be modeled over time as well.
+
+Consider:
+
+```js
+var b = a.filter( function isOdd(v) {
+	return v % 2 == 1;
+} );
+
+b.listen( function onlyOdds(v){
+	console.log( "Odd:", v );
+} );
+```
+
+Here, a value from `a` only comes into `b` if it passes the `isOdd(..)` predicate.
+
+Even `reduce(..)` can be modeled over time:
+
+```js
+var b = a.reduce( function sum(total,v){
+	return total + v;
+} );
+
+b.listen( function runningTotal(v){
+	console.log( "New current total:", v );
+} );
+```
+
+Since we don't specify an `initialValue` to the `reduce(..)` call, neither the `sum(..)` reducer nor the `runningTotal(..)` event callback will be invoked until at least two values have come through from `a`.
+
+This snippet implies that the reduction has a *memory* of sorts, in that each time a future value comes in, the `sum(..)` reducer will be invoked with whatever the previous `total` was as well as the new next value `v`.
+
+Other FP operations extended over time could even involve an internal buffer, like for example `unique(..)` keeping track of every value it's seen so far.
 
 ### Observables
 
