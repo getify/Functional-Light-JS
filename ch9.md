@@ -118,6 +118,82 @@ The `mapLazy(..)` we've imagined here essentially "listens" to the `a` array, an
 
 Consider the benefits of being able to pair an `a` and `b` together, where any time you put a value into `a`, it's transformed and projected to `b`. That's the same kind of declarative FP power out of a `map(..)` operation, but now it can be stretched over time; you don't have to know all the values of `a` to set up the mapping.
 
+## Reactive FP
+
+To understand how we could create and use a lazy mapping between two sets of values, we need to abstract our idea of list (array) a bit.
+
+Let's imagine a smarter kind of array, not one which simply holds values but one which actively receives and responds (aka "reacts") to values. Consider:
+
+```js
+var a = new SmarterArray();
+
+var b = a.map( function double(v){
+	return v * 2;
+} );
+
+setInterval( function everySecond(){
+	a.push( Math.random() );
+}, 1000 );
+```
+
+So far, this snippet doesn't look any different than a normal array. The only unusual thing is that we're used to the `map(..)` running eagerly and immediately producing a `b` array with all the currently mapped values from `a`. But the timer pushing random values into `a` is strange, since all those values are coming *after* the `map(..)` call.
+
+But this fictional `SmarterArray` is different; it assumes that values may come one at a time, over time. Just `push(..)` values in whenever you want. `b` will be a lazy mapping of whatever values eventually end up in `a`.
+
+Also, we don't really need to keep values in `a` or `b` once they've been handled; this special kind of array only holds a value only as long as its needed. So these arrays don't strictly grow in memory usage over time, an important characteristic of lazy data structures and operations. In fact, it's less like an array and more like a buffer.
+
+Since we won't necessarily know when a new value has arrived in `a`, another key thing we need to support is to be able to listen to `b` to be notified when new values are made available. We could imagine a listener like this:
+
+```js
+b.listen( function onValue(v){
+	console.log( v );
+} );
+```
+
+`b` is *reactive* in that it's set up to *react* to values as they come into `a`. There's an FP operation `map(..)` that describes how each value transfers from the origin `a` to the target `b`. Each discrete mapping operation is exactly how we modeled single-value operations with normal synchronous FP, but here we're spreading out the sourcing of values over time.
+
+**Note:** The term most commonly applied to these concepts is Functional Reactive Programming (FRP). I'm deliberately avoiding that term because there's some debate as to whether FP + Reactive genuinely constitutes FRP. We're not going to fully dive into all the implications of FRP here, so I'll just keep calling it reactive FP. Alternately, you could call it evented-FP if that feels less confusing.
+
+We can think of `a` as producing values and `b` as consuming them. So for readability, let's reorganize this snippet to separate the concerns into *producer* and *consumer* roles:
+
+```js
+// producer:
+
+var a = new SmarterArray();
+
+setInterval( function everySecond(){
+	a.push( Math.random() );
+}, 1000 );
+
+
+// **************************
+// consumer:
+
+var b = a.map( function double(v){
+	return v * 2;
+} );
+
+b.listen( function onValue(v){
+	console.log( v );
+} );
+```
+
+`a` is the producer, which acts essentially like a stream of values. We can think of each value arriving in `a` as an *event*. The `map(..)` operation then triggers a corresponding event on `b`, which we `listen(..)` to so we can consume the new value.
+
+### Declarative Time
+
+We're being very careful about how we introduce time into the discussion. Specifically, just as promises abstract time out from our concern for a single asynchronous operation, reactive FP abstracts (separates) time away from a series of values/operations.
+
+From the perspective of `a` (the producer), the only evident time  concern is our manual `setInterval(..)` loop. But that's only for demonstration purposes.
+
+Imagine `a` could actually be attached to some other event source, like the user's mouse clicks or keystrokes, websocket messages from a server, etc. In that way, `a` doesn't actually have to concern itself with *time*. It's merely a time-independent conduit for values, whenever they are ready.
+
+From the perspective of `b` (the consumer), we do not know or care when/where the values in `a` come from. As a matter of fact, all the values could already be present. All we care about is that we want those values, whenever they are ready. Again, this is a time-independent (aka lazy) modeling of the `map(..)` transformation operation.
+
+The *time* relationship between `a` and `b` is declarative, not imperative.
+
+The value of organizing such operations-over-time this way may not feel particularly effective yet. To illustrate the benefits, let's compare to how this same sort of behavior could have be expressed imperatively.
+
 ### Observables
 
 // TODO

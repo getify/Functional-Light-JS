@@ -57,6 +57,7 @@
 * Chapter 9: Functional Async
 	* Time As State
 	* Eager vs Lazy
+	* Reactive FP
 * Chapter 10: Putting It All Together
 * Appendix A: Transducing
 * Appendix B: The Humble Monad
