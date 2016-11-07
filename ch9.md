@@ -184,17 +184,17 @@ b.listen( function onValue(v){
 
 ### Declarative Time
 
-We're being very careful about how we introduce time into the discussion. Specifically, just as promises abstract time out from our concern for a single asynchronous operation, reactive FP abstracts (separates) time away from a series of values/operations.
+We're being very careful about how we introduce time into the discussion. Specifically, just as promises abstract time away from our concern for a single asynchronous operation, reactive FP abstracts (separates) time away from a series of values/operations.
 
 From the perspective of `a` (the producer), the only evident time  concern is our manual `setInterval(..)` loop. But that's only for demonstration purposes.
 
-Imagine `a` could actually be attached to some other event source, like the user's mouse clicks or keystrokes, websocket messages from a server, etc. In that way, `a` doesn't actually have to concern itself with *time*. It's merely a time-independent conduit for values, whenever they are ready.
+Imagine `a` could actually be attached to some other event source, like the user's mouse clicks or keystrokes, websocket messages from a server, etc. In that scenario, `a` doesn't actually have to concern itself with time. It's merely a time-independent conduit for values, whenever they are ready.
 
 From the perspective of `b` (the consumer), we do not know or care when/where the values in `a` come from. As a matter of fact, all the values could already be present. All we care about is that we want those values, whenever they are ready. Again, this is a time-independent (aka lazy) modeling of the `map(..)` transformation operation.
 
 The *time* relationship between `a` and `b` is declarative, not imperative.
 
-The value of organizing such operations-over-time this way may not feel particularly effective yet. To illustrate the benefits, let's compare to how this same sort of behavior could have be expressed imperatively:
+The value of organizing such operations-over-time this way may not feel particularly effective yet. Let's compare to how this same sort of functionality could have be expressed imperatively:
 
 ```js
 // producer:
@@ -224,9 +224,9 @@ var b = {
 };
 ```
 
-It may seem rather subtle, but there's a important difference between this more-imperative version of the code and the previous more-declarative version, aside from `b.onValue(..)` needing to call `this.map(..)` itself. In the former snippet, `b` pulls from `a`, but in the latter snippet, `a` pushes to `b`. In other words, compare `b = a.map(..)` to `b.onValue(v)`.
+It may seem rather subtle, but there's a important difference between this more-imperative version of the code and the previous more-declarative version, aside from just `b.onValue(..)` needing to call `this.map(..)` itself. In the former snippet, `b` pulls from `a`, but in the latter snippet, `a` pushes to `b`. In other words, compare `b = a.map(..)` to `b.onValue(v)`.
 
-In the latter imperative snippet, it's not clear (readability wise) from the consumer's perspective where the `v` values are coming from. Moreover, the imperative hard coding of `b.onValue(..)` in the mix of the producer `a`'s logic is a bit of a violation of concerns. That can make it harder to reason about producer and consumer independently.
+In the latter imperative snippet, it's not clear (readability wise) from the consumer's perspective where the `v` values are coming from. Moreover, the imperative hard coding of `b.onValue(..)` in the mix of producer `a`'s logic is a bit of a violation of concerns. That can make it harder to reason about producer and consumer independently.
 
 By contrast, in the former snippet, `b = a.map(..)` declares that `b`'s values are seeded from `a`, and treats `a` as abstract event stream data source that we don't have to concern ourselves with at that moment. We *declare* that any value that comes from `a` into `b` will go through the `map(..)` operation as specified.
 
