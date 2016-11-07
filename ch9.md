@@ -122,10 +122,10 @@ Consider the benefits of being able to pair an `a` and `b` together, where any t
 
 To understand how we could create and use a lazy mapping between two sets of values, we need to abstract our idea of list (array) a bit.
 
-Let's imagine a smarter kind of array, not one which simply holds values but one which actively receives and responds (aka "reacts") to values. Consider:
+Let's imagine a smarter kind of array, not one which simply holds values but one which lazily receives and responds (aka "reacts") to values. Consider:
 
 ```js
-var a = new SmarterArray();
+var a = new LazyArray();
 
 var b = a.map( function double(v){
 	return v * 2;
@@ -138,7 +138,7 @@ setInterval( function everySecond(){
 
 So far, this snippet doesn't look any different than a normal array. The only unusual thing is that we're used to the `map(..)` running eagerly and immediately producing a `b` array with all the currently mapped values from `a`. But the timer pushing random values into `a` is strange, since all those values are coming *after* the `map(..)` call.
 
-But this fictional `SmarterArray` is different; it assumes that values may come one at a time, over time. Just `push(..)` values in whenever you want. `b` will be a lazy mapping of whatever values eventually end up in `a`.
+But this fictional `LazyArray` is different; it assumes that values may come one at a time, over time. Just `push(..)` values in whenever you want. `b` will be a lazy mapping of whatever values eventually end up in `a`.
 
 Also, we don't really need to keep values in `a` or `b` once they've been handled; this special kind of array only holds a value only as long as its needed. So these arrays don't strictly grow in memory usage over time, an important characteristic of lazy data structures and operations. In fact, it's less like an array and more like a buffer.
 
@@ -161,7 +161,7 @@ We can think of `a` as producing values and `b` as consuming them. So for readab
 ```js
 // producer:
 
-var a = new SmarterArray();
+var a = new LazyArray();
 
 setInterval( function everySecond(){
 	a.push( Math.random() );
