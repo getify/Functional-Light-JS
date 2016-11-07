@@ -78,11 +78,11 @@ We'll now explore how we similarly can spread various synchronous FP operations 
 
 ## Eager vs Lazy
 
-Eager and lazy in the realm of computer science aren't compliments or insults, but rather ways to describe whether an operation will finish right away or finish over time.
+Eager and lazy in the realm of computer science aren't compliments or insults, but rather ways to describe whether an operation will finish right away or progress over time.
 
-The FP operations that we've seen in this text can be characterized as eager because they operate synchronously (right now) on a discrete value or list of values.
+The FP operations that we've seen in this text can be characterized as eager because they operate synchronously (right now) on a discrete immediate value or list/structure of values.
 
-For example:
+Recall:
 
 ```js
 var a = [1,2,3]
@@ -92,7 +92,7 @@ var b = a.map( v => v * 2 );
 b;			// [2,4,6]
 ```
 
-This mapping is eager because it operates on all the values in the `a` array at that moment, and produces a new array we call `b`. If you later modify `a`, for example adding a new value to the end of it, nothing will change about the contents of `b`. That's eager FP.
+This mapping from `a` to `b` is eager because it operates on all the values in the `a` array at that moment, and produces a new `b` array. If you later modify `a`, for example adding a new value to the end of it, nothing will change about the contents of `b`. That's eager FP.
 
 But what would it look like to have a lazy FP operation? Consider something like this:
 
@@ -114,9 +114,9 @@ b[1];		// 4
 
 The `mapLazy(..)` we've imagined here essentially "listens" to the `a` array, and every time a new value is added to the end of it (with `push(..)`), it runs the `v => v * 2` mapping function and pushes the transformed value to the `b` array.
 
-Consider the benefits of being able to pair an `a` and `b` together, where any time you put a value into `a`, it's transformed and projected to `b`. That's the same kind of declarative FP power out of a `map(..)` operation, but now it can be stretched over time; you don't have to know all the values of `a` to set up the mapping.
+**Note:** The implementation of `mapLazy(..)` has not been shown because this is a fictional illustration, not a real operation. To accomplish this kind of lazy operation pairing between `a` and `b`, they will need to be smarter than simple arrays.
 
-**Note:** The implementation of `mapLazy(..)` has not been shown because this is a fictional illustration, not a real operation. To accomplish this kind of lazy operation pairing between `a` and `b`, these values will need to be smarter than simple arrays.
+Consider the benefits of being able to pair an `a` and `b` together, where any time you put a value into `a`, it's transformed and projected to `b`. That's the same kind of declarative FP power out of a `map(..)` operation, but now it can be stretched over time; you don't have to know all the values of `a` to set up the mapping.
 
 ### Observables
 
