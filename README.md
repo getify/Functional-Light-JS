@@ -29,7 +29,7 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 * [Chapter 7: List Operations](ch7.md)
 * [Chapter 8: Recursion](ch8.md)
 * [Chapter 9: Functional Async](ch9.md)
-* Chapter 10: Putting It All together
+* [Chapter 10: Putting It All together](ch10.md)
 * Appendix A: Transducing
 * Appendix B: The Humble Monad
 * Appendix C: FP Libraries
