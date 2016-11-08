@@ -182,6 +182,8 @@ b.listen( function onValue(v){
 
 `a` is the producer, which acts essentially like a stream of values. We can think of each value arriving in `a` as an *event*. The `map(..)` operation then triggers a corresponding event on `b`, which we `listen(..)` to so we can consume the new value.
 
+The reason we separate the *producer* and *consumer* concerns is so that different parts of our application can be responsible for each concern. This code organization can drastically improve both code readability and maintenance.
+
 ### Declarative Time
 
 We're being very careful about how we introduce time into the discussion. Specifically, just as promises abstract time away from our concern for a single asynchronous operation, reactive FP abstracts (separates) time away from a series of values/operations.
