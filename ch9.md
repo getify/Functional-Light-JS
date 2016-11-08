@@ -228,7 +228,7 @@ var b = {
 
 It may seem rather subtle, but there's a important difference between this more-imperative version of the code and the previous more-declarative version, aside from just `b.onValue(..)` needing to call `this.map(..)` itself. In the former snippet, `b` pulls from `a`, but in the latter snippet, `a` pushes to `b`. In other words, compare `b = a.map(..)` to `b.onValue(v)`.
 
-In the latter imperative snippet, it's not clear (readability wise) from the consumer's perspective where the `v` values are coming from. Moreover, the imperative hard coding of `b.onValue(..)` in the mix of producer `a`'s logic is a bit of a violation of concerns. That can make it harder to reason about producer and consumer independently.
+In the latter imperative snippet, it's not clear (readability wise) from the consumer's perspective where the `v` values are coming from. Moreover, the imperative hard coding of `b.onValue(..)` in the mix of producer `a`'s logic is a bit of a violation of separation-of-concerns. That can make it harder to reason about producer and consumer independently.
 
 By contrast, in the former snippet, `b = a.map(..)` declares that `b`'s values are seeded from `a`, and treats `a` as abstract event stream data source that we don't have to concern ourselves with at that moment. We *declare* that any value that comes from `a` into `b` will go through the `map(..)` operation as specified.
 
