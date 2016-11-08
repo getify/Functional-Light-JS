@@ -272,7 +272,7 @@ Other FP operations extended over time could even involve an internal buffer, li
 
 Hopefully by now you can see the importance of a reactive, evented, array-like data structure like the fictional `LazyArray` we've conjured. The good news is, this kind of data structure already exists, and it's called an observable.
 
-**Note:** Just to set some expectation: the following discussion is only a brief intro to the world of observables. This is a far more in-depth topic than we have space to fully explore. But if you've understand functional-light programming in this text, and now understood how asynchronous time can be modeled with FP principles, observables should follow very naturally for your continued learning.
+**Note:** Just to set some expectation: the following discussion is only a brief intro to the world of observables. This is a far more in-depth topic than we have space to fully explore. But if you've understood functional-light programming in this text, and now understood how asynchronous-time can be modeled via FP principles, observables should follow very naturally for your continued learning.
 
 Observables have been implemented by a variety of userland libraries, most notably RxJS and Most. At the time of this writing, there's an in-progress proposal to add observables directly to JS, just like promises. For the sake of demonstration, we'll use RxJS-flavored Observables for these next examples.
 
@@ -302,7 +302,9 @@ b.subscribe( function onValue(v){
 } );
 ```
 
-In the RxJS universe, an Observer subscribes to an Observable. If you combine the functionality of an Observer and an Observable, you get a Subject. So, to keep our snippet simpler, we construct `a` as a Subject, so that we can call `onNext(..)` on it to push values (events) into its stream. If we wanted to keep Observer and Observable separate, we could instead have done:
+In the RxJS universe, an Observer subscribes to an Observable. If you combine the functionality of an Observer and an Observable, you get a Subject. So, to keep our snippet simpler, we construct `a` as a Subject, so that we can call `onNext(..)` on it to push values (events) into its stream.
+
+If we want to keep the Observer and Observable separate:
 
 ```js
 // TODO: double check the accuracy of this snippet
@@ -319,6 +321,23 @@ var a = Rx.Observable.create( function onObserver(observer){
 In this snippet, `a` is the Observable, and unsurprisingly, the separate observer is called `observer`; it's able to "observe" some events (like our `setInterval(..)` loop) and publish events to the `a` observable stream.
 
 In addition to `map(..)`, RxJS defines well over a hundred operators that are invoked lazily as each new value comes in. Just like with arrays, each operator on an Observable returns a new Observable, meaning they are chainable. If an invocation of operator function determines a value should be passed along from the input Observable, it will be fired on the output Observable; otherwise it's discarded.
+
+Example of a declarative observable chain:
+
+```js
+var b =
+	a
+	.filter( v => v % 2 == 1 )		// only odd numbers
+	.distinctUntilChanged()			// only consecutive-distinct
+	.throttle( 100 )				// slow it down a bit
+	.map( v = v * 2 );				// double them
+
+b.subscribe( function onValue(v){
+	console.log( "Next:", v );
+} );
+```
+
+**Note:** It's not necessary to assign the observable to `b` and then call `b.subscribe(..)` separately from the chain; that's only done to reinforce that each operator returns a new observable from the previous one. Often, the `subscribe(..)` call is just the final method in the chain.
 
 ## Summary
 
