@@ -19,7 +19,7 @@ I know I've promised we'd stay away from math as much as possible, but bear with
 
 Do you remember learning anything about `f(x)` back in school? What about the equation `y = f(x)`?
 
-Let's say an equation is defined like this: `f(x) = 2x^2 + 3`. What does that mean? What does it mean to graph that equation? Here's the graph:
+Let's say an equation is defined like this: <code>f(x) = 2x<sup>2</sup> + 3</code>. What does that mean? What does it mean to graph that equation? Here's the graph:
 
 <img src="fig1.png">
 
