@@ -322,4 +322,10 @@ In addition to `map(..)`, RxJS defines well over a hundred operators that are in
 
 ## Summary
 
-// TODO
+This book has detailed a wide variety of FP operations that take a single value (or an immediate list of values) and transform them into another value/values.
+
+For operations that will be proceed over time, all of these foundational FP principles can be applied time-independently. Exactly like promises model single future values, we can model eager lists of values instead as lazy observable (event) streams of values that may come in one-at-a-time.
+
+A `map(..)` on an array runs its mapping function once for each value currently in the array, putting all the mapped values in the outcome array. A `map(..)` on an observable runs its mapping function once for each value, whenever it comes in, and pushes all the mapped values to the output observable.
+
+In other words, if an array is an eager data structure for FP operations, an observable is its lazy over-time counterpart.
