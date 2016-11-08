@@ -467,7 +467,7 @@ For example, consider this (obviously contrived) code:
 ```js
 function saveComment(txt) {
 	if (txt != "") {
-		comments[comments.length - 1] = txt;
+		comments[comments.length] = txt;
 	}
 }
 
@@ -489,7 +489,7 @@ function storeData(store,location,value) {
 
 function saveComment(txt) {
 	if (txt != "") {
-		storeData( comments, comments.length - 1, txt );
+		storeData( comments, comments.length, txt );
 	}
 }
 
@@ -524,7 +524,7 @@ function isPropUndefined(val,obj,prop) {
 }
 
 function saveComment(txt) {
-	conditionallyStoreData( comments, comments.length - 1, txt, notEmpty );
+	conditionallyStoreData( comments, comments.length, txt, notEmpty );
 }
 
 function trackEvent(evt) {
