@@ -39,8 +39,8 @@
 	* Reassignment
 	* Performance
 	* Treatment
-* Chapter 7: Closure & Objects
-	* TODO
+* Chapter 7: Closure vs Object
+	* The Same Page
 * Chapter 8: List Operations
 	* Non-FP List Processing
 	* Map
