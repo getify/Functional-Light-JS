@@ -1,5 +1,5 @@
 # Functional-Light JavaScript
-# Chapter 8: Recursion
+# Chapter 9: Recursion
 
 On the next page, we're going to jump into the topic of recursion.
 
