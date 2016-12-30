@@ -1,350 +1,679 @@
 # Functional-Light JavaScript
-# Chapter 9: Functional Async
+# Chapter 8: Recursion
 
-At this point of the book, you now have all the raw concepts in place for the foundation of FP that I call "Functional-Light Programming". In this chapter, we're going to apply these concepts to a different context, but we won't really present particularly new ideas.
+On the next page, we're going to jump into the topic of recursion.
 
-So far, almost everything we've done is synchronous, meaning that we call functions with immediate inputs and immediately get back output values. A lot of work can be done this way, but it's not nearly sufficient for the entirety of a modern JS application. To be truly ready for FP in the real world of JS, we need to understand async FP.
+<hr>
 
-Our goal in this chapter is to expand our thinking about managing values with FP, to spread out such operations over time.
+*(rest of the page intentionally left blank)*
 
-## Time As State
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 
-The most complicated state in your entire application is time. That is, it's far easier to manage state when the transition from one state to another is immediate and affirmatively in your control. When the state of your application changes implicitly in response to events spread out over time, management becomes exponentially more difficult.
+<div style="page-break-after: always;"></div>
 
-Every part of how we've presented FP in this text has been about making code easier to read by making it more trustable and more predictable. When you introduce asynchrony to your program, those efforts take a big hit.
+Let's talk about recursion. Before we dive in, consult the previous page for the formal definition.
 
-But let's be more explicit: it's not the mere fact that some operations don't finish synchronously that is concerning; firing off asynchronous behavior is easy. It's the coordination of the responses to these actions, each of which has the potential to change the state of your application, that requires so much extra effort.
+Weak joke, I know. :)
 
-So, is it better for you the author to take that effort, or should you just leave it to the reader of your code to figure out what the state of the program will be if A finishes before B, or vice versa? That's a rhetorical question but one with a pretty concrete answer from my perspective: to have any hope of making such complex code more readable, the author has to take a lot more concern than they normally would.
+Recursion is one of those programming techniques that most developers admit can be very powerful, but also most of them don't like to use it. I'd put it in the same category as regular expressions, in that sense. Powerful, but confusing, and thus seen as *not worth the effort*.
 
-### Reducing Time
+I'm a big fan of recursion, and you can, too! My goal in this chapter is to convince you that recursion is an important tool that you should bring with you in your FP approach to code. When used properly, recursion is powerfully declarative for complex problems.
 
-One of the most important outcomes of async programming patterns is simplifying state change management by abstracting out time from our sphere of concern.
+## Definition
 
-To illustrate, let's first look at a scenario where a race condition (aka, time complexity) exists, and must be manually managed:
+Recursion is when a function calls itself, and that call does the same, and this cycle continues until a base condition is satisfied and the call loop unwinds.
+
+**Warning:** If you don't ensure that a base condition is *eventually* met, recursion will run forever, and crash or lock up your program; the base condition is pretty important to get right!
+
+But... that definition is too confusing in its written form. We can do better. Consider this recursive function:
 
 ```js
-var customerId = 42;
-var customer;
+function foo(x) {
+	if (x < 5) return x;
+	return foo( x / 2 );
+}
+```
 
-lookupCustomer( customerId, function onCustomer(customerRecord){
-	var orders = customer ? customer.orders : null;
-	customer = customerRecord;
-	if (orders) {
-		customer.orders = orders;
+Let's visualize what happens with this function when we call `foo( 16 )`:
+
+<p align="center">
+	<img src="fig13.png" width="850">
+</p>
+
+In step 2, `x / 2` produces `8`, and that's passed in as the argument so a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
+
+But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
+
+<p align="center">
+	<img src="fig14.png" width="850">
+</p>
+
+Once the base condition is satisified, the returned value cascades back through all of the calls (and thus `return`s) in the call stack, eventually `return`ing the final result out.
+
+Another recursion example:
+
+```js
+function isPrime(num,divisor = 2){
+	if (num < 2 || (num > 2 && num % divisor == 0)) {
+		return false;
 	}
-} );
-
-lookupOrders( customerId, function onOrders(customerOrders){
-	if (!customer) {
-		customer = {};
+	if (divisor <= Math.sqrt( num )) {
+		return isPrime( num, divisor + 1 );
 	}
-	customer.orders = customerOrders;
-} );
+
+	return true;
+}
 ```
 
-The `onCustomer(..)` and `onOrders(..)` callbacks are in a binary race condition. Assuming they both run, it's possible that either might run first, and it's impossible to predict which will happen.
+This prime checking basically works by trying each integer from `2` up to the square root of the `num` being checked, to see if any of them divide evenly (`%` mod returning `0`) into the number. If any do, it's not a prime. Otherwise, it must be prime. The `divisor + 1` uses the recursion to iterate through each possible `divisor` value.
 
-If we could embed the call to `lookupOrders(..)` inside of `onCustomer(..)`, we'd be sure that `onOrders(..)` was running after `onCustomer(..)`. But we can't do that, because we need the two lookups to occur concurrently.
+One of the most famous examples of recursion is calculating a Fibonacci number, where the sequence is defined as:
 
-So to normalize this time-based state complexity, we use a pairing of `if`-statement checks in the respective callbacks, along with an outer lexically-closed over variable `customer`. When each callback runs, it checks the state of `customer`, and thus determines its own relative ordering; if `customer` is unset for a callback, it's the first to run, otherwise it's the second.
-
-This code works, but it's far from ideal in terms of readability. The time complexity makes this code harder to read.
-
-Let's instead use a JS promise to factor time out of the picture:
-
-```js
-var customerId = 42;
-
-var customerPromise = lookupCustomer( customerId );
-var ordersPromise = lookupOrders( customerId );
-
-customerPromise.then( function onCustomer(customer){
-	ordersPromise.then( function onOrders(orders){
-		customer.orders = orders;
-	} );
-} );
+```
+fib( 0 ): 0
+fib( 1 ): 1
+fib( n ):
+	fib( n - 2 ) + fib( n - 1 )
 ```
 
-The `onOrders(..)` callback is now inside of the `onCustomer(..)` callback, so their relative ordering is guaranteed. The concurrency of the lookups is accomplished by making the `lookupCustomer(..)` and `lookupOrders(..)` calls separately before specifying the `then(..)` response handling.
+**Note:** The first several numbers of this sequence are: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... Each number is the addition of the previous two numbers in the sequence.
 
-It may not be obvious, but there would otherwise inherently be a race condition in this snippet, were it not for how promises are defined to behave. If the lookup of the `orders` finishes before the `ordersPromise.then(..)` is called to provide an `onOrders(..)` callback, *something* needs to be smart enough to keep that `orders` list around until `onOrders(..)` can be called. In fact, the same concern could apply to `record` being present before `onCustomer(..)` is specified to receive it.
-
-That *something* is the same kind of time complexity logic we discussed with the previous snippet. But we don't have to worry about any of that complexity, either in the writing of this code or -- more importantly -- in the reading of it, because the promises take care of that time normalization for us.
-
-A promise represents a single (future) value in a time-independent manner. Moreover, extracting the value from a promise is the asynchronous form of the synchronous assiginment (via `=`) of an immediate value. In other words, a promise spreads an `=` assignment operation out over time, but in a trustable (time-independent) fashion.
-
-We'll now explore how we similarly can spread various synchronous FP operations from earlier in this book asynchronously over time.
-
-## Eager vs Lazy
-
-Eager and lazy in the realm of computer science aren't compliments or insults, but rather ways to describe whether an operation will finish right away or progress over time.
-
-The FP operations that we've seen in this text can be characterized as eager because they operate synchronously (right now) on a discrete immediate value or list/structure of values.
-
-Recall:
+The definition of fibonacci expressed directly in code:
 
 ```js
-var a = [1,2,3]
-
-var b = a.map( v => v * 2 );
-
-b;			// [2,4,6]
+function fib(n) {
+	if (n <= 1) return n;
+	return fib( n - 2 ) + fib( n - 1 );
+}
 ```
 
-This mapping from `a` to `b` is eager because it operates on all the values in the `a` array at that moment, and produces a new `b` array. If you later modify `a`, for example adding a new value to the end of it, nothing will change about the contents of `b`. That's eager FP.
+`fib(..)` calls itself recursively twice, which is typically referred to as binary recursion. We'll talk more about binary recursion later.
 
-But what would it look like to have a lazy FP operation? Consider something like this:
+We'll use `fib(..)` variously throughout this chapter to illustrate ideas around recursion, but one downside to this particular form is that there's an awful lot of duplicated work. `fib(n-1)` and `fib(n-2)` don't share any of their work with each other, but overlap with each other almost entirely, over the entire integer space down to `0`.
+
+We briefly touched on memoization in the "Performance Effects" section of Chapter 5. Here, memoization would allow the `fib(..)` of any given number to be computed only once, instead of being recomputed many times. We won't go further into that topic here, but that performance caveat is important to keep in mind with any algorithm, recursive or not.
+
+### Mutual Recursion
+
+When a function calls itself, specifically, this is referred to as direct recursion. That's what we saw in the previous section with `foo(..)`, `isPrime(..)`, and `fib(..)`. Two or more functions can call each other in a recursive cycle, and this is referred to as mutual recursion.
+
+These two functions are mutually recursive:
 
 ```js
-var a = [];
+function isOdd(v) {
+	if (v === 0) return false;
+	return isEven( Math.abs( v ) - 1 );
+}
 
-var b = mapLazy( a, v => v * 2 );
-
-a.push( 1 );
-
-a[0];		// 1
-b[0];		// 2
-
-a.push( 2 );
-
-a[1];		// 2
-b[1];		// 4
+function isEven(v) {
+	if (v === 0) return true;
+	return isOdd( Math.abs( v ) - 1 );
+}
 ```
 
-The `mapLazy(..)` we've imagined here essentially "listens" to the `a` array, and every time a new value is added to the end of it (with `push(..)`), it runs the `v => v * 2` mapping function and pushes the transformed value to the `b` array.
+Yes, this is a silly way to calculate if a number is odd or even. But it illustrates the idea that certain algorithms can be defined in terms of mutual recursion.
 
-**Note:** The implementation of `mapLazy(..)` has not been shown because this is a fictional illustration, not a real operation. To accomplish this kind of lazy operation pairing between `a` and `b`, they will need to be smarter than simple arrays.
-
-Consider the benefits of being able to pair an `a` and `b` together, where any time you put a value into `a`, it's transformed and projected to `b`. That's the same kind of declarative FP power out of a `map(..)` operation, but now it can be stretched over time; you don't have to know all the values of `a` to set up the mapping.
-
-## Reactive FP
-
-To understand how we could create and use a lazy mapping between two sets of values, we need to abstract our idea of list (array) a bit.
-
-Let's imagine a smarter kind of array, not one which simply holds values but one which lazily receives and responds (aka "reacts") to values. Consider:
+Recall the binary recursive `fib(..)` from the previous section; we could instead have expressed it with mutual recursion:
 
 ```js
-var a = new LazyArray();
+function fib_(n) {
+	if (n == 1) return 1;
+	else return fib( n - 2 );
+}
 
-var b = a.map( function double(v){
-	return v * 2;
-} );
-
-setInterval( function everySecond(){
-	a.push( Math.random() );
-}, 1000 );
+function fib(n) {
+	if (n == 0) return 0;
+	else return fib( n - 1 ) + fib_( n );
+}
 ```
 
-So far, this snippet doesn't look any different than a normal array. The only unusual thing is that we're used to the `map(..)` running eagerly and immediately producing a `b` array with all the currently mapped values from `a`. But the timer pushing random values into `a` is strange, since all those values are coming *after* the `map(..)` call.
+**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in "Fibonacci Numbers Using Mutual Recursion" (https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
 
-But this fictional `LazyArray` is different; it assumes that values may come one at a time, over time. Just `push(..)` values in whenever you want. `b` will be a lazy mapping of whatever values eventually end up in `a`.
+While these mutual recursion examples shown are rather contrived, there are more complex use cases where mutual recursion can be very helpful.
 
-Also, we don't really need to keep values in `a` or `b` once they've been handled; this special kind of array only holds a value only as long as its needed. So these arrays don't strictly grow in memory usage over time, an important characteristic of lazy data structures and operations. In fact, it's less like an array and more like a buffer.
+### Why Recursion?
 
-A normal array is eager in that it holds all of its values right now. A "lazy array" is an array where the values will come in over time.
+Now that we've defined and illustrated recursion, we should examine why recursion is useful.
 
-Since we won't necessarily know when a new value has arrived in `a`, another key thing we need is to be able to listen to `b` to be notified when new values are made available. We could imagine a listener like this:
+The most commonly cited reason that recursion fits the spirit of FP is because it trades (much of) the explicit tracking of state with implicit state on the call stack. Typically, recursion is most useful when the problem requires conditional branching and back-tracking, and managing that kind of state in a purely iterative environment can be quite tricky; at a minimum, the code is highly imperative and harder to read and verify. But tracking each level of branching as its own scope on the call stack often significantly cleans up the readability of the code.
 
-```js
-b.listen( function onValue(v){
-	console.log( v );
-} );
-```
-
-`b` is *reactive* in that it's set up to *react* to values as they come into `a`. There's an FP operation `map(..)` that describes how each value transfers from the origin `a` to the target `b`. Each discrete mapping operation is exactly how we modeled single-value operations with normal synchronous FP, but here we're spreading out the sourcing of values over time.
-
-**Note:** The term most commonly applied to these concepts is Functional Reactive Programming (FRP). I'm deliberately avoiding that term because there's some debate as to whether FP + Reactive genuinely constitutes FRP. We're not going to fully dive into all the implications of FRP here, so I'll just keep calling it reactive FP. Alternately, you could call it evented-FP if that feels less confusing.
-
-We can think of `a` as producing values and `b` as consuming them. So for readability, let's reorganize this snippet to separate the concerns into *producer* and *consumer* roles:
+Simple iterative algorithms can trivially be expressed as recursion:
 
 ```js
-// producer:
-
-var a = new LazyArray();
-
-setInterval( function everySecond(){
-	a.push( Math.random() );
-}, 1000 );
-
-
-// **************************
-// consumer:
-
-var b = a.map( function double(v){
-	return v * 2;
-} );
-
-b.listen( function onValue(v){
-	console.log( v );
-} );
-```
-
-`a` is the producer, which acts essentially like a stream of values. We can think of each value arriving in `a` as an *event*. The `map(..)` operation then triggers a corresponding event on `b`, which we `listen(..)` to so we can consume the new value.
-
-The reason we separate the *producer* and *consumer* concerns is so that different parts of our application can be responsible for each concern. This code organization can drastically improve both code readability and maintenance.
-
-### Declarative Time
-
-We're being very careful about how we introduce time into the discussion. Specifically, just as promises abstract time away from our concern for a single asynchronous operation, reactive FP abstracts (separates) time away from a series of values/operations.
-
-From the perspective of `a` (the producer), the only evident time  concern is our manual `setInterval(..)` loop. But that's only for demonstration purposes.
-
-Imagine `a` could actually be attached to some other event source, like the user's mouse clicks or keystrokes, websocket messages from a server, etc. In that scenario, `a` doesn't actually have to concern itself with time. It's merely a time-independent conduit for values, whenever they are ready.
-
-From the perspective of `b` (the consumer), we do not know or care when/where the values in `a` come from. As a matter of fact, all the values could already be present. All we care about is that we want those values, whenever they are ready. Again, this is a time-independent (aka lazy) modeling of the `map(..)` transformation operation.
-
-The *time* relationship between `a` and `b` is declarative, not imperative.
-
-The value of organizing such operations-over-time this way may not feel particularly effective yet. Let's compare to how this same sort of functionality could have be expressed imperatively:
-
-```js
-// producer:
-
-var a = {
-	onValue(v){
-		b.onValue( v );
+function sum(total,...nums) {
+	for (let i = 0; i < nums.length; i++) {
+		total = total + nums[i];
 	}
-};
 
-setInterval( function everySecond(){
-	a.onValue( Math.random() );
-}, 1000 );
+	return total;
+}
 
+// vs
 
-// **************************
-// consumer:
+function sum(num1,...nums) {
+	if (nums.length == 0) return num1;
+	return num1 + sum( ...nums );
+}
+```
 
-var b = {
-	map(v){
-		return v * 2;
-	},
-	onValue(v){
-		v = this.map( v );
-		console.log( v );
+It's not just that the `for`-loop is eliminated in favor of the call stack, but that the incremental partial sums (the intermittent state of `total`) are tracked implicitly across the `return`s of the call stack instead of reassigning `total` each iteration. FPers will often prefer to avoid reassignment of local variables where it's possible to avoid.
+
+In a basic algorithm like this kind of summation, this difference is minor and nuanced. But the more sophisticated your algorithm, the more you will likely see the payoff of recursion instead of imperative state tracking.
+
+## Declarative Recursion
+
+Mathematicians use the **Σ** symbol as a placeholder to represent the summation of a list of numbers. The primary reason they do that is because it's more cumbersome (and less readable!) if they're working with more complex formulas and they have to write out the summation manually, like `1 + 3 + 5 + 7 + 9 + ..`. Using the notation is declarative math!
+
+Recursion is declarative for algorithms in the same sense that **Σ** is declarative for mathematics. Recursion expresses that a problem solution exists, but doesn't necessarily require the reader of the code to understand how that solution works. Let's consider two approaches to finding the highest even number passed as an argument:
+
+```js
+function maxEven(...nums) {
+	var num = -Infinity;
+
+	for (let i = 0; i < nums.length; i++) {
+		if (nums[i] % 2 == 0 && nums[i] > num) {
+			num = nums[i];
+		}
 	}
-};
+
+	if (num !== -Infinity) {
+		return num;
+	}
+}
 ```
 
-It may seem rather subtle, but there's a important difference between this more-imperative version of the code and the previous more-declarative version, aside from just `b.onValue(..)` needing to call `this.map(..)` itself. In the former snippet, `b` pulls from `a`, but in the latter snippet, `a` pushes to `b`. In other words, compare `b = a.map(..)` to `b.onValue(v)`.
+This implementation is not particulary intractable, but it's also not readily apparent what its nuances are. How obvious is it that `maxEven()`, `maxEven(1)`, and `maxEven(1,13)` all return `undefined`? Is it quickly clear why the final `if` statement is necessary?
 
-In the latter imperative snippet, it's not clear (readability wise) from the consumer's perspective where the `v` values are coming from. Moreover, the imperative hard coding of `b.onValue(..)` in the mix of producer `a`'s logic is a bit of a violation of separation-of-concerns. That can make it harder to reason about producer and consumer independently.
+Let's instead consider a recursive approach, to compare. We could notate the recursion this way:
 
-By contrast, in the former snippet, `b = a.map(..)` declares that `b`'s values are seeded from `a`, and treats `a` as abstract event stream data source that we don't have to concern ourselves with at that moment. We *declare* that any value that comes from `a` into `b` will go through the `map(..)` operation as specified.
+```
+maxEven( nums ):
+	maxEven( nums.0, maxEven( ...nums.1 ) )
+```
 
-### More Than Map
+In other words, we can define the max-even of a list of numbers as the max-even of the first number compared to the max-even of the rest of the numbers. For example:
 
-For convenience, we've illustrated this notion of pairing `a` and `b` together over time via a one-to-one `map(..)`ing. But many of our other FP operations could be modeled over time as well.
+```
+maxEven( 1, 10, 3, 2 ):
+	maxEven( 1, maxEven( 10, maxEven( 3, maxEven( 2 ) ) )
+```
 
-Consider:
+To implement this recursive definition in JS, one approach is:
 
 ```js
-var b = a.filter( function isOdd(v) {
-	return v % 2 == 1;
-} );
+function maxEven(num1,...restNums) {
+	var maxRest = restNums.length > 0 ?
+			maxEven( ...restNums ) :
+			undefined;
 
-b.listen( function onlyOdds(v){
-	console.log( "Odd:", v );
-} );
+	return (num1 % 2 != 0 || num1 < maxRest) ?
+		maxRest :
+		num1;
+}
 ```
 
-Here, a value from `a` only comes into `b` if it passes the `isOdd(..)` predicate.
+So what advantages does this approach have?
 
-Even `reduce(..)` can be modeled over time:
+First, the signature is a little different than before. I intentionally called out `num1` as the first argument name, collecting the rest of the arguments into `restNums`. But why? We could just have collected them all into a single `nums` array and then referred to `nums[0]`.
+
+This function signature is an intentional hint at the recursive definition. It reads like this:
+
+```
+maxEven( num1, ...restNums ):
+	maxEven( num1, maxEven( ...restNums ) )
+```
+
+Do you see the symmetry between the signature and the recursive definition?
+
+When we can make the recursive definition more apparent even in the function signature, we improve the declarativeness of the function. And if we can then mirror the recursive definition from the signature to the function body, it gets even better.
+
+But I'd say the most obvious improvement is that the distraction of the imperative `for`-loop is suppressed. All the looping logic is abstracted into the recursive call stack, so that stuff doesn't clutter the code. We're free then to focus on the logic of finding a max-even by comparing two numbers at a time -- the important part anyway!
+
+Mentally, what's happening is similar to when a mathematician uses a **Σ** summation in a larger equation. We're saying, "the max-even of the rest of the list is calculated by `maxEven(...restNums)`, so we'll just assume that part and move on."
+
+Additionally, we reinforce that notion with the `restNums.length > 0` guard, because if there are no more numbers to consider, the natural result is that `maxRest` would have to be `undefined`. We don't need to devote any extra mental attention to that part of the reasoning. This base condition (no more numbers to consider) is clearly evident.
+
+Next, we turn our attention to checking `num1` against `maxRest` -- the main logic of the algorithm is how to determine which of two numbers, if any, is a max-even. If `num1` is not even (`num1 % 2 != 0`), or it's less than `maxRest`, then `maxRest` *has* to be `return`ed, even if it's `undefined`. Otherwise, `num1` is the answer.
+
+The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` approach.
+
+**Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations like we discussed in Chapter 7. The list of numbers could first be `filter(..)`ed to include only evens, and then finding the max is a `reduce(..)` that simply compares two numbers and returns the bigger of the two. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
+
+Here's another recursion example: calculating the depth of a binary tree. The depth of a binary tree is the longest path down (either left or right) through the nodes of the tree. Another way to define that is recursively: the depth of a tree at any node is 1 (the current node) plus the greater of depths from either its left or right child trees:
+
+```
+depth( node ):
+	1 + max( depth( node.left ), depth( node.right ) )
+```
+
+Translating that straightforwardly to a binary recursive function:
 
 ```js
-var b = a.reduce( function sum(total,v){
-	return total + v;
-} );
+function depth(node) {
+	if (node) {
+		let depthLeft = depth( node.left );
+		let depthRight = depth( node.right );
+		return 1 +
+			(depthLeft > depthRight ? depthLeft : depthRight);
+	}
 
-b.listen( function runningTotal(v){
-	console.log( "New current total:", v );
-} );
+	return 0;
+}
 ```
 
-Since we don't specify an `initialValue` to the `reduce(..)` call, neither the `sum(..)` reducer nor the `runningTotal(..)` event callback will be invoked until at least two values have come through from `a`.
+I'm not going to list out the imperative form of this algorithm, but trust me, it's a lot messier and more imperative. This recursive approach is nicely and gracefully declarative. It follows the recursive definition of the algorithm very closely with very little distraction.
 
-This snippet implies that the reduction has a *memory* of sorts, in that each time a future value comes in, the `sum(..)` reducer will be invoked with whatever the previous `total` was as well as the new next value `v`.
+Not all problems are cleanly recursive. This is not some silver bullet that you should try to apply broadly. But recursion can be very effective at evolving the expression of a problem from more imperative to more declarative.
 
-Other FP operations extended over time could even involve an internal buffer, like for example `unique(..)` keeping track of every value it's seen so far.
+## Stack
 
-### Observables
-
-Hopefully by now you can see the importance of a reactive, evented, array-like data structure like the fictional `LazyArray` we've conjured. The good news is, this kind of data structure already exists, and it's called an observable.
-
-**Note:** Just to set some expectation: the following discussion is only a brief intro to the world of observables. This is a far more in-depth topic than we have space to fully explore. But if you've understood functional-light programming in this text, and now understood how asynchronous-time can be modeled via FP principles, observables should follow very naturally for your continued learning.
-
-Observables have been implemented by a variety of userland libraries, most notably RxJS and Most. At the time of this writing, there's an in-progress proposal to add observables directly to JS, just like promises. For the sake of demonstration, we'll use RxJS-flavored Observables for these next examples.
-
-Here's our earlier reactive example, expressed with Observables instead of `LazyArray`:
+Let's revisit the `isOdd(..)` / `isEven(..)` recursion from earlier:
 
 ```js
-// TODO: double check the accuracy of this snippet
+function isOdd(v) {
+	if (v === 0) return false;
+	return isEven( Math.abs( v ) - 1 );
+}
 
-// producer:
-
-var a = new Rx.Subject();
-
-setInterval( function everySecond(){
-	a.onNext( Math.random() );
-}, 1000 );
-
-
-// **************************
-// consumer:
-
-var b = a.map( function double(v){
-	return v * 2;
-} );
-
-b.subscribe( function onValue(v){
-	console.log( v );
-} );
+function isEven(v) {
+	if (v === 0) return true;
+	return isOdd( Math.abs( v ) - 1 );
+}
 ```
 
-In the RxJS universe, an Observer subscribes to an Observable. If you combine the functionality of an Observer and an Observable, you get a Subject. So, to keep our snippet simpler, we construct `a` as a Subject, so that we can call `onNext(..)` on it to push values (events) into its stream.
-
-If we want to keep the Observer and Observable separate:
+In most browsers, if you try this you'll get an error:
 
 ```js
-// TODO: double check the accuracy of this snippet
-
-// producer:
-
-var a = Rx.Observable.create( function onObserver(observer){
-	setInterval( function everySecond(){
-		a.onNext( Math.random() );
-	}, 1000 );
-} );
+isOdd( 33333 );			// RangeError: Maximum call stack size exceeded
 ```
 
-In this snippet, `a` is the Observable, and unsurprisingly, the separate observer is called `observer`; it's able to "observe" some events (like our `setInterval(..)` loop) and publish events to the `a` observable stream.
+What's going on with this error? The engine throws this error because it's trying to protect your program from running the system out of memory. To explain that, we need to peek a little below the hood at what's going on in the JS engine when function calls happen.
 
-In addition to `map(..)`, RxJS defines well over a hundred operators that are invoked lazily as each new value comes in. Just like with arrays, each operator on an Observable returns a new Observable, meaning they are chainable. If an invocation of operator function determines a value should be passed along from the input Observable, it will be fired on the output Observable; otherwise it's discarded.
+Each function call sets aside a small chunk of memory called a stack frame. The stack frame holds certain important information about the current state of processing statements in a function, including the values in any variables. The reason this information needs to be stored in memory (in a stack frame) is because the function may call out to another function, which pauses the current function. When the other function finishes, the engine needs to resume the exact state from when it was paused.
 
-Example of a declarative observable chain:
+When the second function call starts, it needs a stack frame as well, bringing the count to 2. If that function calls another, we need a third stack frame. And so on. The word "stack" speaks to the notion that each time a function is called from the previous one, the next frame is *stacked* on top. When a function call finishes, its frame is popped off the stack.
+
+Consider this program:
 
 ```js
-var b =
-	a
-	.filter( v => v % 2 == 1 )		// only odd numbers
-	.distinctUntilChanged()			// only consecutive-distinct
-	.throttle( 100 )				// slow it down a bit
-	.map( v = v * 2 );				// double them
+function foo() {
+	var z = "foo!";
+}
 
-b.subscribe( function onValue(v){
-	console.log( "Next:", v );
-} );
+function bar() {
+	var y = "bar!";
+	foo();
+}
+
+function baz() {
+	var x = "baz!";
+	bar();
+}
+
+baz();
 ```
 
-**Note:** It's not necessary to assign the observable to `b` and then call `b.subscribe(..)` separately from the chain; that's only done to reinforce that each operator returns a new observable from the previous one. Often, the `subscribe(..)` call is just the final method in the chain.
+Visualizing this program's stack frame step by step:
+
+<p align="center">
+	<img src="fig15.png" width="600">
+</p>
+
+**Note:** If these functions didn't call each other, but were just called sequentially -- like `baz(); bar(); foo();`, where each one finishes before the next one starts -- the  frames won't stack up; each function call finishes and removes its frame from the stack before the next one is added.
+
+OK, so a little bit of memory is needed for each function call. No big deal under most normal program conditions, right? But it quickly becomes a big deal once you introduce recursion. While you'd almost certainly never manually stack thousands (or even hundreds!) of calls of different functions together in one call stack, you'll easily see tens of thousands or more recursive calls stack up.
+
+The `isOdd(..)` / `isEven(..)` pairing throws a `RangeError` because the engine steps in at an arbitrary limit when it thinks the call stack has grown too much and should be stopped. This is not likely a limit based on actual memory levels nearing zero, but rather a prediction by the engine that if this kind of program was left running, memory usage would be runaway. It is impossible to know or prove that a program will eventually stop, so the engine has to make an informed guess.
+
+This limit is implementation dependent. The specification doesn't say anything about it at all, so it's not *required*. But practically all JS engines do have a limit, because having no limit would create an unstable device that's susceptible to poorly written or malicious code. Each engine in each different device environment is going to enforce its own limits, so there's no way to predict or guarantee how far we can run up the function call stack.
+
+What this limit means to us as developers is that there's a practical limitation on the usefulness of recursion in solving problems on non-trivially sized data sets. In fact, I think this kind of limitation might be single biggest reason that recursion is a second-class citizen in the developer's toolbox. Regrettably, recursion is an after thought rather than a primary technique.
+
+### Tail Calls
+
+Recursion far predates JS, and so do these memory limitations. Back in the sixties, developers were wanting to use recursion and running up against hard limits of device memory of their powerful computers that were far lower than we have on our watches today.
+
+Fortunately, a powerful observation was made in those early days that still offers hope. The technique is called *tail calls*.
+
+The idea is that if a call from function `baz()` to function `bar()` happens at the very end of function `baz()`'s execution -- referred to as a tail call -- the stack frame for `baz()` isn't needed anymore. That means that either the memory can be reclaimed, or even better, simply reused to handle function `bar()`'s execution. Visualizing:
+
+<p align="center">
+	<img src="fig16.png" width="600">
+</p>
+
+Tail calls are not really directly related to recursion, per se; this notion holds for any function call. But your manual non-recursion call stacks are unlikely to go beyond maybe 10 levels deep in most cases, so the chances of tail calls impacting your program's memory footprint are pretty low.
+
+Tail calls really shine in the recursion case, because it means that a recursive stack could run "forever", and the only performance concern would be computation, not fixed memory limitations. Tail call recursion can run in `O(1)` fixed memory usage.
+
+These sorts of techniques are often referred to as Tail Call Optimizations (TCO), but it's important to distinguish the ability to detect a tail call to run in fixed memory space, from the techniques that optimize this approach. Technically, tail calls themselves are not a performance optimization as most people would think, as they might actually run slower than normal calls. TCO is about optimizing tail calls to run more efficiently.
+
+### Proper Tail Calls (PTC)
+
+JavaScript has never required (nor forbidden) tail calls, until ES6. ES6 mandates recognition of tail calls, of a specific form referred to as Proper Tail Calls (PTC), and the guarantee that code in PTC form will run without unbounded stack memory growth. Practically speaking, this means we should not get `RangeError`s thrown if we adhere to PTC.
+
+First, PTC in JavaScript requires strict mode. You should already be using strict mode, but if you aren't, this is yet another reason you should already be using strict mode. Did I mention, yet, you should already be using strict mode!?
+
+Second, a *proper* tail call is exactly like this:
+
+```js
+return foo( .. );
+```
+
+In other words, the function call is the last thing to execute in the function, and whatever value it returns is explicitly `return`ed. In this way, JS can be absolutely guaranteed that the current stack frame won't be needed anymore.
+
+These *are not* PTC:
+
+```js
+foo();
+return;
+
+// or
+
+var x = foo( .. );
+return x;
+
+// or
+
+return 1 + foo( .. );
+```
+
+**Note:** A JS engine *could* do some code reorganization to realize that `var x = foo(); return x;` is effectively the same as `return foo();`, which would then make it eligible as PTC. But that is not be required by the specification.
+
+The `1 +` part is definitely processed *after* `foo(..)` finishes, so the stack frame has to be kept around.
+
+However, this *is* PTC:
+
+```js
+return x ? foo( .. ) : bar( .. );
+```
+
+After the `x` condition is computed, either `foo(..)` or `bar(..)` will run, and in either case, the return value will be always be `return`ed back. That's PTC form.
+
+Binary recursion -- two (or more!) recursive calls are made -- can never be effective PTC as-is, because all the recursion has to be in tail call position to avoid the stack growth. Earlier, we showed an example of refactoring from binary recursion to mutual recursion. It may be possible to achieve PTC from a multiple-recursive algorithm by splitting each into separate function calls, where each is expressed respectively in PTC form.
+
+## Rearranging Recursion
+
+If you want to use recursion but your problem set could grow enough eventually to exceed the stack limit of the JS engine, you're going to need to rearrange your recursive calls to take advantage of PTC (or avoid nested calls entirely). There are several refactoring strategies that can help, but there are of course tradeoffs to be aware of.
+
+As a word of caution, always keep in mind that code readability is our overall most important goal. If recursion along with some combination of these following strategies results in harder to read/understand code, **don't use recursion**; find another more readable approach.
+
+### Replacing The Stack
+
+The main problem with recursion is its memory usage, keeping around the stack frames to track the state of a function call while it dispatches to the next recursive call iteration. If we can figure out how to rearrange our usage of recursion so that the stack frame doesn't need to be kept, then we can express recursion with PTC and take advantage of the JS engine's optimized handling of tail calls.
+
+Let's recall the summation example from earlier:
+
+```js
+function sum(num1,...nums) {
+	if (nums.length == 0) return num1;
+	return num1 + sum( ...nums );
+}
+```
+
+This isn't in PTC form because after the recursive call to `sum(...nums)` is finished, the `total` variable is added to that result. So, the stack frame has to be preserved to keep track of the `total` partial result while the rest of the recursion proceeds.
+
+The key recognition point for this refactoring strategy is that we could remove our dependence on the stack by doing the addition *now* instead of *after*, and then forward-passing that partial result as an argument to the recursive call. In other words, instead of keeping `total` in the current function's stack frame, push it into the stack frame of the next recursive call; that frees up the current stack frame to be removed/reused.
+
+To start, we could alter the signature our `sum(..)` function to have a new first parameter as the partial result:
+
+```js
+function sum(result,num1,...nums) {
+	// ..
+}
+```
+
+Now, we should pre-calculate the addition of `result` and `num1`, and pass that along:
+
+```js
+"use strict";
+
+function sum(result,num1,...nums) {
+	result = result + num1;
+	if (nums.length == 0) return result;
+	return sum( result, ...nums );
+}
+```
+
+Now our `sum(..)` is in PTC form! Yay!
+
+But the downside is we now have altered the signature of the function that makes using it stranger. The caller essentially has to pass `0` as the first argument ahead of the rest of the numbers they want to sum.
+
+```js
+sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
+```
+
+That's unfortunate.
+
+Typically, people will solve this by naming their awkward-signature recursive function differently, then defining an interface function that hides the awkwardness:
+
+```js
+"use strict";
+
+function sumRec(result,num1,...nums) {
+	result = result + num1;
+	if (nums.length == 0) return result;
+	return sumRec( result, ...nums );
+}
+
+function sum(...nums) {
+	return sumRec( /*initialResult=*/0, ...nums );
+}
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+That's better. Still unfortunate that we've now created multiple functions instead of just one. Sometimes you'll see developers "hide" the recursive function as an inner function, like this:
+
+```js
+"use strict";
+
+function sum(...nums) {
+	return sumRec( /*initialResult=*/0, ...nums );
+
+	function sumRec(result,num1,...nums) {
+		result = result + num1;
+		if (nums.length == 0) return result;
+		return sumRec( result, ...nums );
+	}
+}
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+The downside here is that we'll recreate that inner `sumRec(..)` function each time the outer `sum(..)` is called. So, we can go back to them being side-by-side functions, but hide them both inside an IIFE, and expose just the one we want to:
+
+```js
+"use strict";
+
+var sum = (function IIFE(){
+
+	return function sum(...nums) {
+		return sumRec( /*initialResult=*/0, ...nums );
+	}
+
+	function sumRec(result,num1,...nums) {
+		result = result + num1;
+		if (nums.length == 0) return result;
+		return sumRec( result, ...nums );
+	}
+
+})();
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+OK, we've got PTC and we've got a nice clean signature for our `sum(..)` that doesn't require the caller to know about our implementation details. Yay!
+
+But... wow, our simple recursive function has a lot more noise now. The readability has definitely been reduced. That's unfortunate to say the least. Sometimes, that's just the best we can do.
+
+Luckily, in some other cases, like the present one, there's a better way. Let's reset back to this version:
+
+```js
+"use strict";
+
+function sum(result,num1,...nums) {
+	result = result + num1;
+	if (nums.length == 0) return result;
+	return sum( result, ...nums );
+}
+
+sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
+```
+
+What you might observe is that `result` is a number just like `num1`, which means that we can always treat the first number in our list as our running total; that includes even the first call. All we need is to rename those params to make this clear:
+
+```js
+"use strict";
+
+function sum(num1,num2,...nums) {
+	num1 = num1 + num2;
+	if (nums.length == 0) return num1;
+	return sum( num1, ...nums );
+}
+
+sum( 3, 1, 17, 94, 8 );								// 123
+```
+
+Awesome. That's much better, huh!? I think this pattern achieves a good balance between declarative/reasonable and performant.
+
+Let's try refactoring with PTC once more, revisitng our earlier `maxEven(..)` (currently not PTC). We'll observe that similar to keeping the sum as the first argument, we can narrow the list of numbers one at a time, keeping the first argument as the highest even we've come across thus far.
+
+For clarity, the algorithm strategy (similar to what we discussed earlier) we might use:
+
+1. Start by comparing the first two numbers, `num1` and `num2`.
+2. Is `num1` even, and is `num1` greater than `num2`? If so, keep `num1`.
+3. If `num2` is even, keep it (store in `num1`).
+4. Otherwise, fall back to `undefined` (store in `num1`).
+5. If there are more `nums` consider, recursively compare them to `num1`.
+6. Finally, just return whatever value is left in `num1`.
+
+Our code can follow these steps almost exactly closely:
+
+```js
+"use strict";
+
+function maxEven(num1,num2,...nums) {
+	num1 =
+		(num1 % 2 == 0 && !(maxEven( num2 ) > num1)) ?
+			num1 :
+			(num2 % 2 == 0 ? num2 : undefined);
+
+	return nums.length == 0 ?
+		num1 :
+		maxEven( num1, ...nums )
+}
+```
+
+**Note:** The first `maxEven(..)` call is not in PTC position, but since it only passes in `num2`, it only recurses just that one level then returns right back out; this is only a trick to avoid repeating the `%` logic. As such, this call won't increase the growth of the recursive stack, any more than if that call was to an entirely different function. The second `maxEven(..)` call is the legitimate recursive call, and it is in fact in PTC position, meaning our stack won't grow as the recursion proceeds.
+
+It should be repeated that this example is only to illustrate the approach to moving recursion to the PTC form to optimize the stack (memory) usage. The more direct way to express a max-even algorithm might indeed be a filtering of the `nums` list for evens first, followed then by a max bubbling or even a sort.
+
+Refactoring recursion into PTC is admittedly a little intrusive on the simple declarative form, but it still gets the job done reasonably. Unfortunately, some kinds of recursion won't work well even with an interface function, so we'll need different strategies.
+
+### Continuation Passing Style (CPS)
+
+In JavaScript, the word *continuation* is often used to mean a function callback that specifies the next step(s) to execute after a certain function finishes its work. Organizing code so that each function receives another function to execute at its end, is referred to as Continuation Passing Style (CPS).
+
+Some forms of recursion cannot practically be refactored to pure PTC, especially multiple recursion. Recall the `fib(..)` function earlier, and even the mutual recursion form we derived. In both cases, there are multiple recursive calls, which effectively defeats PTC memory optimizations.
+
+However, you perform the first recursive call, and wrap the subsequent recursive calls in a continuation function to pass into that first call. Even though this would mean ultimately many more functions will need to be executed in the stack, as long all of them, continuations included, are in PTC form, stack memory usage will not grow unbounded.
+
+We could do this for `fib(..)`:
+
+```js
+"use strict";
+
+function fib(n,cont = identity) {
+	if (n <= 1) return cont( n );
+	return fib(
+		n - 2,
+		n2 => fib(
+			n - 1,
+			n1 => cont( n2 + n1 )
+		)
+	);
+}
+```
+
+Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our `identity(..)` utility from Chapter 3; remember, it simply returns whatever is passed to it.
+
+Morever, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
+
+Perhaps this will help mentally sort out what's going on: just like in the previous discussion when we passed partial results along instead of returning them back after the recursive stack, we're doing the same here, but each step gets wrapped in a continuation, which defers its computation. That trick allows us to perform multiple steps where each is in PTC form.
+
+In static languages, CPS is often an opportunity for tail calls the compiler can automatically identify and rearrange recursive code to take advantage of. Unfortunately, that doesn't really apply to the nature of JS.
+
+In JavaScript, you'd likely need to write the CPS form yourself. It's clunkier, for sure; the declarative notation-like form has certainly been obscured. But overall, this form is still more declarative than the `for`-loop imperative implementation.
+
+**Warning:** One major caveat that should be noted is that in CPS, creating the extra inner continuation functions still consumes memory, but of a different sort. Instead of piling up stack frames, the closures just consume free memory (typically, from the heap). Engines don't seem to apply the `RangeError` limits in these cases, but that doesn't mean your memory usage is fixed in scale.
+
+### Trampolines
+
+Where CPS creates continuations and passes them along, another technique for alleviating memory pressure is called trampolines. In this style of code, CPS-like continuations are created, but instead of passed in, they are shallowly returned.
+
+Instead of functions calling functions, the stack never goes beyond depth of one, because each function just returns the next function that should be called. A loop simply keeps running each returned function until there are no more functions to run.
+
+One advantage with trampolines is you aren't limited to environments that support PTC; another is that each function call is regular, not PTC optimized, so it may run quicker.
+
+Let's sketch that a `trampoline(..)` utility in code:
+
+```js
+function trampoline(fn) {
+	return function trampolined(...args) {
+		var result = fn( ...args );
+
+		while (typeof result == "function") {
+			result = result();
+		}
+
+		return result;
+	}
+}
+```
+
+As long as a function is returned, the loop keeps going, executing that function and capturing its return, then checking its type. Once a non-function comes back, the trampoline assumes the function calling is complete, and just gives back the value.
+
+Because each continuation needs to return another continuation, we likely we'll need to use the earlier trick of forward-passing the partial result as an argument. Here's how we could use this utility with our earlier example of summation of a list of numbers:
+
+```js
+var sum = trampoline(
+	function sum(num1,num2,...nums) {
+		num1 = num1 + num2;
+		if (nums.length == 0) return num1;
+		return () => sum( num1, ...nums );
+	}
+);
+
+var xs = [];
+for (let i=0; i<20000; i++) {
+	xs.push( i );
+}
+
+sum( ...xs );					// 199990000
+```
+
+The downside is that a trampoline requires you to wrap your recursive function in the trampoline driving function; moreover, just like CPS, closures are created for each continuation. However, unlike CPS, each continuation function returned runs and finishes right away, so the engine won't have to accumulate a growing amount of closure memory while the call stack depth of the problem is exhausted.
+
+Beyond execution and memory performance, the advantage of trampolines over CPS is that they're less intrusive on the declarative recursion form, in that you don't have to change the function signature to receive a continuation function argument. Trampolines are not ideal, but they can be effective in your balancing act between imperative looping code and declarative recursion.
 
 ## Summary
 
-This book has detailed a wide variety of FP operations that take a single value (or an immediate list of values) and transform them into another value/values.
+Recursion is when a function recursively calls itself. Heh. A recursive definition for recursion. Get it!?
 
-For operations that will be proceed over time, all of these foundational FP principles can be applied time-independently. Exactly like promises model single future values, we can model eager lists of values instead as lazy observable (event) streams of values that may come in one-at-a-time.
+Direct recursion is a function that makes at least one call to itself, and it keeps dispatching to itself until it satisifies a base condition. Multiple recursion (like binary recursion) is when a function calls itself multiple times. Mutual recursion is when a two or more functions recursively loop by *mutually* calling each other.
 
-A `map(..)` on an array runs its mapping function once for each value currently in the array, putting all the mapped values in the outcome array. A `map(..)` on an observable runs its mapping function once for each value, whenever it comes in, and pushes all the mapped values to the output observable.
+The upside of recursion is that it's more declarative and thus typically more readable. The downside is usually performance, but more memory constraints even than execution speed.
 
-In other words, if an array is an eager data structure for FP operations, an observable is its lazy over-time counterpart.
+Tail calls alleviate the memory pressure by reusing/discarding stack frames. JavaScript requires strict mode and proper tail calls (PTC) to take advantage of this "optimization". There are several techniques we can mix-n-match to refactor a non-PTC recursive function to PTC form, or at least avoid the memory constraints by flattening the stack.
+
+Remember: recursion should be used to make code more readable. If you misuse or abuse recursion, the readability will end up worse than the imperative form. Don't do that!

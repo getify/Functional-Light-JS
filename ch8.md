@@ -1,679 +1,1403 @@
 # Functional-Light JavaScript
-# Chapter 8: Recursion
+# Chapter 7: List Operations
 
-On the next page, we're going to jump into the topic of recursion.
+> If you can do something awesome, keep doing it repeatedly.
 
-<hr>
+We've already seen several brief references earlier in the text to some utilities that we now want to take a very close look at, namely `map(..)`, `filter(..)`, and `reduce(..)`. In JavaScript, these utilities are typically used as methods on the array (aka, "list") prototype, so we would naturally refer to them as array or list operations.
 
-*(rest of the page intentionally left blank)*
+Before we talk about the specific array methods, we want to examine conceptually what these operations are used for. It's equally important in this chapter that you understand *why* list operations are important as it is to understand *how* list operations work. Make sure you approach this chapter with that detail in mind.
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+The vast majority of common illustrations of these operations, both outside of this book and here in this chapter, depict trivial tasks performed on lists of values (like doubling each number in an array); it's a cheap and easy way to get the point across.
 
-<div style="page-break-after: always;"></div>
+But don't just gloss over these simple examples and miss the deeper point. Some of the most important FP value in understanding list operations comes from being able to model a sequence of tasks -- a series of statements that wouldn't otherwise *look* like a list -- as a list operation instead of performing them individually.
 
-Let's talk about recursion. Before we dive in, consult the previous page for the formal definition.
+This isn't just a trick to write more terse code. What we're after is to move from imperative to declarative style, to make the code patterns more readily recognizable and thus more readable.
 
-Weak joke, I know. :)
+But there's something **even more important to grasp**. With imperative code, each intermediate result in a set of calculations is stored in variable(s) through assignment. The more of these imperative patterns your code relies on, the harder it is to verify that there aren't mistakes -- in the logic, accidental mutation of values, or hidden side causes/effects lurking.
 
-Recursion is one of those programming techniques that most developers admit can be very powerful, but also most of them don't like to use it. I'd put it in the same category as regular expressions, in that sense. Powerful, but confusing, and thus seen as *not worth the effort*.
+By chaining and/or composing list operations together, the intermediate results are tracked implicitly and largely protected from these hazards.
 
-I'm a big fan of recursion, and you can, too! My goal in this chapter is to convince you that recursion is an important tool that you should bring with you in your FP approach to code. When used properly, recursion is powerfully declarative for complex problems.
+**Note:** More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my advice on `=>` from Chapter 2 still applies for general coding.
 
-## Definition
+## Non-FP List Processing
 
-Recursion is when a function calls itself, and that call does the same, and this cycle continues until a base condition is satisfied and the call loop unwinds.
+As a quick preamble to our discussion in this chapter, I want to call out a few operations which may seem related to JavaScript arrays and FP list operations, but which aren't. These operations will not be covered here, because they are not consistent with general FP best practices:
 
-**Warning:** If you don't ensure that a base condition is *eventually* met, recursion will run forever, and crash or lock up your program; the base condition is pretty important to get right!
+* `forEach(..)`
+* `some(..)`
+* `every(..)`
 
-But... that definition is too confusing in its written form. We can do better. Consider this recursive function:
+`forEach(..)` is an iteration helper, but it's designed for each function call to operate with side effects; you can probably guess why that's not an endorsed FP list operation for our discussion!
+
+`some(..)` and `every(..)` do encourage the use of pure functions (specifically, predicate functions like `filter(..)` does), but they inevitably reduce a list to a `true` / `false` result, essentially like a search or matching. These two utilities don't really fit the mold of how we want to model our code with FP, so we're going to skip covering them here.
+
+## Map
+
+We'll start our exploration of FP list operations with one of the most basic and fundamental: `map(..)`.
+
+A mapping is a transformation from one value to another value. For example, if you start with the number `2` and you multiply it by `3`, you have mapped it to `6`. It's important to note that we're not talking about mapping transformation as implying *in-place* mutation or reassignment; rather mapping transformation projects a new value from one location to the other.
+
+In other words:
 
 ```js
-function foo(x) {
-	if (x < 5) return x;
-	return foo( x / 2 );
-}
+var x = 2, y;
+
+// transformation / projection
+y = x * 3;
+
+// mutation / reassignment
+x = x * 3;
 ```
 
-Let's visualize what happens with this function when we call `foo( 16 )`:
+If we define a function for this multiplying by `3`, that function acts as a mapping (transformer) function:
+
+```js
+var multipleBy3 = v => v * 3;
+
+var x = 2, y;
+
+// transformation / projection
+y = multiplyBy3( x );
+```
+
+We can naturally extend mapping from a single value transformation to a collection of values. `map(..)` is an operation that transforms all the values of a list as it projects them to a new list:
 
 <p align="center">
-	<img src="fig13.png" width="850">
+	<img src="fig9.png" width="400">
 </p>
 
-In step 2, `x / 2` produces `8`, and that's passed in as the argument so a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
+To implement `map(..)`:
 
-But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
+```js
+function map(arr,mapperFn) {
+	var newList = [];
+
+	for (let idx = 0; i < arr.length; i++) {
+		newList.push(
+			mapperFn( arr[i], idx, arr )
+		);
+	}
+
+	return newList;
+}
+```
+
+Notice that `mapperFn(..)` is naturally passed the list item to map/transform, but also an `idx` and `arr`. We're doing that to keep consistency with the built-in array `map(..)`. These extra pieces of information can be very useful in some cases.
+
+But in other cases, you may want to use a `mapperFn(..)` that only the list item should be passed to, because the extra arguments might change its behavior. In "All For One" in Chapter 3, we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed).
+
+Recall the example from Chapter 3 about limiting `parseInt(..)` to a single argument to be used safely as a `mapperFn(..)`:
+
+```js
+map( ["1","2","3"], unary( parseInt ) );
+// [1,2,3]
+```
+
+JavaScript provides the `map(..)` utility built-in on arrays, making it very convenient to use as part of a chain of operations on a list.
+
+**Note:** The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in "What's This?" in Chapter 2, `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support this `this` feature.
+
+Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here's some other examples of mapping operations. We can use `map(..)` to transform a list of functions a list of their return values:
+
+```js
+var one = () => 1;
+var two = () => 2;
+var three = () => 3;
+
+[one,two,three].map( fn => fn() );
+// [1,2,3]
+```
+
+Or we can first transform a list of functions by composing each of them with another function, and then execute them:
+
+```js
+var increment = v => ++v;
+var decrement = v => --v;
+var square = v => v * v;
+
+var double = v => v * 2;
+
+[increment,decrement,square]
+.map( fn => compose( fn, double ) )
+.map( fn => fn( 3 ) );
+// [7,5,36]
+```
+
+Something interesting to observe about `map(..)`: we typically would assume that the list is processed left-to-right, but there's nothing about the concept of `map(..)` that really requires that. Each transformation is supposed to be independent of every other transformation.
+
+Mapping in a general sense could even been parallelized in an environment that supports that, which for a large list could drastically improve performance. We don't see JavaScript actually doing that because there's nothing that requires you to pass a pure function as `mapperFn(..)`, even though you **really ought to**. If you were to pass an impure function and JS were to run different calls in different orders, it would quickly cause havoc.
+
+Even though theoretically mapping is independent, JS has to assume that it's not. That's a bummer.
+
+### Sync vs Async
+
+The list operations we're discussing in this chapter all operate synchronously on a list of values that are all already present; `map(..)` as conceived here is an eager oepration. But another way of thinking about the mapper function is as an event handler which is invoked for each new value encountered in the list.
+
+Imagine something fictional like this:
+
+```js
+var newArr = arr.map();
+
+arr.addEventListener( "value", multiplyBy3 );
+```
+
+Now, any time a value is added to `arr`, the `multiplyBy3(..)` event handler -- mapper function -- is called with the value, and its transformation is added to `newArr`.
+
+What we're hinting at is that arrays, and the array operations we perform on them, are the eager synchronous versions, whereas these same operations can also be modeled lazily over a "list" that receives its values over time. We'll dive into this topic in a later chapter.
+
+### Mapping vs Eaching
+
+Some advocate using `map(..)` as a general form of `forEach(..)`-iteration, where essentially the value received is passed through untouched, but then some side-effect can be performed:
+
+```js
+[1,2,3,4,5]
+.map( function mapperFn(v){
+	console.log( v );
+	return v;
+} )
+..
+```
+
+The reason this technique can seem useful is that the `map(..)` returns the array so you can keep chaining more operations after it; the return value of `forEach(..)` is `undefined`. However, I think you should avoid using `map(..)` in this way, because it's a net confusion to use a core FP operation in a decidedly un-FP way.
+
+You've heard the old addage about using the right tool for the right job, right? Hammer for a nail, screwdriver for a screw, etc. This is slightly different: it's use the right tool *in the right way*. A hammer is meant to be swung in your hand; if you instead hold it in your mouth and try to hammer the nail, you're not gonna be very effective.
+
+## Filter
+
+Imagine I bring an empty basket with me to the grocery store to visit the fruit section; there's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one-by-one, and I walk away with a basket full of just the apples and oranges.
+
+Let's say we call this process *filtering*. Would you more naturally describe my shopping as starting with an empty basket and **filtering in** (selecting, including) only the apples and oranges, or starting with the full display of fruits and **filtering out** (skipping, excluding) the bananas as my basket is filled with fruit?
+
+If you cook spaghetti in a pot of water, and then pour it into a strainer (aka filter) over the sink, are you filtering in the spaghetti or filtering out the water? If you put coffee grounds into a filter and make a cup of coffee, did you filter in the coffee into your cup, or filter out the coffee grounds? Does your view of filtering depend on whether the stuff you want is "kept" in the filter or passes through the filter?
+
+What about on airline / hotel websites, when you specify options to "filter your results"? Are you filtering in the results that match your criteria, or are you filtering out everything that doesn't match? Think carefully: this example might have a different semantic than the previous ones.
+
+Depending on your perspective, filter is either exclusionary or inclusionary. This conceptual conflation is unfortunate.
+
+I think the most common interpretation of filtering -- outside of programming, anyway -- is that you filter out unwanted stuff. Unfortunately, in programming, we have essentially flipped this semantic to be more like filtering in wanted stuff.
+
+The `filter(..)` list operation takes a function to decide if each value in the original array should be in the new array or not. This function needs to return `true` if a value should make it, and `false` if it should be skipped. A function that returns `true` / `false` for this kind of decision making goes by the special name: predicate function.
+
+If you think of `true` as being as a positive signal, the definition of `filter(..)` is that you are saying "keep" (to filter in) a value rather than saying "discard" (to filter out) a value. To use `filter(..)` as an exclusionary action, you have to twist your brain to think of positively signaling an exclusion by returning `false`, and passively letting a value pass through by returning `true`.
+
+The reason this semantic mismatch matters is because of how you will likely name the function used as `predicateFn(..)`, and what that means for the readability of code. We'll come back to this point shortly.
+
+Here's how to visualize a `filter(..)` operation across a list of values:
 
 <p align="center">
-	<img src="fig14.png" width="850">
+	<img src="fig10.png" width="400">
 </p>
 
-Once the base condition is satisified, the returned value cascades back through all of the calls (and thus `return`s) in the call stack, eventually `return`ing the final result out.
-
-Another recursion example:
+To implement `filter(..)`:
 
 ```js
-function isPrime(num,divisor = 2){
-	if (num < 2 || (num > 2 && num % divisor == 0)) {
-		return false;
-	}
-	if (divisor <= Math.sqrt( num )) {
-		return isPrime( num, divisor + 1 );
-	}
+function filter(arr,predicateFn) {
+	var newList = [];
 
-	return true;
-}
-```
-
-This prime checking basically works by trying each integer from `2` up to the square root of the `num` being checked, to see if any of them divide evenly (`%` mod returning `0`) into the number. If any do, it's not a prime. Otherwise, it must be prime. The `divisor + 1` uses the recursion to iterate through each possible `divisor` value.
-
-One of the most famous examples of recursion is calculating a Fibonacci number, where the sequence is defined as:
-
-```
-fib( 0 ): 0
-fib( 1 ): 1
-fib( n ):
-	fib( n - 2 ) + fib( n - 1 )
-```
-
-**Note:** The first several numbers of this sequence are: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... Each number is the addition of the previous two numbers in the sequence.
-
-The definition of fibonacci expressed directly in code:
-
-```js
-function fib(n) {
-	if (n <= 1) return n;
-	return fib( n - 2 ) + fib( n - 1 );
-}
-```
-
-`fib(..)` calls itself recursively twice, which is typically referred to as binary recursion. We'll talk more about binary recursion later.
-
-We'll use `fib(..)` variously throughout this chapter to illustrate ideas around recursion, but one downside to this particular form is that there's an awful lot of duplicated work. `fib(n-1)` and `fib(n-2)` don't share any of their work with each other, but overlap with each other almost entirely, over the entire integer space down to `0`.
-
-We briefly touched on memoization in the "Performance Effects" section of Chapter 5. Here, memoization would allow the `fib(..)` of any given number to be computed only once, instead of being recomputed many times. We won't go further into that topic here, but that performance caveat is important to keep in mind with any algorithm, recursive or not.
-
-### Mutual Recursion
-
-When a function calls itself, specifically, this is referred to as direct recursion. That's what we saw in the previous section with `foo(..)`, `isPrime(..)`, and `fib(..)`. Two or more functions can call each other in a recursive cycle, and this is referred to as mutual recursion.
-
-These two functions are mutually recursive:
-
-```js
-function isOdd(v) {
-	if (v === 0) return false;
-	return isEven( Math.abs( v ) - 1 );
-}
-
-function isEven(v) {
-	if (v === 0) return true;
-	return isOdd( Math.abs( v ) - 1 );
-}
-```
-
-Yes, this is a silly way to calculate if a number is odd or even. But it illustrates the idea that certain algorithms can be defined in terms of mutual recursion.
-
-Recall the binary recursive `fib(..)` from the previous section; we could instead have expressed it with mutual recursion:
-
-```js
-function fib_(n) {
-	if (n == 1) return 1;
-	else return fib( n - 2 );
-}
-
-function fib(n) {
-	if (n == 0) return 0;
-	else return fib( n - 1 ) + fib_( n );
-}
-```
-
-**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in "Fibonacci Numbers Using Mutual Recursion" (https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
-
-While these mutual recursion examples shown are rather contrived, there are more complex use cases where mutual recursion can be very helpful.
-
-### Why Recursion?
-
-Now that we've defined and illustrated recursion, we should examine why recursion is useful.
-
-The most commonly cited reason that recursion fits the spirit of FP is because it trades (much of) the explicit tracking of state with implicit state on the call stack. Typically, recursion is most useful when the problem requires conditional branching and back-tracking, and managing that kind of state in a purely iterative environment can be quite tricky; at a minimum, the code is highly imperative and harder to read and verify. But tracking each level of branching as its own scope on the call stack often significantly cleans up the readability of the code.
-
-Simple iterative algorithms can trivially be expressed as recursion:
-
-```js
-function sum(total,...nums) {
-	for (let i = 0; i < nums.length; i++) {
-		total = total + nums[i];
-	}
-
-	return total;
-}
-
-// vs
-
-function sum(num1,...nums) {
-	if (nums.length == 0) return num1;
-	return num1 + sum( ...nums );
-}
-```
-
-It's not just that the `for`-loop is eliminated in favor of the call stack, but that the incremental partial sums (the intermittent state of `total`) are tracked implicitly across the `return`s of the call stack instead of reassigning `total` each iteration. FPers will often prefer to avoid reassignment of local variables where it's possible to avoid.
-
-In a basic algorithm like this kind of summation, this difference is minor and nuanced. But the more sophisticated your algorithm, the more you will likely see the payoff of recursion instead of imperative state tracking.
-
-## Declarative Recursion
-
-Mathematicians use the **Σ** symbol as a placeholder to represent the summation of a list of numbers. The primary reason they do that is because it's more cumbersome (and less readable!) if they're working with more complex formulas and they have to write out the summation manually, like `1 + 3 + 5 + 7 + 9 + ..`. Using the notation is declarative math!
-
-Recursion is declarative for algorithms in the same sense that **Σ** is declarative for mathematics. Recursion expresses that a problem solution exists, but doesn't necessarily require the reader of the code to understand how that solution works. Let's consider two approaches to finding the highest even number passed as an argument:
-
-```js
-function maxEven(...nums) {
-	var num = -Infinity;
-
-	for (let i = 0; i < nums.length; i++) {
-		if (nums[i] % 2 == 0 && nums[i] > num) {
-			num = nums[i];
+	for (let idx = 0; idx < arr.length; idx++) {
+		if (predicateFn( arr[idx], idx, arr )) {
+			newList.push( arr[idx] );
 		}
 	}
 
-	if (num !== -Infinity) {
-		return num;
-	}
+	return newList;
 }
 ```
 
-This implementation is not particulary intractable, but it's also not readily apparent what its nuances are. How obvious is it that `maxEven()`, `maxEven(1)`, and `maxEven(1,13)` all return `undefined`? Is it quickly clear why the final `if` statement is necessary?
+Notice that just like `mapperFn(..)` before, `predicateFn(..)` is passed not only the value but also the `idx` and `arr`. Use `unary(..)` to limit its arguments as necessary.
 
-Let's instead consider a recursive approach, to compare. We could notate the recursion this way:
+Just as with `map(..)`, `filter(..)` is provided as a built-in utility on JS arrays.
 
-```
-maxEven( nums ):
-	maxEven( nums.0, maxEven( ...nums.1 ) )
-```
-
-In other words, we can define the max-even of a list of numbers as the max-even of the first number compared to the max-even of the rest of the numbers. For example:
-
-```
-maxEven( 1, 10, 3, 2 ):
-	maxEven( 1, maxEven( 10, maxEven( 3, maxEven( 2 ) ) )
-```
-
-To implement this recursive definition in JS, one approach is:
+Let's consider a predicate function like this:
 
 ```js
-function maxEven(num1,...restNums) {
-	var maxRest = restNums.length > 0 ?
-			maxEven( ...restNums ) :
-			undefined;
-
-	return (num1 % 2 != 0 || num1 < maxRest) ?
-		maxRest :
-		num1;
-}
+var whatToCallIt = v => v % 2 == 1;
 ```
 
-So what advantages does this approach have?
-
-First, the signature is a little different than before. I intentionally called out `num1` as the first argument name, collecting the rest of the arguments into `restNums`. But why? We could just have collected them all into a single `nums` array and then referred to `nums[0]`.
-
-This function signature is an intentional hint at the recursive definition. It reads like this:
-
-```
-maxEven( num1, ...restNums ):
-	maxEven( num1, maxEven( ...restNums ) )
-```
-
-Do you see the symmetry between the signature and the recursive definition?
-
-When we can make the recursive definition more apparent even in the function signature, we improve the declarativeness of the function. And if we can then mirror the recursive definition from the signature to the function body, it gets even better.
-
-But I'd say the most obvious improvement is that the distraction of the imperative `for`-loop is suppressed. All the looping logic is abstracted into the recursive call stack, so that stuff doesn't clutter the code. We're free then to focus on the logic of finding a max-even by comparing two numbers at a time -- the important part anyway!
-
-Mentally, what's happening is similar to when a mathematician uses a **Σ** summation in a larger equation. We're saying, "the max-even of the rest of the list is calculated by `maxEven(...restNums)`, so we'll just assume that part and move on."
-
-Additionally, we reinforce that notion with the `restNums.length > 0` guard, because if there are no more numbers to consider, the natural result is that `maxRest` would have to be `undefined`. We don't need to devote any extra mental attention to that part of the reasoning. This base condition (no more numbers to consider) is clearly evident.
-
-Next, we turn our attention to checking `num1` against `maxRest` -- the main logic of the algorithm is how to determine which of two numbers, if any, is a max-even. If `num1` is not even (`num1 % 2 != 0`), or it's less than `maxRest`, then `maxRest` *has* to be `return`ed, even if it's `undefined`. Otherwise, `num1` is the answer.
-
-The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` approach.
-
-**Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations like we discussed in Chapter 7. The list of numbers could first be `filter(..)`ed to include only evens, and then finding the max is a `reduce(..)` that simply compares two numbers and returns the bigger of the two. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
-
-Here's another recursion example: calculating the depth of a binary tree. The depth of a binary tree is the longest path down (either left or right) through the nodes of the tree. Another way to define that is recursively: the depth of a tree at any node is 1 (the current node) plus the greater of depths from either its left or right child trees:
-
-```
-depth( node ):
-	1 + max( depth( node.left ), depth( node.right ) )
-```
-
-Translating that straightforwardly to a binary recursive function:
+This function uses `v % 2 == 1` to return `true` or `false`. The effect here is that an odd number will return `true`, and an even number will return `false`. So, what should we call this function? A natural name might be:
 
 ```js
-function depth(node) {
-	if (node) {
-		let depthLeft = depth( node.left );
-		let depthRight = depth( node.right );
-		return 1 +
-			(depthLeft > depthRight ? depthLeft : depthRight);
-	}
-
-	return 0;
-}
+var isOdd = v => v % 2 == 1;
 ```
 
-I'm not going to list out the imperative form of this algorithm, but trust me, it's a lot messier and more imperative. This recursive approach is nicely and gracefully declarative. It follows the recursive definition of the algorithm very closely with very little distraction.
-
-Not all problems are cleanly recursive. This is not some silver bullet that you should try to apply broadly. But recursion can be very effective at evolving the expression of a problem from more imperative to more declarative.
-
-## Stack
-
-Let's revisit the `isOdd(..)` / `isEven(..)` recursion from earlier:
+Consider how you might use `isOdd(..)` with a simple value check somewhere in your code:
 
 ```js
-function isOdd(v) {
-	if (v === 0) return false;
-	return isEven( Math.abs( v ) - 1 );
-}
+var midIdx;
 
-function isEven(v) {
-	if (v === 0) return true;
-	return isOdd( Math.abs( v ) - 1 );
+if (isOdd( list.length )) {
+	midIdx = (list.length + 1) / 2;
+}
+else {
+	midIdx = list.length / 2;
 }
 ```
 
-In most browsers, if you try this you'll get an error:
+Makes sense, right? But, let's consider using it with the built-in array `filter(..)` to filter a list of values:
 
 ```js
-isOdd( 33333 );			// RangeError: Maximum call stack size exceeded
+[1,2,3,4,5].filter( isOdd );
+// [1,3,5]
 ```
 
-What's going on with this error? The engine throws this error because it's trying to protect your program from running the system out of memory. To explain that, we need to peek a little below the hood at what's going on in the JS engine when function calls happen.
+If you described the `[1,3,5]` result, would you say, "I filtered out the even numbers", or would you say "I filtered in the odd numbers"? I think the former is a more natural way of describing it. But the code reads the opposite. The code reads, almost literally, that we "filtered (in) for each number that is odd".
 
-Each function call sets aside a small chunk of memory called a stack frame. The stack frame holds certain important information about the current state of processing statements in a function, including the values in any variables. The reason this information needs to be stored in memory (in a stack frame) is because the function may call out to another function, which pauses the current function. When the other function finishes, the engine needs to resume the exact state from when it was paused.
+I personally find this semantic confusing. There's no question there's plenty of precedent for experienced developers. But if you just start with a fresh slate, this expression of the logic seems kinda like not speaking without a double negative -- aka, speaking with a double negative.
 
-When the second function call starts, it needs a stack frame as well, bringing the count to 2. If that function calls another, we need a third stack frame. And so on. The word "stack" speaks to the notion that each time a function is called from the previous one, the next frame is *stacked* on top. When a function call finishes, its frame is popped off the stack.
-
-Consider this program:
+We could make this easier by renaming the function from `isOdd(..)` to `isEven(..)`:
 
 ```js
-function foo() {
-	var z = "foo!";
-}
+var isEven = v => v % 2 == 1;
 
-function bar() {
-	var y = "bar!";
-	foo();
-}
-
-function baz() {
-	var x = "baz!";
-	bar();
-}
-
-baz();
+[1,2,3,4,5].filter( isEven );
+// [1,3,5]
 ```
 
-Visualizing this program's stack frame step by step:
+Yay! But that function makes no sense with its name, in that it returns `false` when it's even:
+
+```js
+isEven( 2 );		// false
+```
+
+Yuck.
+
+Recall that in "No Points" in Chapter 3, we defined a `not(..)` operator that negates a predicate function. Consider:
+
+```js
+var isEven = not( isOdd );
+
+isEven( 2 );		// true
+```
+
+But we can't use *this* `isEven(..)` with `filter(..)` the way it's currently defined, because our logic will be reversed; we'll end up with evens, not odds. We'd need to do:
+
+```js
+[1,2,3,4,5].filter( not( isEven ) );
+// [1,3,5]
+```
+
+That defeats the whole purpose, though, so let's not do that. We're just going in circles.
+
+### Filtering-Out & Filtering-In
+
+To clear up all this confusion, let's define a `filterOut(..)` that actually **filters out** values by internally negating the predicate check. While we're at it, we'll alias `filterIn(..)` to the existing `filter(..)`:
+
+```js
+var filterIn = filter;
+
+function filterOut(arr,predicateFn) {
+	return filterIn( arr, not( predicateFn ) );
+}
+```
+
+Now we can use whichever filtering makes most sense at any point in our code:
+
+```js
+isOdd( 3 );								// true
+isEven( 2 );							// true
+
+filterIn( [1,2,3,4,5], isOdd );			// [1,3,5]
+filterOut( [1,2,3,4,5], isEven );		// [1,3,5]
+```
+
+I think using `filterIn(..)` and `filterOut(..)` will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
+
+## Reduce
+
+While `map(..)` and `filter(..)` produce new lists, typically this third operator (`reduce(..)`) combines (aka "reduces") the values of a list down to a single finite (non-list) value, like a number or string. However, later in this chapter, we'll look at how you can push `reduce(..)` to use it in more advanced ways. `reduce(..)` is one of the most important FP tools; it's like a swiss army all-in-one knife with all its usefulness.
+
+A combination/reduction is abstractly defined as taking two values and making them into one value. Just like with mapping and filtering, the manner of the combination is entirely up to you, and generally dependent on the types of values in the list. For example, numbers will typically be combined through arithmetic, strings through concatenation, and functions through composition.
+
+Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list, cascading down through each of the rest of the values in the list. That looks like this:
 
 <p align="center">
-	<img src="fig15.png" width="600">
+	<img src="fig11.png" width="400">
 </p>
 
-**Note:** If these functions didn't call each other, but were just called sequentially -- like `baz(); bar(); foo();`, where each one finishes before the next one starts -- the  frames won't stack up; each function call finishes and removes its frame from the stack before the next one is added.
-
-OK, so a little bit of memory is needed for each function call. No big deal under most normal program conditions, right? But it quickly becomes a big deal once you introduce recursion. While you'd almost certainly never manually stack thousands (or even hundreds!) of calls of different functions together in one call stack, you'll easily see tens of thousands or more recursive calls stack up.
-
-The `isOdd(..)` / `isEven(..)` pairing throws a `RangeError` because the engine steps in at an arbitrary limit when it thinks the call stack has grown too much and should be stopped. This is not likely a limit based on actual memory levels nearing zero, but rather a prediction by the engine that if this kind of program was left running, memory usage would be runaway. It is impossible to know or prove that a program will eventually stop, so the engine has to make an informed guess.
-
-This limit is implementation dependent. The specification doesn't say anything about it at all, so it's not *required*. But practically all JS engines do have a limit, because having no limit would create an unstable device that's susceptible to poorly written or malicious code. Each engine in each different device environment is going to enforce its own limits, so there's no way to predict or guarantee how far we can run up the function call stack.
-
-What this limit means to us as developers is that there's a practical limitation on the usefulness of recursion in solving problems on non-trivially sized data sets. In fact, I think this kind of limitation might be single biggest reason that recursion is a second-class citizen in the developer's toolbox. Regrettably, recursion is an after thought rather than a primary technique.
-
-### Tail Calls
-
-Recursion far predates JS, and so do these memory limitations. Back in the sixties, developers were wanting to use recursion and running up against hard limits of device memory of their powerful computers that were far lower than we have on our watches today.
-
-Fortunately, a powerful observation was made in those early days that still offers hope. The technique is called *tail calls*.
-
-The idea is that if a call from function `baz()` to function `bar()` happens at the very end of function `baz()`'s execution -- referred to as a tail call -- the stack frame for `baz()` isn't needed anymore. That means that either the memory can be reclaimed, or even better, simply reused to handle function `bar()`'s execution. Visualizing:
+Alternately, you can omit the `initialValue` in which case the first value of the list will act in place of the `initialValue` and the combining will start with the second value in the list, like this:
 
 <p align="center">
-	<img src="fig16.png" width="600">
+	<img src="fig12.png" width="400">
 </p>
 
-Tail calls are not really directly related to recursion, per se; this notion holds for any function call. But your manual non-recursion call stacks are unlikely to go beyond maybe 10 levels deep in most cases, so the chances of tail calls impacting your program's memory footprint are pretty low.
+**Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
 
-Tail calls really shine in the recursion case, because it means that a recursive stack could run "forever", and the only performance concern would be computation, not fixed memory limitations. Tail call recursion can run in `O(1)` fixed memory usage.
+The function you pass to `reduce(..)` to perform the reduction is typically called a reducer. A reducer has a different signature from the mapper and predicate functions we looked at earlier. Reducers primarily receive the current reduction result as well as the next value to reduce it with. The current result at each step of the reduction is often referred to as the accumulator.
 
-These sorts of techniques are often referred to as Tail Call Optimizations (TCO), but it's important to distinguish the ability to detect a tail call to run in fixed memory space, from the techniques that optimize this approach. Technically, tail calls themselves are not a performance optimization as most people would think, as they might actually run slower than normal calls. TCO is about optimizing tail calls to run more efficiently.
+For example, consider the steps involved in multiply-reducing the numbers `5`, `10`, and `15`, with an `initialValue` of `3`:
 
-### Proper Tail Calls (PTC)
+1. `3` * `5` = `15`
+2. `15` * `10` = `150`
+3. `150` * `15` = `2250`
 
-JavaScript has never required (nor forbidden) tail calls, until ES6. ES6 mandates recognition of tail calls, of a specific form referred to as Proper Tail Calls (PTC), and the guarantee that code in PTC form will run without unbounded stack memory growth. Practically speaking, this means we should not get `RangeError`s thrown if we adhere to PTC.
-
-First, PTC in JavaScript requires strict mode. You should already be using strict mode, but if you aren't, this is yet another reason you should already be using strict mode. Did I mention, yet, you should already be using strict mode!?
-
-Second, a *proper* tail call is exactly like this:
+Expressed in JavaScript using the built-in `reduce(..)` method on arrays:
 
 ```js
-return foo( .. );
+[5,10,15].reduce( (product,v) => product * v, 3 );
+// 2250
 ```
 
-In other words, the function call is the last thing to execute in the function, and whatever value it returns is explicitly `return`ed. In this way, JS can be absolutely guaranteed that the current stack frame won't be needed anymore.
-
-These *are not* PTC:
+But a standalone implementation of `reduce(..)` might look like this:
 
 ```js
-foo();
-return;
+function reduce(arr,reducerFn,initialValue) {
+	var acc, startIdx;
 
-// or
-
-var x = foo( .. );
-return x;
-
-// or
-
-return 1 + foo( .. );
-```
-
-**Note:** A JS engine *could* do some code reorganization to realize that `var x = foo(); return x;` is effectively the same as `return foo();`, which would then make it eligible as PTC. But that is not be required by the specification.
-
-The `1 +` part is definitely processed *after* `foo(..)` finishes, so the stack frame has to be kept around.
-
-However, this *is* PTC:
-
-```js
-return x ? foo( .. ) : bar( .. );
-```
-
-After the `x` condition is computed, either `foo(..)` or `bar(..)` will run, and in either case, the return value will be always be `return`ed back. That's PTC form.
-
-Binary recursion -- two (or more!) recursive calls are made -- can never be effective PTC as-is, because all the recursion has to be in tail call position to avoid the stack growth. Earlier, we showed an example of refactoring from binary recursion to mutual recursion. It may be possible to achieve PTC from a multiple-recursive algorithm by splitting each into separate function calls, where each is expressed respectively in PTC form.
-
-## Rearranging Recursion
-
-If you want to use recursion but your problem set could grow enough eventually to exceed the stack limit of the JS engine, you're going to need to rearrange your recursive calls to take advantage of PTC (or avoid nested calls entirely). There are several refactoring strategies that can help, but there are of course tradeoffs to be aware of.
-
-As a word of caution, always keep in mind that code readability is our overall most important goal. If recursion along with some combination of these following strategies results in harder to read/understand code, **don't use recursion**; find another more readable approach.
-
-### Replacing The Stack
-
-The main problem with recursion is its memory usage, keeping around the stack frames to track the state of a function call while it dispatches to the next recursive call iteration. If we can figure out how to rearrange our usage of recursion so that the stack frame doesn't need to be kept, then we can express recursion with PTC and take advantage of the JS engine's optimized handling of tail calls.
-
-Let's recall the summation example from earlier:
-
-```js
-function sum(num1,...nums) {
-	if (nums.length == 0) return num1;
-	return num1 + sum( ...nums );
-}
-```
-
-This isn't in PTC form because after the recursive call to `sum(...nums)` is finished, the `total` variable is added to that result. So, the stack frame has to be preserved to keep track of the `total` partial result while the rest of the recursion proceeds.
-
-The key recognition point for this refactoring strategy is that we could remove our dependence on the stack by doing the addition *now* instead of *after*, and then forward-passing that partial result as an argument to the recursive call. In other words, instead of keeping `total` in the current function's stack frame, push it into the stack frame of the next recursive call; that frees up the current stack frame to be removed/reused.
-
-To start, we could alter the signature our `sum(..)` function to have a new first parameter as the partial result:
-
-```js
-function sum(result,num1,...nums) {
-	// ..
-}
-```
-
-Now, we should pre-calculate the addition of `result` and `num1`, and pass that along:
-
-```js
-"use strict";
-
-function sum(result,num1,...nums) {
-	result = result + num1;
-	if (nums.length == 0) return result;
-	return sum( result, ...nums );
-}
-```
-
-Now our `sum(..)` is in PTC form! Yay!
-
-But the downside is we now have altered the signature of the function that makes using it stranger. The caller essentially has to pass `0` as the first argument ahead of the rest of the numbers they want to sum.
-
-```js
-sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
-```
-
-That's unfortunate.
-
-Typically, people will solve this by naming their awkward-signature recursive function differently, then defining an interface function that hides the awkwardness:
-
-```js
-"use strict";
-
-function sumRec(result,num1,...nums) {
-	result = result + num1;
-	if (nums.length == 0) return result;
-	return sumRec( result, ...nums );
-}
-
-function sum(...nums) {
-	return sumRec( /*initialResult=*/0, ...nums );
-}
-
-sum( 3, 1, 17, 94, 8 );								// 123
-```
-
-That's better. Still unfortunate that we've now created multiple functions instead of just one. Sometimes you'll see developers "hide" the recursive function as an inner function, like this:
-
-```js
-"use strict";
-
-function sum(...nums) {
-	return sumRec( /*initialResult=*/0, ...nums );
-
-	function sumRec(result,num1,...nums) {
-		result = result + num1;
-		if (nums.length == 0) return result;
-		return sumRec( result, ...nums );
+	if (arguments.length == 3) {
+		acc = initialValue;
+		startIdx = 0;
 	}
-}
-
-sum( 3, 1, 17, 94, 8 );								// 123
-```
-
-The downside here is that we'll recreate that inner `sumRec(..)` function each time the outer `sum(..)` is called. So, we can go back to them being side-by-side functions, but hide them both inside an IIFE, and expose just the one we want to:
-
-```js
-"use strict";
-
-var sum = (function IIFE(){
-
-	return function sum(...nums) {
-		return sumRec( /*initialResult=*/0, ...nums );
+	else if (arr.length > 0) {
+		acc = arr[0];
+		startIdx = 1;
+	}
+	else {
+		throw new Error( "Must provide at least one value." );
 	}
 
-	function sumRec(result,num1,...nums) {
-		result = result + num1;
-		if (nums.length == 0) return result;
-		return sumRec( result, ...nums );
+	for (let idx = startIdx; idx < arr.length; idx++) {
+		acc = reducerFn( acc, arr[idx], idx, arr );
 	}
 
-})();
-
-sum( 3, 1, 17, 94, 8 );								// 123
-```
-
-OK, we've got PTC and we've got a nice clean signature for our `sum(..)` that doesn't require the caller to know about our implementation details. Yay!
-
-But... wow, our simple recursive function has a lot more noise now. The readability has definitely been reduced. That's unfortunate to say the least. Sometimes, that's just the best we can do.
-
-Luckily, in some other cases, like the present one, there's a better way. Let's reset back to this version:
-
-```js
-"use strict";
-
-function sum(result,num1,...nums) {
-	result = result + num1;
-	if (nums.length == 0) return result;
-	return sum( result, ...nums );
-}
-
-sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
-```
-
-What you might observe is that `result` is a number just like `num1`, which means that we can always treat the first number in our list as our running total; that includes even the first call. All we need is to rename those params to make this clear:
-
-```js
-"use strict";
-
-function sum(num1,num2,...nums) {
-	num1 = num1 + num2;
-	if (nums.length == 0) return num1;
-	return sum( num1, ...nums );
-}
-
-sum( 3, 1, 17, 94, 8 );								// 123
-```
-
-Awesome. That's much better, huh!? I think this pattern achieves a good balance between declarative/reasonable and performant.
-
-Let's try refactoring with PTC once more, revisitng our earlier `maxEven(..)` (currently not PTC). We'll observe that similar to keeping the sum as the first argument, we can narrow the list of numbers one at a time, keeping the first argument as the highest even we've come across thus far.
-
-For clarity, the algorithm strategy (similar to what we discussed earlier) we might use:
-
-1. Start by comparing the first two numbers, `num1` and `num2`.
-2. Is `num1` even, and is `num1` greater than `num2`? If so, keep `num1`.
-3. If `num2` is even, keep it (store in `num1`).
-4. Otherwise, fall back to `undefined` (store in `num1`).
-5. If there are more `nums` consider, recursively compare them to `num1`.
-6. Finally, just return whatever value is left in `num1`.
-
-Our code can follow these steps almost exactly closely:
-
-```js
-"use strict";
-
-function maxEven(num1,num2,...nums) {
-	num1 =
-		(num1 % 2 == 0 && !(maxEven( num2 ) > num1)) ?
-			num1 :
-			(num2 % 2 == 0 ? num2 : undefined);
-
-	return nums.length == 0 ?
-		num1 :
-		maxEven( num1, ...nums )
+	return acc;
 }
 ```
 
-**Note:** The first `maxEven(..)` call is not in PTC position, but since it only passes in `num2`, it only recurses just that one level then returns right back out; this is only a trick to avoid repeating the `%` logic. As such, this call won't increase the growth of the recursive stack, any more than if that call was to an entirely different function. The second `maxEven(..)` call is the legitimate recursive call, and it is in fact in PTC position, meaning our stack won't grow as the recursion proceeds.
+Just as with `map(..)` and `filter(..)`, the reducer function is also passed the lesser-common `idx` and `arr` arguments in case that's useful to the reduction. I would say I don't typically use these, but I guess it's nice to have them available.
 
-It should be repeated that this example is only to illustrate the approach to moving recursion to the PTC form to optimize the stack (memory) usage. The more direct way to express a max-even algorithm might indeed be a filtering of the `nums` list for evens first, followed then by a max bubbling or even a sort.
-
-Refactoring recursion into PTC is admittedly a little intrusive on the simple declarative form, but it still gets the job done reasonably. Unfortunately, some kinds of recursion won't work well even with an interface function, so we'll need different strategies.
-
-### Continuation Passing Style (CPS)
-
-In JavaScript, the word *continuation* is often used to mean a function callback that specifies the next step(s) to execute after a certain function finishes its work. Organizing code so that each function receives another function to execute at its end, is referred to as Continuation Passing Style (CPS).
-
-Some forms of recursion cannot practically be refactored to pure PTC, especially multiple recursion. Recall the `fib(..)` function earlier, and even the mutual recursion form we derived. In both cases, there are multiple recursive calls, which effectively defeats PTC memory optimizations.
-
-However, you perform the first recursive call, and wrap the subsequent recursive calls in a continuation function to pass into that first call. Even though this would mean ultimately many more functions will need to be executed in the stack, as long all of them, continuations included, are in PTC form, stack memory usage will not grow unbounded.
-
-We could do this for `fib(..)`:
+Recall in Chapter 4, we discussed the `compose(..)` utility and showed an implementation with `reduce(..)`:
 
 ```js
-"use strict";
+function compose(...fns) {
+	return function composed(result){
+		return fns.reverse().reduce( function reducer(result,fn){
+			return fn( result );
+		}, result );
+	};
+}
+```
 
-function fib(n,cont = identity) {
-	if (n <= 1) return cont( n );
-	return fib(
-		n - 2,
-		n2 => fib(
-			n - 1,
-			n1 => cont( n2 + n1 )
-		)
+To illustrate `reduce(..)`-based composition differently, consider a reducer that will compose functions left-to-right (like `pipe(..)` does), to use in an array chain:
+
+```js
+var pipeReducer = (composedFn,fn) => pipe( composedFn, fn );
+
+var fn =
+	[3,17,6,4]
+	.map( v => n => v * n )
+	.reduce( pipeReducer );
+
+fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
+fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
+```
+
+`pipeReducer(..)` is unfortunately not point-free (see "No Points" in Chapter 3), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
+
+Earlier we talked about using `unary(..)` to limit a `mapperFn(..)` or `predicateFn(..)` to just a single argument. It might be handy to have a `binary(..)` that does something similar but limits to two arguments, for a `reducerFn(..)` function:
+
+```js
+var binary =
+	fn =>
+		(arg1,arg2) =>
+			fn( arg1, arg2 );
+```
+
+Using `binary(..)`, our previous example is a little cleaner:
+
+```js
+var pipeReducer = binary( pipe );
+
+var fn =
+	[3,17,6,4]
+	.map( v => n => v * n )
+	.reduce( pipeReducer );
+
+fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
+fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
+```
+
+Unlike `map(..)` and `filter(..)` whose order of passing through the array wouldn't actually matter, `reduce(..)` definitely uses left-to-right processing. If you want to reduce right-to-left, JavaScript provides a `reduceRight(..)`, with all other behaviors the same as `reduce(..)`:
+
+```js
+var hyphenate = (str,char) => str + "-" + char;
+
+["a","b","c"].reduce( hyphenate );
+// "a-b-c"
+
+["a","b","c"].reduceRight( hyphenate );
+// "c-b-a"
+```
+
+Where `reduce(..)` works left-to-right and thus acts naturally like `pipe(..)` in composing functions, `reduceRight(..)`'s right-to-left ordering is natural for performing a `compose(..)`-like operation.
+
+### Map As Reduce
+
+The `map(..)` operation is iterative in its nature, so it can also be represented as a reduction (`reduce(..)`). The trick is to realize that the `initialValue` of `reduce(..)` can be itself an (empty) array, in which case the result of a reduction can be another list!
+
+```js
+var double = v => v * 2;
+
+[1,2,3,4,5].map( double );
+// [2,4,6,8,10]
+
+[1,2,3,4,5].reduce(
+	(list,v) => (
+		list.push( double( v ) ),
+		list
+	), []
+);
+// [2,4,6,8,10]
+```
+
+Implementing `map(..)` with `reduce(..)` is not on its surface an obvious step or even an improvement. However, this ability will be a crucial recognition for more advanced techniques like those we'll cover in Appendix A "Transducing".
+
+### Filter As Reduce
+
+Just as `map(..)` can be done with `reduce(..)`, so can `filter(..)`:
+
+```js
+var isOdd = v => v % 2 == 1;
+
+[1,2,3,4,5].filter( isOdd );
+// [1,3,5]
+
+[1,2,3,4,5].reduce(
+	(list,v) => (
+		isOdd( v ) ? list.push( v ) : undefined,
+		list
+	), []
+);
+// [1,3,5]
+```
+
+Again, you'll see this trick again in Appendix A "Transducing".
+
+## Advanced List Operations
+
+Now that we feel somewhat comfortable with the foundational list operations `map(..)`, `filter(..)`, and `reduce(..)`, let's look at a few more-sophisticated operations you may find useful in various situations. These are generally utilities you'll find in various FP libraries.
+
+### Unique
+
+Filtering a list to include only unique values, based on `indexOf(..)` searching ( which uses `===` strict equality comparision):
+
+```js
+var unique =
+	arr =>
+		arr.filter(
+			(v,idx) =>
+				arr.indexOf( v ) == idx
+		);
+```
+
+This technique works by observing that we should only include the first occurrence of an item from `arr` into the new list; when running left-to-right, this will only be true if its `idx` position is the same as the `indexOf(..)` found position.
+
+Another way to implement `unique(..)` is to run through `arr` and include an item into a new (initially empty) list if that item cannot already be found in the new list. For that processing, we use `reduce(..)`:
+
+```js
+var unique =
+	arr =>
+		arr.reduce(
+			(list,v) =>
+				list.indexOf( v ) == -1 ?
+					( list.push( v ), list ) : list
+		, [] );
+```
+
+**Note:** There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
+
+`unique(..)` nicely produces a new list with no duplicates:
+
+```js
+unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
+// [1, 4, 7, 3, 9, 2, 6, 0, 5]
+```
+
+### Flatten
+
+From time to time, you may have (or produce through some other operations) an array that's not just a flat list of values, but with nested arrays, such as:
+
+```js
+[ [1, 2, 3], 4, 5, [6, [7, 8]] ]
+```
+
+What if you'd like to transform it into:
+
+```js
+[ 1, 2, 3, 4, 5, 6, 7, 8 ]
+```
+
+The operation we're looking for is typically called `flatten(..)`, and it could be implemented like this using our swiss army knife `reduce(..)`:
+
+```js
+var flatten =
+	arr =>
+		arr.reduce(
+			(list,v) =>
+				list.concat( Array.isArray( v ) ? flatten( v ) : v )
+		, [] );
+```
+
+**Note:** This implementation choice relies on recursion to handle the nesting of lists. More on recursion in a later chapter.
+
+To use `flatten(..)` with an array of arrays (of any nested depth):
+
+```js
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
+// [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
+```
+
+You might like to limit the recursive flattening to a certain depth. We can handle this by adding an optional `depth` limit argument to the implementaiton:
+
+```js
+var flatten =
+	(arr,depth = Infinity) =>
+		arr.reduce(
+			(list,v) =>
+				list.concat(
+					depth > 0 ?
+						(depth > 1 && Array.isArray( v ) ?
+							flatten( v, depth - 1 ) :
+							v
+						) :
+						[v]
+				)
+		, [] );
+```
+
+Illustrating the results with different flattening depths:
+
+```js
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 0 );
+// [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 1 );
+// [0,1,2,3,4,[5,6,7],[8,[9,[10,[11,12],13]]]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 2 );
+// [0,1,2,3,4,5,6,7,8,[9,[10,[11,12],13]]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 3 );
+// [0,1,2,3,4,5,6,7,8,9,[10,[11,12],13]]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 4 );
+// [0,1,2,3,4,5,6,7,8,9,10,[11,12],13]
+
+flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 5 );
+// [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
+```
+
+#### Mapping, Then Flattening
+
+One of the most common usages of `flatten(..)` behavior is when you've mapped a list of elements where each transformed value from the original list is now itself a list of values. For example:
+
+```js
+var firstNames = [
+	{ name: "Jonathan", variations: [ "John", "Jon", "Jonny" ] },
+	{ name: "Stephanie", variations: [ "Steph", "Stephy" ] },
+	{ name: "Frederick", variations: [ "Fred", "Freddy" ] }
+];
+
+firstNames
+.map( entry => [entry.name].concat( entry.variations ) );
+// [ ["Jonathan","John","Jon","Jonny"], ["Stephanie","Steph","Stephy"],
+//   ["Frederick","Fred","Freddy"] ]
+```
+
+If we want a single dimension list with all the names:
+
+```js
+flatten(
+	firstNames
+	.map( entry => [entry.name].concat( entry.variations ) )
+);
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
+//  "Fred","Freddy"]
+```
+
+The disadvantages of doing the `map(..)` and `flatten(..)` as separate steps are primarily around performance; this approach processes the list twice. FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) that does the mapping and flattening combined, where each mapping is flattened after transformation.
+
+```js
+flatMap( firstNames, entry => [entry.name].concat( entry.variations ) );
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
+//  "Fred","Freddy"]
+```
+
+The basic implementation of `flatMap(..)` with both steps done separately:
+
+```js
+var flatMap =
+	(arr,mapperFn) =>
+		flatten( arr.map( mapperFn ), 1 );
+```
+
+**Note:** We use `1` for the depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
+
+To perform better, though, we can combine the operations manually, using `reduce(..)`:
+
+```js
+var flatMap =
+	(arr,mapperFn) =>
+		arr.reduce(
+			(list,v) =>
+				list.concat( mapperFn( v ) )
+		, [] );
+```
+
+While there's some convenience and performance gained with this approach, there may very well be times when you need other operations like `filter(..)`ing mixed in, in which case doing the `map(..)` and `flatten(..)` separately might be more called for.
+
+### Zip
+
+So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of two input lists into sub-lists, called `zip(..)`:
+
+```js
+zip( [1,3,5,7,9], [2,4,6,8,10] );
+// [ [1,2], [3,4], [5,6], [7,8], [9,10] ]
+```
+
+Values `1` and `2` were selected into the sub-list `[1,2]`, then `3` and `4` into `[3,4]`, etc. The definition of `zip(..)` requires a value from each of the two lists. If the two lists are of different lengths, the selection of values will continue until the shorter list has been exhausted, with the extra values in the other list ignored.
+
+An implementation of `zip(..)`:
+
+```js
+function zip(list1,list2) {
+	var zipped = [];
+	list1 = list1.slice();
+	list2 = list2.slice();
+
+	while (list1.length > 0 && list2.length > 0) {
+		zipped.push( [ list1.shift(), list2.shift() ] );
+	}
+
+	return zipped;
+}
+```
+
+The `list1.slice()` and `list2.slice()` calls ensure `zip(..)` is pure by not causing side effects with the received array references.
+
+**Note:** There are some decidedly un-FP things going on in this implementation. There's an imperative `while`-loop and mutations of lists with both `shift()` and `push(..)`. Earlier in the book, I asserted that it's reasonable for pure functions to use impure behavior inside them (usually for performance), as long as the effects are fully self-contained. This implementation is safely pure.
+
+### Merge
+
+Merging two lists by interleaving values from each source looks like this:
+
+```js
+mergeLists( [1,3,5,7,9], [2,4,6,8,10] );
+// [1,2,3,4,5,6,7,8,9,10]
+```
+
+It may not be obvious, but this result seems similar to what we get if we compose `flatten(..)` and `zip(..)`:
+
+```js
+zip( [1,3,5,7,9], [2,4,6,8,10] );
+// [ [1,2], [3,4], [5,6], [7,8], [9,10] ]
+
+flatten( [ [1,2], [3,4], [5,6], [7,8], [9,10] ] );
+// [1,2,3,4,5,6,7,8,9,10]
+
+// composed:
+flatten( zip( [1,3,5,7,9], [2,4,6,8,10] ) );
+// [1,2,3,4,5,6,7,8,9,10]
+```
+
+However, recall that `zip(..)` only selects values until the shorter of two lists is exhausted, ignoring the leftover values; merging two lists would most naturally retain those extra values. Also, `flatten(..)` works recursively on nested lists, but you might expect list-merging to only work shallowly, keeping nested lists.
+
+So, let's define a `mergeLists(..)` that works more like we'd expect:
+
+```js
+function mergeLists(list1,list2) {
+	var merged = [];
+	list1 = list1.slice();
+	list2 = list2.slice();
+
+	while (list1.length > 0 || list2.length > 0) {
+		if (list1.length > 0) {
+			merged.push( list1.shift() );
+		}
+		if (list2.length > 0) {
+			merged.push( list2.shift() );
+		}
+	}
+
+	return merged;
+}
+```
+
+**Note:** Various FP libraries don't define a `mergeLists(..)` but instead define a `merge(..)` that merges properties of two objects; the results of `merge(..)` will differ from our `mergeLists(..)`.
+
+Alternatively, here's a couple of options to implement the list merging as a reducer:
+
+```js
+// via @rwaldron
+var mergeReducer =
+	(merged,v,idx) =>
+		(merged.splice( idx * 2, 0, v ), merged);
+
+
+// via @WebReflection
+var mergeReducer =
+	(merged,v,idx) =>
+		merged
+			.slice( 0, idx * 2 )
+			.concat( v, merged.slice( idx * 2 ) );
+```
+
+And using a `mergeReducer(..)`:
+
+```js
+[1,3,5,7,9]
+.reduce( mergeReducer, [2,4,6,8,10] );
+// [1,2,3,4,5,6,7,8,9,10]
+```
+
+**Tip:** We'll use the `mergeReducer(..)` trick later in the chapter.
+
+## Method vs. Standalone
+
+A common source of frustration for FPers in JavaScript is unifying their strategy for working with utilities when some of them are provided as standalone functions -- think about the various FP utilities we've derived in previous chapters -- and others are methods of the array prototype -- like the ones we've seen in this chapter.
+
+The pain of this problem becomes more evident when you consider combining multiple operations:
+
+```js
+[1,2,3,4,5]
+.filter( isOdd )
+.map( double )
+.reduce( sum, 0 );					// 18
+
+// vs.
+
+reduce(
+	map(
+		filter( [1,2,3,4,5], isOdd ),
+		double
+	),
+	sum,
+	0
+);									// 18
+```
+
+Both API styles accomplish the same task, but they have very different ergonomics. Many FPers will prefer the latter to the former, but the former is unquestionably more common in JavaScript. One thing specifically that's disliked about the latter is the nesting of the calls. The preference for the method chain style -- typically called a fluent API style, as in jQuery and other tools -- is that it's compact/concise and it reads in declarative top-down order.
+
+The visual order for that manual composition of the standalone style is neither strictly left-to-right (top-to-bottom) nor right-to-left (bottom-to-top); it's inner-to-outer, which harms the readability.
+
+Automatic composition normalizes the reading order as right-to-left (bottom-to-top) for both styles. So, to explore the implications of the form differences, let's examine composition specifically; it seems like it should be straightforward, but it's a little awkward in both cases.
+
+### Composing Method Chains
+
+The array methods receive the implicit `this` argument, so despite their appearance, they can't be treated as unary; that makes composition more awkward. To cope, we'll first need a `this`-aware version of `partial(..)`:
+
+```js
+var partialThis =
+	(fn,...presetArgs) =>
+		// intentionally `function` to allow `this`-binding
+		function partiallyApplied(...laterArgs){
+			return fn.apply( this, [...presetArgs, ...laterArgs] );
+		};
+```
+
+We'll also need a version of `compose(..)` that calls each of the partially applied methods in the context of the chain -- the input value it's being "passed" (via implicit `this`) from the previous step:
+
+```js
+var composeChainedMethods =
+	(...fns) =>
+		result =>
+			fns.reduceRight(
+				(result,fn) =>
+					fn.call( result )
+				, result
+			);
+```
+
+And using these two `this`-aware utilities together:
+
+```js
+composeChainedMethods(
+   partialThis( [].reduce, sum, 0 ),
+   partialThis( [].map, double ),
+   partialThis( [].filter, isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+**Note:** The three `[].XYZ`-style references are grabbing references to the generic `Array.prototype.*` methods without repeating `Array.prototype` each time; this is done by creating a throwaway `[]` empty array value to access a method reference. This is just a shorthand cheat for shorter code.
+
+### Composing Standalone Utilities
+
+Standalone `compose(..)`-style composition of these utilities doesn't need all the `this` contortions, which is its most favorable argument.
+
+But standalone style suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application:
+
+```js
+compose(
+	partialRight( reduce, sum, 0 )
+	partialRight( map, double )
+	partialRight( filter, isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+However, if `filter(..)`, `map(..)`, and `reduce(..)` are alternately defined to receive the array last instead of first, and are curried, the composition flows a bit nicer:
+
+```js
+compose(
+	reduce( sum )( 0 ),
+	map( double ),
+	filter( isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+The cleanliness of this approach is in part why FPers prefer the standalone utility style instead of instance methods. But your mileage may vary.
+
+### Adapting Methods To Standalones
+
+If you prefer to work with only standalone utilities, you can straightforwardly define standalone adaptations of the array methods.
+
+```js
+var filter = (arr,predicateFn) => arr.filter( predicateFn );
+
+var map = (arr,mapperFn) => arr.map( mapperFn );
+
+var reduce = (arr,reducerFn,initialValue) =>
+	arr.reduce( reducerFn, initialValue );
+```
+
+You might have spotted the common pattern across these three; can we generate these standalone adaptations with a utility? Yes. While we're at it, let's swap the `arr` argument to the right and `curry(..)` the generated function, to make composition easier:
+
+```js
+var unmethodify =
+	(methodName,argCount) =>
+		curry(
+			(...args) => {
+				var arr = args.pop();
+				return arr[methodName]( ...args );
+			},
+			argCount
+		);
+```
+
+And to use this utility:
+
+```js
+var filter = unmethodify( "filter" );
+var map = unmethodify( "map" );
+var reduce = unmethodify( "reduce" );
+
+compose(
+	reduce( sum )( 0 ),
+	map( double ),
+	filter( isOdd )
+)
+( [1,2,3,4,5] );					// 18
+```
+
+### Adapting Standalones To Methods
+
+If you prefer to work with only array methods, you have two choices. You can:
+
+1. Extend the built-in `Array.prototype` with additional methods.
+2. Adapt the standalone utility to work as a reducer function and pass it to the `reduce(..)` instance method.
+
+**Don't do (1).** It's never a good idea to extend built-in natives like `Array.prototype` -- unless you define a subclass of `Array`, but that's beyond our discussion scope here. In an effort to discourage bad practices, we won't go any further into this approach.
+
+Let's **focus on (2)** instead. Recall the `flatten(..)` standalone utility we defined earlier:
+
+```js
+var flatten =
+	arr =>
+		arr.reduce(
+			(list,v) =>
+				list.concat( Array.isArray( v ) ? flatten( v ) : v )
+		, [] );
+```
+
+Let's pull out the inner `reducer(..)` function as the standalone utility (and adapt it to work without the outer `flatten(..)`):
+
+```js
+// intentionally a function to allow recursion by name
+function flattenReducer(list,v) {
+	return list.concat(
+		Array.isArray( v ) ? v.reduce( flattenReducer, [] ) : v
 	);
 }
 ```
 
-Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our `identity(..)` utility from Chapter 3; remember, it simply returns whatever is passed to it.
-
-Morever, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
-
-Perhaps this will help mentally sort out what's going on: just like in the previous discussion when we passed partial results along instead of returning them back after the recursive stack, we're doing the same here, but each step gets wrapped in a continuation, which defers its computation. That trick allows us to perform multiple steps where each is in PTC form.
-
-In static languages, CPS is often an opportunity for tail calls the compiler can automatically identify and rearrange recursive code to take advantage of. Unfortunately, that doesn't really apply to the nature of JS.
-
-In JavaScript, you'd likely need to write the CPS form yourself. It's clunkier, for sure; the declarative notation-like form has certainly been obscured. But overall, this form is still more declarative than the `for`-loop imperative implementation.
-
-**Warning:** One major caveat that should be noted is that in CPS, creating the extra inner continuation functions still consumes memory, but of a different sort. Instead of piling up stack frames, the closures just consume free memory (typically, from the heap). Engines don't seem to apply the `RangeError` limits in these cases, but that doesn't mean your memory usage is fixed in scale.
-
-### Trampolines
-
-Where CPS creates continuations and passes them along, another technique for alleviating memory pressure is called trampolines. In this style of code, CPS-like continuations are created, but instead of passed in, they are shallowly returned.
-
-Instead of functions calling functions, the stack never goes beyond depth of one, because each function just returns the next function that should be called. A loop simply keeps running each returned function until there are no more functions to run.
-
-One advantage with trampolines is you aren't limited to environments that support PTC; another is that each function call is regular, not PTC optimized, so it may run quicker.
-
-Let's sketch that a `trampoline(..)` utility in code:
+Now, we can use this utility in an array method chain via `reduce(..)`:
 
 ```js
-function trampoline(fn) {
-	return function trampolined(...args) {
-		var result = fn( ...args );
+[ [1, 2, 3], 4, 5, [6, [7, 8]] ]
+.reduce( flattenReducer, [] )
+// ..
+```
 
-		while (typeof result == "function") {
-			result = result();
+## Looking For Lists
+
+So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can start to shine: modeling an imperative series of statements declaratively.
+
+Consider this base example:
+
+```js
+var getSessionId = partial( prop, "sessId" );
+var getUserId = partial( prop, "uId" );
+
+var session, sessionId, user, userId, orders;
+
+session = getCurrentSession();
+if (session != null) sessionId = getSessionId( sessionId );
+if (sessionId != null) user = lookupUser( sessionId );
+if (user != null) userId = getUserId( user );
+if (userId != null) orders = lookupOrders( userId );
+if (orders != null) processOrders( orders );
+```
+
+First, let's observe that the five variable declarations and the running series of `if` conditionals guarding the function calls are effectively one big composition of these six calls `getCurrentSession()`, `getSessionId(..)`, `lookupUser(..)`, `getUserId(..)`, `lookupOrders(..)`, and `processOrders(..)`. Ideally, we'd like to get rid of all these variable declarations and imperative conditionals.
+
+Unfortunately, the `compose(..)` / `pipe(..)` utilties we explored in Chapter 4 don't by themselves offer a convenient way to express the `!= null` conditionals in the composition. Let's define a utility to help:
+
+```js
+var guard =
+	fn =>
+		arg =>
+			arg != null ? fn( arg ) : arg;
+```
+
+This `guard(..)` utility lets us map the five conditional-guarded functions:
+
+```js
+[ getSessionId, lookupUser, getUserId, lookupOrders, processOrders ]
+.map( guard )
+```
+
+The result of this mapping is an array of functions that are ready to compose (actually, pipe, in this listed order). We could spread this array to `pipe(..)`, but since we're already doing list operations, let's do it with a `reduce(..)`, using the session value from `getCurrentSession()` as the initial value:
+
+```js
+.reduce(
+	(result,nextFn) => nextFn( result )
+	, getCurrentSession()
+)
+```
+
+Next, let's observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
+
+```js
+[ "sessId", "uId" ].map( propName => partial( prop, propName ) )
+```
+
+But to use these, we'll need to interleave them with the other three functions (`lookupUser(..)`, `lookupOrders(..)`, and `processOrders(..)`) to get the array of five functions to guard / compose as discussed above.
+
+To do the interleaving, we can model this as list merging. Recall `mergeReducer(..)` from earlier in the chapter:
+
+```js
+var mergeReducer =
+	(merged,v,idx) =>
+		(merged.splice( idx * 2, 0, v ), merged);
+```
+
+We can use `reduce(..)` (our swiss army knife, remember!?) to "insert" `lookupUser(..)` in the array between the generated `getSessionId(..)` and `getUserId(..)` functions, by merging two lists:
+
+```js
+.reduce( mergeReducer, [ lookupUser ] )
+```
+
+Then we'll concatenate `lookupOrders(..)` and `processOrders(..)` onto the end of the running functions array:
+
+```js
+.concat( lookupOrders, processOrders )
+```
+
+To review, the generated list of five functions is expressed as:
+
+```js
+[ "sessId", "uId" ].map( propName => partial( prop, propName ) )
+.reduce( mergeReducer, [ lookupUser ] )
+.concat( lookupOrders, processOrders )
+```
+
+Finally, to put it all together, take this list of functions and tack on the guarding and composition from earlier:
+
+```js
+[ "sessId", "uId" ].map( propName => partial( prop, propName ) )
+.reduce( mergeReducer, [ lookupUser ] )
+.concat( lookupOrders, processOrders )
+.map( guard )
+.reduce(
+	(result,nextFn) => nextFn( result )
+	, getCurrentSession()
+);
+```
+
+Gone are all the imperative variable declarations and conditionals, and in their place we have clean and declarative list operations chained together.
+
+If this version is harder for you read right now than the original, don't worry. The original is unquestionably the more common imperative form you're familiar with. Part of your evolution to become a functional programmer is to develop a recognition of FP patterns such as list operations. Over time, these will jump out of the code more readily as your sense of code readability shifts to declarative style.
+
+Before we leave this topic, let's take a reality check: the example here is heavily contrived. Not all code segments will be straightforwardly modeled as list operations. The pragmatic take-away is to develop the instinct to look for these opportunities, but not get too hung up on code acrobatics; some improvement is better than none. Always step back and ask if you're **improving or harming** code readability.
+
+## Fusion
+
+As you roll FP list operations into more of your thinking about code, you'll likely start seeing very quickly chains that combine behavior like:
+
+```js
+..
+.filter(..)
+.map(..)
+.reduce(..);
+```
+
+And more often than not, you're also probably going to end up with chains with multiple adjacent instances of each operation, like:
+
+```js
+..
+.filter(..)
+.filter(..)
+.map(..)
+.map(..)
+.map(..)
+.reduce(..);
+```
+
+The good news is these chains are declarative and it's easy to read the specific steps that will happen, in order. The downside is that each of these operations loops over the entire list, meaning performance can suffer unnecessarily, especially if the list is longer.
+
+Fusion deals with combining adjacent operators to reduce the number of times the list is iterated over. We'll focus here on collapsing adjacent `map(..)`s as it's the most straightforward to explain.
+
+Imagine this scenario:
+
+```js
+var removeInvalidChars = str => str.replace( /[^\w]*/g, "" );
+
+var upper = str => str.toUpperCase();
+
+var elide = str =>
+	str.length > 10 ?
+		str.substr( 0, 7 ) + "..." :
+		str;
+
+var words = "Mr. Jones isn't responsible for this disaster!"
+	.split( /\s/ );
+
+words;
+// ["Mr.","Jones","isn't","responsible","for","this","disaster!"]
+
+words
+.map( removeInvalidChars )
+.map( upper )
+.map( elide );
+// ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
+```
+
+Think about each value that goes through this flow of transformations. The first value in the `words` list starts out as `"Mr."`, becomes `"Mr"`, then `"MR"`, and then passes through `elide(..)` unchanged. Another piece of data flows: `"responsible"` -> `"responsible"` -> `"RESPONSIBLE"` -> `"RESPONS..."`.
+
+In other words, you could think of these data transformations like this:
+
+```js
+elide( upper( removeInvalidChars( "Mr." ) ) );
+// "MR"
+
+elide( upper( removeInvalidChars( "responsible" ) ) );
+// "RESPONS..."
+```
+
+Did you catch the point? We can express the three separate steps of the adjacent `map(..)` calls as a composition of the transformers, since they are all unary functions and each returns the value that's suitable as input to the next. We can fuse the mapper functions using `compose(..)`, and then pass the composed function to a single `map(..)` call:
+
+```js
+words
+.map(
+	compose( elide, upper, removeInvalidChars )
+);
+// ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
+```
+
+This is another case where `pipe(..)` can be a more convenient form of composition, for its ordering readability:
+
+```js
+words
+.map(
+	pipe( removeInvalidChars, upper, elide )
+);
+// ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
+```
+
+What about fusing two or more `filter(..)` predicate functions? Typically treated as unary functions, they seem suitable for composition. But the wrinkle is they each return a different kind of value (`boolean`) than the next one would want as input. Fusing adjacent `reduce(..)` calls is also possible, but reducers are not unary so that's a bit more challenging; we need more sophisticated tricks to pull this kind of fusion off. We'll cover these advanced techniques in Appendix A "Transducing".
+
+## Beyond Lists
+
+So far we've been discussing operations in the context of the list (array) data structure; it's by far the most common scenario you encounter them. But in a more general sense, these operations can be performed against any collection of values.
+
+Just as we said earlier that array's `map(..)` adapts a single-value operation to all its values, any data structure can provide a `map(..)` operation to do the same. Likewise, it can implement `filter(..)`, `reduce(..)`, or any other operation that makes sense for working with the data structure's values.
+
+The important part to maintain in the spirit of FP is that these operators must behave according to value immutability, meaning that they must return a new data structure rather than mutating the existing one.
+
+Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has two references to other nodes (binary trees), typically referred to as *left* and *right* child trees. Each node holds one value of the overall data structure.
+
+<p align="center">
+	<img src="fig7.png" width="250">
+</p>
+
+For ease of illustration, we'll make our binary tree a binary search tree (BST). However, the operations we'll identify work the same for any regular non-BST binary tree.
+
+**Note:** A binary search tree is a general binary tree with a special constraint on the relationship of values in the tree to each other. Each value of nodes on the left side of a tree is less than the value of the node at the root of that tree, which in turn is less than each value of nodes in the right side of the tree. The notion of "less than" is relative to the kind of data stored; it can be numerical for numbers, lexicographic for strings, etc. BSTs are useful because they make searching for a value in the tree straightforward and more efficient, using a recursive binary search algorithm.
+
+To make a binary tree node object, let's use this factory function:
+
+```js
+var BinaryTree =
+	(value,parent,left,right) => ({ value, parent, left, right });
+```
+
+For convenience, we make each node store the `left` and `right` child trees as well as a reference to its own `parent` node.
+
+Let's now define a BST of names of common produce (fruits, vegetables):
+
+```js
+var banana = BinaryTree( "banana" );
+var apple = banana.left = BinaryTree( "apple", banana );
+var cherry = banana.right = BinaryTree( "cherry", banana );
+var apricot = apple.right = BinaryTree( "apricot", apple );
+var avocado = apricot.right = BinaryTree( "avocado", apricot );
+var cantelope = cherry.left = BinaryTree( "cantelope", cherry );
+var cucumber = cherry.right = BinaryTree( "cucumber", cherry );
+var grape = cucumber.right = BinaryTree( "grape", cucumber );
+```
+
+In this particular tree structure, `banana` is the root node; this tree could have been set up with nodes in different locations, but still had a BST with the same traversal.
+
+Our tree looks like:
+
+<p align="center">
+	<img src="fig8.png" width="450">
+</p>
+
+There are multiple ways to traverse a binary tree to process its values. If it's a BST (our's is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
+
+For convenience, let's define a `forEach(..)` method that visits a binary tree in the same manner as an array:
+
+```js
+// in-order traversal
+BinaryTree.forEach = function forEach(node,visitFn){
+	if (node) {
+		if (node.left) {
+			forEach( node.left, visitFn );
 		}
 
-		return result;
+		visitFn( node );
+
+		if (node.right) {
+			forEach( node.right, visitFn );
+		}
 	}
-}
+};
 ```
 
-As long as a function is returned, the loop keeps going, executing that function and capturing its return, then checking its type. Once a non-function comes back, the trampoline assumes the function calling is complete, and just gives back the value.
+**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We'll cover recursion in more detail in a later chapter, where we'll cover recursion in that chapter.
 
-Because each continuation needs to return another continuation, we likely we'll need to use the earlier trick of forward-passing the partial result as an argument. Here's how we could use this utility with our earlier example of summation of a list of numbers:
+Use `forEach(..)` to print out values from the tree:
 
 ```js
-var sum = trampoline(
-	function sum(num1,num2,...nums) {
-		num1 = num1 + num2;
-		if (nums.length == 0) return num1;
-		return () => sum( num1, ...nums );
-	}
-);
+BinaryTree.forEach( banana, node => console.log( node.value ) );
+// apple apricot avocado banana cantelope cherry cucumber grape
 
-var xs = [];
-for (let i=0; i<20000; i++) {
-	xs.push( i );
-}
-
-sum( ...xs );					// 199990000
+// visit only `cherry`-rooted subtree
+BinaryTree.forEach( cherry, node => console.log( node.value ) );
+// cantelope cherry cucumber grape
 ```
 
-The downside is that a trampoline requires you to wrap your recursive function in the trampoline driving function; moreover, just like CPS, closures are created for each continuation. However, unlike CPS, each continuation function returned runs and finishes right away, so the engine won't have to accumulate a growing amount of closure memory while the call stack depth of the problem is exhausted.
+To operate on our binary tree data structure using FP patterns, let's start by defining a `map(..)`:
 
-Beyond execution and memory performance, the advantage of trampolines over CPS is that they're less intrusive on the declarative recursion form, in that you don't have to change the function signature to receive a continuation function argument. Trampolines are not ideal, but they can be effective in your balancing act between imperative looping code and declarative recursion.
+```js
+BinaryTree.map = function map(node,mapperFn){
+	if (node) {
+		let newNode = mapperFn( node );
+		newNode.parent = node.parent;
+		newNode.left = node.left ?
+			map( node.left, mapperFn ) : undefined;
+		newNode.right = node.right ?
+			map( node.right, mapperFn ): undefined;
+
+		if (newNode.left) {
+			newNode.left.parent = newNode;
+		}
+		if (newNode.right) {
+			newNode.right.parent = newNode;
+		}
+
+		return newNode;
+	}
+};
+```
+
+You might have assumed we'd `map(..)` only the node `value` properties, but in general we might actually want to map the tree nodes themselves. So, the `mapperFn(..)` is passed the whole node being visited, and it expects to receive a new `BinaryTree(..)` node back, with the transformation applied. If you just return the same node, this operation will mutate your tree and quite possibly cause unexpected results!
+
+Let's map our tree to a list of produce with all uppercase names:
+
+```js
+var BANANA = BinaryTree.map(
+	banana,
+	node => node.value.toUpperCase()
+);
+
+BinaryTree.forEach( BANANA, node => console.log( node.value ) );
+// APPLE APRICOT AVOCADO BANANA CANTELOPE CHERRY CUCUMBER GRAPE
+```
+
+`BANANA` is a different tree (with all different nodes) than `banana`, just like calling `map(..)` on an array returns a new array. Just like arrays of other objects/arrays, if `node.value` itself references some object/array, you'll also need to handle manually copying it in the mapper function if you want deeper immutability.
+
+How about `reduce(..)`? Same basic process: do an in-order traversal of the tree nodes. One usage would be to `reduce(..)` our tree to an array of its values, which would be useful in further adapting other typical list operations. Or we can `reduce(..)` our tree to a string concatenation of all its produce names.
+
+We'll mimic the behavior of the array `reduce(..)`, which makes passing the `initialValue` argument optional. This algorithm is a little trickier, but still manageable:
+
+```js
+BinaryTree.reduce = function reduce(node,reducerFn,initialValue){
+	if (node) {
+		let result;
+
+		if (arguments.length < 3) {
+			if (node.left) {
+				result = reduce( node.left, reducerFn );
+			}
+			else {
+				return node.right ?
+					reduce( node.right, reducerFn, node ) :
+					node;
+			}
+		}
+		else {
+			result = node.left ?
+				reduce( node.left, reducerFn, initialValue ) :
+				initialValue;
+		}
+
+		result = reducerFn( result, node );
+		result = node.right ?
+			reduce( node.right, reducerFn, result ) : result;
+		return result;
+	}
+
+	return initialValue;
+};
+```
+
+Let's use `reduce(..)` to make our shopping list:
+
+```js
+BinaryTree.reduce(
+	banana,
+	(result,node) => result.concat( node.value )
+);
+// ["apple","apricot","avocado","banana","cantelope"
+//   "cherry","cucumber","grape"]
+```
+
+Finally, let's consider `filter(..)` for our tree. This algorithm is trickiest so far because it effectively (not actually) involves removing nodes from the tree, which requires handling several corner cases. Don't get intimiated by the implementation, though. Just skip over it for now, if you prefer, and focus on how we use it instead.
+
+```js
+BinaryTree.filter = function filter(node,predicateFn){
+	if (node) {
+		let newNode;
+		let newLeft = node.left ?
+			filter(node.left,predicateFn) : undefined;
+		let newRight = node.right ?
+			filter(node.right,predicateFn) : undefined;
+
+		if (predicateFn( node )) {
+			newNode = BinaryTree(
+				node.value,
+				node.parent,
+				newLeft,
+				newRight
+			);
+			if (newLeft) {
+				newLeft.parent = newNode;
+			}
+			if (newRight) {
+				newRight.parent = newNode;
+			}
+		}
+		else {
+			if (newLeft) {
+				if (newRight) {
+					newNode = BinaryTree(
+						undefined,
+						node.parent,
+						newLeft,
+						newRight
+					);
+					newLeft.parent = newRight.parent = newNode;
+
+					if (newRight.left) {
+						let minRightNode = newRight;
+						while (minRightNode.left) {
+							minRightNode = minRightNode.left;
+						}
+
+						newNode.value = minRightNode.value;
+
+						if (minRightNode.right) {
+							minRightNode.parent.left =
+								minRightNode.right;
+							minRightNode.right.parent =
+								minRightNode.parent;
+						}
+						else {
+							minRightNode.parent.left = undefined;
+						}
+
+						minRightNode.right =
+							minRightNode.parent = undefined;
+					}
+					else {
+						newNode.value = newRight.value;
+						newNode.right = newRight.right;
+						if (newRight.right) {
+							newRight.right.parent = newNode;
+						}
+					}
+				}
+				else {
+					return newLeft;
+				}
+			}
+			else {
+				return newRight;
+			}
+		}
+
+		return newNode;
+	}
+};
+```
+
+The majority of this code listing is dedicated to handling the shifting of node parent/child references if a node is "removed" (filtered out) of the duplicated tree structure.
+
+As an example to illustrate using `filter(..)`, let's narrow our produce tree down to only vegetables:
+
+```js
+var vegetables = [ "asparagus", "avocado", "brocolli", "carrot",
+	"celery", "corn", "cucumber", "lettuce", "potato", "squash",
+	"zucchini" ];
+
+var whatToBuy = BinaryTree.filter(
+	banana,
+	node => vegetables.indexOf( node.value ) != -1
+);
+
+// shopping list
+BinaryTree.reduce(
+	whatToBuy,
+	(result,node) => result.concat( node.value )
+);
+// ["avocado","cucumber"]
+```
+
+You will likely use most of the list operations from this chapter in the context of simple list data structures. But now we've seen that the concepts apply to whatever data structures and operations you might need. That's a powerful expression of how FP can be widely applied to many different application scenarios!
 
 ## Summary
 
-Recursion is when a function recursively calls itself. Heh. A recursive definition for recursion. Get it!?
+Three common and powerful list operations:
 
-Direct recursion is a function that makes at least one call to itself, and it keeps dispatching to itself until it satisifies a base condition. Multiple recursion (like binary recursion) is when a function calls itself multiple times. Mutual recursion is when a two or more functions recursively loop by *mutually* calling each other.
+* `map(..)`: transforms values as it projects them to a new list.
+* `filter(..)`: selects or excludes values as it projects them to a new list.
+* `reduce(..)`: combines values in a list to produce some other (usually but not always non-list) value.
 
-The upside of recursion is that it's more declarative and thus typically more readable. The downside is usually performance, but more memory constraints even than execution speed.
+Other more advanced operations that can be very useful in processing lists: `unique(..)`, `flatten(..)`, and `merge(..)`.
 
-Tail calls alleviate the memory pressure by reusing/discarding stack frames. JavaScript requires strict mode and proper tail calls (PTC) to take advantage of this "optimization". There are several techniques we can mix-n-match to refactor a non-PTC recursive function to PTC form, or at least avoid the memory constraints by flattening the stack.
+Fusion uses function composition techniques to consolidate multiple adjacent `map(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
 
-Remember: recursion should be used to make code more readable. If you misuse or abuse recursion, the readability will end up worse than the imperative form. Don't do that!
+Lists are typically visualized as arrays, but can be generalized as any data structure that represents/produces an ordered collection of values. As such, all these "list operations" are actually "data structure operations".
