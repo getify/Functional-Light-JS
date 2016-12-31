@@ -73,9 +73,139 @@ Many people conjur lots of extra things when you mention "closure", such as the 
 
 As we go along, we'll carefully address the parts of this external context that matter, but for now, try to just stick to the simplest interpretations of "closure" and "object" -- it'll make this journey less confusing.
 
-## State
+## Look Alike
 
-In the previous two snippets, both the closure than `inner()` has and the `obj` object are holding some state: `one` with value `1` and `two` with value `2`.
+It may not be obvious how closures and objects are related. So let's explore their similarities first.
+
+To frame this discussion, let me just briefly assert two observations:
+
+1. A language without closures can simulate them with objects instead.
+2. A language without objects can simulate them with closures instead.
+
+In other words, we can think of closures and objects as two different representations of a thing.
+
+### State
+
+Consider this code from above:
+
+```js
+function outer() {
+	var one = 1;
+	var two = 2;
+
+	return function inner(){
+		return one + two;
+	};
+}
+
+var obj = {
+	one: 1,
+	two: 2
+};
+```
+
+Both the scope closed over by `inner()` and the object `obj` contain two elements of state: `one` with value `1` and `two` with value `2`. Syntactically and mechanically, these representations of state are different. But conceptually, they're actually quite similar.
+
+As a matter of fact, it's fairly straightforward to represent an object as a closure, or a closure as an object. Go ahead, try it yourself:
+
+```js
+var point = {
+	x: 10,
+	y: 12,
+	z: 14
+};
+```
+
+Did you come up with something like?
+
+```js
+function outer() {
+	var x = 10;
+	var y = 12;
+	var z = 14;
+
+	return function inner(){
+		return [x,y,z];
+	}
+};
+
+var point = outer();
+```
+
+What if we have nested objects?
+
+```js
+var person = {
+	name: "Kyle Simpson",
+	address: {
+		street: "123 Easy St",
+		city: "JS'ville",
+		state: "ES"
+	}
+};
+```
+
+We could represent that same kind of state with nested closures:
+
+```js
+function outer() {
+	var name = "Kyle Simpson";
+	return middle();
+
+	// ********************
+
+	function middle() {
+		var street = "123 Easy St";
+		var city = "JS'ville";
+		var state = "ES";
+
+		return function inner(){
+			return [name,street,city,state];
+		};
+	}
+}
+
+var person = outer();
+```
+
+Let's practice going the other direction, from closure to object:
+
+```js
+function point(x1,y1) {
+	return function distFromPoint(x2,y2){
+		return Math.sqrt(
+			Math.pow( x2 - x1, 2 ) +
+			Math.pow( y2 - y1, 2 )
+		);
+	};
+}
+
+var pointDistance = point( 1, 1 );
+
+pointDistance( 4, 5 );		// 5
+```
+
+`distFromPoint(..)` is closed over `x1` and `y1`, but we could instead explicitly pass those values as an object:
+
+```js
+function pointDistance(point,x2,y2) {
+	return Math.sqrt(
+		Math.pow( x2 - point.x1, 2 ) +
+		Math.pow( y2 - point.y1, 2 )
+	);
+};
+
+pointDistance(
+	{ x1: 1, y1: 1 },
+	4,	// x2
+	5	// y2
+);
+// 5
+```
+
+The `point` object replaces the closure. In fact, any state represented with a closure could be represented with an object. In this respect, closures and objects are isomorphic representations of state.
+
+## Two Roads Diverged In A Wood...
 
 // TODO
 

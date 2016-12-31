@@ -41,6 +41,8 @@
 	* Treatment
 * Chapter 7: Closure vs Object
 	* The Same Page
+	* Look Alike
+	* Two Roads Diverged In A Wood...
 * Chapter 8: List Operations
 	* Non-FP List Processing
 	* Map
