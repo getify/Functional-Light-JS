@@ -472,7 +472,7 @@ I'm not unconditionally saying that you should always have a single `return`, or
 
 One technique that you've probably used in most code you've written, and maybe didn't even think about it much, is to have a function output some or all of its values by simply changing variables outside itself.
 
-Remember our `y = f(x) = 2x^2 + 3` function from earlier in the chapter? We could have defined it like this in JS:
+Remember our <code>f(x) = 2x<sup>2</sup> + 3</code> function from earlier in the chapter? We could have defined it like this in JS:
 
 ```js
 var y;
