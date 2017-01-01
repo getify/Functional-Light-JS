@@ -203,7 +203,27 @@ pointDistance(
 // 5
 ```
 
-The `point` object replaces the closure. In fact, any state represented with a closure could be represented with an object. In this respect, closures and objects are isomorphic representations of state.
+The `point` object state explicitly passed in replaces the closure that implicitly held that state.
+
+#### Isomorphic
+
+The term "isomorphic" gets thrown around a lot in JavaScript these days, and it's usually used to refer to code that can be used/shared in both the server and the browser. I wrote a blog post awhile back that calls bogus on that usage of this word "isomorphic", which actually has an explicit and important meaning that's being clouded.
+
+Here's some selections from a part of that post:
+
+> What does isomorphic mean? Well, we could talk about it in mathematic terms, or sociology, or biology. The general notion of isomorphism is that you have two things which are similar in structure but not the same.
+>
+> In all those usages, isomorphism is differentiated from equality in this way: two values are equal if they’re exactly identical in all ways, but they are isomorphic if they are represented differently but still have a 1-to-1, bi-directional mapping relationship.
+>
+> In other words, two things A and B would be isomorphic if you could map (convert) from A to B and then go back to A with the inverse mapping.
+
+Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case called a bijective morphism, which means that the mapping must be able to go in either direction.
+
+But instead of thinking about numbers, let's relate isomorphism to code. Again quoting my blog post:
+
+> [W]hat would isomorphic JS be if there were such a thing? Well, it could be that you have one set of JS code that is converted to another set of JS code, and that (importantly) you could convert from the latter back to the former if you wanted.
+
+As we asserted earlier with our examples of closures-as-objects and objects-as-closures, these representative alternations go either way. In this respect, closures and objects are isomorphic representations of state.
 
 ## Two Roads Diverged In A Wood...
 
