@@ -205,6 +205,51 @@ pointDistance(
 
 The `point` object state explicitly passed in replaces the closure that implicitly held that state.
 
+### State And Behavior
+
+It's not just that objects and closures represent ways to encapsulate collections of state, but also that they can include behavior via functions/methods.
+
+Consider:
+
+```js
+function person(name,age) {
+	return happyBirthday(){
+		age++;
+		console.log(
+			"Happy " + age + "th Birthday, " + name + "!"
+		);
+	}
+}
+
+var birthdayBoy = person( "Kyle", 36 );
+
+birthdayBoy();			// Happy 37th Birthday, Kyle!
+```
+
+The inner function `happyBirthday()` has closure over `name` and `age` so that the functionality therein is kept with the state.
+
+We can achieve that same capability with a `this` binding to an object:
+
+```js
+var birthdayBoy = {
+	name: "Kyle",
+	age: 36,
+	happyBirthday() {
+		this.age++;
+		console.log(
+			"Happy " + this.age + "th Birthday, " + this.name + "!"
+		);
+	}
+};
+
+birthdayBoy.happyBirthday();
+// Happy 37th Birthday, Kyle!
+```
+
+We're still expressing the encapsulation of state data with the `happyBirthday()` function, but with an object instead of a closure. And we don't have to explicitly pass in an object to a function (as with earlier examples); JavaScript's `this` binding easily creates an implicit binding.
+
+Another way to analyze this relationship: a closure associates a single function with a set of state, whereas an object holidng the same state can have any number of functions to operate on that state.
+
 #### Isomorphic
 
 The term "isomorphic" gets thrown around a lot in JavaScript these days, and it's usually used to refer to code that can be used/shared in both the server and the browser. I wrote a blog post awhile back that calls bogus on that usage of this word "isomorphic", which actually has an explicit and important meaning that's being clouded.
@@ -217,13 +262,15 @@ Here's some selections from a part of that post:
 >
 > In other words, two things A and B would be isomorphic if you could map (convert) from A to B and then go back to A with the inverse mapping.
 
-Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case called a bijective morphism, which means that the mapping must be able to go in either direction.
+Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case of bijective morphism that requires not only that the mapping must be able to go in either direction, but also that the behavior is identical in either form.
 
 But instead of thinking about numbers, let's relate isomorphism to code. Again quoting my blog post:
 
 > [W]hat would isomorphic JS be if there were such a thing? Well, it could be that you have one set of JS code that is converted to another set of JS code, and that (importantly) you could convert from the latter back to the former if you wanted.
 
-As we asserted earlier with our examples of closures-as-objects and objects-as-closures, these representative alternations go either way. In this respect, closures and objects are isomorphic representations of state.
+As we asserted earlier with our examples of closures-as-objects and objects-as-closures, these representative alternations go either way. In this respect, they are isomorphisms of each other.
+
+Put simply, closures and objects are isomorphic representations of state (and its associated functionality).
 
 ## Two Roads Diverged In A Wood...
 
