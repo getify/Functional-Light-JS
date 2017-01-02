@@ -205,7 +205,7 @@ pointDistance(
 
 The `point` object state explicitly passed in replaces the closure that implicitly held that state.
 
-### State And Behavior
+#### Behavior, Too!
 
 It's not just that objects and closures represent ways to encapsulate collections of state, but also that they can include behavior via functions/methods.
 
@@ -248,9 +248,9 @@ birthdayBoy.happyBirthday();
 
 We're still expressing the encapsulation of state data with the `happyBirthday()` function, but with an object instead of a closure. And we don't have to explicitly pass in an object to a function (as with earlier examples); JavaScript's `this` binding easily creates an implicit binding.
 
-Another way to analyze this relationship: a closure associates a single function with a set of state, whereas an object holidng the same state can have any number of functions to operate on that state.
+Another way to analyze this relationship: a closure associates a single function with a set of state, whereas an object holding the same state can have any number of functions to operate on that state.
 
-#### Isomorphic
+### Isomorphic
 
 The term "isomorphic" gets thrown around a lot in JavaScript these days, and it's usually used to refer to code that can be used/shared in both the server and the browser. I wrote a blog post awhile back that calls bogus on that usage of this word "isomorphic", which actually has an explicit and important meaning that's being clouded.
 
@@ -274,7 +274,7 @@ Put simply, closures and objects are isomorphic representations of state (and it
 
 The next time you hear someone say "X is isomorphic with Y", what they mean is, "X and Y can be converted from either one to the other, and maintain the same behavior regardless."
 
-#### Under The Hood
+### Under The Hood
 
 So, we can think of objects as an isomorphic representation of closures from the perspective of code we could write. But we can also observe that a closure system could actually be implemented -- and likely is -- with objects!
 
@@ -295,7 +295,7 @@ We could imagine that the scope -- the set of all variables defined -- of `outer
 ```js
 scopeOfOuter = {
 	x: 1
-}
+};
 ```
 
 And then for the `inner()` function, when created, it gets an (empty) scope object called `scopeOfInner`, which is linked via its `[[Prototype]]` to the `scopeOfOuter` object, sorta like this:
@@ -311,13 +311,13 @@ Then, inside `inner()`, when it makes reference to the lexical variable `x`, it'
 return scopeOfInner.x;
 ```
 
-Now, `scopeOfInner` doesn't have an `x` property, but it's `[[Prototype]]`-linked to `scopeOfOuter`, which does have an `x` property. Accessing `scopeOfOuter.x` via prototype delegation results in the `1` value being returned.
+`scopeOfInner` doesn't have an `x` property, but it's `[[Prototype]]`-linked to `scopeOfOuter`, which does have an `x` property. Accessing `scopeOfOuter.x` via prototype delegation results in the `1` value being returned.
 
 In this way, we can sorta see why the scope of `outer()` is preserved (via closure) even after it finishes: because the `scopeOfInner` object is linked to the `scopeOfOuter` object, thereby keeping that object and its properties alive and well.
 
-Now, this is all conceptual. I'm not literally saying the JS engine uses objects and prototypes. But it's entirely possible that it *could* work in this way. Many languages do in fact implement closures via objects.
+Now, this is all conceptual. I'm not literally saying the JS engine uses objects and prototypes. But it's entirely plausible that it *could* work similarly.
 
-And other languages implement objects in terms of closures. But we'll let the reader use their imagination on how that would work.
+Many languages do in fact implement closures via objects. And other languages implement objects in terms of closures. But we'll let the reader use their imagination on how that would work.
 
 ## Two Roads Diverged In A Wood...
 
