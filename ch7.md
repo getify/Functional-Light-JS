@@ -272,6 +272,53 @@ As we asserted earlier with our examples of closures-as-objects and objects-as-c
 
 Put simply, closures and objects are isomorphic representations of state (and its associated functionality).
 
+The next time you hear someone say "X is isomorphic with Y", what they mean is, "X and Y can be converted from either one to the other, and maintain the same behavior regardless."
+
+#### Under The Hood
+
+So, we can think of objects as an isomorphic representation of closures from the perspective of code we could write. But we can also observe that a closure system could actually be implemented -- and likely is -- with objects!
+
+Think about it this way: in the following code, how is JS keeping track of the `x` variable for `inner()` to keep referencing, long after `outer()` has already run?
+
+```js
+function outer() {
+	var x = 1;
+
+	return function inner(){
+		return x;
+	};
+}
+```
+
+We could imagine that the scope -- the set of all variables defined -- of `outer()` is implemented as an object with properties. So, conceptually, somewhere in memory, there's something like:
+
+```js
+scopeOfOuter = {
+	x: 1
+}
+```
+
+And then for the `inner()` function, when created, it gets an (empty) scope object called `scopeOfInner`, which is linked via its `[[Prototype]]` to the `scopeOfOuter` object, sorta like this:
+
+```js
+scopeOfInner = {};
+Object.setPrototypeOf( scopeOfInner, scopeOfOuter );
+```
+
+Then, inside `inner()`, when it makes reference to the lexical variable `x`, it's actually more like:
+
+```js
+return scopeOfInner.x;
+```
+
+Now, `scopeOfInner` doesn't have an `x` property, but it's `[[Prototype]]`-linked to `scopeOfOuter`, which does have an `x` property. Accessing `scopeOfOuter.x` via prototype delegation results in the `1` value being returned.
+
+In this way, we can sorta see why the scope of `outer()` is preserved (via closure) even after it finishes: because the `scopeOfInner` object is linked to the `scopeOfOuter` object, thereby keeping that object and its properties alive and well.
+
+Now, this is all conceptual. I'm not literally saying the JS engine uses objects and prototypes. But it's entirely possible that it *could* work in this way. Many languages do in fact implement closures via objects.
+
+And other languages implement objects in terms of closures. But we'll let the reader use their imagination on how that would work.
+
 ## Two Roads Diverged In A Wood...
 
 // TODO
