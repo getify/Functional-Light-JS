@@ -403,11 +403,11 @@ What about DOM updates?
 var hist = document.getElementById( "orderHistory" );
 
 // idempotent:
-hist.orderHistory.innerHTML = order.historyText;
+hist.innerHTML = order.historyText;
 
 // non-idempotent:
 var update = document.createTextNode( order.latestUpdate );
-hist.orderHistory.appendChild( update );
+hist.appendChild( update );
 ```
 
 The key difference illustrated here is that the idempotent update replaces the DOM element's content. The current state of the DOM element is irrelevant, because it's unconditionally overwritten. The non-idempotent operation adds content to the element; implicitly, the current state of the DOM element is part of computing the next state.
