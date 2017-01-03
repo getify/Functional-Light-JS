@@ -132,6 +132,8 @@ function outer() {
 var point = outer();
 ```
 
+**Note:** The `inner()` function creates and returns a new array (aka, an object!) each time it's called. That's because JS doesn't afford us any capability to `return` multiple values without encapsulating them in an object. That's not technically a violation of our object-as-closure task, because it's just an implementation detail of exposing/transporting values; the state tracking itself is still object-free. With ES6+ array destructuring, we can declaratively ignore this temporary intermediate array on the other side: `var [x,y,z] = point()`. From a developer ergonomics perspective, the values are stored individually and tracked via closure instead of objects.
+
 What if we have nested objects?
 
 ```js
@@ -207,7 +209,7 @@ The `point` object state explicitly passed in replaces the closure that implicit
 
 #### Behavior, Too!
 
-It's not just that objects and closures represent ways to encapsulate collections of state, but also that they can include behavior via functions/methods.
+It's not just that objects and closures represent ways to express collections of state, but also that they can include behavior via functions/methods. Bundling data with its behavior has a fancy name: encapsulation.
 
 Consider:
 
@@ -249,6 +251,62 @@ birthdayBoy.happyBirthday();
 We're still expressing the encapsulation of state data with the `happyBirthday()` function, but with an object instead of a closure. And we don't have to explicitly pass in an object to a function (as with earlier examples); JavaScript's `this` binding easily creates an implicit binding.
 
 Another way to analyze this relationship: a closure associates a single function with a set of state, whereas an object holding the same state can have any number of functions to operate on that state.
+
+### (Im)mutability
+
+Many people will initially think that closures and objects behave differently with respect to mutability; closures protect from external mutation while objects do not. But, it turns out, both forms have identical mutation behavior.
+
+That's because what we care about, as discussed in Chapter 6, is **value** mutability, and this is a characteristic of the value itself, regardless of where or how it's assigned.
+
+```js
+function outer() {
+	var x = 1;
+	var y = [2,3];
+
+	return function inner(){
+		return [ x, y[0], y[1] ];
+	};
+}
+
+var xyPublic = {
+	x: 1,
+	y: [2,3]
+};
+```
+
+The value stored in the `x` lexical variable inside `outer()` is immutable -- remember, primitives like `2` are by definition immutable. But the value referenced by `y`, an array, is definitely mutable. The exact same goes for the `x` and `y` properties on `xyPublic`.
+
+We can reinforce the point that objects and closures have no bearing on mutability by pointing out that `y` is itself an array, and thus we need to break this example down further:
+
+```js
+function outer() {
+	var x = 1;
+	return middle();
+
+	// ********************
+
+	function middle() {
+		var y0 = 2;
+		var y1 = 3;
+
+		return function inner(){
+			return [ x, y0, y1 ];
+		};
+	}
+}
+
+var xyPublic = {
+	x: 1,
+	y: {
+		0: 2,
+		1: 3
+	}
+};
+```
+
+If you think about it as "turtles (aka, objects) all the way down", at the lowest level, all state data is primitives, and all primitives are value-immutable.
+
+Whether you represent this state with nested objects, or with nested closures, the values being held are all immutable.
 
 ### Isomorphic
 
@@ -321,7 +379,135 @@ Many languages do in fact implement closures via objects. And other languages im
 
 ## Two Roads Diverged In A Wood...
 
+So closures and objects are equivalent, right? Not quite. I bet they're more similar than you thought before you started this chapter, but they still have important differences.
+
+These differences should not be viewed as weaknesses or arguments against usage; that's the wrong perspective. They should be viewed as features and advantages that make one or the other more suitable (and readable!) for a given task.
+
+### Structural Mutability
+
+Conceptually, the structure of a closure is not mutable.
+
+In other words, you can never add to or remove state from a closure. Closure is a characteristic of where variables are declared (fixed at author/compile time), and is not sensitive to any runtime conditions -- assuming you use strict mode and/or avoid using cheats like `eval(..)`, of course!
+
+**Note:** The JS engine could technically cull a closure to weed out any variables in its scope that are no longer going to be used, but this is an advanced optimization that's opaque to the developer. Whether the engine actually does these kinds of optimizations, I think it's safest for the developer to assume that closure is per-scope rather than per-variable. If you don't want it to stay around, don't close over it!
+
+However, objects by default are quite mutable. You can freely add or remove (`delete`) properties/indices from an object, as long as that object hasn't been frozen (`Object.freeze(..)`).
+
+It may be an advantage of the code to be able to track more (or less!) state depending on the runtime conditions in the program.
+
+For example, let's imagine tracking the keypress events in a game. Almost certainly, you'll think about using an array to do this:
+
+```js
+function trackEvent(evt,keypresses = []) {
+	return keypresses.concat( evt );
+}
+
+var keypresses = trackEvent( newEvent1 );
+
+keypresses = trackEvent( newEvent2, keypresses );
+```
+
+**Note:** Did you spot why I used `concat(..)` instead of `push(..)`ing directly to `keypresses`? Because in FP, we typically want to treat arrays as immutable data structures that can be recreated and added to, but not directly changed. We trade out the evil of side-effects for an explicit reassignment (more on that later).
+
+Though we're not changing the structure of the array, we could if we wanted to. More on this in a moment.
+
+But an array is not the only way to track this growing "list" of `evt` objects. We could use closure:
+
+```js
+function trackEvent(evt,keypresses = () => []) {
+	return function newKeypresses() {
+		return [ ...keypresses(), evt ];
+	};
+}
+
+var keypresses = trackEvent( newEvent1 );
+
+keypresses = trackEvent( newEvent2, keypresses );
+```
+
+Do you spot what's happening here?
+
+Each time we add a new event to the "list", we create a new closure wrapped around the existing `keypresses()` function (closure), which captures the current `evt`. When we call the `keypresses()` function, it will successively call all the nested functions, building up an intermediate array of all the individually closed-over `evt` objects. Again, closure is the mechanism that's tracking all the state; the array you see is only an implementation detail of needing a way to return multiple values from a function.
+
+So which one is better suited for our task? No surprise here, the array approach is probably a lot more appropriate. The structural immutability of a closure means our only option is to wrap more closure around it. Objects are by default extensible, so we can just grow the array as needed.
+
+By the way, even though I'm presenting this structural (im)mutability as a clear difference between closure and object, the way we're using the object as an immutable value is actually more similar than dislike.
+
+Creating a new array (via `concat(..)`) for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its design.
+
+### Cloning State
+
 // TODO
+
+### Privacy
+
+Probably one of the first differences you think of when analyzing closure vs object is that closure offers "privacy" of state through lexical scoping, whereas objects expose everything as public properties. Such privacy has a fancy name: information hiding.
+
+Consider lexical closure hiding:
+
+```js
+function outer() {
+	var x = 1;
+
+	return function inner(){
+		return x;
+	};
+}
+
+var xHidden = outer();
+
+xHidden();			// 1
+```
+
+Now the same state in public:
+
+```js
+var xPublic = {
+	x: 1
+};
+
+xPublic.x;			// 1
+```
+
+Let's stop to think about the utility of information hiding.
+
+There's some obvious differences here that apply to general software engineering principles -- consider abstraction, the module pattern with public and private APIs, etc -- but let's try to restrain our discussion to the perspective of FP; this is, after all, a book about functional programming!
+
+#### Visibility
+
+// TODO
+
+#### Change Control
+
+If the lexical variable `x` is hidden inside a closure, the only code that has the freedom to reassign it is also inside that closure; it's impossible to modify `x` from the outside.
+
+As we saw in Chapter 6, that fact alone improves the readability of code by reducing the surface area that the reader must consider to predict the behavior of any given variable.
+
+The local proximity of lexical reassignment is a big reason why I don't find `const` as a feature that helpful. Scopes (and thus closures) should in general be pretty small, and that means there will only be a few lines of code that can affect reassignment. In `outer()` above, we can quickly inspect to see that no line of code reassigns `x`, so for all intents and purposes it's acting as a constant.
+
+This kind of guarantee is a powerful contributor to our confidence in the purity of a function, for example.
+
+On the other hand, `xPublic.x` is a public property, and any part of the program that gets a reference to `xPublic` has the ability, by default, to reassign `xPublic.x` to some other value. That's a lot more lines of code to consider!
+
+That's why in Chapter 6, we looked at `Object.freeze(..)` as a quick-n-dirty means of making all of an object's properties read-only (`writable: false`), so that they can't be reassigned unpredictably.
+
+Unfortunately, `Object.freeze(..)` is both all-or-nothing and irreversible.
+
+With closure, you have some code with the privilege to change, and the rest of the program is restricted. When you freeze an object, no part of the code will be able to reassign. Moreover, once an object is frozen, it can't be thawed out, so the properties will remain read-only for the duration of the program.
+
+In places where I want to allow reassignment but restrict its surface area, closures are a more convenient and flexible form than objects. In places where I want no reassignment, a frozen object is a lot more convenient than repeating `const` declarations all over my function.
+
+Many FPers take a hard-line stance on reassignment: it shouldn't be used. They will tend to use `const` to make all closure variables read-only, and they'll use `Object.freeze(..)` or full immutable data structures to prevent property reassignment. Moreover, they'll try to reduce the amount of explicitly declared/tracked variables and properties wherever possible, perferring value transfer -- function chains, `return` value passed as argument, etc -- instead of intermediate value storage.
+
+This book is about "functional light" programming in JavaScript, and this is one of those cases where I diverge from the core FP crowd.
+
+I think variable reassignment can be quite useful and, when used approriately, quite readable in its explicitness. It's certainly been by experience that debugging is a lot easier when you can insert a `debugger` or breakpoint, or track a watch expression.
+
+### Performance
+
+One reason objects may be favored over closures, from an implementation perspective, is that in JavaScript objects are often lighter-weight in terms of memory and even computation.
+
+But be careful with that as a general assertion: there are plenty of things you can do with objects that will erase any performance gains you may get from ignoring closure and moving to object-based state tracking.
 
 ## Summary
 
