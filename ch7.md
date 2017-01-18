@@ -487,11 +487,7 @@ So which one is better suited for our task? No surprise here, the array approach
 
 By the way, even though I'm presenting this structural (im)mutability as a clear difference between closure and object, the way we're using the object as an immutable value is actually more similar than dislike.
 
-Creating a new array (via `concat(..)`) for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its design.
-
-### Cloning State
-
-// TODO
+Creating a new array (via `concat(..)`) for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its very design.
 
 ### Privacy
 
@@ -602,11 +598,56 @@ This book is about "functional light" programming in JavaScript, and this is one
 
 I think variable reassignment can be quite useful and, when used approriately, quite readable in its explicitness. It's certainly been by experience that debugging is a lot easier when you can insert a `debugger` or breakpoint, or track a watch expression.
 
+### Cloning State
+
+As we learned in Chapter 6, one of the key ways we prevent side effects from eroding the predictability of our code is by making sure we treat all state values as immutable, regardless of whether they are actually immutable (frozen) or not.
+
+If you're not using a purpose-built library to provide sophisticated immutable data structures, you're going to just need the most naive of capabilities: to duplicate your objects/arrays before making each change.
+
+Arrays are easy to clone shallowly: just use the `slice()` method:
+
+```js
+var a = [ 1, 2, 3 ];
+
+var b = a.slice();
+b.push( 4 );
+
+a;			// [1,2,3]
+b;			// [1,2,3,4]
+```
+
+Objects can be shallow-cloned relatively easily too:
+
+```js
+var o = {
+	x: 1,
+	y: 2
+};
+
+// in ES2017+, using object spread:
+var p = { ...o };
+
+// in ES2015+:
+var p = Object.assign( {}, o );
+```
+
+If you want deep cloning and the values in an object/array are themselves non-primitives (objects/arrays), you'll have to walk each layer manually to clone all the nested objects.
+
+But did you notice that this cloning is possible only because all these state values are visible and can thus be easily copied? What about a set of state wrapped up in a closure; how would you clone that state?
+
+The answer is, it's much more tedious. Essentially, you'd have to do something similar to what we did earlier with our custom `forEach` API method: provide a function inside each layer of the closure with the privilege to extract/copy all the hidden values, creating new equivalent closures along the way.
+
+But even though that's theoretically possible -- another exercise for the reader! -- it's far less practical to implement than you're likely to justify for any real program.
+
+Objects have a clear advantage when it comes to holding state that we need to be able to clone.
+
 ### Performance
 
 One reason objects may be favored over closures, from an implementation perspective, is that in JavaScript objects are often lighter-weight in terms of memory and even computation.
 
 But be careful with that as a general assertion: there are plenty of things you can do with objects that will erase any performance gains you may get from ignoring closure and moving to object-based state tracking.
+
+// TODO
 
 ## Summary
 
