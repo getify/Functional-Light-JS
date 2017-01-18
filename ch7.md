@@ -441,7 +441,7 @@ Creating a new array (via `concat(..)`) for each addition to the array is treati
 
 ### Privacy
 
-Probably one of the first differences you think of when analyzing closure vs object is that closure offers "privacy" of state through lexical scoping, whereas objects expose everything as public properties. Such privacy has a fancy name: information hiding.
+Probably one of the first differences you think of when analyzing closure vs object is that closure offers "privacy" of state through nested lexical scoping, whereas objects expose everything as public properties. Such privacy has a fancy name: information hiding.
 
 Consider lexical closure hiding:
 
@@ -469,13 +469,58 @@ var xPublic = {
 xPublic.x;			// 1
 ```
 
-Let's stop to think about the utility of information hiding.
-
-There's some obvious differences here that apply to general software engineering principles -- consider abstraction, the module pattern with public and private APIs, etc -- but let's try to restrain our discussion to the perspective of FP; this is, after all, a book about functional programming!
+There's some obvious differences around general software engineering principles -- consider abstraction, the module pattern with public and private APIs, etc -- but let's try to constrain our discussion to the perspective of FP; this is, after all, a book about functional programming!
 
 #### Visibility
 
-// TODO
+It may seem that the ability to hide information is a desired characteristic of state tracking, but I believe the FPer might argue the opposite.
+
+One of the advantages of managing state as public properties on an object is that it's easier to enumerate (and iterate!) all the data in your state. Imagine you wanted to process each keypress event (from the earlier example) to save it to a database, using a utility like:
+
+```js
+function recordKeypress(keypressEvt) {
+	// database utility
+	DB.store( "keypress-events", keypressEvt );
+}
+```
+
+If you already have an array -- just an object with public numerically-named properties -- this is very straightforward using a built-in JS array utility `forEach(..)`:
+
+```js
+keypresses.forEach( recordKeypress );
+```
+
+But, if the list of keypresses is hidden inside closure, you'll have to expose a utility on the public API of the closure with privileged access to the hidden data.
+
+For example, we can give our closure-`keypresses` example its own `forEach`,  like built-in arrays have:
+
+```js
+function trackEvent(
+	evt,
+	keypresses = {
+		list() { return []; },
+		forEach() {}
+	}
+) {
+	return {
+		list() {
+			return [ ...keypresses.list(), evt ];
+		},
+		forEach(fn) {
+			keypresses.forEach( fn );
+			fn( evt );
+		}
+	};
+}
+
+// ..
+
+keypresses.list();		// [ evt, evt, .. ]
+
+keypresses.forEach( recordKeypress );
+```
+
+The visibility of an object's state data makes using it more straightforward, whereas closure obscures the state making us work harder to process it.
 
 #### Change Control
 
