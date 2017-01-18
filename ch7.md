@@ -600,9 +600,9 @@ I think variable reassignment can be quite useful and, when used approriately, q
 
 ### Cloning State
 
-As we learned in Chapter 6, one of the key ways we prevent side effects from eroding the predictability of our code is by making sure we treat all state values as immutable, regardless of whether they are actually immutable (frozen) or not.
+As we learned in Chapter 6, one of the best ways we prevent side effects from eroding the predictability of our code is to make sure we treat all state values as immutable, regardless of whether they are actually immutable (frozen) or not.
 
-If you're not using a purpose-built library to provide sophisticated immutable data structures, you're going to just need the most naive of capabilities: to duplicate your objects/arrays before making each change.
+If you're not using a purpose-built library to provide sophisticated immutable data structures, the simplest approach will suffice: duplicate your objects/arrays each time before making a change.
 
 Arrays are easy to clone shallowly: just use the `slice()` method:
 
@@ -626,20 +626,22 @@ var o = {
 
 // in ES2017+, using object spread:
 var p = { ...o };
+p.y = 3;
 
 // in ES2015+:
 var p = Object.assign( {}, o );
+p.y = 3;
 ```
 
-If you want deep cloning and the values in an object/array are themselves non-primitives (objects/arrays), you'll have to walk each layer manually to clone all the nested objects.
+If the values in an object/array are themselves non-primitives (objects/arrays), to get deep cloning you'll have to walk each layer manually to clone each nested object. Otherwise, you'll have copies of shared references to those sub-objects, and that's likely to create havoc in your program logic.
 
-But did you notice that this cloning is possible only because all these state values are visible and can thus be easily copied? What about a set of state wrapped up in a closure; how would you clone that state?
+Did you notice that this cloning is possible only because all these state values are visible and can thus be easily copied? What about a set of state wrapped up in a closure; how would you clone that state?
 
-The answer is, it's much more tedious. Essentially, you'd have to do something similar to what we did earlier with our custom `forEach` API method: provide a function inside each layer of the closure with the privilege to extract/copy all the hidden values, creating new equivalent closures along the way.
+That's much more tedious. Essentially, you'd have to do something similar to our custom `forEach` API method earlier: provide a function inside each layer of the closure with the privilege to extract/copy the hidden values, creating new equivalent closures along the way.
 
-But even though that's theoretically possible -- another exercise for the reader! -- it's far less practical to implement than you're likely to justify for any real program.
+Even though that's theoretically possible -- another exercise for the reader! -- it's far less practical to implement than you're likely to justify for any real program.
 
-Objects have a clear advantage when it comes to holding state that we need to be able to clone.
+Objects have a clear advantage when it comes to representing state that we need to be able to clone.
 
 ### Performance
 
