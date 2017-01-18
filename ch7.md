@@ -252,6 +252,60 @@ We're still expressing the encapsulation of state data with the `happyBirthday()
 
 Another way to analyze this relationship: a closure associates a single function with a set of state, whereas an object holding the same state can have any number of functions to operate on that state.
 
+As a matter of fact, you could even expose multiple methods with a single closure as the interface. Consider a traditional object with two methods:
+
+```js
+var person = {
+	firstName: "Kyle",
+	lastName: "Simpson",
+	first() {
+		return this.firstName;
+	},
+	last()
+		return this.lastName;
+	}
+}
+
+person.first() + " " + person.last();
+// Kyle Simpson
+```
+
+Just using closure without objects, we could represent this program as:
+
+```js
+function createPerson(firstName,lastName) {
+	return API;
+
+	// ********************
+
+	function API(methodName) {
+		switch (methodName) {
+			case "first":
+				return first();
+				break;
+			case "last":
+				return last();
+				break;
+		};
+	}
+
+	function first() {
+		return firstName;
+	}
+
+	function last() {
+		return lastName;
+	}
+}
+
+var person = createPerson( "Kyle", "Simpson" );
+
+person( "first" ) + " " + person( "last" );
+// Kyle Simpson
+```
+
+While these programs look and feel a bit different ergonomically, they're actually just different implementation variations of the same program behavior.
+
 ### (Im)mutability
 
 Many people will initially think that closures and objects behave differently with respect to mutability; closures protect from external mutation while objects do not. But, it turns out, both forms have identical mutation behavior.
@@ -330,13 +384,13 @@ As we asserted earlier with our examples of closures-as-objects and objects-as-c
 
 Put simply, closures and objects are isomorphic representations of state (and its associated functionality).
 
-The next time you hear someone say "X is isomorphic with Y", what they mean is, "X and Y can be converted from either one to the other, and maintain the same behavior regardless."
+The next time you hear someone say "X is isomorphic with Y", what they mean is, "X and Y can be converted from either one to the other in either direction, and maintain the same behavior regardless."
 
 ### Under The Hood
 
 So, we can think of objects as an isomorphic representation of closures from the perspective of code we could write. But we can also observe that a closure system could actually be implemented -- and likely is -- with objects!
 
-Think about it this way: in the following code, how is JS keeping track of the `x` variable for `inner()` to keep referencing, long after `outer()` has already run?
+Think about it this way: in the following code, how is JS keeping track of the `x` variable for `inner()` to keep referencing, well after `outer()` has already run?
 
 ```js
 function outer() {
