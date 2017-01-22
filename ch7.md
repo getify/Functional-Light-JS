@@ -649,7 +649,79 @@ One reason objects may be favored over closures, from an implementation perspect
 
 But be careful with that as a general assertion: there are plenty of things you can do with objects that will erase any performance gains you may get from ignoring closure and moving to object-based state tracking.
 
-// TODO
+Let's consider a scenario with both implementations. First, the closure-style implementation:
+
+```js
+function StudentRecord(name,major,gpa) {
+	return function printStudent(){
+		return `${name}, Major: ${major}, GPA: ${gpa.toFixed(1)}`;
+	};
+}
+
+var student = StudentRecord( "Kyle Simpson", "kyle@some.tld", "CS", 4 );
+
+// later
+
+student();
+// Kyle Simpson, Major: CS, GPA: 4.0
+```
+
+The inner function `printStudent()` closes over three variables: `name`, `major`, and `gpa`. It maintains this state wherever we transfer a reference to that function -- we call it `student()` in this example.
+
+Now for the object (and `this`) approach:
+
+```js
+function StudentRecord(){
+	return `${this.name}, Major: ${this.major}, GPA: ${this.gpa.toFixed(1)}`;
+}
+
+var student = StudentRecord.bind( {
+	name: "Kyle Simpson",
+	major: "CS",
+	gpa: 4
+} );
+
+// later
+
+student();
+// Kyle Simpson, Major: CS, GPA: 4.0
+```
+
+The `student()` function -- technically referred to as a "bound function" -- has a hard-bound `this` reference to the object literal we passed in, such that any later call to `student()` will use that object for it `this`, and thus be able to access its encapsulated state.
+
+Both implemenations have the same outcome: a function with preserved state. But what about the performance; what differences will there be?
+
+**Note:** Accurately and actionably judging performance of a snippet of JS code is a very dodgy affair. We won't get into all the details here, but I urge you to read the "You Don't Know JS: Async & Performance" book, specifically Chapter 6 "Benchmarking & Tuning", for more details.
+
+If you were writing a library that created a pairing of state with its function -- either the call to `StudentRecord(..)` in the first snippet or the call to `StudentRecord.bind(..)` in the second snippet -- you're likely to care most about how those two perform. Inspecting the code, we can see that the former has to create a new function expression each time. The second one uses `bind(..)`, which is not as obvious in its implications.
+
+One way to think about what `bind(..)` does under the covers is that it creates a closure over a function, like this:
+
+```js
+function bind(orinFn,thisObj) {
+	return function boundFn(...args) {
+		return origFn.apply( thisObj, args );
+	};
+}
+
+var student = bind( StudentRecord, { name: "Kyle.." } );
+```
+
+In this way, it looks like both implementations of our scenario create a closure, so the performance is likely to be about the same.
+
+However, the built-in `bind(..)` utility doesn't really have to create a closure to accomplish the task. It simply creates a function and manually sets its internal `this` to the specified object. That's potentially a more efficient operation than if we did the closure ourselves.
+
+The kind of performance savings we're talking about here is miniscule on an individual operation. But if your library's critical path is doing this hundreds or thousands of times or more, that savings can add up quickly. Many libraries -- Bluebird being one such example -- have ended up optimizing by removing closures and going with objects, in exactly this means.
+
+Outside of the library use-case, the pairing of the state with its function usually only happens relatively few times in the critical path of an application. By contrast, typically the usage of the function+state -- calling `student()` in either snippet -- is more common.
+
+If that's the case for some given situation in your code, you should probably care more about the performance of the latter versus the former.
+
+Bound functions have historically had pretty lousy performance in general, but have recently been much more highly optimized by JS engines. If you benchmarked these variations a couple of years ago, it's entirely possible you'd get different results repeating the same test with the latest engines.
+
+A bound function is now likely to perform at least as good if not better as the equivalent closed-over function. So that's another tick in favor of objects over closures.
+
+I just want to reiterate: these performance observations are not absolutes, and the determination of what's best for a given scenario is very complex. Do not just casually apply what you've heard from others or even what you've seen on some other earlier project. Carefully examine whether objects or closures are appropriately efficient for the task.
 
 ## Summary
 
