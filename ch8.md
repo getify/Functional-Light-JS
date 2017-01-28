@@ -867,11 +867,11 @@ You might have spotted the common pattern across these three; can we generate th
 
 ```js
 var unmethodify =
-	(methodName,argCount) =>
+	(methodName,argCount = 2) =>
 		curry(
 			(...args) => {
-				var arr = args.pop();
-				return arr[methodName]( ...args );
+				var obj = args.pop();
+				return obj[methodName]( ...args );
 			},
 			argCount
 		);
@@ -882,7 +882,7 @@ And to use this utility:
 ```js
 var filter = unmethodify( "filter" );
 var map = unmethodify( "map" );
-var reduce = unmethodify( "reduce" );
+var reduce = unmethodify( "reduce", 3 );
 
 compose(
 	reduce( sum )( 0 ),
