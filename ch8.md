@@ -813,20 +813,29 @@ And using these two `this`-aware utilities together:
 
 ```js
 composeChainedMethods(
-   partialThis( [].reduce, sum, 0 ),
-   partialThis( [].map, double ),
-   partialThis( [].filter, isOdd )
+   partialThis( Array.prototype.reduce, sum, 0 ),
+   partialThis( Array.prototype.map, double ),
+   partialThis( Array.prototype.filter, isOdd )
 )
 ( [1,2,3,4,5] );					// 18
 ```
 
-**Note:** The three `[].XYZ`-style references are grabbing references to the generic `Array.prototype.*` methods without repeating `Array.prototype` each time; this is done by creating a throwaway `[]` empty array value to access a method reference. This is just a shorthand cheat for shorter code.
+**Note:** The three `Array.prototype.XYZ`-style references are grabbing references to the built-in `Array.prototype.*` methods so that we can reuse them with our own arrays.
 
 ### Composing Standalone Utilities
 
-Standalone `compose(..)`-style composition of these utilities doesn't need all the `this` contortions, which is its most favorable argument.
+Standalone `compose(..)`-style composition of these utilities doesn't need all the `this` contortions, which is its most favorable argument. For example, we could define standalones as:
 
-But standalone style suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application:
+```js
+var filter = (arr,predicateFn) => arr.filter( predicateFn );
+
+var map = (arr,mapperFn) => arr.map( mapperFn );
+
+var reduce = (arr,reducerFn,initialValue) =>
+	arr.reduce( reducerFn, initialValue );
+```
+
+But this particular standalone style suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application to compose them:
 
 ```js
 compose(
@@ -837,7 +846,25 @@ compose(
 ( [1,2,3,4,5] );					// 18
 ```
 
-However, if `filter(..)`, `map(..)`, and `reduce(..)` are alternately defined to receive the array last instead of first, and are curried, the composition flows a bit nicer:
+However, we could define `filter(..)`, `map(..)`, and `reduce(..)` to alternately receive the array last instead of first and be automatically curried:
+
+```js
+var filter = curry(
+	(predicateFn,arr) =>
+		arr.filter( predicateFn )
+);
+
+var map = curry(
+	(mapperFn,arr) =>
+		arr.map( mapperFn )
+);
+
+var reduce = curry(
+	(reducerFn,initialValue,arr) =>
+		arr.reduce( reducerFn, initialValue );
+```
+
+Working with the utilities defined in this way, the composition flow is a bit nicer:
 
 ```js
 compose(
@@ -852,18 +879,7 @@ The cleanliness of this approach is in part why FPers prefer the standalone util
 
 ### Adapting Methods To Standalones
 
-If you prefer to work with only standalone utilities, you can straightforwardly define standalone adaptations of the array methods.
-
-```js
-var filter = (arr,predicateFn) => arr.filter( predicateFn );
-
-var map = (arr,mapperFn) => arr.map( mapperFn );
-
-var reduce = (arr,reducerFn,initialValue) =>
-	arr.reduce( reducerFn, initialValue );
-```
-
-You might have spotted the common pattern across these three; can we generate these standalone adaptations with a utility? Yes. While we're at it, let's swap the `arr` argument to the right and `curry(..)` the generated function, to make composition easier:
+In the previous definition of `filter(..)` / `map(..)` / `reduce(..)`, you might have spotted the common pattern across all three. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unmethodify(..)` to do just that:
 
 ```js
 var unmethodify =
@@ -880,8 +896,8 @@ var unmethodify =
 And to use this utility:
 
 ```js
-var filter = unmethodify( "filter" );
-var map = unmethodify( "map" );
+var filter = unmethodify( "filter", 2 );
+var map = unmethodify( "map", 2 );
 var reduce = unmethodify( "reduce", 3 );
 
 compose(
