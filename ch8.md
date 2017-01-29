@@ -665,20 +665,20 @@ Values `1` and `2` were selected into the sub-list `[1,2]`, then `3` and `4` int
 An implementation of `zip(..)`:
 
 ```js
-function zip(list1,list2) {
+function zip(arr1,arr2) {
 	var zipped = [];
-	list1 = list1.slice();
-	list2 = list2.slice();
+	arr1 = arr1.slice();
+	arr2 = arr2.slice();
 
-	while (list1.length > 0 && list2.length > 0) {
-		zipped.push( [ list1.shift(), list2.shift() ] );
+	while (arr1.length > 0 && arr2.length > 0) {
+		zipped.push( [ arr1.shift(), arr2.shift() ] );
 	}
 
 	return zipped;
 }
 ```
 
-The `list1.slice()` and `list2.slice()` calls ensure `zip(..)` is pure by not causing side effects with the received array references.
+The `arr1.slice()` and `arr2.slice()` calls ensure `zip(..)` is pure by not causing side effects on the received array references.
 
 **Note:** There are some decidedly un-FP things going on in this implementation. There's an imperative `while`-loop and mutations of lists with both `shift()` and `push(..)`. Earlier in the book, I asserted that it's reasonable for pure functions to use impure behavior inside them (usually for performance), as long as the effects are fully self-contained. This implementation is safely pure.
 
@@ -710,17 +710,17 @@ However, recall that `zip(..)` only selects values until the shorter of two list
 So, let's define a `mergeLists(..)` that works more like we'd expect:
 
 ```js
-function mergeLists(list1,list2) {
+function mergeLists(arr1,arr2) {
 	var merged = [];
-	list1 = list1.slice();
-	list2 = list2.slice();
+	arr1 = arr1.slice();
+	arr2 = arr2.slice();
 
-	while (list1.length > 0 || list2.length > 0) {
-		if (list1.length > 0) {
-			merged.push( list1.shift() );
+	while (arr1.length > 0 || arr2.length > 0) {
+		if (arr1.length > 0) {
+			merged.push( arr1.shift() );
 		}
-		if (list2.length > 0) {
-			merged.push( list2.shift() );
+		if (arr2.length > 0) {
+			merged.push( arr2.shift() );
 		}
 	}
 
