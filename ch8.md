@@ -616,36 +616,40 @@ flatten(
 //  "Fred","Freddy"]
 ```
 
-The disadvantages of doing the `map(..)` and `flatten(..)` as separate steps are primarily around performance; this approach processes the list twice. FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) that does the mapping and flattening combined, where each mapping is flattened after transformation.
+The disadvantages of doing the `map(..)` and `flatten(..)` as separate steps are primarily around performance; this approach processes the list twice.
+
+FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) that does the mapping and flattening combined, where each mapping is flattened after transformation.
 
 ```js
-flatMap( firstNames, entry => [entry.name].concat( entry.variations ) );
+flatMap( entry => [entry.name].concat( entry.variations ), firstNames );
 // ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
 //  "Fred","Freddy"]
 ```
+
+**Note:** For easier composition (via currying), the `flatMap(..)` / `chain(..)` utility is usually defined to take the list parameter (`firstNames` argument, in our example) last instead of first.
 
 The basic implementation of `flatMap(..)` with both steps done separately:
 
 ```js
 var flatMap =
-	(arr,mapperFn) =>
+	(mapperFn,arr) =>
 		flatten( arr.map( mapperFn ), 1 );
 ```
 
-**Note:** We use `1` for the depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
+**Note:** We use `1` for the flattening-depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
 
 To perform better, though, we can combine the operations manually, using `reduce(..)`:
 
 ```js
 var flatMap =
-	(arr,mapperFn) =>
+	(mapperFn,arr) =>
 		arr.reduce(
 			(list,v) =>
 				list.concat( mapperFn( v ) )
 		, [] );
 ```
 
-While there's some convenience and performance gained with this approach, there may very well be times when you need other operations like `filter(..)`ing mixed in, in which case doing the `map(..)` and `flatten(..)` separately might be more called for.
+While there's some convenience and performance gained with a `flatMap(..)` utility, there may very well be times when you need other operations like `filter(..)`ing mixed in. If that's the case, doing the `map(..)` and `flatten(..)` separately might be more appropriate.
 
 ### Zip
 
