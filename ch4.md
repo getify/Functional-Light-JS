@@ -668,7 +668,21 @@ var prop =
 		obj[name];
 ```
 
-To make an `extractName(..)` that pulls a `"name"` property off an object:
+While we're dealing with object properties, let's also define the opposite utility: `setProp(..)` for setting a property value onto an object. To make this utility easier to compose / chain multiple calls with, we'll return the object whose property was set:
+
+```js
+function setProp(name,obj,val) {
+	obj[name] = val;
+	return obj;
+}
+
+// or the ES6 => form
+var setProp =
+	(name,obj,val) =>
+		(obj[name] = val, obj);
+```
+
+Now, to define an `extractName(..)` that pulls a `"name"` property off an object, we'll partially apply `prop(..)`:
 
 ```
 var extractName = partial( prop, "name" );
@@ -676,7 +690,7 @@ var extractName = partial( prop, "name" );
 
 **Note:** Don't miss that `extractName(..)` here hasn't actually extracted anything yet. We partially applied `prop(..)` to make a function that's waiting to extract the `"name"` property from whatever object we pass into it. We could also have done it with `curry(prop)("name")`.
 
-Next, let's reduce our example's nested lookup calls to this:
+Next, let's narrow the focus on our example's nested lookup calls to this:
 
 ```js
 getLastOrder( function orderFound(order){
@@ -720,25 +734,23 @@ But we need to keep going and remove the `order` "point". The next step is to ob
 var extractPersonId = partial( prop, "personId" );
 ```
 
-To construct the `{ id: .. }` object that needs to be passed to `processPerson(..)`, let's make another utility for wrapping a value in an object at a specified property name -- this is kind of like the opposite of `prop(..)`. I'll call this utility `setProp(..)`:
+To construct the object (of the form `{ id: .. }`) that needs to be passed to `processPerson(..)`, let's make another utility for wrapping a value in an object at a specified property name, called `makeObjProp(..)`:
 
 ```js
-function setProp(name,value) {
-	return {
-		[name]: value
-	};
+function makeObjProp(name,value) {
+	return setProp( name, {}, value );
 }
 
 // or the ES6 => form
-var setProp =
+var makeObjProp =
 	(name,value) =>
-		({ [name]: value });
+		setProp( name, {}, value );
 ```
 
-Just as we did with `prop(..)` to make `extractName(..)`, we'll partially apply `setProp(..)` to build a function `personData(..)` that makes our data object:
+Just as we did with `prop(..)` to make `extractName(..)`, we'll partially apply `makeObjProp(..)` to build a function `personData(..)` that makes our data object:
 
 ```js
-var personData = partial( setProp, "id" );
+var personData = partial( makeObjProp, "id" );
 ```
 
 To use `processPerson(..)` to perform the lookup of a person attached to an `order` value, the conceptual flow of data through operations we need is:
@@ -762,7 +774,7 @@ var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
 var extractName = partial( prop, "name" );
 var outputPersonName = compose( output, extractName );
 var processPerson = partialRight( getPerson, outputPersonName );
-var personData = partial( setProp, "id" );
+var personData = partial( makeObjProp, "id" );
 var extractPersonId = partial( prop, "personId" );
 var lookupPerson = compose( processPerson, personData, extractPersonId );
 
@@ -783,7 +795,7 @@ partial( ajax, "http://some.api/order", { id: -1 } )
 			partial( ajax, "http://some.api/person" ),
 			compose( output, partial( prop, "name" ) )
 		),
-		partial( setProp, "id" ),
+		partial( makeObjProp, "id" ),
 		partial( prop, "personId" )
 	)
 );

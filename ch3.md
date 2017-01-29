@@ -51,7 +51,7 @@ One way to articulate what's going on is that the `getOrder(data,cb)` function i
 
 To be a tiny bit more formal about this pattern, partial application is strictly a reduction in a function's arity; remember, that's the number of expected parameter inputs. We reduced the original `ajax(..)` function's arity from 3 to 2 for the `getOrder(..)` function.
 
-Let's invent a `partial(..)` utility:
+Let's define a `partial(..)` utility:
 
 ```js
 function partial(fn,...presetArgs) {
