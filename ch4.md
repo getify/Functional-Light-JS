@@ -668,18 +668,16 @@ var prop =
 		obj[name];
 ```
 
-While we're dealing with object properties, let's also define the opposite utility: `setProp(..)` for setting a property value onto an object. To make this utility easier to compose / chain multiple calls with, we'll return the object whose property was set:
+While we're dealing with object properties, let's also define the opposite utility: `setProp(..)` for setting a property value onto an object.
+
+However, we want to be careful not to just mutate an existing object but rather create a clone of the object to make the change to, and then return it. The reasons for such care will be discussed in detail in Chapter 5 "Reducing Side Effects".
 
 ```js
 function setProp(name,obj,val) {
-	obj[name] = val;
-	return obj;
+	var o = Object.assign( {}, obj );
+	o[name] = val;
+	return o;
 }
-
-// or the ES6 => form
-var setProp =
-	(name,obj,val) =>
-		(obj[name] = val, obj);
 ```
 
 Now, to define an `extractName(..)` that pulls a `"name"` property off an object, we'll partially apply `prop(..)`:
