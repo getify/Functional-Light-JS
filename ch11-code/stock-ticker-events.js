@@ -1,6 +1,6 @@
 var server = connectToServer();
 
-var formatDecimal = unmethodify( "toFixed" )( 2 );
+var formatDecimal = unboundMethod( "toFixed" )( 2 );
 var formatPrice = pipe( formatDecimal, formatCurrency );
 var formatChange = pipe( formatDecimal, formatSign );
 var processNewStock = pipe( addStockName, formatStockNumbers );

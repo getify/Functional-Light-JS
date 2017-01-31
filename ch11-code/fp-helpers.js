@@ -1,10 +1,10 @@
 "use strict";
 
 // curried list operators
-var map = unmethodify( "map", 2 );
-var filter = unmethodify( "filter", 2 );
-var reduce = unmethodify( "reduce", 3 );
-var each = unmethodify( "forEach", 2 );
+var map = unboundMethod( "map", 2 );
+var filter = unboundMethod( "filter", 2 );
+var reduce = unboundMethod( "reduce", 3 );
+var each = unboundMethod( "forEach", 2 );
 var flatMap = curry( function flatMap(mapperFn,arr) {
 	return arr.reduce( function reducer(list,v) {
 		return list.concat( mapperFn( v ) );
@@ -71,8 +71,6 @@ function compose(...fns) {
 		var list = fns.slice();
 
 		while (list.length > 0) {
-			// take the last function off the end of the list
-			// and execute it
 			result = list.pop()( result );
 		}
 
@@ -85,8 +83,6 @@ function pipe(...fns) {
 		var list = fns.slice();
 
 		while (list.length > 0) {
-			// take the first function from the list
-			// and execute it
 			result = list.shift()( result );
 		}
 
@@ -104,7 +100,7 @@ function setProp(name,obj,val) {
 	return o;
 }
 
-function unmethodify(methodName,argCount = 2) {
+function unboundMethod(methodName,argCount = 2) {
 	return curry(
 		(...args) => {
 			var obj = args.pop();

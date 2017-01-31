@@ -87,7 +87,7 @@ var stockTickerUIMethodsWithDOMContext = map(
 ( [ stockTickerUI.addStock, stockTickerUI.updateStock ] );
 var stockTickerObservables = [ newStocks, stockUpdates ];
 var observableSubscribe =
-	pipe( uncurry, spreadArgs )( unmethodify( "subscribe" ) );
+	pipe( uncurry, spreadArgs )( unboundMethod( "subscribe" ) );
 
 // !!SIDE EFFECTS!!
 each( observableSubscribe )

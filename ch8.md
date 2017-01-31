@@ -901,10 +901,10 @@ The cleanliness of this approach is in part why FPers prefer the standalone util
 
 ### Adapting Methods To Standalones
 
-In the previous definition of `filter(..)` / `map(..)` / `reduce(..)`, you might have spotted the common pattern across all three. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unmethodify(..)` to do just that:
+In the previous definition of `filter(..)` / `map(..)` / `reduce(..)`, you might have spotted the common pattern across all three. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unboundMethod(..)` to do just that:
 
 ```js
-var unmethodify =
+var unboundMethod =
 	(methodName,argCount = 2) =>
 		curry(
 			(...args) => {
@@ -918,9 +918,9 @@ var unmethodify =
 And to use this utility:
 
 ```js
-var filter = unmethodify( "filter", 2 );
-var map = unmethodify( "map", 2 );
-var reduce = unmethodify( "reduce", 3 );
+var filter = unboundMethod( "filter", 2 );
+var map = unboundMethod( "map", 2 );
+var reduce = unboundMethod( "reduce", 3 );
 
 compose(
 	reduce( sum )( 0 ),
