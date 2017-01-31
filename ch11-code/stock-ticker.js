@@ -65,7 +65,7 @@ var stockTickerUI = {
 		// !!SIDE EFFECTS!!
 		stockTickerUI.updateStockElems( infoChildElems, data );
 		reduce( appendDOMChild )( stockElem )( infoChildElems );
-		ticker.appendChild( stockElem );
+		tickerElem.appendChild( stockElem );
 	}
 
 };
@@ -80,18 +80,18 @@ var getElementProp = curry( reverseArgs( getElemAttr ), 2 );
 var createElement = document.createElement.bind( document );
 var getStockId = getElementProp( "data-stock-id" );
 var getClassName = getElementProp( "class" );
+var ticker = document.getElementById( "stock-ticker" );
+var stockTickerUIMethodsWithDOMContext = map(
+	curry( reverseArgs( partial ), 2 )( ticker )
+)
+( [ stockTickerUI.addStock, stockTickerUI.updateStock ] );
+var stockTickerObservables = [ newStocks, stockUpdates ];
+var observableSubscribe =
+	pipe( uncurry, spreadArgs )( unmethodify( "subscribe" ) );
 
 // !!SIDE EFFECTS!!
-var ticker = document.getElementById( "stock-ticker" );
-each(
-	spreadArgs( function subscribeObservers(obsv,subscriberFn){
-		obsv.subscribe( partial( subscriberFn, ticker ) )
-	} )
-)
-( [
-	[ newStocks, stockTickerUI.addStock ],
-	[ stockUpdates, stockTickerUI.updateStock ]
-] );
+each( observableSubscribe )
+( zip( stockTickerUIMethodsWithDOMContext, stockTickerObservables ) );
 
 
 // *********************
