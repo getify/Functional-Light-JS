@@ -63,6 +63,7 @@
 	* Eager vs Lazy
 	* Reactive FP
 * Chapter 11: Putting It All Together
+	* Setup
 * Appendix A: Transducing
 * Appendix B: The Humble Monad
 * Appendix C: FP Libraries
