@@ -20,8 +20,7 @@ var stockTickerUI = {
 			( zip( stockInfoChildElemList, orderedDataVals ) );
 
 		// !!SIDE EFFECTS!!
-		compose( each, spreadArgs )
-		( setDOMContent )
+		compose( each, spreadArgs )( setDOMContent )
 		( elemsValsTuples );
 	},
 
