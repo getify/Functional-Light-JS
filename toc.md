@@ -64,6 +64,7 @@
 	* Reactive FP
 * Chapter 11: Putting It All Together
 	* Setup
+	* Stock Events
 * Appendix A: Transducing
 * Appendix B: The Humble Monad
 * Appendix C: FP Libraries

@@ -35,12 +35,14 @@ function formatStockNumbers(stock) {
 }
 
 function formatSign(val) {
-	if (Number(val) > 0) val = "+" + val;
+	if (Number(val) > 0) {
+		return `+${val}`;
+	}
 	return val;
 }
 
 function formatCurrency(val) {
-	return "$" + val;
+	return `$${val}`;
 }
 
 function transformObservable(mapperFn,obsv){
