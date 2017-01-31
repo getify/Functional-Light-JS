@@ -320,7 +320,9 @@ Think about a specialized data structure that's like an array, but that you want
 
 Internally, it might be like a linked-list tree of object references where each node in the tree represents a mutation of the original value. Actually, this is conceptually similar to how **git** version control works.
 
-// TODO: image visualization of the tree
+<p align="center">
+	<img src="fig18.png" width="490">
+</p>
 
 Imagine using this hypothetical specialized array data structure like this:
 
