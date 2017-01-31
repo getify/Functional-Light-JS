@@ -43,6 +43,32 @@ If we use FP principles, I believe we will create code that is easier to reason 
 
 FP (at least, without all the terminology weighing it down) is one of the most effective tools for writing readable code. *That* is why it's so important.
 
+### Readability Curve
+
+It's really important I take a moment to call out a phenomena that has derailed and frustrated me many times over the years, and was especially acute while writing this book.
+
+I also think it's probably something that many developers have a tendency to run into. You, dear reader, may just find yourself in this same boat as you work through this text. But take heart; if you stick this out, the curve comes back.
+
+<p align="center">
+	<img src="fig17.png" width="600">
+</p>
+
+We'll cover this more in the next chapter, but imperative code is the code you probably already write, like `if` statements and `for`-loops. It's focused on precisely instructing the computer *how* to do something. Declarative code, and moreover the kind of code we'll be striving to learn to write that adheres to FP principles, is code that's more focused on describing the *what* outcome.
+
+Let me just clue you into a painful fact, one that I've been trying to swallow the whole time I've worked on this book: it takes a lot more effort, and often a lot more code, to improve the readability of your code and to minimize or eliminate most of the places where you might write bugs.
+
+If you're hoping that your FP code refactoring will immediately make your code more graceful, elegant, clever, and concise, that's just not a realistic expectation -- at least not at first.
+
+FP is a very different way of thinking about how code should be structured, to make the flow of data much more obvious and to help your reader follow your thinking. This effort is eminently worthwhile, but it can be an arduous journey and the code you end up with will not seem more readable until you've spent a lot more time conditioning yourself to FP.
+
+Also, my experience has been that it takes about a half dozen attempts at turning a snippet of imperative code into more declarative FP, before I end up with something that's clear enough for me to understand. For me, writing FP is more like a process than a binary flip from one paradigm to another.
+
+I also apply the "read it later" test to every piece of FP code I write. I write it, then leave the code alone for a few hours or a day, then come back and try to read it with fresh eyes. Usually, it's confusing as hell, so I tweak it and repeat.
+
+Functional programming has not been for me achieving a single elegant brush stroke on the artist's canvas that leaves the audience in awe. Rather, it's a painstaking, detailed, sometimes treacherous hack through the weeds of a neglected field.
+
+But I'm not trying to dampen your spirits. I really want you to hack through those weeds. I am glad I have. I can finally start to see the curve bending upward towards more readability. The effort has been worth it. I believe it will be for you, too.
+
 ## Take
 
 We're going to approach FP from the ground up, and uncover the basic foundational principles that I believe formal FPers would admit are the scaffolding for everything they do. But for the most part we'll stay arms length away from most of the intimidating terminology or mathematical notation that can so easily frustrate learners.
