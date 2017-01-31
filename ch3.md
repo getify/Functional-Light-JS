@@ -298,8 +298,8 @@ How might we define a utility to do this currying? We're going to use some trick
 ```js
 function curry(fn,arity = fn.length) {
 	return (function nextCurried(prevArgs){
-		return function curried(nextArg){
-			var args = prevArgs.concat( [nextArg] );
+		return function curried(){
+			var args = prevArgs.concat( [].slice.call(arguments) );
 
 			if (args.length >= arity) {
 				return fn( ...args );
@@ -316,19 +316,14 @@ And for the ES6 `=>` fans:
 
 ```js
 var curry =
-	(fn, arity = fn.length, nextCurried) =>
-		(nextCurried = prevArgs =>
-			nextArg => {
-				var args = prevArgs.concat( [nextArg] );
-
-				if (args.length >= arity) {
-					return fn( ...args );
-				}
-				else {
-					return nextCurried( args );
-				}
+	(fn, arity = fn.length, nextCurried) => (
+		nextCurried = (prevArgs) => (
+			(...nextArg) => {
+				let args = [...prevArgs, ...nextArg];
+				return (args.length >= arity) ? fn(...args) : nextCurried(args);
 			}
-		)( [] );
+		)
+	)( [] );
 ```
 
 The approach here is to start a collection of arguments in `prevArgs` as an empty `[]` array, and add each received `nextArg` to that, calling the concatenation `args`. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), make and return another `curried(..)` function to collect the next `nextArg` argument, passing the running `args` collection along as `prevArgs`. Once we have enough `args`, execute the original `fn(..)` function with them.
