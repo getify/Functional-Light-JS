@@ -12,11 +12,9 @@ var stockTickerUI = {
 		var orderedDataVals =
 			map( extractInfoChildElemVal )( stockInfoChildElemList );
 		var elemsValsTuples =
-			filterOut(
-				spreadArgs( function updateValuePresent(infoChildElem,val){
-					return val === undefined;
-				} )
-			)
+			filterOut( function updateValueMissing([infoChildElem,val]){
+				return val === undefined;
+			} )
 			( zip( stockInfoChildElemList, orderedDataVals ) );
 
 		// !!SIDE EFFECTS!!
