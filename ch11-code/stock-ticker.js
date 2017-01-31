@@ -12,9 +12,9 @@ var stockTickerUI = {
 		var orderedDataVals =
 			map( extractInfoChildElemVal )( stockInfoChildElemList );
 		var elemsValsTuples =
-			filter(
+			filterOut(
 				spreadArgs( function updateValuePresent(infoChildElem,val){
-					return val !== undefined;
+					return val === undefined;
 				} )
 			)
 			( zip( stockInfoChildElemList, orderedDataVals ) );
@@ -70,10 +70,13 @@ var stockTickerUI = {
 
 };
 
-var getDOMChildren = flatMap(
-	pipe(
-		curry( prop )( "childNodes" ),
-		Array.from
+var getDOMChildren = pipe(
+	listify,
+	flatMap(
+		pipe(
+			curry( prop )( "childNodes" ),
+			Array.from
+		)
 	)
 );
 var createElement = document.createElement.bind( document );
@@ -85,12 +88,12 @@ var stockTickerUIMethodsWithDOMContext = map(
 	curry( reverseArgs( partial ), 2 )( ticker )
 )
 ( [ stockTickerUI.addStock, stockTickerUI.updateStock ] );
-var stockTickerObservables = [ newStocks, stockUpdates ];
-var observableSubscribe =
+var subscribeToObservable =
 	pipe( uncurry, spreadArgs )( unboundMethod( "subscribe" ) );
+var stockTickerObservables = [ newStocks, stockUpdates ];
 
 // !!SIDE EFFECTS!!
-each( observableSubscribe )
+each( subscribeToObservable )
 ( zip( stockTickerUIMethodsWithDOMContext, stockTickerObservables ) );
 
 
@@ -102,13 +105,15 @@ function stripPrefix(prefixRegex) {
 	};
 }
 
-function liftToList(listOrItem) {
-	if (!Array.isArray(listOrItem)) return [ listOrItem ];
+function listify(listOrItem) {
+	if (!Array.isArray( listOrItem )) {
+		return [ listOrItem ];
+	}
 	return listOrItem;
 }
 
-function isRealDOMElement(val) {
-	return val && val.getAttribute;
+function isTextNode(node) {
+	return node && node.nodeType == 3;
 }
 
 function getElemAttr(elem,prop) {
@@ -132,20 +137,18 @@ function isStockInfoChildElem(elem) {
 
 function getStockElem(tickerElem,stockId) {
 	return pipe(
-		liftToList,
 		getDOMChildren,
-		filter( isRealDOMElement ),
-		filter( matchingStockId( stockId ) )
+		filterOut( isTextNode ),
+		filterIn( matchingStockId( stockId ) )
 	)
 	( tickerElem );
 }
 
 function getStockInfoChildElems(stockElem) {
 	return pipe(
-		liftToList,
 		getDOMChildren,
-		filter( isRealDOMElement ),
-		filter( isStockInfoChildElem )
+		filterOut( isTextNode ),
+		filterIn( isStockInfoChildElem )
 	)
 	( stockElem );
 }

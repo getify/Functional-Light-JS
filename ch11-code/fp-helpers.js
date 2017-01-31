@@ -3,6 +3,7 @@
 // curried list operators
 var map = unboundMethod( "map", 2 );
 var filter = unboundMethod( "filter", 2 );
+var filterIn = filter;
 var reduce = unboundMethod( "reduce", 3 );
 var each = unboundMethod( "forEach", 2 );
 var flatMap = curry( function flatMap(mapperFn,arr) {
@@ -14,9 +15,25 @@ var flatMap = curry( function flatMap(mapperFn,arr) {
 
 // ************************************
 
+function filterOut(predicateFn,arr) {
+	return filterIn( not( predicateFn ), arr );
+}
+
+function not(predicate) {
+	return function negated(...args){
+		return !predicate( ...args );
+	};
+}
+
 function reverseArgs(fn) {
 	return function argsReversed(...args){
 		return fn( ...args.reverse() );
+	};
+}
+
+function spreadArgs(fn) {
+	return function spreadFn(argsArr) {
+		return fn( ...argsArr );
 	};
 }
 
@@ -108,10 +125,4 @@ function unboundMethod(methodName,argCount = 2) {
 		},
 		argCount
 	);
-}
-
-function spreadArgs(fn) {
-	return function spreadFn(argsArr) {
-		return fn( ...argsArr );
-	};
 }
