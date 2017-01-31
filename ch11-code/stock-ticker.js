@@ -76,10 +76,10 @@ var getDOMChildren = flatMap(
 		Array.from
 	)
 );
-var getElementProp = curry( reverseArgs( getElemAttr ), 2 );
 var createElement = document.createElement.bind( document );
-var getStockId = getElementProp( "data-stock-id" );
-var getClassName = getElementProp( "class" );
+var getElemAttrByName = curry( reverseArgs( getElemAttr ), 2 );
+var getStockId = getElemAttrByName( "data-stock-id" );
+var getClassName = getElemAttrByName( "class" );
 var ticker = document.getElementById( "stock-ticker" );
 var stockTickerUIMethodsWithDOMContext = map(
 	curry( reverseArgs( partial ), 2 )( ticker )
