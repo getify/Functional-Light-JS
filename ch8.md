@@ -296,7 +296,7 @@ To clear up all this confusion, let's define a `filterOut(..)` that actually **f
 var filterIn = filter;
 
 function filterOut(predicateFn,arr) {
-	return filterIn( arr, not( predicateFn ) );
+	return filterIn( not( predicateFn ), arr );
 }
 ```
 
