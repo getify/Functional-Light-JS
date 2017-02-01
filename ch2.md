@@ -1,15 +1,17 @@
 # Functional-Light JavaScript
-# Chapter 2: Functional Functions
+# Chapter 2: Foundations of Functional Functions
 
-Functional Programming is **not just programming with the keyword `function`.** Oh if only it was that easy, I could end the book right here! But importantly, the function really *is* at the center of FP. And it's how we use functions that makes our code *functional*.
+Functional Programming is **not just programming with the `function` keyword.** Oh if only it was that easy, I could end the book right here! But importantly, the function really *is* at the center of FP. And it's how we use functions that makes our code *functional*.
 
 But, how sure are you that you know what *function* means?
 
-In this chapter, we're going to lay the groundwork for the rest of the book by covering all aspects of functions. Brace yourself, because there's a lot more to the function than you may have realized.
+In this chapter, we're going to lay the groundwork for the rest of the book by covering all the foundational aspects of functions. In some ways, the content here is a review of all the things even a non-FP programmer should know about functions. But if we want to get the most out learning FP concepts, we've got to *know* functions inside and out.
+
+Brace yourself, because there's a lot more to the function than you may have realized.
 
 ## What Is A Function?
 
-The most natural place I can think of to start tackling functional programming is with the *function*. That may seem too simplistic and too obvious, but I think our journey needs a solid first step.
+The most natural place I can think of to start tackling functional programming is with the *function*. That may seem too simplistic and obvious, but I think our journey needs a solid first step.
 
 So... what is a function?
 
