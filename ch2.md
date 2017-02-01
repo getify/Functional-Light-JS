@@ -440,23 +440,23 @@ Consider this version of the code:
 function foo(x) {
 	var retValue;
 
-	if (retValue == null && x > 10) {
+	if (retValue == undefined && x > 10) {
 		retValue = x + 1;
 	}
 
 	var y = x / 2;
 
 	if (y > 3) {
-		if (retValue == null && x % 2 == 0) {
+		if (retValue == undefined && x % 2 == 0) {
 			retValue = x;
 		}
 	}
 
-	if (retValue == null && y > 1) {
+	if (retValue == undefined && y > 1) {
 		retValue = y;
 	}
 
-	if (retValue == null) {
+	if (retValue == undefined) {
 		retValue = x;
 	}
 
@@ -778,7 +778,7 @@ Consider these different scenarios:
 ```js
 // sync recursion:
 function findPropIn(propName,obj) {
-	if (obj == null || typeof obj != "object") return;
+	if (obj == undefined || typeof obj != "object") return;
 
 	if (propName in obj) {
 		return obj[propName];
