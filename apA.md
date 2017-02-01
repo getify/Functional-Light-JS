@@ -1,3 +1,10 @@
+# Functional-Light JavaScript
+# Appendix A: Transducing
+
+Transducing means transforming with reduction.
+
+Example:
+
 ```js
 function compose(fn2,fn1) {
 	return function composed(...args){
@@ -44,4 +51,12 @@ words
 );
 ```
 
+## Summary
 
+To transduce means to transform + reduce.
+
+More practically, we use transducing to compose adjacent `map(..)`, `filter(..)`, and `reduce(..)` operations together. We accomplish this by first expressing `map(..)`s and `filter(..)`s as `reduce(..)`s.
+
+A transducer is the composition of multiple adjacent reducers. Composing reducers can't just be done naively with `compose(..)` because of the multiple-parameters signature of a reducer. So we have to abstract the combination step -- taking two values and combining them into one -- so it can be parameterized.
+
+Transducing primarily improves performance, which is especially obvious if used on a lazy sequence (async observable). But more broadly, transducing is how we express a more declarative composition of functions that would otherwise not be composable.
