@@ -3,7 +3,7 @@
 
 In "Function Inputs" in Chapter 2, we talked about the basics of function parameters and arguments. We even looked at some syntactic tricks for easing their use such as the `...` operator and destructuring.
 
-I recommended in that first chapter that you try to design functions with a single parameter if at all possible. The fact is, this won't always be possible, and you won't always be in control of function signatures that you need to work with.
+I recommended in that discussion that you try to design functions with a single parameter if at all possible. The fact is, this won't always be possible, and you won't always be in control of function signatures that you need to work with.
 
 We now want to turn our attention to more sophisticated and powerful patterns for wrangling function inputs in these scenarios.
 
@@ -653,6 +653,68 @@ p1.then( foo ).then( constant( p2 ) ).then( bar );
 
 **Warning:** Although the `_=>p2` arrow function version is shorter than `constant(p2)`, resist the temptation to use it. The function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
 
+## Spread 'Em Out
+
+In Chapter 2, we briefly looked at parameter array destructuring. Recall this example:
+
+```js
+function foo( [x,y,...args] ) {
+	// ..
+}
+
+foo( [1,2,3] );
+```
+
+In the parameter list of `foo(..)`, we declare that we're expecting a single array argument that we want to break down -- or in effect, spread out -- into individually named parameters `x` and `y`. Any other values in the array beyond those first two positions are gathered into an `args` array with the `...` operator.
+
+This trick is handy if an array must be passed in but you want to treat its contents as individual parameters.
+
+However, sometimes you won't have the ability to change the declaration of the function to use parameter array destructuring. For example, imagine these functions:
+
+```js
+function foo(x,y) {
+	console.log( x + y );
+}
+
+function bar(fn) {
+	fn( [ 3, 9 ] );
+}
+
+bar( foo );			// fails
+```
+
+Do you spot why `bar(foo)` fails?
+
+The array `[3,9]` is sent in as a single value to `fn(..)`, but `foo(..)` expects `x` and `y` separately. If we could change the declaration of `foo(..)` to be `function foo([x,y]) { ..`, we'd be fine. Or, if we could change the behavior of `bar(..)` to make the call as `fn(...[3,9])`, the values `3` and `9` would be passed in individually.
+
+There will be occassions when you have two functions that are imcompatible in this way, and you won't be able to change their declarations/definitions for various external reasons. So, how do you use them together?
+
+We can define a helper to adapt a function so that it spreads out a single received array as its individual arguments:
+
+```js
+function spreadArgs(fn) {
+	return function spreadFn(argsArr) {
+		return fn( ...argsArr );
+	};
+}
+
+// or the ES6 => arrow form
+var spreadArgs =
+	fn =>
+		argsArr =>
+			fn( ... argsArr );
+```
+
+Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
+
+```js
+bar( spreadArgs( foo ) );			// 12
+```
+
+It won't seem clear yet why these occassions will arise, but trust me, they do. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
+
+When function output becomes input to another function, this is called composition; we'll cover this topic in detail in Chapter 4.
+
 ## No Points
 
 A popular style of coding in the FP world aims to reduce some of the visual clutter by removing unnecessary parameter-argument mapping. This style is formally called tacit programming, or more commonly: point-free style. The term "point" here is referring to a function's parameter.
@@ -742,7 +804,7 @@ printIf( msg2, isLongEnough );			// Hello World
 
 Easy enough... but "points" now! See how `str` is passed through? Without re-implementing the `str.length` check, can we refactor this code to point-free style?
 
-Let's define a `not(..)` negation operator:
+Let's define a `not(..)` negation helper:
 
 ```js
 function not(predicate) {

@@ -23,7 +23,7 @@ To take a step back and visualize the conceptual flow of data, consider:
 functionValue <-- unary <-- adder <-- 3
 ```
 
-`3` is the input to `adder(..)`. The output of `adder(..)` is the input to `unary(..)`. The output of `unary(..)` is `functionValue`. This is called the composition of `unary(..)` and `adder(..)`.
+`3` is the input to `adder(..)`. The output of `adder(..)` is the input to `unary(..)`. The output of `unary(..)` is `functionValue`. This is the composition of `unary(..)` and `adder(..)`.
 
 Think of this flow of data like a conveyor belt in a candy factory, where each operation is a step in the process of cooling, cutting, and wrapping a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
 
@@ -91,7 +91,7 @@ The code equivalent of this improved candy factory configuration is to skip the 
 var wordsUsed = unique( words( text ) );
 ```
 
-**Note:** Though we typically read the function calls left-to-right -- `unique(..)` and then `words(..)` -- the order of operations will actually be more right-to-left, or inner-to-outer. `words(..)` will run first and then `unique(..)`. Later we'll talk about a pattern that matches the order of execution to our natural left-to-right reading.
+**Note:** Though we typically read the function calls left-to-right -- `unique(..)` and then `words(..)` -- the order of operations will actually be more right-to-left, or inner-to-outer. `words(..)` will run first and then `unique(..)`. Later we'll talk about a pattern that matches the order of execution to our natural left-to-right reading, called `pipe(..)`.
 
 The stacked machines are working fine, but it's kind of clunky to have the wires hanging out all over the place. The more of these machine-stacks they create, the more cluttered the factory floor gets. And the effort to assemble and maintain all these machine stacks is awfully time intensive.
 
@@ -123,7 +123,7 @@ The candy factory is humming along nicely, and thanks to all the saved space, th
 
 But the factory engineers struggle to keep up, because each time a new kind of fancy compound machine needs to be made, they spend quite a bit of time making the new outer box and fitting the individual machines into it.
 
-So the factory engineers contact an industrial machine vendor for help. They're amazed to find out that this vendor offers a machine-making machine! As incredible as it sounds, they get a machine that can take a couple of the factory's smaller machines -- the chocolate cooling one and the cutting one, for example -- and wire them together automatically, even wrapping the nice clean bigger box around them. This is surely going to make the candy factory really take off!
+So the factory engineers contact an industrial machine vendor for help. They're amazed to find out that this vendor offers a **machine-making** machine! As incredible as it sounds, they purchase a machine that can take a couple of the factory's smaller machines -- the chocolate cooling one and the cutting one, for example -- and wire them together automatically, even wrapping a nice clean bigger box around them. This is surely going to make the candy factory really take off!
 
 <p align="center">
 	<img src="fig5.png" width="300">
@@ -151,7 +151,7 @@ That may seem like a strange choice, but there are some reasons for it. Most typ
 
 But why? I think the easiest explanation (but perhaps not the most historically accurate) is that we're listing them to match the order they are written if done manually, or rather the order we encounter them when reading from left-to-right.
 
-`unique(words(str))` lists the functions in the left-to-right order `unique,words`, so we make our `compose2(..)` utility accept them in that order, too. Now, the more efficient definition of the candy making machine is:
+`unique(words(str))` lists the functions in the left-to-right order `unique, words`, so we make our `compose2(..)` utility accept them in that order, too. Now, the more efficient definition of the candy making machine is:
 
 ```js
 var uniqueWords = compose2( unique, words );
@@ -171,7 +171,7 @@ chars;
 
 This works because the `words(..)` utility, for value-type safety sake, first coerces its input to a string using `String(..)`. So the array that `unique(..)` returns -- now the input to `words(..)` -- becomes the string `"H,o,w, ,a,r,e,y,u,n,?"`, and then the rest of the behavior in `words(..)` processes that string into the `chars` array.
 
-Admittedly, this is a slightly contrived example. But the point is that function compositions are not always unidirectional. Sometimes we put the gray brick on top of the blue brick, and sometimes we put the blue brick on top.
+Admittedly, this is a contrived example. But the point is that function compositions are not always unidirectional. Sometimes we put the gray brick on top of the blue brick, and sometimes we put the blue brick on top.
 
 The candy factory better be careful if they try to feed the wrapped candies into the machine that mixes and cools the chocolate!
 
@@ -187,7 +187,7 @@ finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 	<img src="fig6.png" width="300">
 </p>
 
-Now the candy factory owns the best machine of all: a machine that can take any number of separate smaller machines and spit out a big fancy machine that does every step in order. That's one heck of a candy operation. It's Willy Wonka's dream!
+Now the candy factory owns the best machine of all: a machine that can take any number of separate smaller machines and spit out a big fancy machine that does every step in order. That's one heck of a candy operation! It's Willy Wonka's dream!
 
 We can implement a general `compose(..)` utility like this:
 
@@ -260,7 +260,7 @@ Now, let's recall `partialRight(..)` from Chapter 3 to do something more interes
 Then, we can complete the composition multiple times by calling `filterWords(..)`, but with different first-arguments respectively:
 
 ```js
-// uses a `<= 4` check instead of the `> 4` check
+// Note: uses a `<= 4` check instead of the `> 4` check
 // that `skipShortWords(..)` uses
 function skipLongWords(list) { /* .. */ }
 
@@ -356,7 +356,7 @@ We could also define `compose(..)` using recursion. The recursive definition for
 compose( compose(fn1,fn2, .. fnN-1), fnN );
 ```
 
-**Note:** We will cover recursion in deep detail in a later chapter, so if this approach seems confusing, feel free to skip it for now and come back later after having read that chapter.
+**Note:** We will cover recursion in deep detail in Chapter 9, so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
 
 Here's how we implement	`compose(..)` with recursion:
 
@@ -402,7 +402,7 @@ The disadvantage is they're listed in the reverse order that they execute, which
 
 The reverse ordering, composing from left-to-right, has a common name: `pipe(..)`. This name is said to come from Unix/Linux land, where multiple programs are strung together by "pipe"ing (`|` operator) the output of the first one in as the input of the second, and so on (i.e., `ls -la | grep "foo" | less`).
 
-`pipe(..)` is identical to `compose(..)` except it runs through the list in left-to-right order:
+`pipe(..)` is identical to `compose(..)` except it processes through the list of functions in left-to-right order:
 
 ```js
 function pipe(...fns) {

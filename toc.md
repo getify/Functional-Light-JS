@@ -21,6 +21,7 @@
 	* Some Now, Some Later
 	* One At A Time
 	* All For One
+	* Spread 'Em Out
 	* No Points
 * Chapter 4: Composing Functions
 	* Output To Input
