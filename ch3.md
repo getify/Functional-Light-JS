@@ -644,14 +644,14 @@ var constant =
 With this tidy little utility, we can solve our `then(..)` annoyance:
 
 ```js
-p1.then( foo ).then( _=>p2 ).then( bar );
+p1.then( foo ).then( () => p2 ).then( bar );
 
 // vs
 
 p1.then( foo ).then( constant( p2 ) ).then( bar );
 ```
 
-**Warning:** Although the `_=>p2` arrow function version is shorter than `constant(p2)`, resist the temptation to use it. The function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
+**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
 
 ## Spread 'Em Out
 
