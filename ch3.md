@@ -459,7 +459,7 @@ Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave
 
 It may also be the case that you have a curried function that you'd like to sort of un-curry -- basically, to turn a function like `f(1)(2)(3)` back into a function like `g(1,2,3)`.
 
-The standard utility for this is (un)shockingly called `uncurry(..)`:
+The standard utility for this is (un)shockingly typically called `uncurry(..)`. Here's a simple naive implementation:
 
 ```js
 function uncurry(fn) {
@@ -488,7 +488,7 @@ var uncurry =
 		};
 ```
 
-**Warning:** Don't just assume that `uncurry(curry(f))` has the same behavior as `f`. The uncurried function acts (mostly) the same as the original function if you pass as many arguments to it as the original function expected. However, if you pass fewer arguments, you still get back a partially curried function waiting for more arguments; this quirk is illustrated in the next snippet.
+**Warning:** Don't just assume that `uncurry(curry(f))` has the same behavior as `f`. In some libs the uncurrying would result in a function like the original, but not all of them; certainly our example here does not. The uncurried function acts (mostly) the same as the original function if you pass as many arguments to it as the original function expected. However, if you pass fewer arguments, you still get back a partially curried function waiting for more arguments; this quirk is illustrated in the next snippet.
 
 ```js
 function sum(...args) {
@@ -508,7 +508,7 @@ uncurriedSum( 1, 2, 3, 4, 5 );				// 15
 uncurriedSum( 1, 2, 3 )( 4 )( 5 );			// 15
 ```
 
-Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a curried function that comes out as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
+Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a function that comes out curried as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
 
 ## All For One
 
