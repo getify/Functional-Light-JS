@@ -106,6 +106,16 @@ Make sure you're clear on this: you won't ever have to go through all these ment
 
 // TODO
 
+```js
+function strUppercase(str) { return str.toUpperCase(); }
+function strConcat(str1,str2) { return str1 + str2; }
+
+function listCombination(list,v) {
+	list.push( v );
+	return list;
+}
+```
+
 Example:
 
 ```js
@@ -117,7 +127,7 @@ function listCombination(list,v) {
 function filterReducer(predicateFn) {
 	return function toCombine(combineFn){
 		return function reducer(list,v){
-			if (predicateFn( v )) combineFn( list, v );
+			if (predicateFn( v )) return combineFn( list, v );
 			return list;
 		};
 	}
@@ -152,21 +162,67 @@ words
 
 So, how do we use transducing in our applications without jumping through all those mental hoops?
 
-// TODO
+Let's recall the helpers we derived earlier and clean them up a little bit:
+
+```js
+var transducingMap = curry( function map(mapperFn,combineFn){
+	return function reducer(list,v){
+		return combineFn( list, mapperFn( v ) );
+	};
+} );
+
+var transducingFilter = curry( function filter(predicateFn,combineFn){
+	return function reducer(list,v){
+		if (predicateFn( v )) return combineFn( list, v );
+		return list;
+	};
+} );
+```
+
+Recall that we use them like this:
+
+```js
+var transducer = compose(
+	transducingFilter( isShortEnough ),
+	transducingFilter( isLongEnough ),
+	transducingMap( strUppercase )
+);
+```
+
+Remember, `transducer` still needs a combination function (like `listCombination(..)` or `strConcat(..)`) passed to it to produce a transduce-reducer function, which then gets used with `reduce(..)` (along with an initial value) for the reduction.
+
+To express all these transducing steps more declaratively, let's make a `transduce(..)` utility:
+
+```js
+function transduce(transducer,combinationFn,initialValue,list) {
+	var reducer = transducer( combinationFn );
+	return list.reduce( reducer, initialValue );
+}
+```
+
+Here's our running example, cleaned up:
+
+```js
+var transducer = compose(
+	transducingFilter( isShortEnough ),
+	transducingFilter( isLongEnough ),
+	transducingMap( strUppercase )
+);
+
+transduce( transducer, listCombination, [], words );
+// ["WRITTEN","SOMETHING"]
+
+transduce( transducer, strConcat, "", words );
+// WRITTENSOMETHING
+```
+
+Not bad, huh!?
 
 ### Transducers.js
 
-Now let's illustrate our running example with the `transducers-js` library (https://github.com/cognitect-labs/transducers-js):
+Finally, let's illustrate the running example using the `transducers-js` library (https://github.com/cognitect-labs/transducers-js):
 
 ```js
-function strUppercase(str) { return str.toUpperCase(); }
-function strConcat(str1,str2) { return str1 + str2; }
-
-function listCombination(list,v) {
-	list.push( v );
-	return list;
-}
-
 var transformer = transducers.comp(
 	transducers.filter( isShortEnough ),
 	transducers.filter( isLongEnough ),
@@ -180,13 +236,15 @@ transducers.transduce( transformer, strConcat, "", words );
 // WRITTENSOMETHING
 ```
 
-**Note:** This above snippet uses `transformers.compose(..)` since the library provides it, but in this example our `compose(..)` from Chapter 4 would have produced the same outcome.
+Looks almost identical to above. Almost!
 
-The composed function in this snippet is named `transformer` instead of `transducer`. That's because if we call `transformer(listCombination)` (or `transformer(strConcat)`), we won't get a straight up transducer/reducer function as earlier.
+**Note:** This above snippet uses `transformers.compose(..)` since the library provides it, but in this case our `compose(..)` from Chapter 4 would produce the same outcome.
 
-`transducers.map(..)` and `transducers.filter(..)` are special helpers that adapt regular predicate or mapper functions into functions that produce a special transform object (with the transducer function wrapped underneath); the library uses these transform objects for transducing. The extra capabilities of the transform object abstractino are beyond what we'll explore, so consult the documentation for more information.
+The composed function in this snippet is named `transformer` instead of `transducer`. That's because if we call `transformer(listCombination)` (or `transformer(strConcat)`), we won't get a straight up transduce-reducer function as earlier.
 
-Since calling `transformer(..)` produces a transform object and not a typical two-arity transducer-reducer function, the library also provides a `toFn(..)` adapter to make it suitable for use with native array `reduce(..)`:
+`transducers.map(..)` and `transducers.filter(..)` are special helpers that adapt regular predicate or mapper functions into functions that produce a special transform object (with the transducer function wrapped underneath); the library uses these transform objects for transducing. The extra capabilities of their transform object abstraction are beyond what we'll explore, so consult the library's documentation for more information.
+
+Since calling `transformer(..)` produces a transform object and not a typical two-arity transducer-reducer function, the library also provides a `toFn(..)` adapter to make the transform object suitable for use with native array `reduce(..)`:
 
 ```js
 words.reduce(
