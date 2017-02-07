@@ -72,4 +72,6 @@
 	* How, Next
 	* What, Finally
 * Appendix B: The Humble Monad
+	* Type
+	* Interface
 * Appendix C: FP Libraries
