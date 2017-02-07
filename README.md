@@ -32,7 +32,7 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 * [Chapter 10: Functional Async](ch10.md)
 * [Chapter 11: Putting It All together](ch11.md)
 * [Appendix A: Transducing](apA.md)
-* Appendix B: The Humble Monad
+* [Appendix B: The Humble Monad](apB.md)
 * Appendix C: FP Libraries
 
 ## Publishing
