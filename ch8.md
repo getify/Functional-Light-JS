@@ -174,13 +174,13 @@ We've mostly tried to stay away from artificial invented terminology in FP as mu
 
 I'm going to very briefly break that pattern and use a word that might be a little intimidating: functor. The reason I want to talk about functors here is because we now already understand what they do, and because that term is used heavily throughout the rest of FP literature; you being at least familiar with  and not scared by it will be beneficial.
 
-A functor is a utility that takes a value and an operator function and uses that operator function on the value.
+A functor is a value that has a utility for using an operator function on that value.
 
-If the value in question is compound, meaning it's comprised of individual values -- as is the case with arrays, for example! -- a functor uses the operator function on each individual value. Moreover, a functor creates a new compound value holding the results of all the individual operator function calls.
+If the value in question is compound, meaning it's comprised of individual values -- as is the case with arrays, for example! -- a functor uses the operator function on each individual value. Moreover, the functor utility creates a new compound value holding the results of all the individual operator function calls.
 
-This is all a fancy way of describing what we just looked at with `map(..)`. The `map(..)` function takes a value (an array) and a mapping function (the operator function). It executes the mapping function for each individual value. Finally, it returns a new array with all the newly mapped values in it.
+This is all a fancy way of describing what we just looked at with `map(..)`. The `map(..)` function takes its associated value (an array) and a mapping function (the operator function), and  executes the mapping function for each individual value in the array. Finally, it returns a new array with all the newly mapped values in it.
 
-Another example: a string functor would be a utility that executes some operator function across all the characters in the string, returning a new string with the processed letters. Consider this highly-contrived example:
+Another example: a string functor would be a string plus a utility that executes some operator function across all the characters in the string, returning a new string with the processed letters. Consider this highly-contrived example:
 
 ```js
 function uppercaseLetter(c) {
@@ -203,7 +203,7 @@ stringMap( uppercaseLetter, "Hello World!" );
 // HELLO WORLD!
 ```
 
-`stringMap(..)` is a string functor. You can define a mapping function for any data structure, and as long as it follows these rules, it's a functor.
+`stringMap(..)` allows a string to be a functor. You can define a mapping function for any data structure; as long as the utility follows these rules, the data structure is a functor.
 
 ## Filter
 
