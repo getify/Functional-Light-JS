@@ -471,6 +471,8 @@ var double = v => v * 2;
 // [2,4,6,8,10]
 ```
 
+**Note:** We're cheating with this reducer and allowing a side effect by allowing `list.push(..)` to mutate the list that was passed in. In general, that's not a good idea, obviously, but since we know the `[]` list is being created and passed in, it's less dangerous. You could be more formal -- yet less performant! -- by creating a new list with the val `concat(..)`d onto the end. We'll come back to this cheat in Appendix A.
+
 Implementing `map(..)` with `reduce(..)` is not on its surface an obvious step or even an improvement. However, this ability will be a crucial recognition for more advanced techniques like those we'll cover in Appendix A "Transducing".
 
 ### Filter As Reduce
@@ -492,7 +494,7 @@ var isOdd = v => v % 2 == 1;
 // [1,3,5]
 ```
 
-Again, you'll see this trick again in Appendix A "Transducing".
+**Note:** More impure reducer cheating here. Instead of `list.push(..)`, we could have done `list.concat(..)` and returned the new list. We'll come back to this cheat in Appendix A.
 
 ## Advanced List Operations
 
