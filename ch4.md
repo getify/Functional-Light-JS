@@ -456,7 +456,9 @@ var filterWords = partial( pipe, words, unique );
 
 As you may recall from `partialRight(..)`'s definition in Chapter 3, it uses `reverseArgs(..)` under the covers, just as our `pipe(..)` now does. So we get the same result either way.
 
-The slight performance advantage to `pipe(..)` is that since we're not trying to preserve the right-to-left argument order of `compose(..)` by doing a right-partial application, using `pipe(..)` we don't need to reverse the argument order back, like we do inside `partialRight(..)`. So `partial(pipe, ..)` is a little better than `partialRight(compose, ..)`.
+The slight performance advantage to `pipe(..)` in this specific case is that since we're not trying to preserve the right-to-left argument order of `compose(..)` by doing a right-partial application, using `pipe(..)` we don't need to reverse the argument order back, like we do inside `partialRight(..)`. So `partial(pipe, ..)` is a little better here than `partialRight(compose, ..)`.
+
+In general, `pipe(..)` and `compose(..)` will not have any significant performance differences when using a well-established FP library.
 
 ## Abstraction
 
@@ -670,7 +672,7 @@ var prop =
 
 While we're dealing with object properties, let's also define the opposite utility: `setProp(..)` for setting a property value onto an object.
 
-However, we want to be careful not to just mutate an existing object but rather create a clone of the object to make the change to, and then return it. The reasons for such care will be discussed in detail in Chapter 5 "Reducing Side Effects".
+However, we want to be careful not to just mutate an existing object but rather create a clone of the object to make the change to, and then return it. The reasons for such care will be discussed in detail in Chapter 5.
 
 ```js
 function setProp(name,obj,val) {
@@ -809,4 +811,4 @@ Because JS functions can only return single values, the pattern essentially dict
 
 Instead of listing out each step as a discrete call in our code, function composition using a utility like `compose(..)` abstracts that implementation detail so the code is more readable, allowing us to focus on *what* the composition will be used to accomplish, not *how* it will be performed.
 
-Composition is one of the most important tools that underpins most of the rest of FP.
+Composition -- declarative data flow -- is one of the most important tools that underpins most of the rest of FP.
