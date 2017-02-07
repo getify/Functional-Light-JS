@@ -776,7 +776,7 @@ function output(txt) {
 	console.log( txt );
 }
 
-function printIf( msg, predicate ) {
+function printIf( predicate, msg ) {
 	if (predicate( msg )) {
 		output( msg );
 	}
@@ -789,8 +789,8 @@ function isShortEnough(str) {
 var msg1 = "Hello";
 var msg2 = msg1 + " World";
 
-printIf( msg1, isShortEnough );			// Hello
-printIf( msg2, isShortEnough );
+printIf( isShortEnough, msg1 );			// Hello
+printIf( isShortEnough, msg2 );
 ```
 
 Now let's say you want to print a message only if it's long enough; in other words, if it's `!isShortEnough(..)`. Your first thought is probably this:
@@ -800,8 +800,8 @@ function isLongEnough(str) {
 	return !isShortEnough( str );
 }
 
-printIf( msg1, isLongEnough );
-printIf( msg2, isLongEnough );			// Hello World
+printIf( isLongEnough, msg1 );
+printIf( isLongEnough, msg2 );			// Hello World
 ```
 
 Easy enough... but "points" now! See how `str` is passed through? Without re-implementing the `str.length` check, can we refactor this code to point-free style?
@@ -827,7 +827,7 @@ Next, let's use `not(..)` to alternately define `isLongEnough(..)` without "poin
 ```js
 var isLongEnough = not( isShortEnough );
 
-printIf( msg2, isLongEnough );			// Hello World
+printIf( isLongEnough, msg2 );			// Hello World
 ```
 
 That's pretty good, isn't it? But we *could* keep going. The definition of the `printIf(..)` function can actually be refactored to be point-free itself.
@@ -853,14 +853,12 @@ var when =
 Let's mix `when(..)` with a few other helper utilities we've seen earlier in this chapter, to make the point-free `printIf(..)`:
 
 ```js
-var printIf = reverseArgs(
-	uncurry( partialRight( when, output ) )
-);
+var printIf = uncurry( rightPartial( when, output ) );
 ```
 
-Here's how we did it: we right-partially applied the `output` method as the second (`action`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
+Here's how we did it: we right-partially applied the `output` method as the second (`fn`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
 
-A chain of multiple (two) function calls like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `predicate` and `str` arguments together. Lastly, we reverse those arguments to get back to the original `printIf(str,predicate)` signature.
+A chain of multiple (two) function calls like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `str` and `predicate` arguments together, which matches the original `printIf(predicate,str)` signature.
 
 Here's the whole example put back together (assuming various utilities we've already detailed in this chapter are present):
 
@@ -875,25 +873,23 @@ function isShortEnough(str) {
 
 var isLongEnough = not( isShortEnough );
 
-var printIf = reverseArgs(
-	uncurry( partialRight( when, output ) )
-);
+var printIf = uncurry( partialRight( when, output ) );
 
 var msg1 = "Hello";
 var msg2 = msg1 + " World";
 
-printIf( msg1, isShortEnough );			// Hello
-printIf( msg2, isShortEnough );
+printIf( isShortEnough, msg1 );			// Hello
+printIf( isShortEnough, msg2 );
 
-printIf( msg1, isLongEnough );
-printIf( msg2, isLongEnough );			// Hello World
+printIf( isLongEnough, msg1 );
+printIf( isLongEnough, msg2 );			// Hello World
 ```
 
 Hopefully the FP practice of point-free style coding is starting to make a little more sense. It'll still take a lot of practice to train yourself to think this way naturally. **And you'll still have to make judgement calls** as to whether point-free coding is worth it, as well as what extent will benefit your code's readability.
 
 What do you think? Points or no points for you?
 
-**Note:** Still want more practice with point-free style coding? We'll revisit this technique in "Revisiting Points" in Chapter 4, based on new-found knowledge of function composition.
+**Note:** Want more practice with point-free style coding? We'll revisit this technique in "Revisiting Points" in Chapter 4, based on new-found knowledge of function composition.
 
 ## Summary
 
