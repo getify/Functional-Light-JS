@@ -43,6 +43,43 @@ So a monad is an object data structure with sufficient methods (of practically a
 
 It's in that sense that monads are sort of like an interface.
 
+## Humble
+
+Lots of other material talks about common monads like Maybe; I'm going to skip that discussion.
+
+However, I thought it might be fun to illustrate a monad by making up an entirely artificial one: `Humble`.
+
+First off, a monad is a type, so you might think of defining it with a class to be instantiated. That's a valid way of doing it, but it introduces `this` issues that I don't like, so I'm instead going to stick with just a simple function / object. I'll present the whole implementation, then we'll go back and play with it a little bit.
+
+```js
+function Humble(...args) { return Humble.of( ...args ); }
+
+Humble.of = function of(ego) {
+	var publicAPI = { join, map, chain, ap, __humble__: 1 };
+	return publicAPI;
+
+	// ************************
+
+	function join() { return ego; }
+
+	function map(fn) {
+		return Humble.of( fn( ego ) );
+	}
+
+	function chain(fn) {
+		var mapped = map( fn );
+		var unwrapped = mapped.join();
+		return (unwrapped && "__humble__" in unwrapped) ?
+			unwrapped :
+			mapped;
+	}
+
+	function ap(monad) {
+		return monad.map( () => ego );
+	}
+};
+```
+
 ## Summary
 
 What is a monad, anyway?
