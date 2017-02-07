@@ -5,9 +5,13 @@ Let me just start off this appendix by admitting: I did not know much about what
 
 But we're basically ending this book with a brief glimpse at monads, whereas most other FP literature kinda almost starts with monads! I do not encounter in my "functional light" programming much of a need to think explicitly in terms of monads, so that's why this material is more bonus than main core. But that's not to say monads aren't useful or prevalent -- they very much are.
 
-There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite-of-passage. Over the years, monads have variously been depicted as burritos and all sorts of other wacky conceptual abstractions.
+There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite-of-passage. Over the years, monads have variously been depicted as burritos and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here.
 
-I hope there's none of that silly business going on here. My only hope for what you get out of this discussion is to not be scared of the term or the concept anymore -- I have been, for years! -- and to be able to recognize them when you see them. You might, just maybe, even use them on occassion.
+> A monad is just a monoid in the category of endofunctors.
+
+We started the preface with this quote, so it seems fitting we come back to it here. But no, we won't be talking about monoids, endofunctors, or category theory. So, that quote is not only condescending, but totally unhelpful.
+
+My only hope for what you get out of this discussion is to not be scared of the term monad or the concept anymore -- I have been, for years! -- and to be able to recognize them when you see them. You might, just maybe, even use them on occassion.
 
 ## Type
 
