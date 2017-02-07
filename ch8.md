@@ -101,7 +101,7 @@ JavaScript provides the `map(..)` utility built-in on arrays, making it very con
 
 **Note:** The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in "What's This?" in Chapter 2, `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support such a `this`-binding feature.
 
-Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here's some other examples of mapping operations. We can use `map(..)` to transform a list of functions a list of their return values:
+Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here's some other examples of mapping operations. We can use `map(..)` to transform a list of functions into a list of their return values:
 
 ```js
 var one = () => 1;
@@ -167,6 +167,43 @@ The reason this technique can seem useful is that the `map(..)` returns the arra
 You've heard the old addage about using the right tool for the right job, right? Hammer for a nail, screwdriver for a screw, etc. This is slightly different: it's use the right tool *in the right way*.
 
 A hammer is meant to be swung in your hand; if you instead hold it in your mouth and try to hammer the nail, you're not gonna be very effective. `map(..)` is intended to map values, not create side effects.
+
+### A Word: Functors
+
+We've mostly tried to stay away from artificial invented terminology in FP as much as possible in this book. We have used official terms at times, but mostly when we can derive some sense of meaning from them in regular everyday conversation.
+
+I'm going to very briefly break that pattern and use a word that might be a little intimidating: functor. The reason I want to talk about functors here is because we now already understand what they do, and because that term is used heavily throughout the rest of FP literature; you being at least familiar with  and not scared by it will be beneficial.
+
+A functor is a utility that takes a value and an operator function and uses that operator function on the value.
+
+If the value in question is compound, meaning it's comprised of individual values -- as is the case with arrays, for example! -- a functor uses the operator function on each individual value. Moreover, a functor creates a new compound value holding the results of all the individual operator function calls.
+
+This is all a fancy way of describing what we just looked at with `map(..)`. The `map(..)` function takes a value (an array) and a mapping function (the operator function). It executes the mapping function for each individual value. Finally, it returns a new array with all the newly mapped values in it.
+
+Another example: a string functor would be a utility that executes some operator function across all the characters in the string, returning a new string with the processed letters. Consider this highly-contrived example:
+
+```js
+function uppercaseLetter(c) {
+	var code = c.charCodeAt( 0 );
+
+	// lowercase letter?
+	if (code >= 97 && code <= 122) {
+		// uppercase it!
+		code = code - 32;
+	}
+
+	return String.fromCharCode( code );
+}
+
+function stringMap(mapperFn,str) {
+	return [...str].map( mapperFn ).join( "" );
+}
+
+stringMap( uppercaseLetter, "Hello World!" );
+// HELLO WORLD!
+```
+
+`stringMap(..)` is a string functor. You can define a mapping function for any data structure, and as long as it follows these rules, it's a functor.
 
 ## Filter
 
