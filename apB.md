@@ -46,3 +46,9 @@ It's in that sense that monads are sort of like an interface.
 ## Summary
 
 What is a monad, anyway?
+
+A monad is a value type, an interface, an object data structure with encapsulated behaviors.
+
+But none of those definitions are particularly useful. Here's an attempt at something better: a monad is how you organize behavior with a value in a more declarative way.
+
+As with everything else in this book, use monads where they are helpful but don't use them just because everyone else talks about them in FP. Monads aren't a universal silver bullet, but they do offer some utility when used conservatively.
