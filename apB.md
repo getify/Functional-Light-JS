@@ -49,25 +49,32 @@ Lots of other material talks about common monads like Maybe; I'm going to skip t
 
 However, I thought it might be fun to illustrate a monad by making up an entirely artificial one: `Humble`.
 
-First off, a monad is a type, so you might think of defining it with a class to be instantiated. That's a valid way of doing it, but it introduces `this` issues that I don't like, so I'm instead going to stick with just a simple function / object. I'll present the whole implementation, then we'll go back and play with it a little bit.
+First off, a monad is a type, so you might think of defining it with a class to be instantiated. That's a valid way of doing it, but it introduces `this` issues that I don't want to juggle, so I'm instead going to stick with just a simple function / object. I'll present the whole `Humble` implementation, then we'll go back and explain it bit by bit:
+
+`Humble` is a (sorta nonsense) data structure wrapper that tracks an `egoLevel` number. Specifically, its behavior is to only operate if the ego level is low enough (less than `42`!) to be considered humble.
 
 ```js
 function Humble(...args) { return Humble.of( ...args ); }
 
 // aka: unit, pure
-Humble.of = function of(ego) {
+Humble.of = function of(egoLevel) {
 	var publicAPI = { join, map, chain, ap };
 	return publicAPI;
 
 	// ************************
 
-	function join() { return ego; }
+	// allow anything other than a number that's 42 or higher
+	function isAllowed(val) {
+		return !(Number( val ) >= 42);
+	}
+
+	function join() { return egoLevel; }
 
 	function map(fn) {
-		if (Number( ego ) < 42) {
-			return Humble.of( fn( ego ) );
+		if (isAllowed( egoLevel )) {
+			return Humble.of( fn( egoLevel ) );
 		}
-		return publicAPI;
+		return Humble.of( egoLevel );
 	}
 
 	// aka: bind, flatMap
@@ -75,11 +82,12 @@ Humble.of = function of(ego) {
 		return map( fn ).join();
 	}
 
-	function ap(monad) {
-		return monad.map( ego );
+	function ap(anotherMonad) {
+		return anotherMonad.map( egoLevel );
 	}
 };
 ```
+
 
 ## Summary
 
