@@ -33,25 +33,25 @@ Recall in Chapter 8 that we talked about functors: a value along with a map-like
 
 Actually, a monad isn't a single data type, it's really more like a related collection of data types. It's kind of an interface that's implemented differently depending on the needs of different values. Each implementation is a different type of monad.
 
-For example, you may read about the "Identity Monad", the "IO Monad", the "Maybe Monad", or a variety of others. Each of these has the basic monad behavior defined, but it extends or overrides the interactions according to the use cases for each different type of monad.
+For example, you may read about the "Identity Monad", the "IO Monad", the "Maybe Monad", the "Either Monad", or a variety of others. Each of these has the basic monad behavior defined, but it extends or overrides the interactions according to the use cases for each different type of monad.
 
-It's a little more than an interface though, because it's not just the presence of certain API methods that makes an object a monad. There's a certain set of guarantees about the interactions of these methods that is necessary to be monadic. These well-known invariants are critical to usage of monads improving readability by familiarity; otherwise, it's just an ad hoc data structure that must be fully understood by the reader.
+It's a little more than an interface though, because it's not just the presence of certain API methods that makes an object a monad. There's a certain set of guarantees about the interactions of these methods that is necessary, to be monadic. These well-known invariants are critical to usage of monads improving readability by familiarity; otherwise, it's just an ad hoc data structure that must be fully read to be understood by the reader.
 
-As a matter of fact, there's not even just one single unified agreement on the names of these methods, the way a true interface would mandate; a monad more like a loose interface. Some people call a certain method `bind(..)`, some call it `chain(..)`, some call it `flatMap(..)`, etc.
+As a matter of fact, there's not even just one single unified agreement on the names of these monadic methods, the way a true interface would mandate; a monad is more like a loose interface. Some people call a certain method `bind(..)`, some call it `chain(..)`, some call it `flatMap(..)`, etc.
 
-So a monad is an object data structure with sufficient methods (of practically any name or sort) that at a minimum satisfy the main behavioral requirements of the monad definition. Each kind of monad has a different kind of extension above the minimum. But, because they all have an overlap in behavior, using two different kinds of monads together is still straightforward.
+So a monad is an object data structure with sufficient methods (of practically any name or sort) that at a minimum satisfy the main behavioral requirements of the monad definition. Each kind of monad has a different kind of extension above the minimum. But, because they all have an overlap in behavior, using two different kinds of monads together is still straightforward and predictable.
 
 It's in that sense that monads are sort of like an interface.
 
 ## Humble
 
-Lots of other material talks about common monads like Maybe; I'm going to skip that discussion.
+Most other material talks about common monads like Maybe. I'm going to put a little twist on that and have some self-referential fun by inventing the Humble monad.
 
-However, I thought it might be fun to illustrate a monad by making up an entirely artificial one: `Humble`.
+First off, a monad is a type, so you might think we'd define `Humble` with a class to be instantiated. That's a valid way of doing it, but it introduces `this`-binding issues in the methods that I don't want to juggle; instead I'm going to stick with just a simple function / object.
 
-First off, a monad is a type, so you might think of defining it with a class to be instantiated. That's a valid way of doing it, but it introduces `this` issues that I don't want to juggle, so I'm instead going to stick with just a simple function / object. I'll present the whole `Humble` implementation, then we'll go back and explain it bit by bit:
+`Humble` is a (sorta nonsense!) data structure wrapper that tracks an `egoLevel` number. Specifically, its behavior is to only operate if the ego level is low enough (less than `42`!) to be considered humble, otherwise it has no-op behavior.
 
-`Humble` is a (sorta nonsense) data structure wrapper that tracks an `egoLevel` number. Specifically, its behavior is to only operate if the ego level is low enough (less than `42`!) to be considered humble.
+I'll present the whole `Humble` implementation, then we'll go back and explain it bit by bit:
 
 ```js
 function Humble(...args) { return Humble.of( ...args ); }
@@ -87,7 +87,6 @@ Humble.of = function of(egoLevel) {
 	}
 };
 ```
-
 
 ## Summary
 
