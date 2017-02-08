@@ -74,4 +74,6 @@
 * Appendix B: The Humble Monad
 	* Type
 	* Loose Interface
+	* Maybe
+	* Humble
 * Appendix C: FP Libraries

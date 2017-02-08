@@ -1,15 +1,17 @@
 # Functional-Light JavaScript
 # Appendix B: The Humble Monad
 
-Let me just start off this appendix by admitting: I did not know much about what a monad was before starting to write the following. I am including the topic of monads in the book because it's part of the journey that every developer will encounter while learning FP, just as I have in this writing.
+Let me just start off this appendix by admitting: I did not know much about what a monad was before starting to write the following. And it took a lot of mistakes to get something sensible. If you don't believe me, go look at the commit history of this appendix in the Git repo for this book (https://github.com/getify/Functional-Light-JS)!
 
-But we're basically ending this book with a brief glimpse at monads, whereas most other FP literature kinda almost starts with monads! I do not encounter in my "functional light" programming much of a need to think explicitly in terms of monads, so that's why this material is more bonus than main core. But that's not to say monads aren't useful or prevalent -- they very much are.
+I am including the topic of monads in the book because it's part of the journey that every developer will encounter while learning FP, just as I have in this book writing.
+
+We're basically ending this book with a brief glimpse at monads, whereas most other FP literature kinda almost starts with monads! I do not encounter in my "functional light" programming much of a need to think explicitly in terms of monads, so that's why this material is more bonus than main core. But that's not to say monads aren't useful or prevalent -- they very much are.
 
 There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite-of-passage. Over the years, monads have variously been depicted as burritos, onions, and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here!
 
 > A monad is just a monoid in the category of endofunctors.
 
-We started the preface with this quote, so it seems fitting we come back to it here. But no, we won't be talking about monoids, endofunctors, or category theory. So, that quote is not only condescending, but totally unhelpful.
+We started the preface with this quote, so it seems fitting we come back to it here. But no, we won't be talking about monoids, endofunctors, or category theory. That quote is not only condescending, but totally unhelpful.
 
 My only hope for what you get out of this discussion is to not be scared of the term monad or the concept anymore -- I have been, for years! -- and to be able to recognize them when you see them. You might, just maybe, even use them on occassion.
 
@@ -43,50 +45,124 @@ So a monad is an object data structure with sufficient methods (of practically a
 
 It's in that sense that monads are sort of like an interface.
 
-## Humble
+## Maybe
 
-Most other material talks about common monads like Maybe. I'm going to put a little twist on that and have some self-referential fun by inventing the Humble monad.
+It's very common in FP material to cover well-known monads like Maybe. And actually, the Maybe monad is really a pairing of two other simpler monads: Just and Nothing.
 
-First off, a monad is a type, so you might think we'd define `Humble` with a class to be instantiated. That's a valid way of doing it, but it introduces `this`-binding issues in the methods that I don't want to juggle; instead I'm going to stick with just a simple function / object.
+Since a monad is a type, you might think we'd define `Maybe` as a class to be instantiated. That's a valid way of doing it, but it introduces `this`-binding issues in the methods that I don't want to juggle; instead I'm going to stick with just a simple function / object approach.
 
-`Humble` is a (sorta nonsense!) data structure wrapper that tracks an `egoLevel` number. Specifically, its behavior is to only operate if the ego level is low enough (less than `42`!) to be considered humble, otherwise it has no-op behavior.
-
-I'll present the whole `Humble` implementation, then we'll go back and explain it bit by bit:
+Here's a minimal implementation of Maybe:
 
 ```js
-function Humble(...args) { return Humble.of( ...args ); }
+var Maybe = { Just, Nothing, of/* aka: unit, pure */: Just };
 
-// aka: unit, pure
-Humble.of = function of(egoLevel) {
-	var publicAPI = { join, map, chain, ap };
-	return publicAPI;
+function Just(val) {
+	return { map, chain, ap, inspect };
 
-	// ************************
+	// *********************
 
-	// allow anything other than a number that's 42 or higher
-	function isAllowed(val) {
-		return !(Number( val ) >= 42);
-	}
-
-	function join() { return egoLevel; }
-
-	function map(fn) {
-		if (isAllowed( egoLevel )) {
-			return Humble.of( fn( egoLevel ) );
-		}
-		return Humble.of( egoLevel );
-	}
-
+	function map(fn) { return Just( fn( val ) ); }
 	// aka: bind, flatMap
-	function chain(fn) {
-		return map( fn ).join();
-	}
+	function chain(fn) { return fn( val ); }
+	function ap(anotherMonad) { return anotherMonad.map( val ); }
 
-	function ap(anotherMonad) {
-		return anotherMonad.map( egoLevel );
+	function inspect() {
+		return `Just(${ val })`;
 	}
-};
+}
+
+function Nothing() {
+	return { map: Nothing, chain: Nothing, ap: Nothing, inspect };
+
+	// *********************
+
+	function inspect() {
+		return "Nothing";
+	}
+}
 ```
+
+**Note:** The `inspect(..)` method is included here only for our demonstration purposes. It serves no direct role in the monadic sense.
+
+Don't worry if most of this doesn't make sense right now. We're not gonna obsess much over the details or the math/theory behind the design of the Monad. Instead, we'll focus more on illustrating what we can do with it.
+
+Any monad instances of both `Just(..)` and `Nothing()` will all have `map(..)`, `chain(..)` (also called `bind(..)` or `flatMap(..)`), and `ap(..)` methods, as do all monads. The purpose of these methods and their behavior is to provide a standardized way of multiple monad instances working together. You'll notice that whatever `val` value a `Just(..)` instance holds, it's never changed. All methods create new monad instances instead of mutating it.
+
+Maybe is the pairing of these two monads. If a value is non-empty, it's represented by an instance of `Just(..)`; if it's empty, it's represented by an instance of `Nothing()`. Notice there's no imposition here of what "empty" means -- your code gets to decide that. More on that in the next section.
+
+But the value of this kind of monad representation is that whether we have a `Just(..)` instance of a `Nothing()` instance, we'll use it the same. `Nothing()` instances have no-op definitions for all methods. So if such a monad instance shows up in our monadic operations, it has the effect of basically short-circuiting to ignore behavior.
+
+The power of the Maybe abstraction is to encapsulate that behavior/no-op duality implicitly.
+
+### Different Maybes
+
+Many implementations of a JavaScript Maybe monad include a check (usually in `map(..)`) to see if the value is `null` / `undefined`, and skipping the behavior if so. In fact, Maybe is trumpeted as being valuable precisely because it sort of automatically short-circuits its behavior with the encapsulated empty-value check.
+
+Here's how Maybe is typically illustrated:
+
+```js
+// instead of unsafe `console.log( someObj.something.else.entirely )`:
+
+Maybe.of( someObj )
+.map( prop( "something" ) )
+.map( prop( "else" ) )
+.map( prop( "entirely" ) )
+.map( console.log );
+```
+
+In other words, if at any point in the chain we get a `null` / `undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
+
+But... that approach to Maybe is not a pure monad.
+
+The core spirit of a Monad says that it must be valid for all values and cannot do any inspection of the value, at all -- not even a null check. So those other implementations are cutting corners for the sake of convenience. It's not a huge deal, but when it comes to learning something, you should probably learn it in its purest form first before you go bending the rules.
+
+The earlier implementation of the Maybe monad I provided differs from other Maybes primarily in that it does not have the null-check in it. Also, we present `Maybe` as a loose pairing of `Just(..)` / `Nothing()`.
+
+So wait. If we don't get the automatic short-circuting, why is Maybe useful at all?!? That seems like its whole point.
+
+Never fear! We can simply provide the empty-check externally, and the rest of the short-circuting behavior of the Maybe monad will work just fine. Here's how you could do the `someObj.something.else.entirely` nested-property access from before. But we'll do it more "correctly":
+
+```js
+function isEmpty(val) {
+	return val === null || val === undefined;
+}
+
+var safeProp = curry( function safeProp(prop,obj){
+	if (isEmpty( obj[prop] )) return Maybe.Nothing();
+	return Maybe.of( obj[prop] );
+} );
+
+Maybe.of( someObj )
+.chain( safeProp( "something" ) )
+.chain( safeProp( "else" ) )
+.chain( safeProp( "entirely" ) )
+.map( console.log );
+```
+
+We made a `safeProp(..)` that does the empty-check, and selects either a `Nothing()` monad instance if so, or wraps the value in a `Just(..)` instance (via `Maybe.of(..)`). Then instead of `map(..)`, we use `chain(..)` which knows how to "unwrap" the monad that `safeProp(..)` returns.
+
+We get the same chain short-circuiting upon encountering an empty value. We just don't embed that logic into the Maybe.
+
+The benefit of the monad, and Maybe specifically, is that our `map(..)` and `chain(..)` methods have a consistent and predictable interaction regardless of which kind of monad comes back. That's pretty cool!
+
+## Humble
+
+Now that we have a little more understanding of Maybe and what it does, I'm going to put a little twist on it -- and add some self-deferential humor to our discussion -- by inventing the Maybe+Humble monad. Technically, `Humble(..)` is not a monad itself, but a factory function that produces a Maybe monad instance.
+
+Humble is an admittedly contrived data structure wrapper that uses Maybe to track the status of an `egoLevel` number. Specifically, `Humble(..)`-produced monad instances only operate if their ego level value is low enough (less than `42`!) to be considered humble; otherwise it's a `Nothing()` no-op. That should sound a lot like Maybe; it's pretty similar!
+
+Here's our factory function for our Maybe+Humble monad:
+
+```js
+function Humble(egoLevel) {
+	// accept anything other than a number that's 42 or higher
+	return !(Number( egoLevel ) >= 42) ?
+		Maybe.of( egoLevel ) :
+		Maybe.Nothing();
+}
+```
+
+// TODO
 
 ## Summary
 
