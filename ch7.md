@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Chapter 7: Closure vs Object
 
-A number of years ago, Guy Steele crafted what has become a rather famous and oft-cited [koan](https://www.merriam-webster.com/dictionary/koan) to illustrate and provoke an important tension between closure and objects:
+A number of years ago, Anton van Straaten crafted what has become a rather famous and oft-cited [koan](https://www.merriam-webster.com/dictionary/koan) to illustrate and provoke an important tension between closure and objects:
 
 > The venerable master Qc Na was walking with his student, Anton. Hoping to
 prompt the master into a discussion, Anton said "Master, I have heard that
@@ -21,7 +21,7 @@ that objects are truly a poor man's closures." Qc Na responded by hitting
 Anton with his stick, saying "When will you learn? Closures are a poor man's
 object." At that moment, Anton became enlightened.
 >
-> Guy Steele 6/4/2003
+> Anton van Straaten 6/4/2003
 >
 > http://people.csail.mit.edu/gregs/ll1-discuss-archive-html/msg03277.html
 
