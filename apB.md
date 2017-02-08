@@ -5,7 +5,7 @@ Let me just start off this appendix by admitting: I did not know much about what
 
 But we're basically ending this book with a brief glimpse at monads, whereas most other FP literature kinda almost starts with monads! I do not encounter in my "functional light" programming much of a need to think explicitly in terms of monads, so that's why this material is more bonus than main core. But that's not to say monads aren't useful or prevalent -- they very much are.
 
-There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite-of-passage. Over the years, monads have variously been depicted as burritos and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here.
+There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite-of-passage. Over the years, monads have variously been depicted as burritos, onions, and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here!
 
 > A monad is just a monoid in the category of endofunctors.
 
@@ -54,8 +54,9 @@ First off, a monad is a type, so you might think of defining it with a class to 
 ```js
 function Humble(...args) { return Humble.of( ...args ); }
 
+// aka: unit, pure
 Humble.of = function of(ego) {
-	var publicAPI = { join, map, chain, ap, __humble__: 1 };
+	var publicAPI = { join, map, chain, ap };
 	return publicAPI;
 
 	// ************************
@@ -63,19 +64,19 @@ Humble.of = function of(ego) {
 	function join() { return ego; }
 
 	function map(fn) {
-		return Humble.of( fn( ego ) );
+		if (Number( ego ) < 42) {
+			return Humble.of( fn( ego ) );
+		}
+		return publicAPI;
 	}
 
+	// aka: bind, flatMap
 	function chain(fn) {
-		var mapped = map( fn );
-		var unwrapped = mapped.join();
-		return (unwrapped && "__humble__" in unwrapped) ?
-			unwrapped :
-			mapped;
+		return map( fn ).join();
 	}
 
 	function ap(monad) {
-		return monad.map( () => ego );
+		return monad.map( ego );
 	}
 };
 ```
