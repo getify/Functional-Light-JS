@@ -707,6 +707,8 @@ var spreadArgs =
 			fn( ... argsArr );
 ```
 
+**Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's often called `apply(..)`.
+
 Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
 
 ```js
@@ -806,7 +808,7 @@ printIf( isLongEnough, msg2 );			// Hello World
 
 Easy enough... but "points" now! See how `str` is passed through? Without re-implementing the `str.length` check, can we refactor this code to point-free style?
 
-Let's define a `not(..)` negation helper:
+Let's define a `not(..)` negation helper (often referred to as `complement(..)` in FP libraries):
 
 ```js
 function not(predicate) {
