@@ -7,6 +7,28 @@ I want to close this book leaving you with some quick pointers of working with o
 
 Wherever possible, I recommend you *not* reinvent any wheels. If you find an FP library that suits your needs, use it. Only use the ad hoc helper utilities from this book -- or invent ones of your own! -- if you can't find a suitable library method for your circumstance.
 
-## Libraries To Investigate
+## Stuff To Investigate
+
+Let's expand the list of FP libraries to be aware of, from Chapter 1. We won't cover all of these (as there's a lot of overlap), but here are the ones that should probably be on your radar screen:
+
+* [Ramda](http://ramdajs.com): General FP Utilities
+* [Sanctuary](https://github.com/sanctuary-js/sanctuary): Ramda Companion For FP Types
+* [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide): General FP Utilities
+* [functional.js](http://functionaljs.com/): General FP Utilities
+* [Immutable](https://github.com/facebook/immutable-js): Immutable Data Structures
+* [Mori](https://github.com/swannodette/mori): (ClojureScript Inspired) Immutable Data Structures
+* [Seamless-Immutable](https://github.com/rtfeldman/seamless-immutable): Immutable Data Helpers
+* [tranducers-js](https://github.com/cognitect-labs/transducers-js): Transducers
+* [monet.js](https://github.com/cwmyers/monet.js): Monadic Types
+
+There are dozens of other fine libraries not on this list. Just because it's not on my list here doesn't mean it's not good, nor is this list a particular endorsement. It's just a quick glance at the landscape of FP-in-JavaScript. A much longer list of FP resources can be [found here](https://github.com/stoeffel/awesome-fp-js).
+
+One resource that's extremely important to the FP world -- it's not a library but more an encyclopedia! -- is [Fantasy Land](https://github.com/fantasyland/fantasy-land) (aka FL).
+
+This is definitely not light reading for the faint of heart. It's a complete detailed roadmap of all of FP as it's interpreted in JavaScript. FL has become a de facto standard for JavaScript FP libraries to adhere to, to ensure maximum interoperability.
+
+Fantasy Land is pretty much the exact opposite of "functional-light". It's the full-on no holds barred approach to FP in JavaScript. That said, as you venture beyond this book, it's undeniable that FL will be down that road for you. I'd recommend you bookmark it, and go back to it after you've had at least 6 months of real world practice with this book's concepts.
+
+## Ramda
 
 // TODO
