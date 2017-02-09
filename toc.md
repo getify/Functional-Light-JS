@@ -68,12 +68,5 @@
 	* Stock Events
 	* Stock Ticker UI
 * Appendix A: Transducing
-	* Why, First
-	* How, Next
-	* What, Finally
 * Appendix B: The Humble Monad
-	* Type
-	* Loose Interface
-	* Maybe
-	* Humble
 * Appendix C: FP Libraries
