@@ -675,7 +675,7 @@ That result becomes kinda like a mental `const` declaration, which as you're rea
 
 Hopefully the importance of this characteristic of a pure function is obvious. We're trying to make our programs more readable. One way we can do that is give the reader less work, by providing assistance to skip over the unnecessary stuff so they can focus on the important stuff.
 
-The reader shouldn't need to keep re-computing some outcome that isn't going to change (and doesn't need to). If you make define a pure function with referential transparency, they won't have to.
+The reader shouldn't need to keep re-computing some outcome that isn't going to change (and doesn't need to). If you define a pure function with referential transparency, the reader won't have to.
 
 ### Not So Transparent?
 
