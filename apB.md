@@ -193,9 +193,9 @@ Now, let's use a few monads them together:
 var bob = Humble( 41 );
 var alice = Humble( 39 );
 
-var teamMembers = curry(function teamMembers(ego1,ego2){
+var teamMembers = curry( function teamMembers(ego1,ego2){
 	console.log( `Our humble team's egos: ${ego1} ${ego2}` );
-});
+} );
 
 bob.map( teamMembers ).ap( alice );
 // Our humble team's egos: 41 39
@@ -215,12 +215,71 @@ frank.map( teamMembers ).ap( bob );
 
 `teamMembers(..)` never gets called (and no message is printed), because `frank` is a `Nothing()` instance. That's the power of the Maybe monad, and our `Humble(..)` factory allows us to select based on the ego level. Cool!
 
+### Humility
+
+One more example to illustrate the behaviors of our Maybe+Humble data structure:
+
+```js
+function introduction() {
+	console.log( "I'm just a learner like you! :)" );
+}
+
+var egoChange = curry( function egoChange(amount,concept,egoLevel) {
+	console.log( `${amount > 0 ? "Learned" : "Shared"} ${concept}.` );
+	return Humble( egoLevel + amount );
+} );
+
+var learn = egoChange( 3 );
+
+var learner = Humble( 35 );
+
+learner
+.chain( learn( "closures" ) )
+.chain( learn( "side effects" ) )
+.chain( learn( "recursion" ) )
+.chain( learn( "map/reduce" ) )
+.map( introduction );
+// Learned closures.
+// Learned side effects.
+// Learned recursion.
+```
+
+Unfortunately, the learning process seems to have been cut short. You see, I've found that learning a bunch of stuff without sharing with others: inflates your ego too much and is not good for your skills.
+
+Let's try a better approach:
+
+```js
+var share = egoChange( -2 );
+
+learner
+.chain( learn( "closures" ) )
+.chain( share( "closures" ) )
+.chain( learn( "side effects" ) )
+.chain( share( "side effects" ) )
+.chain( learn( "recursion" ) )
+.chain( share( "recursion" ) )
+.chain( learn( "map/reduce" ) )
+.chain( share( "map/reduce" ) )
+.map( introduction );
+// Learned closures.
+// Shared closures.
+// Learned side effects.
+// Shared side effects.
+// Learned recursion.
+// Shared recursion.
+// Learned map/reduce.
+// Shared map/reduce.
+// I'm just a learner like you! :)
+```
+
+Sharing while you learn. That's the best way to learn more and learn better.
+
 ## Summary
 
 What is a monad, anyway?
 
 A monad is a value type, an interface, an object data structure with encapsulated behaviors.
 
-But none of those definitions are particularly useful. Here's an attempt at something better: a monad is how you organize behavior with a value in a more declarative way.
+But none of those definitions are particularly useful. Here's an attempt at something better: a monad is how you organize behavior around a value in a more declarative way.
 
 As with everything else in this book, use monads where they are helpful but don't use them just because everyone else talks about them in FP. Monads aren't a universal silver bullet, but they do offer some utility when used conservatively.
