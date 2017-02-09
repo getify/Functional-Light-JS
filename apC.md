@@ -31,4 +31,51 @@ Fantasy Land is pretty much the exact opposite of "functional-light". It's the f
 
 ## Ramda
 
+From the [Ramda documentation](http://ramdajs.com/):
+
+> Ramda functions are automatically curried.
+>
+> The parameters to Ramda functions are arranged to make it convenient for currying. The data to be operated on is generally supplied last.
+
+I find that design decision to be one of Ramda's strengths. It's also important to note that Ramda's form of currying (as with most libraries, it seems) is the "loose currying" we talked about in Chapter 3.
+
+The final example of Chapter 3 -- recall defining a point-free `printIf(..)` utility -- can be done with Ramda like this:
+
+```js
+function output(msg) {
+	console.log( msg );
+}
+
+function isShortEnough(str) {
+	return str.length <= 5;
+}
+
+var isLongEnough = R.complement( isShortEnough );
+
+var printIf = R.partial( R.flip( R.when ), [output] );
+
+var msg1 = "Hello";
+var msg2 = msg1 + " World";
+
+printIf( isShortEnough, msg1 );			// Hello
+printIf( isShortEnough, msg2 );
+
+printIf( isLongEnough, msg1 );
+printIf( isLongEnough, msg2 );			// Hello World
+```
+
+A few differences to point out compared to Chapter 3's approach:
+
+* We use `R.complement(..)` instead of `not(..)` to create a negating function `isLongEnough(..)` around `isShortEnough(..)`.
+
+* We use `R.flip(..)` instead of `reverseArgs(..)`. It's important to note that `R.flip(..)` only swaps the first two arguments, whereas `reverseArgs(..)` reverses all of them. In this case, `flip(..)` is more convenient for us, so we don't need to do `partialRight(..)` or any of that kind of juggling.
+
+* `R.partial(..)` takes all of its subsequent arguments (beyond the function) as a single array.
+
+* Because Ramda is using loose currying, we don't need to use `R.uncurryN(..)` to get a `printIf(..)` that takes both its arguments. If we did, it would look like `R.uncurryN( 2, .. )` wrapped around the `R.partial(..)` call; but, that's not necessary.
+
+Ramda is a very popular and powerful library. It's a really good place to start if you're practicing adding FP to your code base.
+
+## Mori
+
 // TODO
