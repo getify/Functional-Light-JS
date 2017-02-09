@@ -339,7 +339,7 @@ state.get( 42 );					// undefined
 newState.get( 2 );					// 3
 newState.get( 42 );					// "meaning of life"
 
-newState.slice( 1, 3 );				// [2,3,4]
+newState.slice( 1, 3 );				// [2,3]
 ```
 
 The `specialArray(..)` data structure would internally keep track of each mutation operation (like `set(..)`) as a *diff*, so it won't have to reallocate memory for the original values (`1`, `2`, `3`, and `4`) just to add the `"meaning of life"` value to the list. But importantly, `state` and `newState` point at different versions of the array value, so **the value immutability semantic is preserved.**
@@ -361,7 +361,7 @@ state.get( 42 );					// undefined
 newState.get( 2 );					// 3
 newState.get( 42 );					// "meaning of life"
 
-newState.toArray().slice( 1, 3 );	// [2,3,4]
+newState.toArray().slice( 1, 3 );	// [2,3]
 ```
 
 A powerful library like Immutable.js employs very sophisticated performance optimizations. Handling all the details and corner-cases manually without such a library would be quite difficult.
