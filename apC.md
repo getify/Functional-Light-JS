@@ -101,6 +101,44 @@ Notice that `fp.compose(..)` (also known as `_.flowRight(..)` in lodash proper) 
 
 You cannot beat the stability, widespread community support, and performance of lodash. It's a solid bet for your FP explorations.
 
-## Mori (0.3.0)
+## Mori (0.3.2)
+
+In Chapter 6, we already briefly glanced at the Immutable.js library, probably the most well-known for immutable data structures.
+
+Let's instead look at another popular library: [Mori](https://github.com/swannodette/mori). Mori is designed with a different (ostensibly more FP-like) take on API: it uses standalone functions instead of methods directly on the values.
+
+```js
+var state = mori.vector( 1, 2, 3, 4 );
+
+var newState = mori.assoc(
+	mori.into( state, Array.from( {length: 39} ) ),
+	42,
+	"meaning of life"
+);
+
+state === newState;						// false
+
+mori.get( state, 2 );					// 3
+mori.get( state, 42 );					// undefined
+
+mori.get( newState, 2 );				// 3
+mori.get( newState, 42 );				// "meaning of life"
+
+mori.toJs( newState ).slice( 1, 3 );	// [2,3]
+```
+
+Some interesting things to point out about Mori for this example:
+
+* We're using a `vector` instead of a `list` (as one might assume), mostly because the documentation says it behaves more like we expect JS arrays to be.
+
+* We cannot just randomly set a position past the end of the vector like we can with JS arrays; that throws an exception. So we have to first "grow" the vector using `mori.into(..)` with an array of the appropriate size of extra slots we want. Once we have a vector with 43 slots (4 + 39), we can set the final slot (position `42`) to the `"meaning of life"` value using the `mori.assoc(..)` method.
+
+* The intermediate step of creating a larger vector with `mori.into(..)` and then creating another from it with `mori.assoc(..)` might sound inefficient. But the beauty of immutable data structures is that no cloning is going on here. Each time a "change" is made, the new data structure is just tracking the difference from the previous state.
+
+Mori is heavily inspired by ClojureScript. Its API will be very familiar if you have experience (or currently work in!) that language. Since I don't have that experience, I find the method names a little strange to get used to.
+
+But I really like the standalone function design instead of methods on values. Mori also has some functions that automatically return regular JS arrays, which is a nice convenience.
+
+## Summary
 
 // TODO
