@@ -151,7 +151,7 @@ Now that we have a little more understanding of Maybe and what it does, I'm goin
 
 Humble is an admittedly contrived data structure wrapper that uses Maybe to track the status of an `egoLevel` number. Specifically, `Humble(..)`-produced monad instances only operate if their ego level value is low enough (less than `42`!) to be considered humble; otherwise it's a `Nothing()` no-op. That should sound a lot like Maybe; it's pretty similar!
 
-Here's our factory function for our Maybe+Humble monad:
+Here's the factory function for our Maybe+Humble monad:
 
 ```js
 function Humble(egoLevel) {
@@ -162,7 +162,58 @@ function Humble(egoLevel) {
 }
 ```
 
-// TODO
+You'll notice that this factory function is kinda like `safeProp(..)`, in that it uses a condition to decide if it should pick the `Just(..)` or the `Nothing()` part of the Maybe.
+
+Let's illustrate some basic usage:
+
+```js
+var bob = Humble( 45 );
+var alice = Humble( 39 );
+
+bob.inspect();							// Nothing
+alice.inspect();						// Just(39)
+```
+
+What if Alice wins a big award and is now a bit more proud of herself?
+
+```js
+function winAward(ego) {
+	return Humble( ego + 3 );
+}
+
+alice = alice.chain( winAward );
+alice.inspect();						// Nothing
+```
+
+The `Humble( 39 + 3 )` call creates a `Nothing()` monad instance to return back from the `chain(..)` call, so now Alice doesn't qualify as humble anymore.
+
+Now, let's use a few monads them together:
+
+```js
+var bob = Humble( 41 );
+var alice = Humble( 39 );
+
+var teamMembers = curry(function teamMembers(ego1,ego2){
+	console.log( `Our humble team's egos: ${ego1} ${ego2}` );
+});
+
+bob.map( teamMembers ).ap( alice );
+// Our humble team's egos: 41 39
+```
+
+Since `teamMembers(..)` is curried, the `bob.map(..)` call passes in the `bob` ego level (`41`), and creates a monad instance with the remaining function wrapped up. Calling `ap(alice)` on *that* monad calls `alice.map(..)` and passes to it the function from the monad. The effect is that both monad's values have been provided to `teamMembers(..)` function, printing out the message as shown.
+
+However, if either or both monads are actually `Nothing()` instances (because their ego level was too high):
+
+```js
+var frank = Humble( 45 );
+
+bob.map( teamMembers ).ap( frank );
+
+frank.map( teamMembers ).ap( bob );
+```
+
+`teamMembers(..)` never gets called (and no message is printed), because `frank` is a `Nothing()` instance. That's the power of the Maybe monad, and our `Humble(..)` factory allows us to select based on the ego level. Cool!
 
 ## Summary
 
