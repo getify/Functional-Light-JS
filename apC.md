@@ -141,4 +141,8 @@ But I really like the standalone function design instead of methods on values. M
 
 ## Summary
 
-// TODO
+JavaScript is not particularly designed as an FP language. However, it does have enough of the basics (like function values, closures, etc) for us to make it FP-friendly. And the libraries we've examined here will help you do that.
+
+Armed with the concepts from this book, you're ready to start tackling real world code. Find a good FP library and jump in. Practice, practice, practice!
+
+So... that's it. I've shared what I have for you, for now. I hereby officially certify you as a "Functional-Light JavaScript" programmer! It's time to close out this "chapter" of our story of learning FP together. But my learning journey continues; I hope your's does, too!
