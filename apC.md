@@ -29,7 +29,7 @@ This is definitely not light reading for the faint of heart. It's a complete det
 
 Fantasy Land is pretty much the exact opposite of "functional-light". It's the full-on no holds barred approach to FP in JavaScript. That said, as you venture beyond this book, it's undeniable that FL will be down that road for you. I'd recommend you bookmark it, and go back to it after you've had at least 6 months of real world practice with this book's concepts.
 
-## Ramda
+## Ramda (0.23.0)
 
 From the [Ramda documentation](http://ramdajs.com/):
 
@@ -76,6 +76,31 @@ A few differences to point out compared to Chapter 3's approach:
 
 Ramda is a very popular and powerful library. It's a really good place to start if you're practicing adding FP to your code base.
 
-## Mori
+## Lodash/fp (4.17.4)
+
+Lodash is one of the most popular libraries in the entire JS ecosystem. They publish an "FP friendly" version of their API as ["lodash/fp"](https://github.com/lodash/lodash/wiki/FP-Guide).
+
+In Chapter 8, we looked at composing standalone list operations (`map(..)`, `filter(..)`, and `reduce(..)`). Here's how we could do it with "lodash/fp":
+
+```js
+var sum = (x,y) => x + y;
+var double = x => x * 2;
+var isOdd = x => x % 2 == 1;
+
+fp.compose( [
+	fp.reduce( sum )( 0 ),
+	fp.map( double ),
+	fp.filter( isOdd )
+] )
+( [1,2,3,4,5] );					// 18
+```
+
+Instead of the more familiar `_.` namespace prefix, "lodash/fp" defines its methods with `fp.` as the namespace prefix. I find that a helpful distinguisher, and also generally more easy on my eyes than `_.` anyway!
+
+Notice that `fp.compose(..)` (also known as `_.flowRight(..)` in lodash proper) takes an array of functions instead of individual arguments.
+
+You cannot beat the stability, widespread community support, and performance of lodash. It's a solid bet for your FP explorations.
+
+## Mori (0.3.0)
 
 // TODO
