@@ -263,8 +263,7 @@ function depth(node) {
 	if (node) {
 		let depthLeft = depth( node.left );
 		let depthRight = depth( node.right );
-		return 1 +
-			(depthLeft > depthRight ? depthLeft : depthRight);
+		return 1 + max( depthLeft, depthRight );
 	}
 
 	return 0;
@@ -341,7 +340,7 @@ What this limit means to us as developers is that there's a practical limitation
 
 ### Tail Calls
 
-Recursion far predates JS, and so do these memory limitations. Back in the sixties, developers were wanting to use recursion and running up against hard limits of device memory of their powerful computers that were far lower than we have on our watches today.
+Recursion far predates JS, and so do these memory limitations. Back in the 1960s, developers were wanting to use recursion and running up against hard limits of device memory of their powerful computers that were far lower than we have on our watches today.
 
 Fortunately, a powerful observation was made in those early days that still offers hope. The technique is called *tail calls*.
 
@@ -546,7 +545,7 @@ sum( 3, 1, 17, 94, 8 );								// 123
 
 Awesome. That's much better, huh!? I think this pattern achieves a good balance between declarative/reasonable and performant.
 
-Let's try refactoring with PTC once more, revisitng our earlier `maxEven(..)` (currently not PTC). We'll observe that similar to keeping the sum as the first argument, we can narrow the list of numbers one at a time, keeping the first argument as the highest even we've come across thus far.
+Let's try refactoring with PTC once more, revisiting our earlier `maxEven(..)` (currently not PTC). We'll observe that similar to keeping the sum as the first argument, we can narrow the list of numbers one at a time, keeping the first argument as the highest even we've come across thus far.
 
 For clarity, the algorithm strategy (similar to what we discussed earlier) we might use:
 
@@ -586,7 +585,7 @@ In JavaScript, the word *continuation* is often used to mean a function callback
 
 Some forms of recursion cannot practically be refactored to pure PTC, especially multiple recursion. Recall the `fib(..)` function earlier, and even the mutual recursion form we derived. In both cases, there are multiple recursive calls, which effectively defeats PTC memory optimizations.
 
-However, you perform the first recursive call, and wrap the subsequent recursive calls in a continuation function to pass into that first call. Even though this would mean ultimately many more functions will need to be executed in the stack, as long all of them, continuations included, are in PTC form, stack memory usage will not grow unbounded.
+However, you can perform the first recursive call, and wrap the subsequent recursive calls in a continuation function to pass into that first call. Even though this would mean ultimately many more functions will need to be executed in the stack, as long all of them, continuations included, are in PTC form, stack memory usage will not grow unbounded.
 
 We could do this for `fib(..)`:
 
@@ -625,7 +624,7 @@ Instead of functions calling functions, the stack never goes beyond depth of one
 
 One advantage with trampolines is you aren't limited to environments that support PTC; another is that each function call is regular, not PTC optimized, so it may run quicker.
 
-Let's sketch that a `trampoline(..)` utility in code:
+Let's sketch out a `trampoline(..)` utility:
 
 ```js
 function trampoline(fn) {
