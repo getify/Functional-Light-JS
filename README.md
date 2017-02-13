@@ -1,8 +1,6 @@
 # Functional-Light JavaScript (book)
 
-<a href="https://igg.me/at/fljs"><img src="https://cloud.githubusercontent.com/assets/150330/18719908/644f7630-7ff7-11e6-92d9-4abc3cf2b4a9.png" border=0 vspace=20><br><big><strong>Please Support my Indiegogo Crowdfunding Campaign!</strong></big></a>
-
-This book explores the core principles of functional programming (FP) that can be applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
+This book explores the core principles of functional programming (FP) as they are applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
 
 **Note:** Despite the word "Light" in the title, I do not consider or recommend this book as a "beginner", "easy", or "intro" book on the topic. This book is rigorous and full of gritty detail; it expects a solid foundation of JS knowledge before diving in. "Light" means limited in scope; instead of being more broad, this book goes much deeper into each topic than you typically find in other FP-JavaScript books.
 
@@ -37,7 +35,7 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 
 ## Publishing
 
-It is expected this book will eventually be published, but nothing is in the works yet. Keep an eye out for future updates here!
+I'm self-publishing this book, most likely digitally [on Leanpub](https://leanpub.com/fljs/). I'll also be trying to work out an option to sell print book copies, but that part is still uncertain.
 
 If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the books, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
 
@@ -63,6 +61,6 @@ But **PLEASE** read the [Contributions Guidelines](CONTRIBUTING.md) carefully be
 
 ## License & Copyright
 
-The materials herein are all (c) 2016 Kyle Simpson.
+The materials herein are all (c) 2016-2017 Kyle Simpson.
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License</a>.
