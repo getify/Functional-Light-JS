@@ -623,7 +623,7 @@ specialOutput( "Hello World" );		// HELLO WORLD
 simpleOutput( "Hello World" );		// Hello World
 ```
 
-You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered later in the text.
+You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in Chapter 8.
 
 ### Unchanging One
 
@@ -704,7 +704,7 @@ function spreadArgs(fn) {
 var spreadArgs =
 	fn =>
 		argsArr =>
-			fn( ... argsArr );
+			fn( ...argsArr );
 ```
 
 **Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's often called `apply(..)`.
@@ -718,6 +718,33 @@ bar( spreadArgs( foo ) );			// 12
 It won't seem clear yet why these occassions will arise, but trust me, they do. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
 
 When function output becomes input to another function, this is called composition; we'll cover this topic in detail in Chapter 4.
+
+While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
+
+```js
+function gatherArgs(fn) {
+	return function gatheredFn(...argsArr) {
+		return fn( argsArr );
+	};
+}
+
+// or the ES6 => arrow form
+var gatherArgs =
+	fn =>
+		(...argsArr) =>
+			fn( argsArr );
+```
+
+We can use this utility to gather individual arguments into a single array, perhaps because we want to adapt a function with array parameter destructuring to another utility that passes arguments separately. We will cover `reduce(..)` in Chapter 8, but briefly: it repeatedly calls its reducer function with two individual parameters, which we can now *gather* together:
+
+```js
+function combineFirstTwo([ v1, v2 ]) {
+	return v1 + v2;
+}
+
+[1,2,3,4,5].reduce( gatherArgs( combineFirstTwo ) );
+// 15
+```
 
 ## Order Matters
 
