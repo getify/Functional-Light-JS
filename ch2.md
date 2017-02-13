@@ -267,7 +267,7 @@ foo( [1,2,3] );
 Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability. Destructuring is the answer:
 
 ```js
-function foo( [x,y,...args] ) {
+function foo( [x,y,...args] = [] ) {
 	// ..
 }
 
@@ -299,7 +299,7 @@ Wherever possible, and to whatever degrees our language and our libraries/framew
 Just as we can destructure arrays, we can destructure object parameters:
 
 ```js
-function foo( {x,y} ) {
+function foo( {x,y} = {} ) {
 	console.log( x, y );
 }
 
@@ -321,6 +321,8 @@ Some languages have a direct feature for this behavior: named arguments. In othe
 The FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that later.
 
 Recall that the term arity refers to how many parameters a function expects to receive. A function with arity of 1 is also referred to as a unary function. In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
+
+**Note:** In Chapter 3, we'll revisit this named-argument destructuring trick to deal with annoying issues around parameter ordering.
 
 ### Functions Varying By Input
 

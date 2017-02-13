@@ -22,6 +22,7 @@
 	* One At A Time
 	* All For One
 	* Spread 'Em Out
+	* Order Matters
 	* No Points
 * Chapter 4: Composing Functions
 	* Output To Input
