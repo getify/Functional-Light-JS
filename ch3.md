@@ -873,7 +873,11 @@ f4( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-A word of caution: The pattern I'm showing here is clearly helpful, but to my knowledge, no FP libraries are using this approach; it falls well outside the mainstream. Though it does help with readability in eliminating the order juggling noise that can sometimes clutter code, it comes at the expense of being far less familiar than how most JavaScript FP is done. Weigh the tradeoffs carefully.
+A word of caution: the object parameters pattern I'm showing here clearly improves readability by reducing the clutter of argument order juggling, but to my knowledge, no mainstream FP libraries are using this approach. It comes at the expense of being far less familiar than how most JavaScript FP is done.
+
+Also, usage of functions defined in this style requires you to know what each argument's name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'".
+
+Weigh these tradeoffs carefully.
 
 ## No Points
 
