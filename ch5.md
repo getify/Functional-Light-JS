@@ -480,7 +480,7 @@ Another common way to articulate a function's purity is: **given the same input(
 
 If a function *can* produce a different output each time it's given the same inputs, it is impure. Even if such a function always `return`s the same value, if it produces an indirect output side effect, the program state is changed each time it's called; this is impure.
 
-Impure functions are undesirable because they make all of their calls harder to reason about. A pure function's call is perfectly predictable. When some reading the code sees multiple `circleArea(3)` calls, they won't have to spend any extra effort to figure out what its output will be *each time*.
+Impure functions are undesirable because they make all of their calls harder to reason about. A pure function's call is perfectly predictable. When someone reading the code sees multiple `circleArea(3)` calls, they won't have to spend any extra effort to figure out what its output will be *each time*.
 
 ### Purely Relative
 
@@ -607,7 +607,7 @@ function rememberNumbers(...nums) {
 
 So is `simpleList(..)` reliably pure yet!? **Nope.** :(
 
-We're only guarding against side effects we can control (mutating by reference). Any function we pass that has other side effects will have poluted the purity of `simpleList(..)`:
+We're only guarding against side effects we can control (mutating by reference). Any function we pass that has other side effects will have polluted the purity of `simpleList(..)`:
 
 ```js
 simpleList( function impureIO(nums){
@@ -617,7 +617,9 @@ simpleList( function impureIO(nums){
 
 In fact, there's no way to define `rememberNumbers(..)` to make a perfectly-pure `simpleList(..)` function.
 
-Purity is about confidence. But we have to admit that in many cases, **any confidence we feel is actually relative to the context** of our program and what we know about it. In practice (in JavaScript) the question of function purity is not about being absolutely pure or not, but about a range of confidence in its purity. The more pure, the better.
+Purity is about confidence. But we have to admit that in many cases, **any confidence we feel is actually relative to the context** of our program and what we know about it. In practice (in JavaScript) the question of function purity is not about being absolutely pure or not, but about a range of confidence in its purity.
+
+The more pure, the better. The more effort you put into making a function pure(r), the higher your confidence will be when you read code that uses it, and that will make that part of the code more readable.
 
 ## There Or Not
 
@@ -1009,7 +1011,7 @@ safer_generate( { prefix: "foo" } );
 
 These strategies are in no way fool-proof; the safest protection against side causes/effects is to not do them. But if you're trying to improve the readability and confidence level of your program, reducing the side causes/effects wherever possible is a huge step forward.
 
-Essentially, we're not really eliminating side causes/effects, but rather containing and limiting them, so that more of our code is verifiable and reliable. If we later run into program bugs, we know it's most likely that the parts of our code still using side causes/effects hold the culprits.
+Essentially, we're not really eliminating side causes/effects, but rather containing and limiting them, so that more of our code is verifiable and reliable. If we later run into program bugs, we know that the parts of our code still using side causes/effects are the most likely culprits.
 
 ## Summary
 
