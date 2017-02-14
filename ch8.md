@@ -1218,7 +1218,7 @@ Just as we said earlier that array's `map(..)` adapts a single-value operation t
 
 The important part to maintain in the spirit of FP is that these operators must behave according to value immutability, meaning that they must return a new data structure rather than mutating the existing one.
 
-Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has two references to other nodes (binary trees), typically referred to as *left* and *right* child trees. Each node holds one value of the overall data structure.
+Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has two references to other nodes (themselves binary trees), typically referred to as *left* and *right* child trees. Each node in the tree holds one value of the overall data structure.
 
 <p align="center">
 	<img src="fig7.png" width="250">
@@ -1260,7 +1260,7 @@ Our tree looks like:
 
 There are multiple ways to traverse a binary tree to process its values. If it's a BST (our's is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
 
-For convenience, let's define a `forEach(..)` method that visits a binary tree in the same manner as an array:
+Since you can't just easily `console.log(..)` a binary tree like you can with an array, let's first define a convenience method, mostly to use for printing. `forEach(..)` will visit the nodes of a binary tree in the same manner as an array:
 
 ```js
 // in-order traversal
@@ -1279,7 +1279,9 @@ BinaryTree.forEach = function forEach(visitFn,node){
 };
 ```
 
-**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We'll cover recursion in more detail in a later chapter, where we'll cover recursion in that chapter.
+**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We'll cover recursion in more detail in a later chapter, where we'll cover recursion in that chapter on recursion.
+
+Recall `forEach(..)` was described at the beginning of this chapter as only being useful for side effects, which is not very typically desired in FP. In this case, we'll use `forEach(..)` only for the side effect of I/O, so it's perfectly reasonable as a helper.
 
 Use `forEach(..)` to print out values from the tree:
 
@@ -1287,7 +1289,7 @@ Use `forEach(..)` to print out values from the tree:
 BinaryTree.forEach( node => console.log( node.value ), banana );
 // apple apricot avocado banana cantelope cherry cucumber grape
 
-// visit only `cherry`-rooted subtree
+// visit only the `cherry`-rooted subtree
 BinaryTree.forEach( node => console.log( node.value ), cherry );
 // cantelope cherry cucumber grape
 ```
@@ -1463,7 +1465,7 @@ BinaryTree.filter = function filter(predicateFn,node){
 };
 ```
 
-The majority of this code listing is dedicated to handling the shifting of node parent/child references if a node is "removed" (filtered out) of the duplicated tree structure.
+The majority of this code listing is dedicated to handling the shifting of a node's parent/child references if it's "removed" (filtered out) of the duplicated tree structure.
 
 As an example to illustrate using `filter(..)`, let's narrow our produce tree down to only vegetables:
 
@@ -1473,6 +1475,7 @@ var vegetables = [ "asparagus", "avocado", "brocolli", "carrot",
 	"zucchini" ];
 
 var whatToBuy = BinaryTree.filter(
+	// filter the produce list only for vegetables
 	node => vegetables.indexOf( node.value ) != -1,
 	banana
 );
