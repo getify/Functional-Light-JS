@@ -544,7 +544,7 @@ Moreover, **composition is helpful even if there's only one occurrence of someth
 
 Aside from generalization vs specialization, I think there's another more useful definition for abstraction, as revealed by this quote:
 
-> ... abstraction is a process by which the programmer associates a name with a potentially complicated program fragment, which can then be thought of in terms of its purpose of function, rather than in terms of how that function is achieved. By hiding irrelvant details, abstraction reduces conceptual complexity, making it possible for the programmer to focus on a manageable subset of the program text at any particular time.
+> ... abstraction is a process by which the programmer associates a name with a potentially complicated program fragment, which can then be thought of in terms of its purpose of function, rather than in terms of how that function is achieved. By hiding irrelvant [sic] details, abstraction reduces conceptual complexity, making it possible for the programmer to focus on a manageable subset of the program text at any particular time.
 >
 > http://web.cs.mun.ca/~ulf/pld/substance.html
 
