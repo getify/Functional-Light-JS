@@ -71,16 +71,16 @@ three( obj );		// 3
 
 Many people conjur lots of extra things when you mention "closure", such as the asynchronous callbacks or even the module pattern with encapsulation and information hiding. Similarly, "object" brings to mind classes, `this`, prototypes, and a whole slew of other utilities and patterns.
 
-As we go along, we'll carefully address the parts of this external context that matter, but for now, try to just stick to the simplest interpretations of "closure" and "object" -- it'll make this journey less confusing.
+As we go along, we'll carefully address the parts of this external context that matter, but for now, try to just stick to the simplest interpretations of "closure" and "object" -- it'll make this exploration less confusing.
 
 ## Look Alike
 
 It may not be obvious how closures and objects are related. So let's explore their similarities first.
 
-To frame this discussion, let me just briefly assert two observations:
+To frame this discussion, let me just briefly assert two things:
 
-1. A language without closures can simulate them with objects instead.
-2. A language without objects can simulate them with closures instead.
+1. A programming language without closures can simulate them with objects instead.
+2. A programming language without objects can simulate them with closures instead.
 
 In other words, we can think of closures and objects as two different representations of a thing.
 
@@ -374,7 +374,7 @@ Here's some selections from a part of that post:
 >
 > In other words, two things A and B would be isomorphic if you could map (convert) from A to B and then go back to A with the inverse mapping.
 
-Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case of bijective morphism that requires not only that the mapping must be able to go in either direction, but also that the behavior is identical in either form.
+Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case of bijective (aka, 2-way) morphism that requires not only that the mapping must be able to go in either direction, but also that the behavior is identical in either form.
 
 But instead of thinking about numbers, let's relate isomorphism to code. Again quoting my blog post:
 
