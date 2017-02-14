@@ -747,6 +747,8 @@ var makeObjProp =
 		setProp( name, {}, value );
 ```
 
+**Tip:** This utility is known as `objOf(..)` in the Ramda library.
+
 Just as we did with `prop(..)` to make `extractName(..)`, we'll partially apply `makeObjProp(..)` to build a function `personData(..)` that makes our data object:
 
 ```js
