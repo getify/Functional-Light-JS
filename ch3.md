@@ -780,20 +780,16 @@ function partialProps(fn,presetArgsObj) {
 }
 
 function curryProps(fn,arity = 1) {
-	return (function nextCurried(prevArgs){
-		return function curried(nextArg){
-			if (!nextArg || typeof nextArg != "object") {
-				nextArg = { value: nextArg };
-			}
+	return (function nextCurried(prevArgsObj){
+		return function curried(nextArgObj = {}){
+			var [key] = Object.keys( nextArgObj );
+			var allArgsObj = Object.assign( {}, prevArgsObj, { [key]: nextArgObj[key] } );
 
-			var [key] = Object.keys( nextArg );
-			var args = Object.assign( {}, prevArgs, { [key]: nextArg[key] } );
-
-			if (Object.keys( args ).length >= arity) {
-				return fn( args );
+			if (Object.keys( allArgsObj ).length >= arity) {
+				return fn( allArgsObj );
 			}
 			else {
-				return nextCurried( args );
+				return nextCurried( allArgsObj );
 			}
 		};
 	})( {} );
@@ -819,11 +815,11 @@ f2( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-That's a neat trick, I think. We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances.
+Order doesn't matter anymore! We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances. Cool!
 
 ### Spreading Properties
 
-Unfortunately, this only works because we have control over the signature of `foo(..)` and defined it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed, and we couldn't change that function signature?
+Unfortunately, this only works because we have control over the signature of `foo(..)` and defined it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature?
 
 ```js
 function bar(x,y,z) {
@@ -835,11 +831,11 @@ Just like the `spreadArgs(..)` utility earlier, we could define a `spreadArgProp
 
 There are some quirks to be aware of, though. With `spreadArgs(..)`, we were dealing with arrays, where ordering is well defined and obvious. However, with objects, property order is less clear and not necessarily reliable. Depending on how an object is created and properties set, we cannot be absolutely certain what enumeration order properties would come out.
 
-Such a utility needs a way to let you define what order the function in question expects its arguments (e.g., property enumeration order). We could pass an array like `["x","y","z"]` to tell the utility to pull the properties off the object argument in exactly that order.
+Such a utility needs a way to let you define what order the function in question expects its arguments (e.g., property enumeration order). We can pass an array like `["x","y","z"]` to tell the utility to pull the properties off the object argument in exactly that order.
 
 That's decent, but it's also unfortunate that we kinda *have* to do add that property-name array even for the simplest of functions. Is there any kind of trick we could use to detect what order the parameters are listed for a function, in at least the common simple cases? Fortunately, yes!
 
-JavaScript functions have a `.toString()` method that gives a string representation of the function's code, including the function declaration signature. Dusting off our regular expression parsing skills, we could parse the string representation of the function, and pull out the individually named parameters. The code looks a bit gnarly, but it's good enough to get the job done:
+JavaScript functions have a `.toString()` method that gives a string representation of the function's code, including the function declaration signature. Dusting off our regular expression parsing skills, we can parse the string representation of the function, and pull out the individually named parameters. The code looks a bit gnarly, but it's good enough to get the job done:
 
 ```js
 function spreadArgProps(
@@ -858,7 +854,7 @@ function spreadArgProps(
 
 **Note:** This utility's parameter parsing logic is far from bullet-proof; we're using regular expressions to parse code, which is already a faulty premise! But our only goal here is to handle the common cases, which this does reasonably well. We only need a sensible default detection of parameter order for functions with simple parameters (as well as those with default parameter values). We don't, for example, need to be able to parse out a complex destructured parameter, because we wouldn't likely be using this utility with such a function, anyway. So, this logic gets the 80% job done; it lets us override the `propOrder` array for any other more complex function signature that wouldn't otherwise be correctly parsed. That's the kind of pragmatic balance this book seeks to find wherever possible.
 
-Let's illustrate our `spreadArgProps(..)` utility:
+Let's illustrate using our `spreadArgProps(..)` utility:
 
 ```js
 function bar(x,y,z) {
@@ -875,9 +871,9 @@ f4( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-A word of caution: the object parameters pattern I'm showing here clearly improves readability by reducing the clutter of argument order juggling, but to my knowledge, no mainstream FP libraries are using this approach. It comes at the expense of being far less familiar than how most JavaScript FP is done.
+A word of caution: the object parameters/named arguments pattern I'm showing here clearly improves readability by reducing the clutter of argument order juggling, but to my knowledge, no mainstream FP libraries are using this approach. It comes at the expense of being far less familiar than how most JavaScript FP is done.
 
-Also, usage of functions defined in this style requires you to know what each argument's name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'".
+Also, usage of functions defined in this style requires you to know what each argument's name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'."
 
 Weigh these tradeoffs carefully.
 
