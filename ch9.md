@@ -553,10 +553,10 @@ For clarity, the algorithm strategy (similar to what we discussed earlier) we mi
 2. Is `num1` even, and is `num1` greater than `num2`? If so, keep `num1`.
 3. If `num2` is even, keep it (store in `num1`).
 4. Otherwise, fall back to `undefined` (store in `num1`).
-5. If there are more `nums` consider, recursively compare them to `num1`.
+5. If there are more `nums` to consider, recursively compare them to `num1`.
 6. Finally, just return whatever value is left in `num1`.
 
-Our code can follow these steps almost exactly closely:
+Our code can follow these steps almost exactly:
 
 ```js
 "use strict";
@@ -636,7 +636,7 @@ function trampoline(fn) {
 		}
 
 		return result;
-	}
+	};
 }
 ```
 
