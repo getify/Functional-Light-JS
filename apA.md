@@ -358,7 +358,9 @@ function reducer(list,val) {
 }
 ```
 
-Do you see how `shortEnoughReducer(..)` has taken the place of `listCombination(..)` inside `longAndShortEnoughReducer(..)`? Why does that work? Because the shape of a `reducer(..)` and the shape of `listCombination(..)` are the same. In other words, a reducer can be used as a combiner for another reducer; that's how they compose!
+Do you see how `shortEnoughReducer(..)` has taken the place of `listCombination(..)` inside `longAndShortEnoughReducer(..)`? Why does that work?
+
+Because **the shape of a `reducer(..)` and the shape of `listCombination(..)` are the same.** In other words, a reducer can be used as a combination function for another reducer; that's how they compose! The `listCombination(..)` function makes the first reducer, then *that reducer* can be as the combination function to make the next reducer, and so on.
 
 Let's test out our `longAndShortEnoughReducer(..)` with a few different values:
 
@@ -384,7 +386,7 @@ var longAndShortEnoughReducer = y( z( listCombination) );
 var upperLongAndShortEnoughReducer = x( longAndShortEnoughReducer );
 ```
 
-As the name `upperLongAndShortEnoughReducer(..)` implies, it does all three steps at once -- a mapping and two filters! What would it kinda look like internally:
+As the name `upperLongAndShortEnoughReducer(..)` implies, it does all three steps at once -- a mapping and two filters! What it kinda look likes internally:
 
 ```js
 // upperLongAndShortEnoughReducer:
@@ -421,8 +423,7 @@ var z = curriedFilterReducer( isShortEnough );
 
 var upperLongAndShortEnoughReducer = x( y( z( listCombination ) ) );
 
-words
-.reduce( upperLongAndShortEnoughReducer, [] );
+words.reduce( upperLongAndShortEnoughReducer, [] );
 // ["WRITTEN","SOMETHING"]
 ```
 
@@ -438,15 +439,18 @@ var composition = compose(
 );
 
 var upperLongAndShortEnoughReducer = composition( listCombination );
+
+words.reduce( upperLongAndShortEnoughReducer, [] );
+// ["WRITTEN","SOMETHING"]
 ```
 
 Think about the flow of "data" in that composed function:
 
-1. `listCombination(..)` flows in as the `combinationFn(..)` to the filter-reducer of `isShortEnough(..)`.
-2. *That* resulting reducer function then flows in as the `combinationFn(..)` for the filter-reducer of `isLongEnough(..)`.
-3. Finally, *that* resulting reducer function flows in as the `combinationFn(..)` for the map-reducer of `strUppercase(..)`.
+1. `listCombination(..)` flows in as the combination function to make the filter-reducer for `isShortEnough(..)`.
+2. *That* resulting reducer function then flows in as the combination function to make the filter-reducer for `isLongEnough(..)`.
+3. Finally, *that* resulting reducer function flows in as the combination function to make the map-reducer for `strUppercase(..)`.
 
-In the previous snippet, `composition(..)` is a composed function expecting a `combinationFn(..)` to make a reducer; `composition(..)` has a special label: transducer. Providing the combination function to a transducer produces the composed reducer:
+In the previous snippet, `composition(..)` is a composed function expecting a combination function to make a reducer; `composition(..)` has a special label: transducer. Providing the combination function to a transducer produces the composed reducer:
 
 // TODO: fact-check if the transducer *produces* the reducer or *is* the reducer
 
@@ -466,7 +470,7 @@ words
 
 #### List Combination: Pure vs Impure
 
-As a quick aside, let's revisit our `listCombination(..)` implementation:
+As a quick aside, let's revisit our `listCombination(..)` combination function implementation:
 
 ```js
 function listCombination(list,val) {
@@ -522,15 +526,14 @@ If you squint your eyes, you can almost see how these two functions are intercha
 
 In other words, `strConcat(..)` is a combination function!
 
-That means that we can use it instead of `listCombination(..)` if our end goal is to get a string concatenation rather than a list:
+That means that we can use *it* instead of `listCombination(..)` if our end goal is to get a string concatenation rather than a list:
 
 ```js
-words
-.reduce( transducer( strConcat ), "" );
+words.reduce( transducer( strConcat ), "" );
 // WRITTENSOMETHING
 ```
 
-Boom! That's transducing for you. I won't drop the mic here, but just gently set it down... eh, you get the point!
+Boom! That's transducing for you. I won't actually drop the mic here, but just gently set it down...
 
 ## What, Finally
 
@@ -614,13 +617,13 @@ transducers.transduce( transformer, strConcat, "", words );
 
 Looks almost identical to above.
 
-**Note:** The above snippet uses `transformers.compose(..)` since the library provides it, but in this case our `compose(..)` from Chapter 4 would produce the same outcome. In other words, composition itself isn't a transducing-sensitive operation.
+**Note:** The above snippet uses `transformers.comp(..)` since the library provides it, but in this case our `compose(..)` from Chapter 4 would produce the same outcome. In other words, composition itself isn't a transducing-sensitive operation.
 
 The composed function in this snippet is named `transformer` instead of `transducer`. That's because if we call `transformer(listCombination)` (or `transformer(strConcat)`), we won't get a straight up transduce-reducer function as earlier.
 
 `transducers.map(..)` and `transducers.filter(..)` are special helpers that adapt regular predicate or mapper functions into functions that produce a special transform object (with the transducer function wrapped underneath); the library uses these transform objects for transducing. The extra capabilities of this transform object abstraction are beyond what we'll explore, so consult the library's documentation for more information.
 
-Since calling `transformer(..)` produces a transform object and not a typical two-arity transducer-reducer function, the library also provides `toFn(..)` to adapt the transform object to be useable by native array `reduce(..)`:
+Since calling `transformer(..)` produces a transform object and not a typical two-arity transduce-reducer function, the library also provides `toFn(..)` to adapt the transform object to be useable by native array `reduce(..)`:
 
 ```js
 words.reduce(
