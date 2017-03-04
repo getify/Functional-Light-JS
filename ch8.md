@@ -942,7 +942,7 @@ The cleanliness of this approach is in part why FPers prefer the standalone util
 
 ### Adapting Methods To Standalones
 
-In the previous definition of `filter(..)` / `map(..)` / `reduce(..)`, you might have spotted the common pattern across all three. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unboundMethod(..)` to do just that:
+In the previous definition of `filter(..)` / `map(..)` / `reduce(..)`, you might have spotted the common pattern across all three: they all dispatch to the corresponding native array method. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unboundMethod(..)` to do just that:
 
 ```js
 var unboundMethod =
@@ -970,6 +970,8 @@ compose(
 )
 ( [1,2,3,4,5] );					// 18
 ```
+
+**Note:** `unboundMethod(..)` is called `invoker(..)` in Ramda.
 
 ### Adapting Standalones To Methods
 
