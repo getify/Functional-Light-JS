@@ -347,7 +347,7 @@ filterIn( isOdd, [1,2,3,4,5] );			// [1,3,5]
 filterOut( isEven, [1,2,3,4,5] );		// [1,3,5]
 ```
 
-I think using `filterIn(..)` and `filterOut(..)` will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
+I think using `filterIn(..)` and `filterOut(..)` (known as `reject(..)` in Ramda) will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
 
 ## Reduce
 
