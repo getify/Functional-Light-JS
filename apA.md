@@ -318,7 +318,7 @@ Remember, if we wanted the independent reducers from all these, we could do:
 
 ```js
 var upperReducer = x( listCombination );
-var shortEnoughReducer = y( listCombination );
+var longEnoughReducer = y( listCombination );
 var shortEnoughReducer = z( listCombination );
 ```
 
