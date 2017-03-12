@@ -316,7 +316,7 @@ var compose = (...fns) =>
 
 Notice that the `reduce(..)` looping happens each time the final `composed(..)` function is run, and that each intermediate `result(..)` is passed along to the next iteration as the input to the next call.
 
-The advantage of this implementation is that the code is more concise and also that it uses a well-known FP construct: `reduce(..)`. And the performace of this implementation is also similar to the original `for`-loop version.
+The advantage of this implementation is that the code is more concise and also that it uses a well-known FP construct: `reduce(..)`. And the performance of this implementation is also similar to the original `for`-loop version.
 
 However, this implementation is limited in that the outer composed function (aka, the first function in the composition) can only receive a single argument. Most other implementations pass along all arguments to that first call. If every function in the composition is unary, this is no big deal. But if you need to pass multiple arguments to that first call, you'd want a different implementation.
 
