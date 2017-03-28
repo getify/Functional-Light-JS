@@ -18,3 +18,5 @@ Kyle is a great teacher known for his relentless pursuit of the whole picture, l
 Functional programming has many different definitions. A Lisp programmer's definition is vastly different from a Haskell perspective. OCaml's FP bears little resemblance to the paradigm seen in Erlang. You will even find several competing definitions in JavaScript. Yet there is a tie that binds - some blurry know-it-when-I-see-it definition, much like obscenity (indeed, some do find FP obscene!) and this book certainly captures it. The end result might not be considered idiomatic in certain circles, but the knowledge acquired here directly applies to any flavor of FP.
 
 This book is a terrific place to begin your FP journey. Take it away Kyle...
+
+*-Brian Lonsdorf (@drboolean)*
