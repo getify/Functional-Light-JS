@@ -261,7 +261,7 @@ var person = {
 	first() {
 		return this.firstName;
 	},
-	last()
+	last() {
 		return this.lastName;
 	}
 }

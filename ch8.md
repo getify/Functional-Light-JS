@@ -1025,7 +1025,7 @@ var getUserId = partial( prop, "uId" );
 var session, sessionId, user, userId, orders;
 
 session = getCurrentSession();
-if (session != null) sessionId = getSessionId( sessionId );
+if (session != null) sessionId = getSessionId( session );
 if (sessionId != null) user = lookupUser( sessionId );
 if (user != null) userId = getUserId( user );
 if (userId != null) orders = lookupOrders( userId );
