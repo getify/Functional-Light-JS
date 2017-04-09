@@ -56,7 +56,7 @@ zip(
 
 Repetitive, right?
 
-Wouldn't it be better (both for readability and performacne) if we could combine the `isLongEnough(..)` predicate with the `isShortEnough(..)` predicate? You could do so manually:
+Wouldn't it be better (both for readability and performance) if we could combine the `isLongEnough(..)` predicate with the `isShortEnough(..)` predicate? You could do so manually:
 
 ```js
 function isCorrectLength(str) {
