@@ -658,7 +658,7 @@ function StudentRecord(name,major,gpa) {
 	};
 }
 
-var student = StudentRecord( "Kyle Simpson", "kyle@some.tld", "CS", 4 );
+var student = StudentRecord( "Kyle Simpson", "CS", 4 );
 
 // later
 
