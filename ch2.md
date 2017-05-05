@@ -3,31 +3,53 @@
 
 Functional Programming is **not just programming with the `function` keyword.** Oh if only it was that easy, I could end the book right here! But importantly, the function really *is* at the center of FP. And it's how we use functions that makes our code *functional*.
 
+函数式编程 **不是使用 `function` 关键字编程。** 如果它真有那么简单，我在这里就可以结束这本书了！但重要的是，函数确实是 FP 的中心。使我们的代码成为 *函数式* 的，使我们如何使用函数。
+
 But, how sure are you that you know what *function* means?
+
+但是，你确信你知道 *函数* 是什么意思？
 
 In this chapter, we're going to lay the groundwork for the rest of the book by covering all the foundational aspects of functions. In some ways, the content here is a review of all the things even a non-FP programmer should know about functions. But if we want to get the most out learning FP concepts, we've got to *know* functions inside and out.
 
+在这一章中，我们将要通过讲解函数的所有基本方面来为本书的剩余部分打下基础。在某种意义上，这里的内容即便是对非 FP 程序员来说也是应当知道的关于函数的一切。但是如果我们想要从 FP 的概念中学到竟可能多的东西，我们必须 *知道* 函数的里里外外。
+
 Brace yourself, because there's a lot more to the function than you may have realized.
+
+振作起来，关于函数东西可能比你已经知道的东西多得多。
 
 ## What Is A Function?
 
 The most natural place I can think of to start tackling functional programming is with the *function*. That may seem too simplistic and obvious, but I think our journey needs a solid first step.
 
+要解释函数式编程，我所能想到的最自然的起点就是 *函数*。这看起来在显而易见不过了，但我想我们的旅程需要坚实的第一步。
+
 So... what is a function?
+
+那么……什么是函数？
 
 ### Brief Math Review
 
 I know I've promised we'd stay away from math as much as possible, but bear with me for a moment as we quickly observe some fundamental things about functions and graphs from algebra before we move on.
 
+我知道我承诺过尽可能远离数学，但稍稍忍耐我片刻，在继续之前我们快速地观察一些东西：代数中有关函数和图像的基础。
+
 Do you remember learning anything about `f(x)` back in school? What about the equation `y = f(x)`?
 
+你还记得在学校里学过的关于 `f(x)` 的一些东西吗？等式 `y = f(x)` 呢？
+
 Let's say an equation is defined like this: <code>f(x) = 2x<sup>2</sup> + 3</code>. What does that mean? What does it mean to graph that equation? Here's the graph:
+
+比如说一个等式这样定义的：<code>f(x) = 2x<sup>2</sup> + 3</code>。这是什么意思？给这个函数画出图像是什么意思？这就是图像：
 
 <img src="fig1.png">
 
 What you can notice is that for any value of `x`, say `2`, if you plug it into the equation, you get `11`. What is `11`, though? It's the *return value* of the `f(x)` function, which earlier we said represents a `y` value.
 
+你能注意到，对于任何 `x` 的值，比如 `2`，如果你将它插入这个等式，你会得到 `11`。那么 `11` 是什么？它是函数 `f(x)` 的 *返回值*，代表我们刚才说到的 `y` 值。
+
 In other words, there's a point at `(2,11)` on that curve in the graph. And for every value of `x` we plug in, we get another `y` value that pairs with it as a coordinate for a point. Another is `(0,3)`, and another is `(-1,5)`. Put all those points together, and you have the graph of that parabolic curve as shown above.
+
+换句话说，在图像的曲线上有一个点 `(2,11)`。而且对于我们插入的任意的 `x` 的值，我们都能得到另一个与之相对应的 `y` 值
 
 So what's any of this got to do with FP?
 
