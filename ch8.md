@@ -902,8 +902,8 @@ But this particular standalone style suffers from its own awkwardness; the casca
 
 ```js
 compose(
-	partialRight( reduce, sum, 0 )
-	partialRight( map, double )
+	partialRight( reduce, sum, 0 ),
+	partialRight( map, double ),
 	partialRight( filter, isOdd )
 )
 ( [1,2,3,4,5] );					// 18
