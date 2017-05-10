@@ -274,7 +274,7 @@ function foo( [x,y,...args] = [] ) {
 foo( [1,2,3] );
 ```
 
-Do you spot the `[ .. ]` brackets around the argument list now? That's array destructuring. Destructuring is a way to declaratively describe a *pattern* for the kind of structure (object, array, etc) that you expect to see, and how decomposition (assignment) of its individual parts should happen.
+Do you spot the `[ .. ]` brackets around the parameter list now? That's array destructuring. Destructuring is a way to declaratively describe a *pattern* for the kind of structure (object, array, etc) that you expect to see, and how decomposition (assignment) of its individual parts should happen.
 
 In this example, destructuring tells the engine that an array is expected in this assignment position (aka parameter). The pattern says to take the first value of that array and assign to a local parameter variable called `x`, the second to `y`, and whatever is left is *gathered* into `args`.
 
