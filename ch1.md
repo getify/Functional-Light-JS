@@ -145,6 +145,8 @@ Here are a few popular FP libraries for JavaScript that are a great place to sta
 * [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide)
 * [functional.js](http://functionaljs.com/)
 * [Immutable.js](https://github.com/facebook/immutable-js)
+* [Sanctuary](https://github.com/sanctuary-js/sanctuary)
+* [Fantasy Land](https://github.com/fantasyland/fantasy-land)
 
 Appendix C illustrates some of these libraries using various examples from the text.
 
