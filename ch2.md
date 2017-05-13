@@ -442,7 +442,7 @@ Consider this version of the code:
 function foo(x) {
 	var retValue;
 
-	if (retValue == undefined && x > 10) {
+	if (x > 10) {
 		retValue = x + 1;
 	}
 
