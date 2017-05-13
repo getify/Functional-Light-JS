@@ -316,7 +316,7 @@ And for the ES6 `=>` fans:
 
 ```js
 var curry =
-	(fn, arity = fn.length, nextCurried) =>
+	(fn, arity = fn.length) =>
 		(nextCurried = prevArgs =>
 			nextArg => {
 				var args = prevArgs.concat( [nextArg] );
