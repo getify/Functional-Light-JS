@@ -537,11 +537,7 @@ sum( nums );			// 124
 
 ## Functions Of Functions
 
-Functions can receive and return values of any type. A function that receives or returns one or more other function values has the special name: higher-order function.
-
 函数可以接收并返回任意类型的值。一个接收或返回一个或多个其他函数的函数有一个特殊的名称：高阶函数（higher-order function）。
-
-Consider:
 
 考虑如下代码：
 
@@ -558,11 +554,7 @@ forEach( [1,2,3,4,5], function each(val){
 // 1 2 3 4 5
 ```
 
-`forEach(..)` is a higher-order function because it receives a function as an argument.
-
 `forEach(..)` 是一个高阶函数，因为它接收一个函数作为实际参数。
-
-A higher-order function can also output another function, like:
 
 一个高阶函数还可以输出另一个函数，比如：
 
@@ -579,8 +571,6 @@ var f = foo();
 
 f( "Hello!" );			// Hello!
 ```
-
-`return` is not the only way to "output" another function:
 
 `return` 不是“输出”另一个函数的唯一方法：
 
@@ -600,21 +590,15 @@ function bar(func) {
 foo();					// Hello!
 ```
 
-Functions that treat other functions as values are higher-order functions by definition. FPers write these all the time!
-
 高阶函数的定义就是将其他函数看做值的函数。FP 程序员一天到晚都在写这些东西！
 
 ### Keeping Scope
 
-One of the most powerful things in all of programming, and especially in FP, is how a function behaves when it's inside another function's scope. When the inner function makes reference to a variable from the outer function, this is called closure.
-
 在一切编程方式 —— 特别是 FP —— 中最强大的东西之一，就是当一个函数位于另一个函数的作用域中时如何动作。当内部函数引用外部函数的一个变量时，这称为闭包（closure）。
 
-Defined pragmatically, closure is when a function remembers and accesses variables from outside of its own scope, even when that function is executed in a different scope.
+实用的定义是，闭包是在一个函数即使在不同的作用域中被执行时，记住并访问它自己作用域之外的变量。
 
-实用的定义是，闭包是当一个函数记住并访问它自己作用域之外的变量时发生的，即使是在这个函数在不同的作用域中被执行时。
-
-Consider:
+考虑如下代码：
 
 ```js
 function foo(msg) {
@@ -630,11 +614,11 @@ var helloFn = foo( "Hello!" );
 helloFn();				// Hello!
 ```
 
-The `msg` parameter variable in the scope of `foo(..)` is referenced inside the inner function. When `foo(..)` is executed and the inner function is created, it captures the access to the `msg` variable, and retains that access even after being `return`d.
+在 `foo(..)` 的作用域中的形式参数变量 `msg` 在内部函数中被引用了。当 `foo(..)` 被执行，内部函数被创建时，它就会捕获对 `msg` 变量的访问权，并且即使在被 `return` 之后依然保持这个访问权。
 
-Once we have `helloFn`, a reference to the inner function, `foo(..)` has finished and it would seem as if its scope should have gone away, meaning the `msg` variable would no longer exist. But that doesn't happen, because the inner function has a closure over `msg` that keeps it alive. The closed over `msg` variable survives for as long as the inner function (now referenced by `helloFn` in a different scope) stays around.
+一旦我们有了 `helloFn`，一个内部函数的引用，`foo(..)` 已经完成运行而且它的作用域看起来应当已经消失了，这意味着变量 `msg` 将不复存在。但是这没有发生，因为内部函数拥有一个对 `msg` 的闭包使它保持存在。只要这个内部函数（现在在一个不同的作用域中通过 `helloFn` 引用）存在，被闭包的变量 `msg` 就会保持下来。
 
-Let's look at a few more examples of closure in action:
+再让我们看几个闭包在实际中的例子：
 
 ```js
 function person(id) {
@@ -652,9 +636,9 @@ fred();					// I am Fred: 0.8331252801601532
 susan();				// I am Susan: 0.3940753308893741
 ```
 
-The inner function `identify()` has closure over two variables, the parameter `id` and the inner variable `randNumber`.
+内部函数 `identify()` 闭包着两个变量，形式参数 `id` 和内部变量 `randNumber`。
 
-The access that closure enables is not restricted to merely reading the variable's original value -- it's not just a snapshot but rather a live link. You can update the value, and that new current state remains remembered until the next access.
+闭包允许的访问权不仅仅限于读取变量的原始值 —— 它不是一个快照而是一个实时链接。你可以更新这个值，而且在下一次访问之前这个新的当前状态会被一直记住。
 
 ```js
 function runningCounter(start) {
@@ -673,9 +657,9 @@ score();				// 2
 score( 13 );			// 15
 ```
 
-**Warning:** For reasons that we'll cover more later in the text, this example of using closure to remember a state that changes (`val`) is probably something you'll want to avoid where possible.
+**警告：** 由于我们将在本文稍后讲解的一些理由，这种使用闭包来记住改变的状态（`val`）的例子可能是你想要尽量避免的。
 
-If you have an operation that needs two inputs, one of which you know now but the other will be specified later, you can use closure to remember the first input:
+如果你有一个操作需要两个输入，你现在知道其中之一但另一个将会在稍后指定，你就可以使用闭包来记住第一个输入：
 
 ```js
 function makeAdder(x) {
@@ -695,11 +679,11 @@ addTo10( 90 );			// 100
 addTo37( 13 );			// 50
 ```
 
-Normally, a `sum(..)` function would take both an `x` and `y` input to add them together. But in this example we receive and remember (via closure) the `x` value(s) first, while the `y` value(s) are separately specified later.
+一般说来，一个 `sum(..)` 函数将会拿着 `x` 和 `y` 两个输入来把它们加在一起。但是在这个例子中我们首先收到并（通过闭包）记住值 `x`，而值 `y` 是在稍后被分离地指定的。
 
-**Note:** This technique of specifying inputs in successive function calls is very common in FP, and comes in two forms: partial application and currying. We'll dive into them more thoroughly later in the text.
+**注意：** 这种在连续的函数调用中指定输入的技术在 FP 中非常常见，而且拥有两种形式：局部应用（partial application）与柯里化（currying）。我们将在本文稍后更彻底地深入它们。
 
-Of course, since functions are just values in JS, we can remember function values via closure.
+当然，因为在 JS 中函数只是一种值，所以我们可以通过闭包来记住函数值。
 
 ```js
 function formatter(formatFn) {
@@ -720,23 +704,23 @@ lower( "WOW" );				// wow
 upperFirst( "hello" );		// Hello
 ```
 
-Instead of distributing/repeating the `toUpperCase()` and `toLowerCase()` logic all over our code, FP encourages us to create simple functions that encapsulate -- a fancy way of saying wrapping up -- that behavior.
+与其将 `toUpperCase()` 和 `toLowerCase()` 的逻辑在我们的代码中散布/重复得到处都是，FP 鼓励我们创建封装（encapsulate） —— “包起来”的炫酷说法 —— 这种行为的简单函数。
 
-Specifically, we create two simple unary functions `lower(..)` and `upperFirst(..)`, because those functions will be much easier to wire up to work with other functions in the rest of our program.
+具体地说，我们创建了两个简单的一元函数 `lower(..)` 和 `upperFirst(..)`，因为在我们程序的其余部分中，这些函数将会更容易地与其他函数组合起来工作。
 
-**Tip:** Did you spot how `upperFirst(..)` could have used `lower(..)`?
+**提示：** 你是否发现了 `upperFirst(..)` 本可以使用 `lower(..)`?
 
-We'll use closure heavily throughout the rest of the text. It may just be the most important foundational practice in all of FP, if not programming as a whole. Get really comfortable with it!
+我们将在本文的剩余部分重度依赖闭包。如果不谈整个编程世界，它可能是一切 FP 中最重要的基础实践。要非常熟悉它！
 
 ## Syntax
 
-Before we move on from this primer on functions, let's take a moment to discuss their syntax.
+在我们从这个函数的入门教程启程之前，让我们花点儿时间讨论一下它们的语法。
 
-More than many other parts of this text, the discussions in this section are mostly opinion and preference, whether you agree with the views presented here or take opposite ones. These ideas are highly subjective, though many people seem to feel rather absolutely about them. Ultimately, you decide.
+与本文的其他许多部分不同，这一节中的讨论带有最多的个人意见与偏好，不论你是否同意或者反对这里出现的看法。这些想法非常主观，虽然看起来许多人感觉它们更绝对。不过说到头来，由你决定。
 
 ### What's In A Name?
 
-Syntatically speaking, function declarations require the inclusion of a name:
+从语法上讲，函数声明要求包含一个名称：
 
 ```js
 function helloMyNameIs() {
@@ -744,7 +728,7 @@ function helloMyNameIs() {
 }
 ```
 
-But function expressions can come in both named and anonymous forms:
+但是函数表达式可以以命名和匿名两种形式出现：
 
 ```js
 foo( function namedFunctionExpr(){
@@ -756,15 +740,15 @@ bar( function(){	// <-- look, no name!
 } );
 ```
 
-What exactly do we mean by anonymous, by the way? Specifically, functions have a `name` property that holds the string value of the name the function was given syntactically, such as `"helloMyNameIs"` or `"namedFunctionExpr"`. This `name` property is most notably used by the console/developer tools of your JS environment to list the function when it participates in a stack trace (usually from an exception).
+顺便问一下，我们说匿名究竟是什么意思？具体地讲，函数有一个 `name` 属性，它持有这个函数在语法上被赋予的名称的字符串值，比如 `"helloMyNameIs"` 或者 `"namedFunctionExpr"`。这个 `name` 属性最显著地被用于你的 JS 环境的控制台/开发者工具中，当这个函数存在于调用栈中时将它罗列出来。
 
-Anonymous functions are generally displayed as `(anonymous function)`.
+匿名函数通常被显示为 `(anonymous function)`。
 
-If you've ever had to debug a JS program from nothing but a stack trace of an exception, you probably have felt the pain of seeing `(anonymous function)` appear line after line. This listing doesn't give a developer any clue whatsoever as to the path the exception came from. It's not doing the developer any favors.
+如果你曾经在除了一个异常的调用栈轨迹以外没有任何可用信息的情况下调试 JS 程序，你就可能感受过看到一行接一行的 `(anonymous function)` 的痛苦。对于该异常从何而来，这种列表不会给开发者任何线索。它帮不到开发者。
 
-If you name your function expressions, the name is always used. So if you use a good name like `handleProfileClicks` instead of `foo`, you'll get much more helpful stack traces.
+如果你给你的函数表达式命名，那么这个名称将总是被使用。所以如果你使用了一个像 `handleProfileClicks` 这样的好名字取代 `foo`，那么你将得到有用得多的调用栈轨迹。
 
-As of ES6, anonymous function expressions can be aided by *name inferencing*. Consider:
+在 ES6 中，匿名函数表达式可以被 *名称推断（name inferencing）* 所辅助。考虑如下代码：
 
 ```js
 var x = function(){};
@@ -772,9 +756,9 @@ var x = function(){};
 x.name;			// x
 ```
 
-If the engine is able to guess what name you *probably* want the function to take, it will go ahead and do so.
+如果引擎能够猜测你 *可能* 想让这个函数叫什么名字，它就会立即这么做。
 
-But beware, not all syntactic forms benefit from name inferencing. Probably the most common place a function expression shows up is as an argument to a function call:
+但要小心，不是所有的语法形式都能从名称推断中受益。函数表达式可能最常出现的地方就是作为一个函数调用的实际参数：
 
 ```js
 function foo(fn) {
@@ -787,11 +771,11 @@ foo( x );				// x
 foo( function(){} );	//
 ```
 
-When the name can't be inferred from the immediate surrounding syntax, it remains an empty string. Such a function will be reported as `(anonymous function)` in a stack trace should one occur.
+当从最近的外围语法中无法推断名称时，它会保留一个空字符串。这样的函数将会在调用栈轨迹中报告为 `(anonymous function)`。
 
-There are other benefits to a function being named besides the debugging question. First, the syntactic name (aka lexical name) is useful for internal self-reference. Self-reference is necessary for recursion (both sync and async) and also helpful with event handlers.
+除了调试的问题之外，被命名的函数还有其他的好处。首先，语法名称（也叫词法名称）对于内部自引用十分有用。自引用对于递归来说是必要的，在事件处理器中也十分有帮助。
 
-Consider these different scenarios:
+考虑这些不同的场景：
 
 ```js
 // sync recursion:
@@ -835,9 +819,9 @@ document.getElementById( "onceBtn" )
 	}, false );
 ```
 
-In all these cases, the named function's name was a useful and reliable self-reference from inside itself.
+在所有这些情况下，命名函数的名称都是它内部的一个有用且可靠的自引用。
 
-Moreover, even in simple cases with one-liner functions, naming them tends to make code more self-explanatory and thus easier to read for those who haven't read it before:
+另外，即使是在一个一行函数的简单情况下，将它们命名也会使代码更具自解释性，因此使代码对于那些以前没有读过它的人来说变得更易读：
 
 ```js
 people.map( function getPreferredName(person){
@@ -846,9 +830,9 @@ people.map( function getPreferredName(person){
 // ..
 ```
 
-The function name `getPreferredName(..)` tells the reader something about what the mapping operation is intending to do that is not entirely obvious from just its code. This name label helps the code be more readable.
+函数名 `getPreferredName(..)` 告诉读者映射操作的意图是什么，而这仅从代码来看的话没那么明显。这个名称标签使得代码更具可读性。
 
-Another place where anonymous function expressions are common is with IIFEs (immediately invoked function expressions):
+另一个匿名函数表达式常见的地方是 IIFE（即时调用的函数表达式）：
 
 ```js
 (function(){
@@ -858,7 +842,7 @@ Another place where anonymous function expressions are common is with IIFEs (imm
 })();
 ```
 
-You virtually never see IIFEs using names for their function expressions, but they should. Why? For all the same reasons we just went over: stack trace debugging, reliable self-reference, and readability. If you can't come up with any other name for your IIFE, at least use the word IIFE:
+你几乎永远看不到 IIFE 为它们的函数表达式使用名称，但它们应该这么做。为什么？为了我们刚刚讲过的所有理由：调用栈轨迹调试、可靠的自引用、与可读性。如果你实在想不出任何其他名称，至少要使用 IIFE 这个词：
 
 ```js
 (function IIFE(){
@@ -868,23 +852,23 @@ You virtually never see IIFEs using names for their function expressions, but th
 })();
 ```
 
-What I'm getting at is there's multiple reasons why **named functions are always more preferable to anonymous functions.** As a matter of fact, I'd go so far as to say that there's basically never a case where an anonymous function is more preferable. They just don't really have any advantage over their named counterparts.
+我的意思是有多种理由可以解释为什么 **命名函数总是优于匿名函数。** 事实上，我甚至可以说基本上不存在匿名函数更优越的情况。对于命名的另一半来说它们根本没有任何优势。
 
-It's incredibly easy to write anonymous functions, because it's one less name we have to devote our mental attention to figuring out.
+编写匿名函数不可思议地容易，因为那样会让我们投入精力找出的名称减少一个。
 
-I'll be honest; I'm as guilty of this as anyone. I don't like to struggle with naming. The first 3 or 4 names I come up with a function are usually bad. I have to revisit the naming over and over. I'd much rather just punt with a good ol' anonymous function expression.
+我承认；我和所有人一样有罪。我不喜欢在命名上挣扎。我想到的头3个或4个名称通常都很差劲。我不得不一次又一次地重新考虑命名。我宁愿撒手不管而使用匿名函数表达式。
 
-But we're trading ease-of-writing for pain-of-reading. This is not a good trade off. Being lazy or uncreative enough to not want to figure out names for your functions is an all too common, but poor, excuse for using anonymous functions.
+当我们是在用好写与难读做交易。这不是一桩好买卖。由于懒惰或没有创意而不想为你的函数找出名称，是一个使用匿名函数的太常见，但很烂的借口。
 
-**Name every single function.** And if you sit there stumped, unable to come up with a good name for some function you've written, I'd strongly suggest you don't fully understand that function's purpose yet -- or it's just too broad or abstract. You need to go back and re-design the function until this is more clear. And by that point, a name will become more apparent.
+**为每个函数命名。** 如果你坐在那里很为难，不能为你写的某个函数想出一个好名字，那么我会强烈地感觉到你还没有完全理解这个函数的目的 —— 或者它的目的太广泛或太抽象了。你需要回过头去重新设计这个函数，直到它变得更清晰。而到了那个时候，一个名称将显而易见。
 
-I can testify from my own experience that in the struggle to name something well, I usually have come to understand it better and often even refactor its design for improved readability and maintability. This time investment is well worth it.
+我可以用我的经验作证，在给某个东西良好命名的挣扎中，我通常对它有了更好的理解，甚至经常为了改进可读性和可维护性而重构它的设计。这种时间上的投资是值得的。
 
 ### Functions Without `function`
 
-So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz around the new ES6 `=>` arrow function syntax.
+至此我们一直在使用完全规范的函数语法。但毫无疑问你也听说过关于新的 ES6 `=>` 箭头函数语法的讨论。
 
-Compare:
+比较一下：
 
 ```js
 people.map( function getPreferredName(person){
@@ -895,19 +879,19 @@ people.map( function getPreferredName(person){
 people.map( person => person.nicknames[0] || person.firstName );
 ```
 
-Whoa.
+哇哦。
 
-The keyword `function` is gone, so is `return`, the `( )` parentheses, the `{ }` curly braces, and the `;` semicolon. For all that, we traded for a so-called fat arrow `=>` symbol.
+关键词 `function` 不见了，`return`、括号 `( )`、花括号 `{ }`、和引号 `;` 也不见了。所有这些，换来了所谓的大箭头符号 `=>`。
 
-But there's another thing we omitted. Did you spot it? The `getPreferredName` function name.
+但这里我们忽略了另一个东西。你发现了吗？函数名 `getPreferredName`。
 
-That's right; `=>` arrow functions are lexically anonymous; there's no way to syntatically provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values as arguments won't get any assistance in that way.
+没错；`=>` 箭头函数是词法上匿名的；没有办法在语法上给它提供一个名称。它们名称可以像普通函数那样被推断，但同样地，在最常见的函数表达式作为实际参数的情况下它帮不上什么忙。
 
-If `person.nicknames` isn't defined for some reason, an exception will be thrown, meaning this `(anonymous function)` will be at the top of the stack trace. Ugh.
+如果由于某些原因 `person.nicknames` 没有被定义，一个异常被抛出，这意味着 `(anonymous function)` 将会位于调用栈轨迹的顶端。呃。
 
-Honestly, the anonymity of `=>` arrow functions is a `=>` dagger to the heart, for me. I cannot abide by the loss of naming. It's harder to read, harder to debug, and impossible to self-reference.
+老实说，对我而言，`=>` 箭头函数的匿名性是一把指向心脏的 `=>` 匕首。我无法忍受命名的缺失。它更难读、更难调试、而且不可能进行自引用。
 
-But if that wasn't bad enough, the other slap in the face is that there's a whole bunch of subtle syntactic variations that you must wade through if you have different scenarios for your function definition. I'm not going to cover all of them in detail here, but briefly:
+如果说这还不够坏，那另一个打脸的地方是，如果你的函数定义有不同的场景，你就必须趟过一大堆有微妙不同的语法。我不会在这里涵盖它们所有的细节，但简答地说：
 
 ```js
 people.map( person => person.nicknames[0] || person.firstName );
@@ -927,23 +911,23 @@ people.map( person =>
 );
 ```
 
-The case for excitement over `=>` in the FP world is primarily that it follows almost exactly from the mathematical notation for functions, especially around FP languages like Haskell. The shape of `=>` arrow function syntax communicates mathematically.
+在 FP 世界中 `=>` 激动人心的地方主要在于它几乎完全符合数学上函数的符号，特别是在像 Haskell 这样的 FP 语言中。箭头函数语法 `=>` 的形状可以进行数学上的交流。
 
-Digging even further, I'd suggest that the argument in favor of `=>` is that by using much lighter-weight syntax, we reduce the visual boundaries between functions which lets us use simple function expressions much like we'd use lazy expressions -- another favorite of the FPer.
+再挖深一些，我觉得支持 `=>` 的争辩是，通过使用轻量得多的语法，我们减少了函数之间的视觉边界，这允许我们像曾经使用懒惰表达式那样使用简单的函数表达式 —— 这是另一件 FP 程序员们最喜欢的事。
 
-I think most FPers are going to blink and wave off these concerns. They love anonymous functions and they love saving on syntax. But like I said before: you decide.
+我想大多数 FP 程序员将会对这些问题不屑一顾。他们深爱着匿名函数，也爱简洁的语法。但正如我之前说的：这由你来决定。
 
-**Note:** Though I do not prefer to use `=>` in practice in my applications, we will use it in many places throughout the rest of this book -- especially when we present typical FP utilities -- where conciseness is preferred to optimize for the limited physical space in code snippets. Make your own determinations whether this approach will make your own code more or less readable.
+**注意：** 虽然在实际中我不喜欢在我的应用程序中使用 `=>`，但我们将会在本书剩余部分的许多地方使用它 —— 特别是当我们展示常用的 FP 工具时 —— 当简洁性在代码段有限的物理空间中成为不错的优化方式时。这种方式是否会使你的代码可读性调高或降低，你要做出自己的决断。
 
 ## What's This?
 
-If you're not familiar with the `this` binding rules in JavaScript, I recommend you check out my "You Don't Know JS: this & Object Prototypes" book. For the purposes of this section, I'll assume you know how `this` gets determined for a function call (one of the four rules). But even if you're still fuzzy on *this*, the good news is we're going to conclude that you shouldn't be using `this` if you're trying to do FP.
+如果你对 JavaScript 中的 `this` 绑定规则不熟悉，我推荐你看看我的“你不懂JS：this 与对象原型”一书。对于这一节的目的来说，我假定你知道在一个函数调用中 `this` 是如何被决定的（四种规则之一）。但就算你对 *this* 还不甚了解，好消息是我们得出这样的结论：如果你想使用 FP，那么你就不应当使用 `this`。
 
-JavaScript `function`s have a `this` keyword that's automatically bound per function call. The `this` keyword can be described in many different ways, but I prefer to say it provides an object context for the function to run against.
+JavaScript 的 `function` 拥有一个在每次函数调用时自动绑定的 `this` 关键字。这个 `this` 关键字可以用许多不同的方式描述，但我喜欢称它为函数运行的对象上下文环境。
 
-`this` is an implicit parameter input for your function.
+对于你的函数来说，`this` 是一个隐含形式参数输入。
 
-Consider:
+考虑如下代码：
 
 ```js
 function sum() {
@@ -964,7 +948,7 @@ var s = sum.bind( context );
 s();						// 3
 ```
 
-Of course, if `this` can be input into a function implicitly, the same object context could be sent in as an explicit argument:
+当然，如果 `this` 可以是一个函数的隐含输入，那么相同的对象环境就可以作为明确的实际参数发送：
 
 ```js
 function sum(ctx) {
@@ -979,9 +963,9 @@ var context = {
 sum( context );
 ```
 
-Simpler. And this kind of code will be a lot easier to deal with in FP. It's much easier to wire multiple functions together, or use any of the other input wrangling techniques we will get into in the next chapter, when inputs are always explicit. Doing them with implicit inputs like `this` ranges from awkward to nearly-impossible depending on the scenario.
+更简单。而且这种代码在 FP 中处理起来容易得多。当输入总是明确的时候，将多个函数组合在一起，或者使用我们将在下一章中学到的其他搬弄输入的技术都将简单得多。要使这些技术与 `this` 这样的隐含输入一起工作，在不同场景下要么很尴尬要么就是几乎不可能。
 
-There are other tricks we can leverage in a `this`-based system, like for example prototype-delegation (also covered in detail in the "this & Object Prototypes" book):
+我们可以在一个基于 `this` 的系统中利用其他技巧，例如原型委托（也在“this 与对象原型”一书中有详细讲解）：
 
 ```js
 var Auth = {
@@ -1014,11 +998,11 @@ var Login = Object.assign( Object.create( Auth ), {
 Login.doLogin( "fred", "123456" );
 ```
 
-**Note:** `Object.assign(..)` is an ES6+ utility for doing a shallow assignment copy of properties from one or more source objects to a single target object: `Object.assign( target, source1, ... )`.
+**注意：** `Object.assign(..)` 是一个 ES6+ 工具，用于从一个或多个源对象向一个目标对象进行属性的浅赋值拷贝：`Object.assign( target, source1, ... )`。
 
-In case you're having trouble parsing what this code does: we have two separate objects `Login` and `Auth`, where `Login` performs prototype-delegation to `Auth`. Through delegation and the implicit `this` context sharing, these two objects virtually compose during the `this.authorize()` function call, so that properties/methods on `this` are dynamically shared with the `Auth.authorize(..)` function.
+如果你解读这段代码有困难：我们有两个分离的对象 `Login` 和 `Auth`，`Login` 实施了向 `Auth` 的原型委托。通过委托与隐含的 `this` 上下文环境共享，这两个对象在 `this.authorize()` 函数调用中被虚拟地组合在一起，这样在 `Auth.authorize(..)` 函数中 `this` 上的属性/方法被动态地共享。
 
-*This* code doesn't fit with various principles of FP for a variety of reasons, but one of the obvious hitches is the implicit `this` sharing. We could be more explicit about it and keep code that was easier to push in the FP direction:
+由于各种原因这段代码不符合 FP 的种种原则，但是最明显的问题就是隐含的 `this` 共享。我们可以使它更明确一些，保持代码可以更容易地向 FP 的方向发展：
 
 ```js
 // ..
@@ -1043,16 +1027,16 @@ doLogin(user,pw) {
 // ..
 ```
 
-From my perspective, the problem is not with using objects to organize behavior. It's that we're trying to use implicit input instead of being explicit about it. When I'm wearing my FP hat, I want to leave `this` stuff on the shelf.
+从我的观点看，这其中的问题并不是使用了对象来组织行为。而是我们试图使用隐含输入取代明确输入。当我带上我的 FP 帽子时，我会想将 `this` 这东西留在衣架上。
 
 ## Summary
 
-Functions are powerful.
+函数十分强大。
 
-But let's be clear what a function is. It's not just a collection of statements/operations. Specifically, a function needs one or more inputs (ideally, just one!) and an output.
+但我们要清楚什么是函数。它不只是一个语句/操作的集合。特别地，一个函数需要一个或多个输入（理想情况，只有一个！）以及一个输出。
 
-Functions inside of functions can have closure over outer variables and remember them for later. This is one of the most important concepts in all of programming, and a fundamental foundation of FP.
+函数内部的函数可以拥有外部变量的闭包，为稍后的访问记住它们。这是所有种类的编程中最重要的概念之一，而且是 FP 基础的基础。
 
-Be careful of anonymous functions, especially `=>` arrow functions. They're convenient to write, but they shift the cost from author to reader. The whole reason we're studying FP here is to write more readable code, so don't be so quick to jump on that bandwagon.
+要小心匿名函数，特别是箭头函数 `=>`。它们写起来方便，但是将作者的成本转嫁到了读者身上。我们学习 FP 的所有原因就是写出可读性更强的代码，所以先不要那么快就赶这个潮流。
 
-Don't use `this`-aware functions. Just don't.
+不要使用 `this` 敏感的函数。别这么干。
