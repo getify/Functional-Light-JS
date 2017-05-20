@@ -261,15 +261,9 @@ f( 1, 2, 3, 4 );	// 1 2 3 [4,"z:last"]
 
 ## One At A Time
 
-Let's examine a technique similar to partial application, where a function that expects multiple arguments is broken down into successive chained functions that each take a single argument (arity: 1) and return another function to accept the next argument.
-
 让我们来检视一种与局部应用相似的技术，它把一个期待多个实际参数的函数分解为相继链接的函数，这些函数的每一个只接收一个参数（元为1）并返回另一个接收下个参数的函数。
 
-This technique is called currying.
-
 这种技术称为柯里化（currying）。
-
-To first illustrate, let's imagine we had a curried version of `ajax(..)` already created. This is how we'd use it:
 
 为了首先展示一下，让我们想象我们已经创建了一个柯里化版本的 `ajax(..)`。这是我们如何使用它：
 
@@ -278,8 +272,6 @@ curriedAjax( "http://some.api/person" )
 	( { user: CURRENT_USER_ID } )
 		( function foundUser(user){ /* .. */ } );
 ```
-
-Perhaps splitting out each of the three calls helps understand what's going on better:
 
 也许将这三个调用分割开有助于我们理解发生了什么：
 
@@ -291,21 +283,17 @@ var getCurrentUser = personFetcher( { user: CURRENT_USER_ID } );
 getCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
-Instead of taking all the arguments at once (like `ajax(..)`), or some of the arguments up-front and the rest later (via `partial(..)`), this `curriedAjax(..)` function receives one argument at a time, each in a separate function call.
-
 与一次性接收所有参数（比如 `ajax(..)`），或者（通过 `partial(..)`）一些参数提前接收剩下的稍后接收不同，这个 `curriedAjax(..)` 函数一次接收一个参数，每个参数都在一个分离的函数调用中。
 
-Currying is similar to partial application in that each successive curried call kind of partially applies another argument to the original function, until all arguments have been passed.
+柯里化与局部应用的相似之处在于，每个连续的柯里化调用都是对原始函进行另一个参数的局部应用，直到所有参数都被传递。
 
-柯里化与局部应用的相似之处在于，每个
+主要的区别是 `curriedAjax(..)` 将会明确地返回一个 **仅期待下个参数 `data`** 的函数（我们称为 `curriedGetPerson(..)`），而不是接收所有剩余参数的函数（比如早先的 `getPerson(..)`）。
 
-The main difference is that `curriedAjax(..)` will explicitly return a function (we call `curriedGetPerson(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
+如果一个原始函数期待 5 个参数，那么这个函数的柯里化形式将会仅仅接收第一个参数，并返回一个接收第二个参数的函数。而这个函数会仅接收第二个参数，并返回接收第三个参数的函数。以此类推。
 
-If an original function expected 5 arguments, the curried form of that function would take just the first argument, and return a function to accept the second. That one would take just the second argument, and return a function to accept the third. And so on.
+所以柯里化是将一个高元函数展开成为一系列链接的一元函数。
 
-So currying unwinds a higher-arity function into a series of chained unary functions.
-
-How might we define a utility to do this currying? We're going to use some tricks from Chapter 2.
+我们如何定义一个执行柯里化的工具呢？我们将使用第二章中的一些技巧。
 
 ```js
 function curry(fn,arity = fn.length) {
@@ -324,7 +312,7 @@ function curry(fn,arity = fn.length) {
 }
 ```
 
-And for the ES6 `=>` fans:
+而为了 ES6 `=>` 爱好者：
 
 ```js
 var curry =
@@ -343,13 +331,13 @@ var curry =
 		)( [] );
 ```
 
-The approach here is to start a collection of arguments in `prevArgs` as an empty `[]` array, and add each received `nextArg` to that, calling the concatenation `args`. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), make and return another `curried(..)` function to collect the next `nextArg` argument, passing the running `args` collection along as `prevArgs`. Once we have enough `args`, execute the original `fn(..)` function with them.
+这里的处理方式是使用一个空的 `[]` 数组初在 `prevArgs` 中始一个参数的集合，并将收到的每一个 `nextArg` 加入其中，这个连接的结果称为 `args`。当 `args.length` 小于 `arity`（原始 `fn(..)` 函数声明/期待的形式参数个数）时，制造并返回另一个 `curried(..)` 函数来收集下一个 `nextArg` 参数，并将当前的的 `args` 集合做为 `prevArgs` 传递。一旦我们有了足够的 `args`，就使用它们执行原始的 `fn(..)` 函数。
 
-By default, this implementation relies on being able to inspect the `length` property of the to-be-curried function to know how many iterations of currying we'll need before we've collected all its expected arguments.
+默认情况下，这种实现有赖于能够检查被柯里化函数的 `length` 属性，来知道在收集齐所有期待参数之前需要进行多少次柯里化的迭代。
 
-If you use this implementation of `curry(..)` with a function that doesn't have an accurate `length` property -- if the function's parameter signature includes default parameter values, parameter destructuring, or it's variadic with `...args`; see Chapter 2 -- you'll need to pass the `arity` (the second parameter of `curry(..)`) to ensure `curry(..)` works correctly.
+如果你对一个没有准确 `length` 属性的函数使用这种实现的 `curry(..)` —— 函数的形式参数签名包含默认参数值，形式参数解构，或者它是带有 `...args` 可变参数；见第二章 —— 那么你就需要传递 `arity`（`curry(..)` 第二个形式参数） 来确保 `curry(..)` 工作正常。
 
-Here's how we would use `curry(..)` for our earlier `ajax(..)` example:
+这是我们如何对先前的 `ajax(..)` 示例使用 `curry(..)`：
 
 ```js
 var curriedAjax = curry( ajax );
@@ -361,16 +349,16 @@ var getCurrentUser = personFetcher( { user: CURRENT_USER_ID } );
 getCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
-Each call adds one more argument to the original `ajax(..)` call, until all three have been provided and `ajax(..)` is executed.
+每个调用都向原始的 `ajax(..)` 调用多添加一个参数，直到所有三个都被提供 `ajax(..)` 就会被执行。
 
-Remember our example from earlier about adding `3` to a each value in a list of numbers? Recall that currying is similar to partial application, so we could do that task with currying in almost the same way:
+还记得先前给数字列表的每个值都加 `3` 的例子吗？回想一下柯里化与局部应用的相似性，那么我们就可以使用柯里化以几乎相同的方式完成任务：
 
 ```js
 [1,2,3,4,5].map( curry( add )( 3 ) );
 // [4,5,6,7,8]
 ```
 
-The difference between the two? `partial(add,3)` vs `curry(add)(3)`. Why might you choose `curry(..)` over partial? It might be helpful in the case where you know ahead of time that `add(..)` is the function to be adapted, but the value `3` isn't known yet:
+两者之间有什么区别？`partial(add,3)` vs `curry(add)(3)`。为什么你可能会选择 `curry(..)` 而不是 `partial(..)`？在你提前知道 `add(..)` 是将被采用的函数，而还不知道值 `3` 的情况下，它可能就很有用：
 
 ```js
 var adder = curry( add );
@@ -380,7 +368,7 @@ var adder = curry( add );
 // [4,5,6,7,8]
 ```
 
-How about another numbers example, this time adding a list of them together:
+再来看另一个数字的例子，这次将它们的列表加在一起：
 
 ```js
 function sum(...args) {
@@ -400,41 +388,41 @@ var curriedSum = curry( sum, 5 );
 curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
 ```
 
-The advantage of currying here is that each call to pass in an argument produces another function that's more specialized, and we can capture and use *that* new function later in the program. Partial application specifies all the partially applied arguments up front, producing a function that's waiting for all the rest of the arguments.
+柯里化在这里的优势是，每次传递一个参数的调用都产生了另一个更加特化的函数，而且我们可以抓住这个新函数并在稍后的程序中使用它。局部应用提前指定所有的局部应用参数，产生一个等待所有剩余参数的函数。
 
-If you wanted to use partial application to specify one parameter at a time, you'd have to keep calling `partialApply(..)` on each successive function. Curried functions do this automatically, making working with individual arguments one-at-a-time more ergonomic.
+如果你想使用局部应用一次指定一个参数，你就不得不在每一个后续函数上持续调用 `partialApply(..)`。柯里化的函数会自动这样做，使得一次一个地使用独立的参数更符合人体工程学。
 
-In JavaScript, both currying and partial application use closure to remember the arguments over time until all have been received, and then the original operation can be performed.
+在 JavaScript 中，柯里化和局部应用两者都是用闭包来跨越时间地记住参数，直到所有参数都被收到，继而原始的操作可以被实施。
 
 ### Why Currying And Partial Application?
 
-With either currying style (`sum(1)(2)(3)`) or partial application style (`partial(sum,1,2)(3)`), the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we go this direction** when adopting FP? There are multiple layers to answering that question.
+不管是柯里化风格（`sum(1)(2)(3)`）还是局部应用风格（`partial(sum,1,2)(3)`），调用点都毫无疑问地比更常见的 `sum(1,2,3)` 看起来更奇怪。那么在采用 FP 时 **我们为什么要走向这个方向呢**？有许多层面可以回答这个问题。
 
-The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your code base) when and where separate arguments are specified, whereas traditional function calls require all the arguments to be present up front. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
+第一个也是最明显的原因是，当参数在不同的时间与位置被声明时，柯里化与局部应用都允许你在时间/空间上分离（在你的整个代码库中），而传统函数调用要求所有的参数都被提前准备好。如果你将在你的代码中的一个地方知道参数中的一些，而在另一个地方其他参数才能被确定，柯里化与局部应用就非常有用。
 
-Another layer to this answer, which applies most specifically to currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs 3 arguments, if curried, becomes a function that needs just one, three times over. That kind of unary function will be a lot easier to work with when we start composing them. We'll tackle this topic later in the text.
+这个回答的另一个层面最适用于柯里化，也就是当函数仅有一个参数时进行函数的组合要简单得多。所以一个最终需要三个参数的函数被柯里化后会变成一个一次仅需一个参数、连续三次的函数。这种一元函数在我们开始组合它们的时候非常容易使用。我们会在本书稍后阐明这个话题。
 
 ### Currying More Than One Argument?
 
-The definition and implementation I've given of currying thus far is, I believe, as true to the spirit as we can likely get in JavaScript.
+到目前为止我给出的柯里化的定义和实现，我相信，是我们能在 JavaScript 中得到的最接近柯里化本色的定义和实现。
 
-Specifically, if we look briefly at how currying works in Haskell, we can observe that multiple arguments always go in to a function one at a time, one per curried call -- other than tuples (analogus to arrays for our purposes) that transport multiple values in a single argument.
+特别是，如果我们简要地看一下在 Haskell 中柯里化是如何工作的，我们就能观察到多个参数总是一次一个，每次柯里化调用一个地进入函数中 —— 而不是像元组（tuples，类似于数组的东西）那样在一个参数中传送多个值。
 
-For example, in Haskell:
+例如，在 Haskell 中：
 
 ```
 foo 1 2 3
 ```
 
-This calls the `foo` function, and has the result of passing in three values `1`, `2`, and `3`. But functions are automatically curried in Haskell, which means each value goes in as a separate curried-call. The JS equivalent of that would look like `foo(1)(2)(3)`, which is the same style as the `curry(..)` I presented above.
+这调用了函数 `foo`，而且得到传入 `1`、`2` 和 `3` 三个值的结果。但在 Haskell 中函数是自动柯里化的，这意味着每个值都是作为分离的柯里化调用传入的。它的 JS 等价物看起来将是 `foo(1)(2)(3)`，与我在上面展示的 `curry(..)` 风格相同。
 
-**Note:** In Haskell, `foo (1,2,3)` is not passing in those 3 values at once as three separate arguments, but a tuple (kinda like a JS array) as a single argument. To work, `foo` would need to be altered to handle a tuple in that argument position. As far as I can tell, there's no way in Haskell to pass all three arguments separately with just one function call; each argument gets its own curried-call. Of course, the presence of multiple calls is transparent to the Haskell developer, but it's a lot more syntactically obvious to the JS developer.
+**注意：** 在 Haskell 中，`foo (1,2,3)` 不会立即将这三个值作为三个分离的参数传入，而是作为一个单独的元组（有些像 JS 的数组）参数。为了能使它工作，`foo` 需要被修改来处理出现在这个参数位置上的元组。据我所知，在 Haskell 中没有办法仅在一次函数调用中就分离地传递三个参数；每个参数都有它自己的柯里化调用。当然，这多次的调用对于 Haskell 开发者来说是透明的，但是对于 JS 开发者来说在语法上就明显多了。
 
-For these reasons, I think the earlier `curry(..)` that I demonstrated is a faithful adaptation, or what I might call "strict currying".
+由于这些原因，我认为我早先展示的 `curry(..)` 是一种忠于其本色的适配，或者我可以称之为“严格柯里化”。
 
-However, it's important to note that there's a looser definition used in most popular JavaScript FP libraries.
+然而，值得注意的是，有一种宽松的定义被用于大多数流行的 JavaScript FP 库中。
 
-Specifically, JS currying utilities typically allow you to specify multiple arguments for each curried-call. Revisiting our `sum(..)` example from before, this would look like:
+具体地讲，JS 柯里化工具经常允许你在每个柯里化调用中指定多个参数。重温我们之前的 `sum(..)` 的例子，它看起来将像是这样：
 
 ```js
 var curriedSum = looseCurry( sum, 5 );
@@ -442,11 +430,11 @@ var curriedSum = looseCurry( sum, 5 );
 curriedSum( 1 )( 2, 3 )( 4, 5 );			// 15
 ```
 
-We see a slight syntax savings of fewer `( )`, and an implied performance benefit of now having three function calls instead of five. But other than that, using `looseCurry(..)` is identical in end result to the narrower `curry(..)` definition from earlier. I would guess the convenience/performance factor is probably why frameworks allow multiple arguments. This seems mostly like a matter of taste.
+我们看到在语法上稍稍节省了几个 `( )`，以及一个隐含的性能收益 —— 现在只有三个函数调用而不是五个。但除此之外，使用 `looseCurry(..)` 在结果上与早先严格的 `curry(..)` 定义是完全相同的。我猜这种方便/性能的因素可能就是这些框架允许多参数的原因。这看起来更像是个人口味的问题。
 
-**Note:** The loose currying *does* give you the ability to send in more arguments than the arity (detected or specified). If you designed your function with optional/variadic arguments, that could be a benefit. For example, if you curry five arguments, looser currying still allows more than five arguments (`curriedSum(1)(2,3,4)(5,6)`), but strict currying wouldn't support `curriedSum(1)(2)(3)(4)(5)(6)`.
+**注意：** 宽松柯里化确实给了你发送多于元数（检测到的或指定的）的参数的能力。如果你的函数设计带有可选/可变参数，这可能就有好处。例如，如果你柯里化五个参数，宽松柯里化依然允许多于五个参数（`curriedSum(1)(2,3,4)(5,6)`），但是严格柯里化不会支持 `curriedSum(1)(2)(3)(4)(5)(6)`。
 
-We can adapt our previous currying implementation to this common looser definition:
+我们可以让前一个柯里化实现采用这种常见的宽松定义：
 
 ```js
 function looseCurry(fn,arity = fn.length) {
@@ -465,13 +453,13 @@ function looseCurry(fn,arity = fn.length) {
 }
 ```
 
-Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave it as an exercise for the interested reader to define the ES6 `=>` version of `looseCurry(..)` similar to how we did it for `curry(..)` earlier.
+现在每一个柯里化调用都接受一个或多个参数（作为 `nextArgs`）。定义 ES6 `=>` 版本的 `looseCurry(..)` 与我们先前为 `curry(..)` 所做的内容是类似的，我们将此作为练习留给感兴趣的读者。
 
 ### No Curry For Me, Please
 
-It may also be the case that you have a curried function that you'd like to sort of un-curry -- basically, to turn a function like `f(1)(2)(3)` back into a function like `g(1,2,3)`.
+可能还有这样的情况：你有一个柯里化函数，而你想进行某种去柯里化 —— 基本上，是将一个 `f(1)(2)(3)` 这样的函数转换回 `g(1,2,3)` 这样的函数。
 
-The standard utility for this is (un)shockingly typically called `uncurry(..)`. Here's a simple naive implementation:
+这样的标准化工具经常（不）令人惊异地称为 `uncurry(..)`。这是一个幼稚的实现：
 
 ```js
 function uncurry(fn) {
@@ -500,7 +488,7 @@ var uncurry =
 		};
 ```
 
-**Warning:** Don't just assume that `uncurry(curry(f))` has the same behavior as `f`. In some libs the uncurrying would result in a function like the original, but not all of them; certainly our example here does not. The uncurried function acts (mostly) the same as the original function if you pass as many arguments to it as the original function expected. However, if you pass fewer arguments, you still get back a partially curried function waiting for more arguments; this quirk is illustrated in the next snippet.
+**警告：** 不要臆测 `uncurry(curry(f))` 将会与 `f` 有相同的行为。在某些库中去柯里化会得到一个与原函数相同的函数，但不是所有的库都是这样；我们这里例子就不是。去柯里化的函数会在你传递如原函数所期待的参数个数同样多的参数时表现得与原函数（几乎）相同。然而，如果你传入的参数少了，你依然会得到一个等待更多参数的局部柯里化的函数；这个怪异之处体现在下面的代码中。
 
 ```js
 function sum(...args) {
@@ -520,13 +508,13 @@ uncurriedSum( 1, 2, 3, 4, 5 );				// 15
 uncurriedSum( 1, 2, 3 )( 4 )( 5 );			// 15
 ```
 
-Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a function that comes out curried as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
+可能使用 `uncurry(..)` 的更常见的情况，不是像刚刚展示的这样与一个手动柯里化过的函数一起使用，而是与一个做为某些其他一组操作的结果产生的柯里化函数一起使用。我们将在本章稍后的“无意义”一节中讨论这种场景。
 
 ## All For One
 
-Imagine you're passing a function to a utility where it will send multiple arguments to your function. But you may only want to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
+想象你正向一工具传递一个函数，这个工具将向你的函数发送多个参数。但你可能只希望收到一个参数。特别是当你有一个像我们前面讨论过的宽松柯里化函数时 —— 它 *可以* 接收更多的你不想要的参数。
 
-We can design a simple utility that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
+我们可以设计一个简单的工具，它包装一个函数调用来确保只有一个参数将会通过。由于这实质上强制一个函数被视为一元（unary）的，那么就让我们如此命名吧：
 
 ```js
 function unary(fn) {
@@ -542,7 +530,7 @@ var unary =
 			fn( arg );
 ```
 
-We saw the `map(..)` utility eariler. It calls the provided mapping function with three arguments: `value`, `index`, and `list`. If you want your mapping function to only receive one of these, like `value`, use the `unary(..)` operation:
+我们早先看到过 `map(..)` 工具。它使用三个参数调用被提供的映射函数：`value`、`index`、和 `list`。如果你想让你的映射函数只接收其中之一，比如 `value`，就可以使用这个 `unary(..)` 操作：
 
 ```js
 function unary(fn) {
@@ -562,7 +550,7 @@ var adder = looseCurry( sum, 2 );
 // [4,5,6,7,8]
 ```
 
-Another commonly cited example using `unary(..)` is:
+另一个常被人说起的 `unary(..)` 用法是：
 
 ```js
 ["1","2","3"].map( parseFloat );
@@ -575,11 +563,11 @@ Another commonly cited example using `unary(..)` is:
 // [1,2,3]
 ```
 
-For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an `index` in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is not mistaken as the `radix`.
+对于签名 `parseInt(str,radix)` 来说很明显，如果 `map(..)` 在第二个参数位置上传递一个 `index`，它将被 `parseInt(..)` 解释为 `radix`，这不是我们想要的。`unary(..)` 创建一个函数，它将会忽略除第一个之外所有被传递给它的参数，这意味着传入 `index` 不会被错认为 `radix`。
 
 ### One On One
 
-Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that takes one argument and does nothing but return the value untouched:
+说道仅含一个参数的函数，在 FP 工具箱中有另一个基本操作：一个函数，接收一个参数但不作任何事情并原封不动地返回它的值：
 
 ```js
 function identity(v) {
@@ -592,9 +580,9 @@ var identity =
 		v;
 ```
 
-This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
+这个工具看起来如此简单，以至于很难有什么用处。但即使是简单的函数也可以在 FP 的世界中很有用处。就像人们关于表演所说的：剧中没有小角色，只有小演员。
 
-For example, imagine you'd like split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (covered in detail later in the text) with `identity(..)` as the predicate:
+例如，想象你想使用一个正则表达式分割一个字符串，但是结果数组中可能含有一些空值。要去掉这些空值，我们可以使用 JS 的 `filter(..)` 数组操作（将在本书稍后详细讲解），将 `identity(..)` 作为判断函数：
 
 ```js
 var words = "   Now is the time for all...  ".split( /\s|\b/ );
@@ -605,11 +593,11 @@ words.filter( identity );
 // ["Now","is","the","time","for","all","..."]
 ```
 
-Since `identity(..)` simply returns the value passed to it, JS coerces each value into either `true` or `false`, and that decides to keep or exclude each value in the final array.
+因为 `identity(..)` 简单地返回传递给它的值，JS 会将每个值强制转换为 `true` 或 `false`，并以此决定每个值是保留还是排除出最终的数组。
 
-**Tip:** Another unary function that can be used as the predicate in the previous example is JS's own `Boolean(..)` function, which explicitly coerces the values to `true` or `false`.
+**提示：** 另一个可以用在前面例子中作为判断函数的一元函数是 JS 自己的 `Boolean(..)` 函数，它明确地将值强制转换为 `true` 或 `false`。
 
-Another example of using `identity(..)` is as a default function in place of a transformation:
+使用 `identity(..)` 的另一个例子是在变形的地方作为默认函数：
 
 ```js
 function output(msg,formatFn = identity) {
@@ -625,7 +613,7 @@ output( "Hello World", upper );		// HELLO WORLD
 output( "Hello World" );			// Hello World
 ```
 
-If `output(..)` didn't have a default for `formatFn`, we could bring our earlier friend `partialRight(..)`:
+如果 `output(..)` 没有为 `formatFn` 准备默认值，我们可以拿出早前的朋友 `partialRight(..)`：
 
 ```js
 var specialOutput = partialRight( output, upper );
@@ -635,11 +623,11 @@ specialOutput( "Hello World" );		// HELLO WORLD
 simpleOutput( "Hello World" );		// Hello World
 ```
 
-You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in Chapter 8.
+你还可能看到 `identity(..)` 被用作 `map(..)` 的默认变形函数，或者在一个函数列表的 `reduce(..)` 中作为初始值；这两种工具都将在第八章中讲解。
 
 ### Unchanging One
 
-Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function just returns the value. One such API is the `then(..)` method on JS Promises. Many claim that ES6 `=>` arrow functions are the "solution". But there's an FP utility that's perfectly suited for the task:
+特定的 API 不允许你将一个值直接传入一个方法，但要求你传入一个函数，即使这个函数只是返回这个值。一个这样的 API 就是 JS Promise 的 `then(..)` 方法。许多人声称 ES6 `=>` 箭头函数就是“解决方案”。但是有一个完美适合此任务的 FP 工具：
 
 ```js
 function constant(v) {
@@ -655,7 +643,7 @@ var constant =
 			v;
 ```
 
-With this tidy little utility, we can solve our `then(..)` annoyance:
+使用这个小小的工具，我们可以解决 `then(..)` 的烦恼：
 
 ```js
 p1.then( foo ).then( () => p2 ).then( bar );
@@ -665,11 +653,11 @@ p1.then( foo ).then( () => p2 ).then( bar );
 p1.then( foo ).then( constant( p2 ) ).then( bar );
 ```
 
-**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
+**警告：** 虽然箭头函数的版本 `() => p2` 要比 `constant(p2)` 更短，但我鼓励你压制使用它的冲动。箭头函数返回了一个它外部的值，从 FP 的视角看来这不太好。我们将在本书稍后讲解这种行为的陷阱，第五章“降低副作用”。
 
 ## Spread 'Em Out
 
-In Chapter 2, we briefly looked at parameter array destructuring. Recall this example:
+在第二章中，我们简要地看了一下形式参数数组解构。回想一下这个例子：
 
 ```js
 function foo( [x,y,...args] ) {
@@ -679,11 +667,11 @@ function foo( [x,y,...args] ) {
 foo( [1,2,3] );
 ```
 
-In the parameter list of `foo(..)`, we declare that we're expecting a single array argument that we want to break down -- or in effect, spread out -- into individually named parameters `x` and `y`. Any other values in the array beyond those first two positions are gathered into an `args` array with the `...` operator.
+在 `foo(..)` 的形式参数列表中，我们声明我们期待一个数组参数，想要将它分解 —— 实质上是散开 —— 为独立的命名形式参数 `x` 与 `y`。任何在数组中超过前两个位置的值都被 `...` 操作符聚集到 `args` 数组中。
 
-This trick is handy if an array must be passed in but you want to treat its contents as individual parameters.
+如果一个数组必须被传入但你想将它的内容看做独立的形式参数时，这种技巧十分方面。
 
-However, sometimes you won't have the ability to change the declaration of the function to use parameter array destructuring. For example, imagine these functions:
+然而，有时你不具备改变函数声明来让它使用数组解构的能力。例如，想象这些函数：
 
 ```js
 function foo(x,y) {
@@ -697,13 +685,13 @@ function bar(fn) {
 bar( foo );			// fails
 ```
 
-Do you spot why `bar(foo)` fails?
+你能看出 `bar(foo)` 为什么失败吗？
 
-The array `[3,9]` is sent in as a single value to `fn(..)`, but `foo(..)` expects `x` and `y` separately. If we could change the declaration of `foo(..)` to be `function foo([x,y]) { ..`, we'd be fine. Or, if we could change the behavior of `bar(..)` to make the call as `fn(...[3,9])`, the values `3` and `9` would be passed in individually.
+数组 `[3,9]` 作为一个单独的值被发送到 `fn(..)`，但是 `foo(..)` 分开期待 `x` 和 `y`。如果我们能将 `foo(..)` 的声明改变为 `function foo([x,y]) {..` 的话就没有问题。或者，如果我们能改变 `bar(..)` 的行为使它发起的调用为 `fn(...[3,9])` 的话，值 `3` 和 `9` 就将会被独立地传入。
 
-There will be occasions when you have two functions that are imcompatible in this way, and you won't be able to change their declarations/definitions for various external reasons. So, how do you use them together?
+会有这样的场景，你有两个这样不兼容的函数，而且由于种种外部原因你又不能改变它们的声明/定义。那么，你如何才能一起使用它们呢？
 
-We can define a helper to adapt a function so that it spreads out a single received array as its individual arguments:
+我们可以定义一个帮助工具来适配一个函数，让它把收到的数组分散为独立的实际参数值：
 
 ```js
 function spreadArgs(fn) {
@@ -721,7 +709,11 @@ var spreadArgs =
 
 **Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's often called `apply(..)`.
 
+**注意：** 我称这个帮助工具为 `spreadArgs(..)`，但在 Ramda 这样的库中它经常被称为 `apply(..)`。
+
 Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
+
+现在我们可以使用 `spreadArgs(..)` 来适配 `foo(..)`，使之成为 `bar(..)` 的恰当输入：
 
 ```js
 bar( spreadArgs( foo ) );			// 12
@@ -729,9 +721,15 @@ bar( spreadArgs( foo ) );			// 12
 
 It won't seem clear yet why these occassions will arise, but trust me, they do. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
 
+这些场景为什么会发生看起来还不清楚，但相信我，它们会的。实质上，`spreadArgs(..)` 将允许我们定义通过一个数组 `return` 多个值的函数，但依然使那些多个值被独立地视为另一个函数的输入。
+
 When function output becomes input to another function, this is called composition; we'll cover this topic in detail in Chapter 4.
 
+当一个函数的输出变为另一个函数的输入时，这称为组合；我们将在第四章中讲解这个话题。
+
 While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
+
+我们谈到了 `spreadArgs(..)` 工具，让我们再定义一个处理相反动作的工具：
 
 ```js
 function gatherArgs(fn) {
@@ -749,7 +747,11 @@ var gatherArgs =
 
 **Note:** In Ramda, this utility is referred to as `unapply(..)`, being that it's the opposite of `apply(..)`. I think the "spread" / "gather" terminology is a little more descriptive for what's going on.
 
+**注意：** 在 Ramda 中，由于它是 `apply(..)` 的反义词，所以这个工具称做 `unapply(..)`。但我认为术语“扩散”/“聚集”对发生的事情更具描述性。
+
 We can use this utility to gather individual arguments into a single array, perhaps because we want to adapt a function with array parameter destructuring to another utility that passes arguments separately. We will cover `reduce(..)` in Chapter 8, but briefly: it repeatedly calls its reducer function with two individual parameters, which we can now *gather* together:
+
+我们可以使用这个工具将独立的参数聚集到一个数组中，也许是因为我们想为另一个，适配一个带有数组形式参数解构的函数
 
 ```js
 function combineFirstTwo([ v1, v2 ]) {
