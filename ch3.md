@@ -707,11 +707,7 @@ var spreadArgs =
 			fn( ...argsArr );
 ```
 
-**Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's often called `apply(..)`.
-
 **注意：** 我称这个帮助工具为 `spreadArgs(..)`，但在 Ramda 这样的库中它经常被称为 `apply(..)`。
-
-Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
 
 现在我们可以使用 `spreadArgs(..)` 来适配 `foo(..)`，使之成为 `bar(..)` 的恰当输入：
 
@@ -719,15 +715,9 @@ Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input t
 bar( spreadArgs( foo ) );			// 12
 ```
 
-It won't seem clear yet why these occassions will arise, but trust me, they do. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
-
 这些场景为什么会发生看起来还不清楚，但相信我，它们会的。实质上，`spreadArgs(..)` 将允许我们定义通过一个数组 `return` 多个值的函数，但依然使那些多个值被独立地视为另一个函数的输入。
 
-When function output becomes input to another function, this is called composition; we'll cover this topic in detail in Chapter 4.
-
 当一个函数的输出变为另一个函数的输入时，这称为组合；我们将在第四章中讲解这个话题。
-
-While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
 
 我们谈到了 `spreadArgs(..)` 工具，让我们再定义一个处理相反动作的工具：
 
@@ -745,13 +735,9 @@ var gatherArgs =
 			fn( argsArr );
 ```
 
-**Note:** In Ramda, this utility is referred to as `unapply(..)`, being that it's the opposite of `apply(..)`. I think the "spread" / "gather" terminology is a little more descriptive for what's going on.
-
 **注意：** 在 Ramda 中，由于它是 `apply(..)` 的反义词，所以这个工具称做 `unapply(..)`。但我认为术语“扩散”/“聚集”对发生的事情更具描述性。
 
-We can use this utility to gather individual arguments into a single array, perhaps because we want to adapt a function with array parameter destructuring to another utility that passes arguments separately. We will cover `reduce(..)` in Chapter 8, but briefly: it repeatedly calls its reducer function with two individual parameters, which we can now *gather* together:
-
-我们可以使用这个工具将独立的参数聚集到一个数组中，也许是因为我们想为另一个，适配一个带有数组形式参数解构的函数
+我们可以使用这个工具将独立的参数聚集到一个数组中，也许是因为我们想为了另一个分开传递参数的函数而适配一个带有数组形式参数解构的函数。我们将在第八章讲解 `reduce(..)`，但简要地说：它使用两个分开的形式参数反复调用它的递减函数，我们可以把这两个参数 *聚集* 在一起：
 
 ```js
 function combineFirstTwo([ v1, v2 ]) {
@@ -764,13 +750,13 @@ function combineFirstTwo([ v1, v2 ]) {
 
 ## Order Matters
 
-One of the frustrating things about currying and partial application of functions with multiple parameters is all the juggling we have to do with our arguments to get them into the right order. Sometimes we define a function with parameters in the order that we would want to curry them, but other times that order is incompatible and we have to jump through hoops to reorder.
+对带有多个形式参数的函数进行柯里化和局部应用的令人沮丧的事情之一，就是为了使我们的实际参数变为正确顺序而不得不进行的所有倒腾。有时我们定义一个函数，使它的形式参数顺序符合我们将要对它进行柯里化的顺序，但另一些时候这个顺序无法兼容，我们就不得不费尽周折地重排它们。
 
-The frustration is not merely that we need to use some utility to juggle the properties, but the fact that the usage of it clutters up our code a little bit with some extra noise. These kinds of things are like little paper cuts; one here or there isn't a showstopper, but the pain can certainly add up.
+这种沮丧不仅仅是我们需要使用一些工具来搬弄这些属性，还有它们的用法带来的额外噪音将我们的代码搞乱了一点点。这种东西就像纸屑，这一点儿那一点儿并不碍事儿，但是这种痛苦无疑会累加起来。
 
-Is there anything we can do to free ourselves from this argument ordering tyranny!?
+有什么东西能将我们从参数重排的暴政下解放出来吗？
 
-In Chapter 2, we looked at the named-argument destructuring pattern. Recall:
+在第二章中，我们看到了命名参数解构模式。回忆一下：
 
 ```js
 function foo( {x,y} = {} ) {
@@ -782,9 +768,9 @@ foo( {
 } );					// undefined 3
 ```
 
-We destructure the first parameter of the `foo(..)` function -- it's expected to be an object -- into individual parameters `x` and `y`. Then, at the call-site, we pass in that single object argument, and provide properties as desired, "named arguments" to map to parameters.
+我们将 `foo(..)` 函数的第一个形式参数 —— 它被期望是一个对象 —— 解构为独立的形式参数 `x` 和 `y`。然后，在调用点上，我们传入一个对象实际参数，并提入期待的那样提供属性 —— “命名实际参数”来映射到形式参数上。
 
-The primary advantage of named arguments is not needing to juggle argument ordering, thereby improving readability. We can exploit this to improve currying/partial application if we invent alternate utilities that work with object properties:
+命名实际参数的主要优势是无需搬弄参数顺序，因此提高了可读性。我们可以开拓这种模式来改进柯里化/局部应用，发明可以使用对象属性的替代工具：
 
 ```js
 function partialProps(fn,presetArgsObj) {
@@ -810,9 +796,9 @@ function curryProps(fn,arity = 1) {
 }
 ```
 
-We don't even need a `partialPropsRight(..)` because we don't need care about what order properties are being mapped; the name mappings make that ordering concern moot!
+我们甚至不需要 `partialPropsRight(..)`，因为我们不必关心属性被映射的顺序是什么；名称映射使得顺序的问题毫无意义！
 
-Here's how we use those utilities:
+这是我们如何使用这些工具：
 
 ```js
 function foo({ x, y, z } = {}) {
@@ -829,11 +815,13 @@ f2( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-Order doesn't matter anymore! We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances. Cool!
+顺序不再重要了！现在我们可以以任何顺序指定参数了。不再有 `reverseArgs(..)` 或其他讨厌的东西了。酷！
 
 ### Spreading Properties
 
 Unfortunately, this only works because we have control over the signature of `foo(..)` and defined it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature?
+
+不幸的是，真能够工作是因为我们拥有 `foo(..)` 的签名的控制权，并将它定义为解构第一个参数。要是我们想要对形式参数独立罗列（没有形式参数解构）的函数使用这种技术，而且我们还不能改变这个函数的签名呢？
 
 ```js
 function bar(x,y,z) {
@@ -843,13 +831,23 @@ function bar(x,y,z) {
 
 Just like the `spreadArgs(..)` utility earlier, we could define a `spreadArgProps(..)` helper that takes the `key: value` pairs out of an object argument and "spreads" the values out as individual arguments.
 
+就像早先的 `spreadArgs(..)` 工具，我们可以定义一个 `spreadArgProps(..)` 帮助工具，它从一个实际参数对象中拿出 `key: value` 对，并将值“扩散”为独立的实际参数。
+
 There are some quirks to be aware of, though. With `spreadArgs(..)`, we were dealing with arrays, where ordering is well defined and obvious. However, with objects, property order is less clear and not necessarily reliable. Depending on how an object is created and properties set, we cannot be absolutely certain what enumeration order properties would come out.
+
+但是有一些怪异之处需要小心。使用 `spreadArgs(..)` 我们对付的是数组，它的顺序定义良好而且明显。然而，对于对象来说，属性顺序不那么清晰而且不一定可靠。根据对象的创建方式与属性设置的方式不同，我们不能绝对确定什么样的属性枚举顺序会出现。
 
 Such a utility needs a way to let you define what order the function in question expects its arguments (e.g., property enumeration order). We can pass an array like `["x","y","z"]` to tell the utility to pull the properties off the object argument in exactly that order.
 
+这样的工具需要一个方法让你定义目标函数期待的实际参数事什么顺序（也就是属性枚举的顺序）。我们可以传递一个 `["x","y","z"]` 这样的数组来告诉工具，从实际参数对象中以这样的顺序来抽取属性。
+
 That's decent, but it's also unfortunate that we kinda *have* to do add that property-name array even for the simplest of functions. Is there any kind of trick we could use to detect what order the parameters are listed for a function, in at least the common simple cases? Fortunately, yes!
 
+这很合理，但很不幸的是，即便是对于最简单的函数我们也 *不得不* 加入这个属性-名称数组。有没有某种技巧可以使我们检测一个函数形式参数的罗列顺序，至少是为那些常见的简单情况？幸运的是，有的！
+
 JavaScript functions have a `.toString()` method that gives a string representation of the function's code, including the function declaration signature. Dusting off our regular expression parsing skills, we can parse the string representation of the function, and pull out the individually named parameters. The code looks a bit gnarly, but it's good enough to get the job done:
+
+JavaScript 函数有一个 `.toString()` 方法，它会给出这个函数代码的字符串表现，包括函数声明的签名。
 
 ```js
 function spreadArgProps(
