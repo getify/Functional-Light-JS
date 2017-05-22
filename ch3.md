@@ -508,7 +508,7 @@ uncurriedSum( 1, 2, 3, 4, 5 );				// 15
 uncurriedSum( 1, 2, 3 )( 4 )( 5 );			// 15
 ```
 
-可能使用 `uncurry(..)` 的更常见的情况，不是像刚刚展示的这样与一个手动柯里化过的函数一起使用，而是与一个做为某些其他一组操作的结果产生的柯里化函数一起使用。我们将在本章稍后的“无意义”一节中讨论这种场景。
+可能使用 `uncurry(..)` 的更常见的情况，不是像刚刚展示的这样与一个手动柯里化过的函数一起使用，而是与一个做为某些其他一组操作的结果产生的柯里化函数一起使用。我们将在本章稍后的“无点”一节中讨论这种场景。
 
 ## All For One
 
@@ -819,8 +819,6 @@ f2( { z: 3, x: 1 } );
 
 ### Spreading Properties
 
-Unfortunately, this only works because we have control over the signature of `foo(..)` and defined it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature?
-
 不幸的是，真能够工作是因为我们拥有 `foo(..)` 的签名的控制权，并将它定义为解构第一个参数。要是我们想要对形式参数独立罗列（没有形式参数解构）的函数使用这种技术，而且我们还不能改变这个函数的签名呢？
 
 ```js
@@ -829,25 +827,15 @@ function bar(x,y,z) {
 }
 ```
 
-Just like the `spreadArgs(..)` utility earlier, we could define a `spreadArgProps(..)` helper that takes the `key: value` pairs out of an object argument and "spreads" the values out as individual arguments.
-
 就像早先的 `spreadArgs(..)` 工具，我们可以定义一个 `spreadArgProps(..)` 帮助工具，它从一个实际参数对象中拿出 `key: value` 对，并将值“扩散”为独立的实际参数。
-
-There are some quirks to be aware of, though. With `spreadArgs(..)`, we were dealing with arrays, where ordering is well defined and obvious. However, with objects, property order is less clear and not necessarily reliable. Depending on how an object is created and properties set, we cannot be absolutely certain what enumeration order properties would come out.
 
 但是有一些怪异之处需要小心。使用 `spreadArgs(..)` 我们对付的是数组，它的顺序定义良好而且明显。然而，对于对象来说，属性顺序不那么清晰而且不一定可靠。根据对象的创建方式与属性设置的方式不同，我们不能绝对确定什么样的属性枚举顺序会出现。
 
-Such a utility needs a way to let you define what order the function in question expects its arguments (e.g., property enumeration order). We can pass an array like `["x","y","z"]` to tell the utility to pull the properties off the object argument in exactly that order.
-
 这样的工具需要一个方法让你定义目标函数期待的实际参数事什么顺序（也就是属性枚举的顺序）。我们可以传递一个 `["x","y","z"]` 这样的数组来告诉工具，从实际参数对象中以这样的顺序来抽取属性。
-
-That's decent, but it's also unfortunate that we kinda *have* to do add that property-name array even for the simplest of functions. Is there any kind of trick we could use to detect what order the parameters are listed for a function, in at least the common simple cases? Fortunately, yes!
 
 这很合理，但很不幸的是，即便是对于最简单的函数我们也 *不得不* 加入这个属性-名称数组。有没有某种技巧可以使我们检测一个函数形式参数的罗列顺序，至少是为那些常见的简单情况？幸运的是，有的！
 
-JavaScript functions have a `.toString()` method that gives a string representation of the function's code, including the function declaration signature. Dusting off our regular expression parsing skills, we can parse the string representation of the function, and pull out the individually named parameters. The code looks a bit gnarly, but it's good enough to get the job done:
-
-JavaScript 函数有一个 `.toString()` 方法，它会给出这个函数代码的字符串表现，包括函数声明的签名。
+JavaScript 函数有一个 `.toString()` 方法，它会给出这个函数代码的字符串表现，包括函数声明的签名。擦亮我们的正则表达式解析技能，我们可以解析函数的字符串表达，并抽出各个命名形式参数。这段代码看起来有点儿粗糙，但是对于完成这个工作来说够好了：
 
 ```js
 function spreadArgProps(
@@ -864,9 +852,9 @@ function spreadArgProps(
 }
 ```
 
-**Note:** This utility's parameter parsing logic is far from bullet-proof; we're using regular expressions to parse code, which is already a faulty premise! But our only goal here is to handle the common cases, which this does reasonably well. We only need a sensible default detection of parameter order for functions with simple parameters (as well as those with default parameter values). We don't, for example, need to be able to parse out a complex destructured parameter, because we wouldn't likely be using this utility with such a function, anyway. So, this logic gets the 80% job done; it lets us override the `propOrder` array for any other more complex function signature that wouldn't otherwise be correctly parsed. That's the kind of pragmatic balance this book seeks to find wherever possible.
+**注意：** 这个工具的形式参数解析逻辑远不够完美；我们使用正则表达式解析代码，这已经是一个错误的前提了！但我们这里唯一的目标是处理常见情况，这时它能工作得相当好。我们只需要为带有简单形式参数的函数（以及那些带有默认形式参数值的函数）准备一个检测参数顺序的合理默认逻辑。我们不会，比如说，需要解析出复杂的被解构的形式参数，因为无论如何，我们不太可能在这样的函数上使用这个工具。所以，这个逻辑可以完成 80% 的工作；对于其他签名更复杂而不能被正确解析的函数，它允许我们覆盖 `propOrder` 数组。这种实用主义的平衡正是本书四处探索的。
 
-Let's illustrate using our `spreadArgProps(..)` utility:
+让我们展示一下如何使用我们的 `spreadArgProps(..)` 工具：
 
 ```js
 function bar(x,y,z) {
@@ -883,19 +871,19 @@ f4( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-A word of caution: the object parameters/named arguments pattern I'm showing here clearly improves readability by reducing the clutter of argument order juggling, but to my knowledge, no mainstream FP libraries are using this approach. It comes at the expense of being far less familiar than how most JavaScript FP is done.
+一句提醒：我在这里展示的对象形式参数/命名实际参数模式通过减少搬弄参数顺序的混乱明显增强了可读性，但是据我所知，没有主流的 FP 库在使用这种方式。它的代价就是，与大多数 JavaScript FP 的方式比起来，远不为人所知。
 
-Also, usage of functions defined in this style requires you to know what each argument's name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'."
+另外，以这种风格定义的函数的用法要求你知道每个参数的名称是什么。你不再只需要记得，“哦，函数作为第一个参数传入”了。而是你不得不记住，“函数形式参数被称为 'fn'”。
 
-Weigh these tradeoffs carefully.
+要小心权衡这些得失。
 
 ## No Points
 
-A popular style of coding in the FP world aims to reduce some of the visual clutter by removing unnecessary parameter-argument mapping. This style is formally called tacit programming, or more commonly: point-free style. The term "point" here is referring to a function's parameter.
+在 FP 世界中有一种很流行的编码风格，它的目标是通过移除不必要的形式参数-实际参数映射来减少视觉上的混乱。这种风格正式地被称为默认编程，或者更常见的被称为：无点风格。“点”这个词在这里指的是函数的形式参数。
 
-**Warning:** Stop for a moment. Let's make sure we're careful not to take this discussion as an unbounded suggestion that you go overboard trying to be point-free in your FP code at all costs. This should be a technique for improving readability, when used in moderation. But as with most things in software development, you can definitely abuse it. If your code gets harder to understand because of the hoops you have to jump through to be point-free, stop. You won't win a blue ribbon just because you found some clever but esoteric way to remove another "point" from your code.
+**警告：** 停下一会。让我们确信我们足够小心而没有把这里的讨论作为一个无边界的建议 —— 使你不惜一切代价在你的 FP 代码中沉溺于无点风格。这应当是一种在适度使用的情况下改善可读性的技术。但正如软件开发中的大多数东西一样，你绝对可以滥用它。如果你的代码由于你试图成为无点风格的努力而变得难理解，停下。你不会因为发现了某些从代码中移除“点”的聪明但神秘的方法而获得荣誉的。
 
-Let's start with a simple example:
+让我们从一个简单的例子开始：
 
 ```js
 function double(x) {
@@ -908,7 +896,7 @@ function double(x) {
 // [2,4,6,8,10]
 ```
 
-Can you see that `mapper(..)` and `double(..)` have the same (or compatible, anyway) signatures? The parameter ("point") `v` can directly map to the corresponding argument in the `double(..)` call. As such, the `mapper(..)` function wrapper is unnecessary. Let's simplify with point-free style:
+你能看到 `mapper(..)` 和 `double(..)` 拥有相同（或兼容，不挂怎样）的签名吗？形式参数（“点”）`v` 可以直接映射到 `double(..)` 调用的响应实际参数上。因此，`mapper(..)` 包装函数是不必要的。让我们用无点风格简化一下：
 
 ```js
 function double(x) {
@@ -919,7 +907,7 @@ function double(x) {
 // [2,4,6,8,10]
 ```
 
-Let's revisit an example from earlier:
+我们来重温一下早先的一个例子：
 
 ```js
 ["1","2","3"].map( function mapper(v){
@@ -928,18 +916,18 @@ Let's revisit an example from earlier:
 // [1,2,3]
 ```
 
-In this example, `mapper(..)` is actually serving an important purpose, which is to discard the `index` argument that `map(..)` would pass in, because `parseInt(..)` would incorrectly interpret that value as a `radix` for the parsing. This was an example where `unary(..)` helps us out:
+在这个例子中，`mapper(..)` 实际上服务于一个重要的目的：丢弃 `map(..)` 将会传入的 `index` 实际参数，因为 `parseInt(..)` 将会在解析时错误地将这个值解释为 `radix`。这是一个 `unary(..)` 可以帮到我们的例子：
 
 ```js
 ["1","2","3"].map( unary( parseInt ) );
 // [1,2,3]
 ```
 
-The key thing to look for is if you have a function with parameter(s) that is/are directly passed to an inner function call. In both the above examples, `mapper(..)` had the `v` parameter that was passed along to another function call. We were able to replace that layer of abstraction with a point-free expression using `unary(..)`.
+寻找的关键之处是，你是否有一个函数，它的形式参数被直接传递给了一个内部函数调用。在上面两个例子中，`mapper(..)` 有一个形式参数 `v` 被直接传递给了另一个函数调用。所以我们可以用一个使用 `unary(..)` 的无点表达式来替换这层抽象。
 
-**Warning:** You might have been tempted, as I was, to try `map(partialRight(parseInt,10))` to right-partially apply the `10` value as the `radix`. However, as we saw earlier, `partialRight(..)` only guarantees that `10` will be the last argument passed in, not that it will be specifically the second argument. Since `map(..)` itself passes three arguments (`value`, `index`, `arr`) to its mapping function, the `10` value would just be the fourth argument to `parseInt(..)`; it only pays attention to the first two.
+**警告：** 你可能有过这种冲动，我也一样，试着用 `map(partialRight(parseInt,10))` 来将值 `10` 从右侧局部应用为 `radix`。但是，正如我们早先看到的，`partialRight(..)` 只能保证 `0` 将是最后一个被传入的参数，而不是特定地保证它将是第二个参数。因为 `map(..)` 本身传递三个参数（`value`、`index`、`arr`）给它的映射函数，所以值 `10` 将会是传给 `parseInt(..)` 的第四个参数；而 `parseInt(..)` 仅关注前两个。
 
-Here's another example:
+这是另外一个例子：
 
 ```js
 // convenience to avoid any potential binding issue
@@ -965,7 +953,7 @@ printIf( isShortEnough, msg1 );			// Hello
 printIf( isShortEnough, msg2 );
 ```
 
-Now let's say you want to print a message only if it's long enough; in other words, if it's `!isShortEnough(..)`. Your first thought is probably this:
+现在我们假定你想仅在一个消息足够长时打印它；换言之，如果它 `!isShortEnough(..)`。你的第一直觉可能是这样：
 
 ```js
 function isLongEnough(str) {
@@ -976,9 +964,9 @@ printIf( isLongEnough, msg1 );
 printIf( isLongEnough, msg2 );			// Hello World
 ```
 
-Easy enough... but "points" now! See how `str` is passed through? Without re-implementing the `str.length` check, can we refactor this code to point-free style?
+很简单…… 但是现在有“点”！看到 `str` 是如何被传递的了吗？在不重新实现 `str.length` 的情况下，我们能将这段代码重构为无点风格的吗？
 
-Let's define a `not(..)` negation helper (often referred to as `complement(..)` in FP libraries):
+让我们定义一个 `not(..)` 否定帮助工具（在 FP 库中经常被称为 `complement(..)`）：
 
 ```js
 function not(predicate) {
@@ -994,7 +982,7 @@ var not =
 			!predicate( ...args );
 ```
 
-Next, let's use `not(..)` to alternately define `isLongEnough(..)` without "points":
+接下来，让我们使用 `not(..)` 来把 `isLongEnough(..)` 重新定义为没有“点”的：
 
 ```js
 var isLongEnough = not( isShortEnough );
@@ -1002,9 +990,9 @@ var isLongEnough = not( isShortEnough );
 printIf( isLongEnough, msg2 );			// Hello World
 ```
 
-That's pretty good, isn't it? But we *could* keep going. The definition of the `printIf(..)` function can actually be refactored to be point-free itself.
+这相当好，不是吗？但我们 *可以* 走得更远。函数 `printIf(..)` 的定义本身实际上可以被重构为无点风格。
 
-We can express the `if` conditional part with a `when(..)` utility:
+我们可以使用一个 `when(..)` 工具来表达 `if` 条件的部分：
 
 ```js
 function when(predicate,fn) {
@@ -1022,17 +1010,17 @@ var when =
 			predicate( ...args ) ? fn( ...args ) : undefined;
 ```
 
-Let's mix `when(..)` with a few other helper utilities we've seen earlier in this chapter, to make the point-free `printIf(..)`:
+让我们把 `when` 与本章早先看到的几种其他帮助工具混合在一起，来制造无点的 `printIf(..)`：
 
 ```js
 var printIf = uncurry( rightPartial( when, output ) );
 ```
 
-Here's how we did it: we right-partially applied the `output` method as the second (`fn`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
+我们是这样做的：我们将 `output` 方法从右侧局部应用为 `when(..)` 的第二个参数（`fn`），这给了我们一个依然在期望第一个参数（`predicate`）的函数。这个函数在被调用时会产生另一个期待消息字符串的函数；看起来就像这样：`fn(predicate)(str)`。
 
-A chain of multiple (two) function calls like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `str` and `predicate` arguments together, which matches the original `printIf(predicate,str)` signature.
+像这样多个（两个）函数调用的链条看起来像极了柯里化函数，于是我们 `uncurry(..)` 这个结果来产生一个同时期待 `str` 和 `predicate` 这两个参数的函数，它与原先的 `printIf(predicate,str)` 签名吻合。
 
-Here's the whole example put back together (assuming various utilities we've already detailed in this chapter are present):
+这是把所有东西放在一起的完整例子（假定我们在本章中讲解过的各种工具都已经存在了）：
 
 ```js
 function output(msg) {
@@ -1057,18 +1045,18 @@ printIf( isLongEnough, msg1 );
 printIf( isLongEnough, msg2 );			// Hello World
 ```
 
-Hopefully the FP practice of point-free style coding is starting to make a little more sense. It'll still take a lot of practice to train yourself to think this way naturally. **And you'll still have to make judgement calls** as to whether point-free coding is worth it, as well as what extent will benefit your code's readability.
+希望无点风格编码的 FP 实践开始有些讲得通了。你还需要很多练习才能以这种方式自然地思考。而无点编码是否值得 **依然需要由你作出决定**，以及将它使用到何种程度才会使你的代码可读性受益。
 
-What do you think? Points or no points for you?
+你怎么看？对你来说有“点”还是无“点”？
 
-**Note:** Want more practice with point-free style coding? We'll revisit this technique in "Revisiting Points" in Chapter 4, based on new-found knowledge of function composition.
+**注意：** 想要更多无点风格代码的练习？我们将在第四章的“重温‘点’”中，基于我们对函数组合的新知再次谈到这种技术.
 
 ## Summary
 
-Partial Application is a technique for reducing the arity -- expected number of arguments to a function -- by creating a new function where some of the arguments are preset.
+局部应用是一种降低元数 —— 一个函数期待的实际参数个数 —— 的技术，它是通过创建一个已预设一部分参数的新函数来做到的。
 
-Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments. You can also undo a currying.
+柯里化是局部应用的一种特殊形式，它将元数降低为 1 —— 使用一个连续的函数调用链条，每个调用接收一个参数。一旦通过这些函数调用所有参数都被指定了，原始函数就会带着这些被收集的参数被调用。你还可以去柯里化。
 
-Other important operations like `unary(..)`, `identity(..)`, and `constant(..)` are part of the base toolbox for FP.
+其他像 `unary(..)`、`identity(..)`、和 `constant(..)` 这样重要的操作，都是 FP 基础工具箱的一部分。
 
-Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making easier to read/understand code.
+无点是一种编写代码的风格，它消灭了没必要的形式参数（“点”）到实际参数映射的繁冗，使得代码更易于阅读/理解。
