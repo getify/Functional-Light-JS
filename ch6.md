@@ -3,13 +3,21 @@
 
 In Chapter 5, we talked about the importance of reducing side causes/effects: the ways that your application's state can change unexpectedly and cause surprises (bugs). The fewer places we have with such landmines, the more confidence we have over our code, and the more readable it will be. Our topic for this chapter follows directly from that same effort.
 
+在第五章中，我们谈论了减少侧因/副作用的重要性：它们使你的应用程序状态会出乎意料地改变并造成以外的结果（bug）。这样有地雷的地方越少，我们就能对自己的代码更有信心，而且它也更具可读性。我们在本章中的话题紧跟着为了相同的目的而做出的努力。
+
 If programming-style idempotence is about defining a value change operation so that it can only affect state once, we now turn our attention to the goal of reducing the number of change occurrences from one to zero.
 
+如果编程风格的幂等性是关于定义一个只影响状态一次的改变值的操作，那么我们现在将注意力转向另一个目标：将改变发生的数量从一降为零。
+
 Let's now explore value immutability, the notion that we use only values in our programs that cannot be changed.
+
+现在我们来探索一下值的不可变性，这个概念是说我们在程序中仅使用不能被改变的值。
 
 ## Primitive Immutability
 
 Values of the primitive types (`number`, `string`, `boolean`, `null`, and `undefined`) are already immutable; there's nothing you can do to change them.
+
+基本类型（`number`、`string`、`boolean`、`null`、以及 `undefined`）的值已经是不可变得了；你无法做任何事情来改变它们。
 
 ```js
 // invalid, and also makes no sense
@@ -18,7 +26,11 @@ Values of the primitive types (`number`, `string`, `boolean`, `null`, and `undef
 
 However, JS does have an peculiar behavior which seems like it allows mutating such primitive type values: "boxing". When you access a property on certain primitive type values -- specifically `number`, `string`, and `boolean` -- under the covers JS automatically wraps (aka "boxes") the value in its object counterpart (`Number`, `String`, and `Boolean`, respectively).
 
+然而，JS 确实有一种特殊的行为，使它看起来允许修改这样的基本类型值：“封箱”。当你访问特定基本类型值上的一个属性时 —— 具体说是 `number`、`string`、和 `boolean` —— JS 在底层自动地将这个值包装（也就是“封箱”）在它对应的对象中（分别是 `Number`、`String`、以及 `Boolean`）。
+
 Consider:
+
+考虑如下代码：
 
 ```js
 var x = 2;
@@ -31,9 +43,15 @@ x.length;		// undefined
 
 Numbers do not normally have a `length` property available, so the `x.length = 4` setting is trying to add a new property, and it silently fails (or is ignored/discarded, depending on your point-of-view); `x` continues to hold the simple primitive `2` number.
 
+数字一般没有 `length` 属性可用，所以设置 `x.length = 4` 是在试图添加一个新属性，而且它无声地失败了（或者说被忽略/丢弃了，这要看你的视角）；`x` 继续持有简单基本类型数字 `2`。
+
 But the fact that JS allows the `x.length = 4` statement to run at all can seem troubling, if for no other reason than its potential confusion to readers. The good news is, if you use strict mode (`"use strict";`), such a statement will throw an error.
 
+但是如果除了潜在地使读者糊涂以外没有其他原因，JS 允许语句 `x.length = 4` 运行这件事看起来根本就是个麻烦。好消息是，如果你使用 strict 模式（`"use strict";`），这样的语句将抛出一个错误。
+
 What if you try to mutate the explicitly-boxed object representation of such a value?
+
+要是你试着改变一个被明确封箱为对象表现形式的这样一个值呢？
 
 ```js
 var x = new Number( 2 );
@@ -44,7 +62,11 @@ x.length = 4;
 
 `x` in this snippet is holding a reference to an object, so custom properties can be added and changed without issue.
 
+这段代码中的 `x` 持有一个指向对象的引用，所以添加和改变自定义属性没有问题。
+
 The immutability of simple primitives like `number`s probably seems fairly obvious. But what about `string` values? JS developers have a very common misconception that strings are like arrays and can thus be changed. JS syntax even hints at them being "array like" with the `[ ]` access operator. However, strings are also immutable.
+
+像 `number` 这样的简单基本类型值的不可变性看起来相当显而易见。那 `string` 值呢？JS 开发者们有一个很常见的误解，就是字符串和数组很像而且因此可以被改变。JS 语法甚至使用 `[]` 访问操作符暗示它们为 “类数组”。然而，字符串也是不可变的。
 
 ```js
 var s = "hello";
@@ -59,7 +81,11 @@ s;					// "hello"
 
 Despite being able to access `s[1]` like it's an array, JS strings are not real arrays. Setting `s[1] = "E"` and `s.length = 10` both silently fail, just as `x.length = 4` did above. In strict mode, these assignments will fail, because both the `1` property and the `length` property are read-only on this primitive `string` value.
 
+除了能够像在一个数组中那样访问 `s[1]`，JS 字符串不是真正的数组。设置 `s[1] = "E"` 和 `s.length = 10` 都会无声地失败，就像上面的 `x.length = 4` 一样。在 strict 模式中，这些语句会失败，因为属性 `1` 和属性 `length` 在击基本类型的 `string` 值上都是只读的。
+
 Interestingly, even the boxed `String` object value will act (mostly) immutable as it will throw errors in strict mode if you change existing properties:
+
+有趣的是，即使是封箱后的 `String` 对象值也会表现为（几乎）不可变，因为如果你在 strict 模式下改变它的既存属性的话，它将抛出错误：
 
 ```js
 "use strict";
@@ -77,6 +103,8 @@ s;					// "hello"
 ## Value To Value
 
 We'll unpack this idea more throughout the chapter, but just to start with a clear understanding in mind: value immutability does not mean we can't have values change over the course of our program. A program without changing state is not a very interesting one! It also doesn't mean that our variables can't hold different values. These are all common misconceptions about value immutability.
+
+我们将在本章中更彻底地展开这个概念，但为了在开始的时让我们的大脑中形成一个清晰的认识
 
 Value immutability means that *when* we need to change the state in our program, we must create and track a new value rather than mutate an existing value.
 
