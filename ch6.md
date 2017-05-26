@@ -1,21 +1,13 @@
 # Functional-Light JavaScript
 # Chapter 6: Value Immutability
 
-In Chapter 5, we talked about the importance of reducing side causes/effects: the ways that your application's state can change unexpectedly and cause surprises (bugs). The fewer places we have with such landmines, the more confidence we have over our code, and the more readable it will be. Our topic for this chapter follows directly from that same effort.
-
 在第五章中，我们谈论了减少侧因/副作用的重要性：它们使你的应用程序状态会出乎意料地改变并造成以外的结果（bug）。这样有地雷的地方越少，我们就能对自己的代码更有信心，而且它也更具可读性。我们在本章中的话题紧跟着为了相同的目的而做出的努力。
 
-If programming-style idempotence is about defining a value change operation so that it can only affect state once, we now turn our attention to the goal of reducing the number of change occurrences from one to zero.
-
 如果编程风格的幂等性是关于定义一个只影响状态一次的改变值的操作，那么我们现在将注意力转向另一个目标：将改变发生的数量从一降为零。
-
-Let's now explore value immutability, the notion that we use only values in our programs that cannot be changed.
 
 现在我们来探索一下值的不可变性，这个概念是说我们在程序中仅使用不能被改变的值。
 
 ## Primitive Immutability
-
-Values of the primitive types (`number`, `string`, `boolean`, `null`, and `undefined`) are already immutable; there's nothing you can do to change them.
 
 基本类型（`number`、`string`、`boolean`、`null`、以及 `undefined`）的值已经是不可变得了；你无法做任何事情来改变它们。
 
@@ -24,11 +16,7 @@ Values of the primitive types (`number`, `string`, `boolean`, `null`, and `undef
 2 = 2.5;
 ```
 
-However, JS does have an peculiar behavior which seems like it allows mutating such primitive type values: "boxing". When you access a property on certain primitive type values -- specifically `number`, `string`, and `boolean` -- under the covers JS automatically wraps (aka "boxes") the value in its object counterpart (`Number`, `String`, and `Boolean`, respectively).
-
 然而，JS 确实有一种特殊的行为，使它看起来允许修改这样的基本类型值：“封箱”。当你访问特定基本类型值上的一个属性时 —— 具体说是 `number`、`string`、和 `boolean` —— JS 在底层自动地将这个值包装（也就是“封箱”）在它对应的对象中（分别是 `Number`、`String`、以及 `Boolean`）。
-
-Consider:
 
 考虑如下代码：
 
@@ -41,15 +29,9 @@ x;				// 2
 x.length;		// undefined
 ```
 
-Numbers do not normally have a `length` property available, so the `x.length = 4` setting is trying to add a new property, and it silently fails (or is ignored/discarded, depending on your point-of-view); `x` continues to hold the simple primitive `2` number.
-
 数字一般没有 `length` 属性可用，所以设置 `x.length = 4` 是在试图添加一个新属性，而且它无声地失败了（或者说被忽略/丢弃了，这要看你的视角）；`x` 继续持有简单基本类型数字 `2`。
 
-But the fact that JS allows the `x.length = 4` statement to run at all can seem troubling, if for no other reason than its potential confusion to readers. The good news is, if you use strict mode (`"use strict";`), such a statement will throw an error.
-
 但是如果除了潜在地使读者糊涂以外没有其他原因，JS 允许语句 `x.length = 4` 运行这件事看起来根本就是个麻烦。好消息是，如果你使用 strict 模式（`"use strict";`），这样的语句将抛出一个错误。
-
-What if you try to mutate the explicitly-boxed object representation of such a value?
 
 要是你试着改变一个被明确封箱为对象表现形式的这样一个值呢？
 
@@ -60,11 +42,7 @@ var x = new Number( 2 );
 x.length = 4;
 ```
 
-`x` in this snippet is holding a reference to an object, so custom properties can be added and changed without issue.
-
 这段代码中的 `x` 持有一个指向对象的引用，所以添加和改变自定义属性没有问题。
-
-The immutability of simple primitives like `number`s probably seems fairly obvious. But what about `string` values? JS developers have a very common misconception that strings are like arrays and can thus be changed. JS syntax even hints at them being "array like" with the `[ ]` access operator. However, strings are also immutable.
 
 像 `number` 这样的简单基本类型值的不可变性看起来相当显而易见。那 `string` 值呢？JS 开发者们有一个很常见的误解，就是字符串和数组很像而且因此可以被改变。JS 语法甚至使用 `[]` 访问操作符暗示它们为 “类数组”。然而，字符串也是不可变的。
 
@@ -79,11 +57,7 @@ s.length = 10;
 s;					// "hello"
 ```
 
-Despite being able to access `s[1]` like it's an array, JS strings are not real arrays. Setting `s[1] = "E"` and `s.length = 10` both silently fail, just as `x.length = 4` did above. In strict mode, these assignments will fail, because both the `1` property and the `length` property are read-only on this primitive `string` value.
-
 除了能够像在一个数组中那样访问 `s[1]`，JS 字符串不是真正的数组。设置 `s[1] = "E"` 和 `s.length = 10` 都会无声地失败，就像上面的 `x.length = 4` 一样。在 strict 模式中，这些语句会失败，因为属性 `1` 和属性 `length` 在击基本类型的 `string` 值上都是只读的。
-
-Interestingly, even the boxed `String` object value will act (mostly) immutable as it will throw errors in strict mode if you change existing properties:
 
 有趣的是，即使是封箱后的 `String` 对象值也会表现为（几乎）不可变，因为如果你在 strict 模式下改变它的既存属性的话，它将抛出错误：
 
@@ -102,13 +76,11 @@ s;					// "hello"
 
 ## Value To Value
 
-We'll unpack this idea more throughout the chapter, but just to start with a clear understanding in mind: value immutability does not mean we can't have values change over the course of our program. A program without changing state is not a very interesting one! It also doesn't mean that our variables can't hold different values. These are all common misconceptions about value immutability.
+我们将在本章中更彻底地展开这个概念，但为了在开始的时让我们的大脑中形成一个清晰的认识：值的不可变性不意味着我们不能拥有在程序运行的整个进程中一直改变的值。一个没有改变的值的程序可不是非常有趣！它也不意味着我们的变量不能持有不同的值。这些都是对值的不可变性的误解。
 
-我们将在本章中更彻底地展开这个概念，但为了在开始的时让我们的大脑中形成一个清晰的认识
+值的不可变性意味着，当我们需要在程序中改变状态时，我们必须创建并追踪一个新的值而不是改变一个既存的值。
 
-Value immutability means that *when* we need to change the state in our program, we must create and track a new value rather than mutate an existing value.
-
-For example:
+例如：
 
 ```js
 function addValue(arr) {
@@ -119,17 +91,17 @@ function addValue(arr) {
 addValue( [1,2,3] );	// [1,2,3,4]
 ```
 
-Notice that we did not change the array that `arr` references, but rather created a new array (`newArr`) that contains the existing values plus the new `4` value.
+注意我们没有改变 `arr` 引用的数组，而是创建了一个新数组 —— 它包含既存的值外加新的值 `4`。
 
-Analyze `addValue(..)` based on what we discussed in Chapter 5 about side causes/effects. Is it pure? Does it have referential transparency? Given the same array, will it always produce the same output? Is it free of both side causes and side effects? **Yes.**
+基于我们在第五章中关于侧因/副作用的讨论来分析一下 `addValue(..)`。它是纯粹的吗？它具有引用透明性吗？给它相同的数组，它会总是产生相同的输出吗？它既没有侧因也没有副作用吗？**是的。**
 
-Imagine the `[1,2,3]` array represents a sequence of data from some previous operations and we stored in some variable. It is our current state. If we want to compute what the next state of our application is, we call `addValue(..)`. But we want that act of next-state computation to be direct and explicit. So the `addValue(..)` operation takes a direct input, returns a direct output, and avoids creating a side effect by mutating the original array that `arr` references.
+想象一下，数组 `[1,2,3]` 表示一系列来自于某些先前的操作数据，而且我们把它存储在某些变量中。这就是我们的当前状态。如果我们想计算我们应用程序的下一个状态是什么，我们调用了 `addValue(..)`。但我们想要下一个状态的计算进行得直接且明确。所以 `addValue(..)` 操作接收一个直接的输入，返回一个直接的输出，并且避免通过改变 `arr` 引用的原始数组来制造副作用。
 
-This means we can calculate the new state of `[1,2,3,4]` and be fully in control of that transition of states. No other part of our program can unexpectedly transition us to that state early, or to another state entirely, like `[1,2,3,5]`. By being disciplined about our values and treating them as immutable, we drastically reduce the surface area of surprise, making our programs easier to read, reason about, and ultimately trust.
+这意味着我们可以计算出新的状态 `[1,2,3,4]` 而且完全掌控这种状态的转换。我们程序中没有其他部分可以意外地将我们提早地转换到这个状态，或者完全转换为另一个状态，比如 `[1,2,3,5]`。通过管控我们的值并将它们视为不可变的，我们极大地缩小了意外的表面积，使我们的程序更易于阅读，易于推理，而最终更可信任。
 
-The array that `arr` references is actually mutable. We just chose not to mutate it, so we practiced the spirit of value immutability.
+`arr` 引用的数组实际上是可变的。我们只是选择不去改变它，所以我们践行了值的不可变性的精神。
 
-We can use the copy-instead-of-mutate strategy for objects, too. Consider:
+我们也可以对对象使用这种拷贝而非改变的策略。考虑如下代码：
 
 ```js
 function updateLastLogin(user) {
@@ -147,7 +119,7 @@ user = updateLastLogin( user );
 
 ### Non-Local
 
-The importance of an immutable value can be seen if you do something like this:
+如果你做这样的事情，就可以看出不可变值的重要性：
 
 ```js
 var arr = [1,2,3];
@@ -157,9 +129,9 @@ foo( arr );
 console.log( arr[0] );
 ```
 
-Ostensibly, you're expecting `arr[0]` to still be the value `1`. But is it? You don't know, because `foo(..)` *might* mutate the array using the reference you pass to it.
+表面上，你希望 `arr[0]` 依然是值 `1`。但它是吗？你不知道，因为 `foo(..)` *可能* 会使用你传递给它的引用改变这个数组。
 
-We already saw a cheat in the previous chapter to avoid such a surprise:
+在前一章中我们已经看到了一种作弊的方法可以避免这样的意外：
 
 ```js
 var arr = [1,2,3];
@@ -169,9 +141,11 @@ foo( arr.slice() );			// ha! a copy!
 console.log( arr[0] );		// 1
 ```
 
-Of course, that assertion holds true only if `foo` doesn't skip its parameter and reference our same `arr` via free variable lexical reference!
+当然，仅在 `foo` 没有跳过它的形式参数而通过自由变量词法引用来引用我们同一个 `arr` 时，这种断言才能够成立！
 
 In a little bit, we'll see another strategy for protecting ourselves from a value being mutated out from underneath us unexpectedly.
+
+再过一会，我们将看到另一种策略，
 
 ## Reassignment
 
