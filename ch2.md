@@ -43,7 +43,7 @@ You may be more accustomed to thinking of functions as procedures. What's the di
 
 A function takes input(s) and definitely always has a `return` value.
 
-If you plan to want to do functional programming, **you should be using functions as much as possible**, and not procedures. All your `function`s should take input(s) and return output(s). Why? The answer to that will have many levels of meaning that we'll uncover throughout this book.
+If you plan to do functional programming, **you should be using functions as much as possible**, and not procedures. All your `function`s should take input(s) and return output(s). Why? The answer to that will have many levels of meaning that we'll uncover throughout this book.
 
 ## Function Input
 
