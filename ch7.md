@@ -1,43 +1,31 @@
 # Functional-Light JavaScript
 # Chapter 7: Closure vs Object
 
-A number of years ago, Anton van Straaten crafted what has become a rather famous and oft-cited [koan](https://www.merriam-webster.com/dictionary/koan) to illustrate and provoke an important tension between closure and objects:
+多年以前，Anton van Straaten 编写了一个名声显赫而且广为流传的 [禅家公案](https://www.merriam-webster.com/dictionary/koan)，描绘并挑起了闭包与对象之间一种重要的紧张状态。
 
-> The venerable master Qc Na was walking with his student, Anton. Hoping to
-prompt the master into a discussion, Anton said "Master, I have heard that
-objects are a very good thing - is this true?" Qc Na looked pityingly at
-his student and replied, "Foolish pupil - objects are merely a poor man's
-closures."
+> 庄严的 Qc Na 大师在与他的学生 Anton 一起散步。Anto 希望促成一次与师傅的讨论，他说：“师傅，我听说对象是个非常好的东西 —— 真的吗？” Qc Na 同情地看着他的学生回答道，“笨学生 —— 对象只不过是一种简单的闭包。”
 >
-> Chastised, Anton took his leave from his master and returned to his cell,
-intent on studying closures. He carefully read the entire "Lambda: The
-Ultimate..." series of papers and its cousins, and implemented a small
-Scheme interpreter with a closure-based object system. He learned much, and
-looked forward to informing his master of his progress.
+> 被训斥的 Anton 告别他的师父返回自己的房间，开始有意地学习闭包。他仔细地阅读了整部 “Lamda：终极……” 系列书籍以及其姊妹篇，并且使用一个基于闭包的对象系统实现了一个小的 Scheme 解释器。他学到了很多，希望向他的师父报告自己的进步。
 >
-> On his next walk with Qc Na, Anton attempted to impress his master by
-saying "Master, I have diligently studied the matter, and now understand
-that objects are truly a poor man's closures." Qc Na responded by hitting
-Anton with his stick, saying "When will you learn? Closures are a poor man's
-object." At that moment, Anton became enlightened.
+> 当他再次与 Qc Na 散步时，Anton 试图给师傅一个好印象，说：“师父，经过勤奋的学习，现在我我理解了对象确实是简化的闭包。” Qc Na 用他的拐杖打了 Anton 作为回应，他说：“你到底什么时候才能明白？闭包只是简化的对象。” 此时此刻，Anton 茅塞顿开。
 >
 > Anton van Straaten 6/4/2003
 >
 > http://people.csail.mit.edu/gregs/ll1-discuss-archive-html/msg03277.html
 
-The original posting, while brief, has more context to the origin and motivations, and I strongly suggest you read that post to properly set your mindset for approaching this chapter.
+原版的文章，虽然简短，但是拥有更多关于其起源与动机的背景内容，我强烈建议你阅读这篇文章，来为本章的学习正确地设置你的思维模式。
 
-Many people I've observed read this koan smirk at its clever wit but then move on without it changing much about their thinking. However, the purpose of a koan (from the Bhuddist Zen perspective) is to prod the reader into wrestling with the contradictory truths therein. So, go back and read it again. Now read it again.
+我见过许多读过这段公案的人都对它的聪明机智表现出一丝假笑，然后并没有改变太多他们的想法就离开了。然而，一个公案的目的（从佛教禅的角度而言）就是刺激读者对其中矛盾的真理上下求索。所以，回头再读一遍。然后再读一遍。
 
-Which is it? Is a closure a poor man's object, or is an object a poor man's closure? Or neither? Or both? Is merely the take-away that closures and objects are in some way equivalent?
+它到底是什么？闭包是简化的对象，或者对象是简化的闭包？或都不是？或都是？难道唯一重点是闭包和对象在某种意义上是等价的？
 
-And what does any of this have to do with functional programming? Pull up a chair and ponder for awhile. This chapter will be an interesting detour, an excursion if you will.
+而且这与函数式编程有什么关系？拉一把椅子深思片刻。如果你乐意的话，这一章将是一次有趣的绕路远足。
 
 ## The Same Page
 
-First, let's make sure we're all on the same page when we refer to closures and objects. We're obviously in the context of how JavaScript deals with these two mechanisms, and specifically talking about simple function closure (see "Keeping Scope" in Chapter 2) and simple objects (collections of key-value pairs).
+首先，让我们确保当我们谈到闭包和对象时我们都在统一轨道上。显然我们的语境是 JavaScript 如何应对这两种机制，而且具体来说谈到的是简单的函数闭包（参见第二章的“保持作用域”）与简单对象（键值对的集合）。
 
-A simple function closure:
+一个简单的函数闭包：
 
 ```js
 function outer() {
@@ -54,7 +42,7 @@ var three = outer();
 three();			// 3
 ```
 
-A simple object:
+一个简单的对象：
 
 ```js
 var obj = {
@@ -69,24 +57,24 @@ function three(outer) {
 three( obj );		// 3
 ```
 
-Many people conjur lots of extra things when you mention "closure", such as the asynchronous callbacks or even the module pattern with encapsulation and information hiding. Similarly, "object" brings to mind classes, `this`, prototypes, and a whole slew of other utilities and patterns.
+当你提到“闭包”时，很多人都会都会在脑中唤起许多额外的东西，比如异步回调，甚至是带有封装的模块模式和信息隐藏。相似地，“对象”会把类带到思维中，`this`、原型、以及一大堆其他的工具和模式。
 
-As we go along, we'll carefully address the parts of this external context that matter, but for now, try to just stick to the simplest interpretations of "closure" and "object" -- it'll make this exploration less confusing.
+随着我们向前迈进，我们将小心地解说这种重要外部语境的一部分，但就目前来说，只要抓住“闭包”与“对象”的最简单的解释就好 —— 这将使我们的探索少一些困惑。
 
 ## Look Alike
 
-It may not be obvious how closures and objects are related. So let's explore their similarities first.
+闭包与对象是如何联系在一起的，这可能不太明显。所以让我们首先来探索一下它们的相似性。
 
-To frame this discussion, let me just briefly assert two things:
+为了框定这次讨论，让我简要地断言两件事：
 
-1. A programming language without closures can simulate them with objects instead.
-2. A programming language without objects can simulate them with closures instead.
+1. 一个没有闭包的编程语言可以使用对象来模拟闭包。
+2. 一个没有对象的编程语言可以使用闭包来模拟对象。
 
-In other words, we can think of closures and objects as two different representations of a thing.
+换句话说，我们可以认为闭包和对象是同一种东西的两种不同表现形式。
 
 ### State
 
-Consider this code from above:
+考虑这段从上面引用的代码：
 
 ```js
 function outer() {
@@ -104,9 +92,9 @@ var obj = {
 };
 ```
 
-Both the scope closed over by `inner()` and the object `obj` contain two elements of state: `one` with value `1` and `two` with value `2`. Syntactically and mechanically, these representations of state are different. But conceptually, they're actually quite similar.
+被 `inner()` 和对象 `obj` 封闭的两个作用域都包含两个状态元素：带有值 `1` 的 `one`，和带有值 `2` 的 `two`。在语法上和机制上，这些状态的表现形式是不同的。而在概念上，它们其实十分相似。
 
-As a matter of fact, it's fairly straightforward to represent an object as a closure, or a closure as an object. Go ahead, try it yourself:
+事实上，将一个对象表示为一个闭包，或者将一个闭包表示为一个对象是相当直接了当的。去吧，自己试一下：
 
 ```js
 var point = {
@@ -116,7 +104,7 @@ var point = {
 };
 ```
 
-Did you come up with something like?
+你有没有想到过这样的东西？
 
 ```js
 function outer() {
@@ -132,9 +120,9 @@ function outer() {
 var point = outer();
 ```
 
-**Note:** The `inner()` function creates and returns a new array (aka, an object!) each time it's called. That's because JS doesn't afford us any capability to `return` multiple values without encapsulating them in an object. That's not technically a violation of our object-as-closure task, because it's just an implementation detail of exposing/transporting values; the state tracking itself is still object-free. With ES6+ array destructuring, we can declaratively ignore this temporary intermediate array on the other side: `var [x,y,z] = point()`. From a developer ergonomics perspective, the values are stored individually and tracked via closure instead of objects.
+**注意：** `inner()` 函数在每次被调用时创建并返回一个新数组（也就是一个对象！）。这是因为 JS 没有给我们任何 `return` 多个值的能力，除非将它们封装在一个对象中。从技术上讲，这并不违背我们的闭包做对象的任务，因为这只是一个暴露/传送值的实现细节；状态追踪本身依然是无对象的。使用 ES6+ 的数组解构，我们可以在另一侧声明式地忽略这个临时中间数组：`var [x,y,z] = point()`。从一个开发者的人体工程学角度来说，这些值被分离地存储而且是通过闭包而非对象追踪的。
 
-What if we have nested objects?
+要是我们有一些嵌套的对象呢？
 
 ```js
 var person = {
@@ -147,7 +135,7 @@ var person = {
 };
 ```
 
-We could represent that same kind of state with nested closures:
+我们可以使用嵌套的闭包来表示同种状态：
 
 ```js
 function outer() {
@@ -170,7 +158,7 @@ function outer() {
 var person = outer();
 ```
 
-Let's practice going the other direction, from closure to object:
+让我们实践一下从另一个方向走，闭包到对象：
 
 ```js
 function point(x1,y1) {
@@ -187,7 +175,7 @@ var pointDistance = point( 1, 1 );
 pointDistance( 4, 5 );		// 5
 ```
 
-`distFromPoint(..)` is closed over `x1` and `y1`, but we could instead explicitly pass those values as an object:
+`distFromPoint(..)` 闭合着 `x1` 和 `y1`，但我们可以将这些值作为一个对象明确地传递：
 
 ```js
 function pointDistance(point,x2,y2) {
@@ -205,13 +193,13 @@ pointDistance(
 // 5
 ```
 
-The `point` object state explicitly passed in replaces the closure that implicitly held that state.
+`point` 状态对象被明确地传入，取代了隐含地持有这个状态的闭包。
 
 #### Behavior, Too!
 
-It's not just that objects and closures represent ways to express collections of state, but also that they can include behavior via functions/methods. Bundling data with its behavior has a fancy name: encapsulation.
+对象和闭包不仅代表表达状态的集合的方式，它们还可以通过函数/方法包含行为。将数据与它的行为打包有一个炫酷的名字：封装。
 
-Consider:
+考虑如下代码：
 
 ```js
 function person(name,age) {
@@ -228,9 +216,9 @@ var birthdayBoy = person( "Kyle", 36 );
 birthdayBoy();			// Happy 37th Birthday, Kyle!
 ```
 
-The inner function `happyBirthday()` has closure over `name` and `age` so that the functionality therein is kept with the state.
+内部函数 `happyBirthday()` 闭合着 `name` 与 `age`，所以其中的功能和状态一起保留了下来。
 
-We can achieve that same capability with a `this` binding to an object:
+我们可以使用 `this` 与一个对象的绑定取得相同的能力：
 
 ```js
 var birthdayBoy = {
@@ -248,11 +236,11 @@ birthdayBoy.happyBirthday();
 // Happy 37th Birthday, Kyle!
 ```
 
-We're still expressing the encapsulation of state data with the `happyBirthday()` function, but with an object instead of a closure. And we don't have to explicitly pass in an object to a function (as with earlier examples); JavaScript's `this` binding easily creates an implicit binding.
+我们仍然使用 `happyBirthday()` 函数来表达状态数据的封装，但使用一个对象而不是闭包。而且我们不必向一个函数明确地传入一个对象（比如前一个例子）；JavaScript 的 `this` 绑定很容易地创建了一个隐含绑定。
 
-Another way to analyze this relationship: a closure associates a single function with a set of state, whereas an object holding the same state can have any number of functions to operate on that state.
+另一种分析这种关系的方式：一个闭包将一个函数与一组状态联系起来，而一个持有相同状态的对象可以有任意多个操作这些状态的函数。
 
-As a matter of fact, you could even expose multiple methods with a single closure as the interface. Consider a traditional object with two methods:
+事实上，你甚至可以使用一个闭包作为接口暴露多个方法。考虑一个带有两个方法的传统对象：
 
 ```js
 var person = {
@@ -270,7 +258,7 @@ person.first() + " " + person.last();
 // Kyle Simpson
 ```
 
-Just using closure without objects, we could represent this program as:
+仅使用闭包而非对象，我们可以将这个程序表示为：
 
 ```js
 function createPerson(firstName,lastName) {
@@ -304,13 +292,13 @@ person( "first" ) + " " + person( "last" );
 // Kyle Simpson
 ```
 
-While these programs look and feel a bit different ergonomically, they're actually just different implementation variations of the same program behavior.
+虽然这些程序在人体工程学上的观感不同，但它们实际上只是相同程序行为的不同种类实现。
 
 ### (Im)mutability
 
-Many people will initially think that closures and objects behave differently with respect to mutability; closures protect from external mutation while objects do not. But, it turns out, both forms have identical mutation behavior.
+许多人一开始认为闭包和对象在可变性方面表现不同；闭包可以防止外部改变而对象不能。但是，事实表明，两种形式具有完全相同的可变性行为。
 
-That's because what we care about, as discussed in Chapter 6, is **value** mutability, and this is a characteristic of the value itself, regardless of where or how it's assigned.
+这是因为我们关心的，正如第六章中讨论的，是 **值** 的可变性，而它是值本身的性质，与它在哪里以及如何被赋值无关。
 
 ```js
 function outer() {
@@ -328,9 +316,9 @@ var xyPublic = {
 };
 ```
 
-The value stored in the `x` lexical variable inside `outer()` is immutable -- remember, primitives like `2` are by definition immutable. But the value referenced by `y`, an array, is definitely mutable. The exact same goes for the `x` and `y` properties on `xyPublic`.
+存储在 `outer()` 内部的词法变量 `x` 中的值是不可变的 —— 记住，`2` 这样的基本类型根据定义就是不可变的。但是被 `y` 引用的值，一个数组，绝对是可变的。这对 `xyPublic` 上的属性 `x` 和 `y` 来说是完全一样的。
 
-We can reinforce the point that objects and closures have no bearing on mutability by pointing out that `y` is itself an array, and thus we need to break this example down further:
+我们可以佐证对象与闭包和不可变性无关：指出 `y` 本身就是一个数组，如此我们需要将这个例子进一步分解：
 
 ```js
 function outer() {
@@ -358,29 +346,44 @@ var xyPublic = {
 };
 ```
 
-If you think about it as "turtles (aka, objects) all the way down", at the lowest level, all state data is primitives, and all primitives are value-immutable.
+如果你将它考虑为 “乌龟（也就是对象）背地球”，那么在最底下一层，所有的状态数据都是基本类型，而所有的基本类型都是不可变的。
 
-Whether you represent this state with nested objects, or with nested closures, the values being held are all immutable.
+不管你是用嵌套的对象表示状态，还是用嵌套的闭包表示状态，被持有的值都是不可变的。
 
 ### Isomorphic
 
 The term "isomorphic" gets thrown around a lot in JavaScript these days, and it's usually used to refer to code that can be used/shared in both the server and the browser. I wrote a blog post awhile back that calls bogus on that usage of this word "isomorphic", which actually has an explicit and important meaning that's being clouded.
 
+如今 “同构” 这个词经常被扔到 JavaScript 旁边，它通常用来指代可以在服务器与浏览器中使用/共享的代码。一段时间以前我写过一篇博客，称对 “同构” 这一词的这种用法是一种捏造，它实际上有一种明确和重要的含义被掩盖了。
+
 Here's some selections from a part of that post:
 
+这是那篇博客的一些节选：
+
 > What does isomorphic mean? Well, we could talk about it in mathematic terms, or sociology, or biology. The general notion of isomorphism is that you have two things which are similar in structure but not the same.
+> 同构意味着什么？好吧，我们可以从数学上，或社会学上，或生物学上讨论它。同构的一般概念是，你有两个东西，它们虽然不同但在结构上有相似之处。
 >
 > In all those usages, isomorphism is differentiated from equality in this way: two values are equal if they’re exactly identical in all ways, but they are isomorphic if they are represented differently but still have a 1-to-1, bi-directional mapping relationship.
+> 在所有这些用法中，同构与等价以这样的方式被区分开：如果两个值在所有的方面都完全相，那么它们就是等价的。但如果它们表现不同，却仍然拥有 1 对 1 的、双向的映射关系，那么它们就是同构的。
 >
-> In other words, two things A and B would be isomorphic if you could map (convert) from A to B and then go back to A with the inverse mapping.
+> In other words, two things A and B would be isomorphic if you could map (convert) from A to B and then go back to A with the inverse mapping
+> 换言之，如果你能够从 A 映射（转换）到 B 而后又可以从用反向的映射从 B 走回到 A，那么 A 和 B 就是同构的。
 
 Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case of bijective (aka, 2-way) morphism that requires not only that the mapping must be able to go in either direction, but also that the behavior is identical in either form.
 
+回忆一下第二章的 “数学简忆”，我们讨论了函数的数学定义 —— 输入与输出之间的映射。我们指出这在技术上被称为一种态射。同构是双射（也就是两个方向的）的一种特殊情况，它不仅要求映射必须能够在两个方向上进行，而且要求这两种形式在行为上也完全一样。
+
 But instead of thinking about numbers, let's relate isomorphism to code. Again quoting my blog post:
+
+把对数字的思考放在一边，让我们将同构联系到代码上。再次引用我的博客：
 
 > [W]hat would isomorphic JS be if there were such a thing? Well, it could be that you have one set of JS code that is converted to another set of JS code, and that (importantly) you could convert from the latter back to the former if you wanted.
 
+> 如果 JS 中存在同构这样的东西，它将会是什么样子？好吧，它可能是这样：你拥有这样一套 JS 代码，它可以被转换为另一套 JS 代码，而且（重要的是）如果你想这么做的话，你可将后者转换回前者。
+
 As we asserted earlier with our examples of closures-as-objects and objects-as-closures, these representative alternations go either way. In this respect, they are isomorphisms of each other.
+
+
 
 Put simply, closures and objects are isomorphic representations of state (and its associated functionality).
 
