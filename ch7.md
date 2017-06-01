@@ -352,48 +352,32 @@ var xyPublic = {
 
 ### Isomorphic
 
-The term "isomorphic" gets thrown around a lot in JavaScript these days, and it's usually used to refer to code that can be used/shared in both the server and the browser. I wrote a blog post awhile back that calls bogus on that usage of this word "isomorphic", which actually has an explicit and important meaning that's being clouded.
-
 如今 “同构” 这个词经常被扔到 JavaScript 旁边，它通常用来指代可以在服务器与浏览器中使用/共享的代码。一段时间以前我写过一篇博客，称对 “同构” 这一词的这种用法是一种捏造，它实际上有一种明确和重要的含义被掩盖了。
 
-Here's some selections from a part of that post:
 
-这是那篇博客的一些节选：
-
-> What does isomorphic mean? Well, we could talk about it in mathematic terms, or sociology, or biology. The general notion of isomorphism is that you have two things which are similar in structure but not the same.
 > 同构意味着什么？好吧，我们可以从数学上，或社会学上，或生物学上讨论它。同构的一般概念是，你有两个东西，它们虽然不同但在结构上有相似之处。
 >
-> In all those usages, isomorphism is differentiated from equality in this way: two values are equal if they’re exactly identical in all ways, but they are isomorphic if they are represented differently but still have a 1-to-1, bi-directional mapping relationship.
 > 在所有这些用法中，同构与等价以这样的方式被区分开：如果两个值在所有的方面都完全相，那么它们就是等价的。但如果它们表现不同，却仍然拥有 1 对 1 的、双向的映射关系，那么它们就是同构的。
 >
-> In other words, two things A and B would be isomorphic if you could map (convert) from A to B and then go back to A with the inverse mapping
 > 换言之，如果你能够从 A 映射（转换）到 B 而后又可以从用反向的映射从 B 走回到 A，那么 A 和 B 就是同构的。
-
-Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case of bijective (aka, 2-way) morphism that requires not only that the mapping must be able to go in either direction, but also that the behavior is identical in either form.
 
 回忆一下第二章的 “数学简忆”，我们讨论了函数的数学定义 —— 输入与输出之间的映射。我们指出这在技术上被称为一种态射。同构是双射（也就是两个方向的）的一种特殊情况，它不仅要求映射必须能够在两个方向上进行，而且要求这两种形式在行为上也完全一样。
 
-But instead of thinking about numbers, let's relate isomorphism to code. Again quoting my blog post:
-
 把对数字的思考放在一边，让我们将同构联系到代码上。再次引用我的博客：
-
-> [W]hat would isomorphic JS be if there were such a thing? Well, it could be that you have one set of JS code that is converted to another set of JS code, and that (importantly) you could convert from the latter back to the former if you wanted.
 
 > 如果 JS 中存在同构这样的东西，它将会是什么样子？好吧，它可能是这样：你拥有这样一套 JS 代码，它可以被转换为另一套 JS 代码，而且（重要的是）如果你想这么做的话，你可将后者转换回前者。
 
-As we asserted earlier with our examples of closures-as-objects and objects-as-closures, these representative alternations go either way. In this respect, they are isomorphisms of each other.
+正如我们早先使用闭包即对象与对象即闭包的例子所主张的，这些表现形式可以从两个方向转换。以这种角度来说，它们互相是同构的。
 
+简而言之，闭包和对象是状态（以及与之关联的功能）的同构表现形式。
 
-
-Put simply, closures and objects are isomorphic representations of state (and its associated functionality).
-
-The next time you hear someone say "X is isomorphic with Y", what they mean is, "X and Y can be converted from either one to the other in either direction, and maintain the same behavior regardless."
+当一下次你听到某些人说 “X 与 Y 是同构的”，那么他们的意思是，“X 和 Y 可以在两个方向上从一者转换为另一者，并保持相同的行为。”
 
 ### Under The Hood
 
-So, we can think of objects as an isomorphic representation of closures from the perspective of code we could write. But we can also observe that a closure system could actually be implemented -- and likely is -- with objects!
+那么，从我们可以编写的代码的角度讲，我们可以认为对象是闭包的一种同构表现形式。但我们还可以发现，一个闭包系统实际上可能 —— 而且很可能 —— 用对象来实现！
 
-Think about it this way: in the following code, how is JS keeping track of the `x` variable for `inner()` to keep referencing, well after `outer()` has already run?
+这样考虑一下：在下面的代码中，JS 如何在 `outer()` 已经运行过后，为了 `inner()` 保持变量 `x` 的引用而追踪它？
 
 ```js
 function outer() {
@@ -405,7 +389,7 @@ function outer() {
 }
 ```
 
-We could imagine that the scope -- the set of all variables defined -- of `outer()` is implemented as an object with properties. So, conceptually, somewhere in memory, there's something like:
+我们可以想象，`outer()` 的作用域 —— 所有变量被定义的集合 —— 是用一个带有属性的对象实现的。那么，从概念上将，在内存的某处，有这样一些东西：
 
 ```js
 scopeOfOuter = {
@@ -413,46 +397,62 @@ scopeOfOuter = {
 };
 ```
 
-And then for the `inner()` function, when created, it gets an (empty) scope object called `scopeOfInner`, which is linked via its `[[Prototype]]` to the `scopeOfOuter` object, sorta like this:
+然后对于函数 `inner()` 来说，在它被创建时，它得到一个称为 `scopeOfInner` 的（空的）作用域对象，这个作用域对象通过它的 `[[Prototype]]` 链接到 `scopeOfOuter` 对象上，有些像这样：
 
 ```js
 scopeOfInner = {};
 Object.setPrototypeOf( scopeOfInner, scopeOfOuter );
 ```
 
-Then, inside `inner()`, when it makes reference to the lexical variable `x`, it's actually more like:
+然后，在 `inner()` 内部，当它引用词法变量 `x` 时，实际上更像是这样：
 
 ```js
 return scopeOfInner.x;
 ```
 
-`scopeOfInner` doesn't have an `x` property, but it's `[[Prototype]]`-linked to `scopeOfOuter`, which does have an `x` property. Accessing `scopeOfOuter.x` via prototype delegation results in the `1` value being returned.
+`scopeOfInner` 没有属性 `x`，但它 `[[Prototype]]` 链接着拥有属性 `x` 的 `scopeOfOuter`。通过原型委托访问 `scopeOfOuter.x` 的结果就是值 `1` 被返回了。
 
-In this way, we can sorta see why the scope of `outer()` is preserved (via closure) even after it finishes: because the `scopeOfInner` object is linked to the `scopeOfOuter` object, thereby keeping that object and its properties alive and well.
+以这种方式，我们可以看到为什么 `outer()` 即使是在运行完成之后它的作用域也会被（通过闭包）保留下来：因为对象 `scopeOfInner` 链接着对象 `scopeOfOuter`，因此这可以使这个对象和它的属性完整地保留。
 
-Now, this is all conceptual. I'm not literally saying the JS engine uses objects and prototypes. But it's entirely plausible that it *could* work similarly.
+这都是概念上的。我没说 JS 引擎使用了对象和原型。但这 *可以* 相似地工作是完全说得通的。
 
-Many languages do in fact implement closures via objects. And other languages implement objects in terms of closures. But we'll let the reader use their imagination on how that would work.
+许多语言确实是通过对象实现闭包的。而另一些语言以闭包的形式实现对象。但至于它们如何工作，我们还是让读者发挥他们的想象力吧。
 
 ## Two Roads Diverged In A Wood...
 
 So closures and objects are equivalent, right? Not quite. I bet they're more similar than you thought before you started this chapter, but they still have important differences.
 
+那么闭包和对象是等价的，对吧？不完全是。我打赌它们要比你在读这一章之前看起来相似多了，但它们依然有重要的不同之处。
+
 These differences should not be viewed as weaknesses or arguments against usage; that's the wrong perspective. They should be viewed as features and advantages that make one or the other more suitable (and readable!) for a given task.
+
+这些不同不应视为弱点或用法上的争议；那是错误的视角。它们应当被视为使其中一者比另一者更适于（而且更合理！）某种特定任务的特性或优势。
 
 ### Structural Mutability
 
 Conceptually, the structure of a closure is not mutable.
 
+从概念上讲，一个闭包的结构是不可变的。
+
 In other words, you can never add to or remove state from a closure. Closure is a characteristic of where variables are declared (fixed at author/compile time), and is not sensitive to any runtime conditions -- assuming you use strict mode and/or avoid using cheats like `eval(..)`, of course!
+
+换言之，你绝不可能像一个闭包添加或移除状态。闭包是一种变量被声明的位置（在编写/编译时固定）的性质，而且对任何运行时条件都不敏感 —— 当然，假定你使用 strict 模式而且/或者没有使用 `eval(..)` 这样的东西作弊！
 
 **Note:** The JS engine could technically cull a closure to weed out any variables in its scope that are no longer going to be used, but this is an advanced optimization that's transparent to the developer. Whether the engine actually does these kinds of optimizations, I think it's safest for the developer to assume that closure is per-scope rather than per-variable. If you don't want it to stay around, don't close over it!
 
+**注意：** JS 引擎在技术上可以加工一个闭包来剔除任何在它作用域中的不再被使用的变量，但这对于开发者来说是一个透明的高级优化。无论引擎实际上是否会做这些种类的优化，我想对于开发者来说最安全的做法是假定闭包是以作用域为单位的，而非以变量为单位的。如果你不想让它存留下来，就不要闭包它！
+
 However, objects by default are quite mutable. You can freely add or remove (`delete`) properties/indices from an object, as long as that object hasn't been frozen (`Object.freeze(..)`).
+
+然而，对象默认是相当可变的。只要这个对象还没有被冻结（`Object.freeze(..)`），你可以自由地向一个对象添加或移除（`delete`）属性/下标。
 
 It may be an advantage of the code to be able to track more (or less!) state depending on the runtime conditions in the program.
 
+能够根据程序中运行时的条件来追踪更多（或更少）的状态，可能是代码的一种优势。
+
 For example, let's imagine tracking the keypress events in a game. Almost certainly, you'll think about using an array to do this:
+
+例如，让我们想象一个游戏中击键事件的追踪。几乎可以肯定，你想要使用一个数组来这样做：
 
 ```js
 function trackEvent(evt,keypresses = []) {
@@ -466,9 +466,15 @@ keypresses = trackEvent( newEvent2, keypresses );
 
 **Note:** Did you spot why I used `concat(..)` instead of `push(..)`ing directly to `keypresses`? Because in FP, we typically want to treat arrays as immutable data structures that can be recreated and added to, but not directly changed. We trade out the evil of side-effects for an explicit reassignment (more on that later).
 
+**注意：** 你有没有发现，为什么我使用 `concat(..)` 而不是直接向 `keypresses` 中 `push(..)`？因为在 FP 中，我们总是想将数组视为一种不可变的 —— 可以被重现创建并添加新元素 —— 数据结构，而不是直接被改变的。我们用了一个明确的重新复制将副作用的恶果替换掉了（稍后有更多关于这一点的内容）。
+
 Though we're not changing the structure of the array, we could if we wanted to. More on this in a moment.
 
+虽然我们没有改变数组的结构，但如果我们想的话就可以。待会儿会详细说明这一点。
+
 But an array is not the only way to track this growing "list" of `evt` objects. We could use closure:
+
+但数组并不是追踪不断增长的 `evt` 对象 “列表” 的唯一方式。我们可以使用闭包：
 
 ```js
 function trackEvent(evt,keypresses = () => []) {
@@ -484,7 +490,11 @@ keypresses = trackEvent( newEvent2, keypresses );
 
 Do you spot what's happening here?
 
+你发现这里发生了什么吗？
+
 Each time we add a new event to the "list", we create a new closure wrapped around the existing `keypresses()` function (closure), which captures the current `evt`. When we call the `keypresses()` function, it will successively call all the nested functions, building up an intermediate array of all the individually closed-over `evt` objects. Again, closure is the mechanism that's tracking all the state; the array you see is only an implementation detail of needing a way to return multiple values from a function.
+
+每当我们向 “列表” 中添加一个新事件，我们就在既存的 `keypresses()` 函数（闭包）周围创建了一个新的闭包，
 
 So which one is better suited for our task? No surprise here, the array approach is probably a lot more appropriate. The structural immutability of a closure means our only option is to wrap more closure around it. Objects are by default extensible, so we can just grow the array as needed.
 
