@@ -420,37 +420,21 @@ return scopeOfInner.x;
 
 ## Two Roads Diverged In A Wood...
 
-So closures and objects are equivalent, right? Not quite. I bet they're more similar than you thought before you started this chapter, but they still have important differences.
-
 那么闭包和对象是等价的，对吧？不完全是。我打赌它们要比你在读这一章之前看起来相似多了，但它们依然有重要的不同之处。
-
-These differences should not be viewed as weaknesses or arguments against usage; that's the wrong perspective. They should be viewed as features and advantages that make one or the other more suitable (and readable!) for a given task.
 
 这些不同不应视为弱点或用法上的争议；那是错误的视角。它们应当被视为使其中一者比另一者更适于（而且更合理！）某种特定任务的特性或优势。
 
 ### Structural Mutability
 
-Conceptually, the structure of a closure is not mutable.
-
 从概念上讲，一个闭包的结构是不可变的。
-
-In other words, you can never add to or remove state from a closure. Closure is a characteristic of where variables are declared (fixed at author/compile time), and is not sensitive to any runtime conditions -- assuming you use strict mode and/or avoid using cheats like `eval(..)`, of course!
 
 换言之，你绝不可能像一个闭包添加或移除状态。闭包是一种变量被声明的位置（在编写/编译时固定）的性质，而且对任何运行时条件都不敏感 —— 当然，假定你使用 strict 模式而且/或者没有使用 `eval(..)` 这样的东西作弊！
 
-**Note:** The JS engine could technically cull a closure to weed out any variables in its scope that are no longer going to be used, but this is an advanced optimization that's transparent to the developer. Whether the engine actually does these kinds of optimizations, I think it's safest for the developer to assume that closure is per-scope rather than per-variable. If you don't want it to stay around, don't close over it!
-
 **注意：** JS 引擎在技术上可以加工一个闭包来剔除任何在它作用域中的不再被使用的变量，但这对于开发者来说是一个透明的高级优化。无论引擎实际上是否会做这些种类的优化，我想对于开发者来说最安全的做法是假定闭包是以作用域为单位的，而非以变量为单位的。如果你不想让它存留下来，就不要闭包它！
-
-However, objects by default are quite mutable. You can freely add or remove (`delete`) properties/indices from an object, as long as that object hasn't been frozen (`Object.freeze(..)`).
 
 然而，对象默认是相当可变的。只要这个对象还没有被冻结（`Object.freeze(..)`），你可以自由地向一个对象添加或移除（`delete`）属性/下标。
 
-It may be an advantage of the code to be able to track more (or less!) state depending on the runtime conditions in the program.
-
 能够根据程序中运行时的条件来追踪更多（或更少）的状态，可能是代码的一种优势。
-
-For example, let's imagine tracking the keypress events in a game. Almost certainly, you'll think about using an array to do this:
 
 例如，让我们想象一个游戏中击键事件的追踪。几乎可以肯定，你想要使用一个数组来这样做：
 
@@ -464,15 +448,9 @@ var keypresses = trackEvent( newEvent1 );
 keypresses = trackEvent( newEvent2, keypresses );
 ```
 
-**Note:** Did you spot why I used `concat(..)` instead of `push(..)`ing directly to `keypresses`? Because in FP, we typically want to treat arrays as immutable data structures that can be recreated and added to, but not directly changed. We trade out the evil of side-effects for an explicit reassignment (more on that later).
-
 **注意：** 你有没有发现，为什么我使用 `concat(..)` 而不是直接向 `keypresses` 中 `push(..)`？因为在 FP 中，我们总是想将数组视为一种不可变的 —— 可以被重现创建并添加新元素 —— 数据结构，而不是直接被改变的。我们用了一个明确的重新复制将副作用的恶果替换掉了（稍后有更多关于这一点的内容）。
 
-Though we're not changing the structure of the array, we could if we wanted to. More on this in a moment.
-
 虽然我们没有改变数组的结构，但如果我们想的话就可以。待会儿会详细说明这一点。
-
-But an array is not the only way to track this growing "list" of `evt` objects. We could use closure:
 
 但数组并不是追踪不断增长的 `evt` 对象 “列表” 的唯一方式。我们可以使用闭包：
 
@@ -488,17 +466,19 @@ var keypresses = trackEvent( newEvent1 );
 keypresses = trackEvent( newEvent2, keypresses );
 ```
 
-Do you spot what's happening here?
-
 你发现这里发生了什么吗？
 
 Each time we add a new event to the "list", we create a new closure wrapped around the existing `keypresses()` function (closure), which captures the current `evt`. When we call the `keypresses()` function, it will successively call all the nested functions, building up an intermediate array of all the individually closed-over `evt` objects. Again, closure is the mechanism that's tracking all the state; the array you see is only an implementation detail of needing a way to return multiple values from a function.
 
-每当我们向 “列表” 中添加一个新事件，我们就在既存的 `keypresses()` 函数（闭包）周围创建了一个新的闭包，
+每当我们向 “列表” 中添加一个新事件，我们就在既存的 `keypresses()` 函数（闭包） —— 她持有当前的 `evt` 对象 —— 周围创建了一个新的闭包。当我们调用 `keypresses()` 函数时，它将依次调用所有嵌套着的函数，建立起一个所有分别被闭包的 `evt` 对象的中间数组。同样，闭包是追踪所有这些状态的机制；你看到的数组只是为了从一个函数中返回多个值而出现的一个实现细节。
 
 So which one is better suited for our task? No surprise here, the array approach is probably a lot more appropriate. The structural immutability of a closure means our only option is to wrap more closure around it. Objects are by default extensible, so we can just grow the array as needed.
 
+那么哪一个适合我们的任务？不出意料地，数组的方式可能要合适得多。闭包在结构上的不可变性意味着我们唯一的选择是在它之上包裹更多的闭包。对象默认就是可扩展的，所我们只要按需要加长数组即可。
+
 By the way, even though I'm presenting this structural (im)mutability as a clear difference between closure and object, the way we're using the object as an immutable value is actually more similar than dislike.
+
+顺带一提，虽然我将这种结构上的（不）可变性作为闭包和对相间的一种明确的不同，但是
 
 Creating a new array (via `concat(..)`) for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its very design.
 
