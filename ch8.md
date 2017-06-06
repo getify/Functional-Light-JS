@@ -1,45 +1,45 @@
 # Functional-Light JavaScript
 # Chapter 8: List Operations
 
-Did you have fun down our little closures/objects rabbit hole in the previous chapter? Welcome back!
+你在前一章闭包/对象的兔子洞中玩儿的开心吗？欢迎回来！
 
-> If you can do something awesome, keep doing it repeatedly.
+> 如果你能做很赞的事情，那就反复做。
 
-We've already seen several brief references earlier in the text to some utilities that we now want to take a very close look at, namely `map(..)`, `filter(..)`, and `reduce(..)`. In JavaScript, these utilities are typically used as methods on the array (aka, "list") prototype, so we would naturally refer to them as array or list operations.
+我们在本书先前的部分已经看到了对一些工具的简要引用，现在我们要非常仔细地看看它们，它们是 `map(..)`、`filter(..)`、和 `reduce(..)`。在 JavaScript 中，这些工具经常作为数组（也就是“列表”）原型上的方法使用，所以我们很自然地称它们为数组或列表操作。
 
-Before we talk about the specific array methods, we want to examine conceptually what these operations are used for. It's equally important in this chapter that you understand *why* list operations are important as it is to understand *how* list operations work. Make sure you approach this chapter with that detail in mind.
+在我们讨论具体的数组方法之前，我们要在概念上检视一下这些操作是用来做什么的。在这一章中有两件同等重要的事情：理解列表操作 *为什么* 重要以及理解列表操作时 *如何* 工作的。确保你在头脑中带着这些细节来阅读这一章。
 
-The vast majority of common illustrations of these operations, both outside of this book and here in this chapter, depict trivial tasks performed on lists of values (like doubling each number in an array); it's a cheap and easy way to get the point across.
+在这本书之外的世界以及这一章中对这些操作的最广大的常见展示方式是，描述一些在值的列表中实施的微不足道的任务（比如将一个数组中的每个数字翻倍）；这是一种讲清要点的简单廉价的方式。
 
-But don't just gloss over these simple examples and miss the deeper point. Some of the most important FP value in understanding list operations comes from being able to model a sequence of tasks -- a series of statements that wouldn't otherwise *look* like a list -- as a list operation instead of performing them individually.
+但是不要仅仅将这些简单的例子一带而过却忽略了深层次的意义。理解列表操作对于 FP 来说最重要的价值来源于能够将一个任务的序列 —— 一系列 *看起来* 不太像一个列表的语句 —— 模型化为一个操作的列表，而非分别独立地执行它们。
 
-This isn't just a trick to write more terse code. What we're after is to move from imperative to declarative style, to make the code patterns more readily recognizable and thus more readable.
+这不只是一个编写更简洁代码的技巧。我们追求的是从指令式转向声明式，使代码模式可以轻而易举地识别从而更具可读性。
 
-But there's something **even more important to grasp**. With imperative code, each intermediate result in a set of calculations is stored in variable(s) through assignment. The more of these imperative patterns your code relies on, the harder it is to verify that there aren't mistakes -- in the logic, accidental mutation of values, or hidden side causes/effects lurking.
+但是这里还有 **更重要的东西需要把握住**。使用指令式代码，一组计算中的每一个中间结果都通过赋值存储在变量中。你的代码越依赖这样的指令式模式，验证它在逻辑上没有错误就越困难 —— 对值的意外改变，或者埋藏下侧因／副作用。
 
-By chaining and/or composing list operations together, the intermediate results are tracked implicitly and largely protected from these hazards.
+通过将列表操作链接和／或组合在一起，中间结果会被隐含地追踪，并极大地防止这些灾难的发生。
 
-**Note:** More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my advice on `=>` from Chapter 2 still applies for general coding.
+**注意：** 与前面的章节相比，为了尽可能地保持后述代码段的简洁，我们将重度应用 ES6 的 `=>` 形式。但是，我在第二章中关于 `=>` 的建议依然在一般性的编码中适用。
 
 ## Non-FP List Processing
 
-As a quick preamble to our discussion in this chapter, I want to call out a few operations which may seem related to JavaScript arrays and FP list operations, but which aren't. These operations will not be covered here, because they are not consistent with general FP best practices:
+作为我们在本章中的讨论的序言，我要指出几个看起来与 JavaScript 数组和 FP 列表操作相关，但其实无关的操作。这些操作将不会在这里讲解，因为它们不符合一般的 FP 最佳实践：
 
 * `forEach(..)`
 * `some(..)`
 * `every(..)`
 
-`forEach(..)` is an iteration helper, but it's designed for each function call to operate with side effects; you can probably guess why that's not an endorsed FP list operation for our discussion!
+`forEach(..)` 是一个迭代帮助函数，但它被设计为对每一个执行的函数调用都带有副作用；你可能猜到了为什么我们讨论不赞同它是一个 FP 列表操作。
 
-`some(..)` and `every(..)` do encourage the use of pure functions (specifically, predicate functions like `filter(..)` does), but they inevitably reduce a list to a `true` / `false` result, essentially like a search or matching. These two utilities don't really fit the mold of how we want to model our code with FP, so we're going to skip covering them here.
+`some(..)` 和 `every(..)` 确实鼓励使用纯函数（具体地讲，是像 `filter(..)` 这样的检测函数），但它们实质上像一个检索或匹配一样，不可避免地将一个列表递减为一个 `true` / `false` 的结果。这两个工具不是很适合我们想要对代码进行 FP 建模的模具，所以这里我们跳过它们不讲。
 
 ## Map
 
-We'll start our exploration of FP list operations with one of the most basic and fundamental: `map(..)`.
+我们将从最基本而且最基础的 FP 列表操作之一开始我们的探索：`map(..)`。
 
-A mapping is a transformation from one value to another value. For example, if you start with the number `2` and you multiply it by `3`, you have mapped it to `6`. It's important to note that we're not talking about mapping transformation as implying *in-place* mutation or reassignment; rather mapping transformation projects a new value from one location to the other.
+一个映射是从一个值到另一个值的变形。例如，如果你有一个数字 `2` 而你将它乘以 `3`，那么你就将它映射到了 `6`。值得注意的是，我们所说的映射变形暗示着 *原地* 修改或者再赋值；而不是映射变形将一个新的值从一个地方投射到另一个地方。
 
-In other words:
+换句话说：
 
 ```js
 var x = 2, y;
@@ -51,7 +51,7 @@ y = x * 3;
 x = x * 3;
 ```
 
-If we define a function for this multiplying by `3`, that function acts as a mapping (transformer) function:
+如果我们将这个乘以 `3` 定义为一个函数，这个函数作为一个映射（变形）函数动作的话：
 
 ```js
 var multipleBy3 = v => v * 3;
@@ -62,13 +62,13 @@ var x = 2, y;
 y = multiplyBy3( x );
 ```
 
-We can naturally extend mapping from a single value transformation to a collection of values. `map(..)` is an operation that transforms all the values of a list as it projects them to a new list:
+我们可以很自然地将映射从一个单独值的变形扩展到一个值的集合。`map(..)` 操作将列表中的所有值变形并将它们投射到一个新的列表中：
 
 <p align="center">
 	<img src="fig9.png" width="400">
 </p>
 
-To implement `map(..)`:
+要实现 `map(..)` 的话：
 
 ```js
 function map(mapperFn,arr) {
@@ -84,24 +84,24 @@ function map(mapperFn,arr) {
 }
 ```
 
-**Note:** The parameter order `mapperFn, arr` may feel backwards at first, but this convention is much more common in FP libraries because it makes these utilities easier to compose (with currying).
+**注意：** 形式参数的顺序 `mapperFn, arr` 一开始可能感觉是弄反了，但是在 FP 库中这种惯例非常常见，因为它使这些工具更容易（使用柯里化）组合。
 
-The `mapperFn(..)` is naturally passed the list item to map/transform, but also an `idx` and `arr`. We're doing that to keep consistency with the built-in array `map(..)`. These extra pieces of information can be very useful in some cases.
+`mapperFn(..)` 自然地讲项目列表传递给映射/变形，同时还有 `idx` 和 `arr`。我们这样做是为了与内建的 `map(..)` 保持一致。在某些情况下这些额外信息可能十分有用。
 
-But in other cases, you may want to use a `mapperFn(..)` that only the list item should be passed to, because the extra arguments might change its behavior. In "All For One" in Chapter 3, we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed).
+但是在其他情况下，你可能想使用一个仅有项目列表应当被传入的 `mapperFn(..)`，因为额外的参数有可能会改变它的行为。在第三章中的 “一切为了一个” 中介绍了 `unary(..)`，它限制一个函数仅接收一个实际参数（不论有多少被传递）。
 
-Recall the example from Chapter 3 about limiting `parseInt(..)` to a single argument to be used safely as a `mapperFn(..)`:
+回忆一下第三章中将 `parseInt(..)` 限制为一个参数的例子，它可以安全地用于 `mapperFn(..)`：
 
 ```js
 map( ["1","2","3"], unary( parseInt ) );
 // [1,2,3]
 ```
 
-JavaScript provides the `map(..)` utility built-in on arrays, making it very convenient to use as part of a chain of operations on a list.
+JavaScript 在数组上提供了内建的 `map(..)` 工具，使得它很容易地用作一个列表操作链条上的一部分。
 
-**Note:** The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in "What's This?" in Chapter 2, `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support such a `this`-binding feature.
+**注意：** JavaScript 原型操作（`map(..)`、`filter(..)`、和 `reduce(..)`）都接收一个最后的可选参数，用于函数的 `this` 绑定。在我们第二章的 “This 是什么” 的讨论中，从为了符合 FP 的最佳实践的角度讲，基于 `this` 的编码一般来说应当尽可能避免。因此，我们在这一章的例子实现中不支持这样的 `this` 绑定特性。
 
-Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here's some other examples of mapping operations. We can use `map(..)` to transform a list of functions into a list of their return values:
+除了你可以分别对数字和字符串列表实施的各种显而易见的操作之外，还有一些其他的映射操作的例子。我们可以使用 `map(..)` 来把一个函数的列表变形为一个它们返回值的列表：
 
 ```js
 var one = () => 1;
@@ -112,7 +112,7 @@ var three = () => 3;
 // [1,2,3]
 ```
 
-Or we can first transform a list of functions by composing each of them with another function, and then execute them:
+或者我们可以首先将列表中的每一个函数都与另一个函数组合，然后再执行它们：
 
 ```js
 var increment = v => ++v;
@@ -127,17 +127,17 @@ var double = v => v * 2;
 // [7,5,36]
 ```
 
-Something interesting to observe about `map(..)`: we typically would assume that the list is processed left-to-right, but there's nothing about the concept of `map(..)` that really requires that. Each transformation is supposed to be independent of every other transformation.
+关于 `map(..)` 的一件有趣的事：我们通常会臆测列表是从左到右处理的，但是 `map(..)` 的概念中对此没有任何要求。每一个变形对于其他的变形来说都应该是独立的。
 
-Mapping in a general sense could even been parallelized in an environment that supports that, which for a large list could drastically improve performance. We don't see JavaScript actually doing that because there's nothing that requires you to pass a pure function as `mapperFn(..)`, even though you **really ought to**. If you were to pass an impure function and JS were to run different calls in different orders, it would quickly cause havoc.
+从一般的意义上说，在一个支持并行的环境中映射甚至可以是并行化的，这对很大的列表来说可以极大地提升性能。我们没有看到 JavaScript 实际上在这样做，因为没有任何东西要求你传入一个像 `mapperFn(..)` 这样的纯函数，即使你 **本应这样做**。如果你传入一个非纯函数而且 JS 以不同的顺序运行不同的调用，那么这很快就会引起灾难。
 
-Even though theoretically, individual mapping operations are independent, JS has to assume that they're not. That's a bummer.
+虽然在理论上每一个映射操作都是独立的，但 JS 不得不假定它们不是。这很扫兴。
 
 ### Sync vs Async
 
-The list operations we're discussing in this chapter all operate synchronously on a list of values that are all already present; `map(..)` as conceived here is an eager operation. But another way of thinking about the mapper function is as an event handler which is invoked for each new value encountered in the list.
+我们在这一章中讨论的列表操作都是在一个所有值都已存在的列表上同步地操作；`map(..)` 在这里被认为是一种迫切的操作。但另一种考虑映射函数的方法是将它作为一个事件处理器，为在列表中遇到的每一个新的值而被调用。
 
-Imagine something fictional like this:
+想象一个如下虚构的东西：
 
 ```js
 var newArr = arr.map();
@@ -145,13 +145,13 @@ var newArr = arr.map();
 arr.addEventListener( "value", multiplyBy3 );
 ```
 
-Now, any time a value is added to `arr`, the `multiplyBy3(..)` event handler -- mapper function -- is called with the value, and its transformation is added to `newArr`.
+现在，无论什么时候一个值被添加到 `arr` 种，事件处理器 `multiplyBy3(..)` —— 映射函数 —— 都会用这个值被调用，它变形出的值被添加到 `newArr`。
 
-What we're hinting at is that arrays, and the array operations we perform on them, are the eager synchronous versions, whereas these same operations can also be modeled on a "lazy list" (aka, stream) that receives its values over time. We'll dive into this topic in Chapter 10.
+我们在暗示的是，数组以及我们在它们之上施加的数组操作，都是饥饿的同步版本，而这些相同的操作也可以在一个经过一段时间后才收到值的 “懒惰列表” （也就是流）上建模。
 
 ### Mapping vs Eaching
 
-Some advocate using `map(..)` as a general form of `forEach(..)`-iteration, where essentially the value received is passed through untouched, but then some side-effect can be performed:
+一些人鼓吹将 `map(..)` 作为一个一般形式的 `forEach(..)` 迭代使用，让它收到的值原封不动地通过，但之后可能实施一些副作用：
 
 ```js
 [1,2,3,4,5]
@@ -162,25 +162,25 @@ Some advocate using `map(..)` as a general form of `forEach(..)`-iteration, wher
 ..
 ```
 
-The reason this technique can seem useful is that the `map(..)` returns the array so you can keep chaining more operations after it; the return value of `forEach(..)` is `undefined`. However, I think you should avoid using `map(..)` in this way, because it's a net confusion to use a core FP operation in a decidedly un-FP way.
+这种技术看起来好像有用是因为 `map(..)` 返回这个数组，于是你就可以继续在它后面链接更多操作；而 `forEach(..)` 的返回值是 `undefined`。然而，我认为你应当避免以这种方式使用 `map(..)`，因为以一种明确的非 FP 方式使用一种 FP 核心操作除了困惑不会造成其他任何东西。
 
-You've heard the old addage about using the right tool for the right job, right? Hammer for a nail, screwdriver for a screw, etc. This is slightly different: it's use the right tool *in the right way*.
+你听说过用正确的工具做正确的工作这句谚语，对吧？锤子对钉子，改锥对螺丝，等等。这里有点儿不同：它是 *用正确的方式* 使用正确的工具。
 
-A hammer is meant to be swung in your hand; if you instead hold it in your mouth and try to hammer the nail, you're not gonna be very effective. `map(..)` is intended to map values, not create side effects.
+一把锤子本应在你的手中挥动；但如果你用嘴叼住它来砸钉子，那你就不会非常高效。`map(..)` 的本意是映射值，不是造成副作用。
 
 ### A Word: Functors
 
-We've mostly tried to stay away from artificial invented terminology in FP as much as possible in this book. We have used official terms at times, but mostly when we can derive some sense of meaning from them in regular everyday conversation.
+在这本书中我们绝大多数时候都尽可能地与人工发明的 FP 术语保持距离。我们有时候用一些官方术语，但这多数是在我们可以从中衍生出一些对普通日常对话有意义的东西的时候。
 
-I'm going to very briefly break that pattern and use a word that might be a little intimidating: functor. The reason I want to talk about functors here is because we now already understand what they do, and because that term is used heavily throughout the rest of FP literature; you being at least familiar with  and not scared by it will be beneficial.
+我将要非常简要地打破这种模式，而使用一个可能有点儿吓人的词：仿函数。我想谈一下仿函数的原因是因为我们现在已经知道它们是做什么的了，也因为这个词在其他的 FP 文献中被频繁使用；至少你熟悉它并且不会被它吓到是有好处的。
 
-A functor is a value that has a utility for using an operator function on that value.
+一个仿函数是一个值，它有一个工具可以使一个操作函数作用于这个值。
 
-If the value in question is compound, meaning it's comprised of individual values -- as is the case with arrays, for example! -- a functor uses the operator function on each individual value. Moreover, the functor utility creates a new compound value holding the results of all the individual operator function calls.
+如果这个值是复合的，也就是它由一些独立的值组成 —— 例如像数组一样！—— 那么仿函数会在每一个独立的值上应用操作函数。另外，仿函数工具会创建一个新的复合值来持有所有独立操作函数调用的结果。
 
-This is all a fancy way of describing what we just looked at with `map(..)`. The `map(..)` function takes its associated value (an array) and a mapping function (the operator function), and executes the mapping function for each individual value in the array. Finally, it returns a new array with all the newly mapped values in it.
+这只是对我们刚刚看到的 `map(..)` 的一种炫酷的描述。`map(..)` 函数拿着与它关联的值（一个数组）和一个映射函数（操作函数），并对每一个数组中的独立值执行这个映射函数。最终，它返回一个带有所有被映射好的值的数组。
 
-Another example: a string functor would be a string plus a utility that executes some operator function across all the characters in the string, returning a new string with the processed letters. Consider this highly-contrived example:
+另一个例子：一个字符串仿函数将是一个字符串外加一个工具，这个工具对字符串中的每一个字符执行一些操作函数，返回一个带有被处理过的字符的新字符串。考虑这个高度造作的例子：
 
 ```js
 function uppercaseLetter(c) {
@@ -203,39 +203,39 @@ stringMap( uppercaseLetter, "Hello World!" );
 // HELLO WORLD!
 ```
 
-`stringMap(..)` allows a string to be a functor. You can define a mapping function for any data structure; as long as the utility follows these rules, the data structure is a functor.
+`stringMap(..)` 允许一个字符串是一个仿函数。你可以为任意数据结构定义一个映射函数；只要这个工具符合这些规则，那么这种数据结构就是一个仿函数。
 
 ## Filter
 
-Imagine I bring an empty basket with me to the grocery store to visit the fruit section; there's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one-by-one, and I walk away with a basket full of just the apples and oranges.
+想象我在百货商店里拿着一个空篮子来到了水果卖场；这里有一大堆水果货架（苹果、橘子、和香蕉）。我真的很饿，所以要尽可能多地拿水果，但我非常喜欢圆形的水果（苹果和橘子）。于是我一个一个地筛选水果，然后带着仅装有苹果和橘子的篮子离开了。
 
-Let's say we call this process *filtering*. Would you more naturally describe my shopping as starting with an empty basket and **filtering in** (selecting, including) only the apples and oranges, or starting with the full display of fruits and **filtering out** (skipping, excluding) the bananas as my basket is filled with fruit?
+假定我们称这种处理为 *过滤*。你将如何更自然地描述我的购物过程？是以一个空篮子为起点并仅仅 **滤入**（选择，包含）苹果和橘子，还是以整个水果货架为起点并 **滤除**（跳过，排除）香蕉，直到我的篮子装满水果？
 
-If you cook spaghetti in a pot of water, and then pour it into a strainer (aka filter) over the sink, are you filtering in the spaghetti or filtering out the water? If you put coffee grounds into a filter and make a cup of coffee, did you filter in the coffee into your cup, or filter out the coffee grounds?
+如果你在一锅水中煮意大利面，然后把它倒进水槽上的笊篱（也就是过滤器）中，你是在滤入意大利面还是在滤除水？如果你将咖啡粉末放进滤纸中泡一杯咖啡，你是在自己的杯子中滤入了咖啡，还是滤除了咖啡粉末？
 
-Does your view of filtering depend on whether the stuff you want is "kept" in the filter or passes through the filter?
+你对过滤的视角是不是有赖于你想要的东西是否 “保留” 在过滤器中或者通过了过滤器？
 
-What about on airline / hotel websites, when you specify options to "filter your results"? Are you filtering in the results that match your criteria, or are you filtering out everything that doesn't match? Think carefully: this example might have a different semantic than the previous ones.
+那么当你在航空公司/酒店的网站上制定一些选项来 “过滤你的结果” 呢？你是在滤入符合你标准的结果，还是在滤除所有不符合标准的东西？仔细考虑一下：这个例子与前一个比起来可能有不同的语义。
 
-Depending on your perspective, filter is either exclusionary or inclusionary. This conceptual conflation is unfortunate.
+根据你的视角不同，过滤不是排除性的就是包含性的。这种概念上的冲突非常不幸。
 
-I think the most common interpretation of filtering -- outside of programming, anyway -- is that you filter out unwanted stuff. Unfortunately, in programming, we have essentially flipped this semantic to be more like filtering in wanted stuff.
+我想对过滤的最常见的解释 —— 在编程的世界之外 —— 是你在滤除不想要的东西。不幸的是，在编程中，我们实质上更像是将这种语义反转为滤入想要的东西。
 
-The `filter(..)` list operation takes a function to decide if each value in the original array should be in the new array or not. This function needs to return `true` if a value should make it, and `false` if it should be skipped. A function that returns `true` / `false` for this kind of decision making goes by the special name: predicate function.
+`filter(..)` 列表操作用一个函数来决定原来数组中的每一个值是否应该保留在新的数组中。如果一个值应当被保留，那么这个函数需要返回 `true`，如果它应当被跳过则返回 `false`。一个为做决定而返回 `true` / `false` 的函数有一个特殊的名字：判定函数。
 
-If you think of `true` as being as a positive signal, the definition of `filter(..)` is that you are saying "keep" (to filter in) a value rather than saying "discard" (to filter out) a value.
+如果你将 `true` 作为一个正面的信号，那么 `filter(..)` 的定义就是你想要 “保留”（滤入）一个值而非 “丢弃”（滤除）一个值。
 
-To use `filter(..)` as an exclusionary action, you have to twist your brain to think of positively signaling an exclusion by returning `false`, and passively letting a value pass through by returning `true`.
+为了将 `filter(..)` 作为一种排除性操作使用，你不得不把思维拧过来，通过返回 `false` 将正面信号考虑为一种排除，并通过返回 `true` 别动地让一个值通过。
 
-The reason this semantic mismatch matters is because of how you will likely name the function used as `predicateFn(..)`, and what that means for the readability of code. We'll come back to this point shortly.
+这种语义错位很重要的原因，是因为它会影响你如何命名那个用作 `predicateFn(..)` 的函数，以及它对代码可读性的意义。我们马上就会谈到这一点。
 
-Here's how to visualize a `filter(..)` operation across a list of values:
+这是 `filter(..)` 操作在一个值的列表中的可视化表达：
 
 <p align="center">
 	<img src="fig10.png" width="400">
 </p>
 
-To implement `filter(..)`:
+要实现 `filter(..)`：
 
 ```js
 function filter(predicateFn,arr) {
@@ -251,23 +251,23 @@ function filter(predicateFn,arr) {
 }
 ```
 
-Notice that just like `mapperFn(..)` before, `predicateFn(..)` is passed not only the value but also the `idx` and `arr`. Use `unary(..)` to limit its arguments as necessary.
+注意，正如之前的 `mapperFn(..)` 一样，`predicateFn(..)` 不仅被传入一个值，而且还被传入了 `idx` 和 `arr`。根据需要使用 `unary(..)` 来限制它的参数。
 
-Just as with `map(..)`, `filter(..)` is provided as a built-in utility on JS arrays.
+和 `map(..)` 一样，`filter(..)` 作为一种 JS 数组上的内建工具被提供。
 
-Let's consider a predicate function like this:
+让我们考虑一个这样的判定函数：
 
 ```js
 var whatToCallIt = v => v % 2 == 1;
 ```
 
-This function uses `v % 2 == 1` to return `true` or `false`. The effect here is that an odd number will return `true`, and an even number will return `false`. So, what should we call this function? A natural name might be:
+这个函数使用 `v % 2 == 1` 来返回 `true` 或 `false`。这里的效果是一个奇数将会返回 `true`，而一个偶数将会返回 `false`。那么，我们应该管这个函数叫什么？一个自然的名字可能是：
 
 ```js
 var isOdd = v => v % 2 == 1;
 ```
 
-Consider how you might use `isOdd(..)` with a simple value check somewhere in your code:
+考虑一下在你代码中的某处你将如何使用 `isOdd(..)` 进行简单的值校验：
 
 ```js
 var midIdx;
@@ -280,18 +280,18 @@ else {
 }
 ```
 
-Makes sense, right? But, let's consider using it with the built-in array `filter(..)` to filter a list of values:
+有些道理，对吧？让我们再考虑一下将它与数组内建的 `filter(..)` 一起使用来过滤一组值：
 
 ```js
 [1,2,3,4,5].filter( isOdd );
 // [1,3,5]
 ```
 
-If you described the `[1,3,5]` result, would you say, "I filtered out the even numbers", or would you say "I filtered in the odd numbers"? I think the former is a more natural way of describing it. But the code reads the opposite. The code reads, almost literally, that we "filtered (in) each number that is odd".
+如果要你描述一下 `[1,3,5]` 这个结果，你会说 “我滤除了偶数” 还是 “我滤入了奇数”？我觉得前者是描述它的更自然的方式。但是代码读起来却相反。代码读起来几乎就是，我们 “过滤（入）了每一个是奇数的数字”。
 
-I personally find this semantic confusing. There's no question there's plenty of precedent for experienced developers. But if you just start with a fresh slate, this expression of the logic seems kinda like not speaking without a double negative -- aka, speaking with a double negative.
+我个人觉得这种语义令人糊涂。对于有经验的开发者来说无疑有许多先例可循。但是如果你刚刚起步，这种逻辑表达式看起来有点儿像不用双否定就不说话 —— 也就是，用双否定说话。
 
-We could make this easier by renaming the function from `isOdd(..)` to `isEven(..)`:
+我们可以通过把函数 `isOdd(..)` 重命名为 `isEven(..)` 让事情容易一些：
 
 ```js
 var isEven = v => v % 2 == 1;
@@ -300,15 +300,15 @@ var isEven = v => v % 2 == 1;
 // [1,3,5]
 ```
 
-Yay! But that function makes no sense with its name, in that it returns `false` when it's even:
+呀！但这个函数用这个名字根本讲不通，因为当数字为偶数时它返回 `false`：
 
 ```js
 isEven( 2 );		// false
 ```
 
-Yuck.
+讨厌。
 
-Recall that in "No Points" in Chapter 3, we defined a `not(..)` operator that negates a predicate function. Consider:
+回忆一下第三章中的 “无点”，我们定义了一个对判定函数取反的 `not(..)` 操作符。考虑：
 
 ```js
 var isEven = not( isOdd );
