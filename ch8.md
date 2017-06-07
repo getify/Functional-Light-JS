@@ -316,18 +316,18 @@ var isEven = not( isOdd );
 isEven( 2 );		// true
 ```
 
-But we can't use *this* `isEven(..)` with `filter(..)` the way it's currently defined, because our logic will be reversed; we'll end up with evens, not odds. We'd need to do:
+但是我们将 *这个* `isEven(..)` 按照它当前定义的方式与 `filter(..)` 一起使用，因为逻辑将是相反的；我们将会得到偶数，不是奇数。我们需要这样做：
 
 ```js
 [1,2,3,4,5].filter( not( isEven ) );
 // [1,3,5]
 ```
 
-That defeats the whole purpose, though, so let's not do that. We're just going in circles.
+这违背了我们的初衷，所以不要这样做。我们只是在绕圈子。
 
 ### Filtering-Out & Filtering-In
 
-To clear up all this confusion, let's define a `filterOut(..)` that actually **filters out** values by internally negating the predicate check. While we're at it, we'll alias `filterIn(..)` to the existing `filter(..)`:
+为了扫清这一切困惑，让我们定义一个通过在内部对判定检查取反来真正 **滤除** 一些值的 `filterOut(..)`。同时我们将 `filterIn(..)` 作为寄存的 `filter(..)` 的别名：
 
 ```js
 var filterIn = filter;
@@ -337,7 +337,7 @@ function filterOut(predicateFn,arr) {
 }
 ```
 
-Now we can use whichever filtering makes most sense at any point in our code:
+现在我们可以在代码的任何地方使用最合理的那一种过滤了：
 
 ```js
 isOdd( 3 );								// true
@@ -347,46 +347,46 @@ filterIn( isOdd, [1,2,3,4,5] );			// [1,3,5]
 filterOut( isEven, [1,2,3,4,5] );		// [1,3,5]
 ```
 
-I think using `filterIn(..)` and `filterOut(..)` (known as `reject(..)` in Ramda) will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
+与仅使用 `filter(..)` 并将语义上的混淆和困惑留给读者相比，我觉得使用 `filterIn(..)` 和 `filterOut(..)`（在 Ramda 中称为 `reject(..)`）将会使你代码的可读性好得多。
 
 ## Reduce
 
-While `map(..)` and `filter(..)` produce new lists, typically this third operator (`reduce(..)`) combines (aka "reduces") the values of a list down to a single finite (non-list) value, like a number or string. However, later in this chapter, we'll look at how you can push `reduce(..)` to use it in more advanced ways. `reduce(..)` is one of the most important FP tools; it's like a swiss army all-in-one knife with all its usefulness.
+`map(..)` 和 `filter(..)` 产生一个新的列表，但这第三种操作（`reduce(..)`）经常讲一个列表的值结合（也就是“递减”）为一个单独的有限（非列表）值，比如数字或字符串。但是在本章稍后，我们将会看到如何以更高级的方式使用 `reduce(..)`。`reduce(..)` 是最重要的 FP 工具之一；它就像瑞士军刀一样多才多艺。
 
-A combination/reduction is abstractly defined as taking two values and making them into one value. Some FP contexts refer to this as "folding", as if you're folding two values together into on value. That's a helpful visualization, I think.
+组合/递减被抽象地定义为将两个值变成一个值。一些 FP 语境中将之称为 “折叠（folding）”，就好像你把两个值折叠成为一个值一样。我觉得这种视觉化很有助于理解。
 
-Just like with mapping and filtering, the manner of the combination is entirely up to you, and generally dependent on the types of values in the list. For example, numbers will typically be combined through arithmetic, strings through concatenation, and functions through composition.
+正如映射与过滤那样，结合的行为完全由你来决定，而且这一般要看列表中值的种类而定。例如，数字通常将通过算数方式来结合，字符串通过连接，而函数通过组合。
 
-Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list, cascading down through each of the rest of the values in the list. That looks like this:
+有时递减将会指定一个 `initialValue` 并以将它与列表中的第一个值结合为起点，穿过列表中剩余的其他每一个值。看起来就像这样：
 
 <p align="center">
 	<img src="fig11.png" width="400">
 </p>
 
-Alternately, you can omit the `initialValue` in which case the first value of the list will act in place of the `initialValue` and the combining will start with the second value in the list, like this:
+另一种方式是你可以忽略 `initialValue`，这时列表中的第一个值将作为 `initialValue`，而结合将始于它与列表中的第二个值，就像这样：
 
 <p align="center">
 	<img src="fig12.png" width="400">
 </p>
 
-**Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
+**注意：** 在 JavaScript 中，递减至少需要一个值（要么在数组中，要么作为 `initialValue` 指定），否则就会抛出一个错误。如果用来递减的列表在某些环境下可能为空，那么就要小心不要忽略 `initialValue`。
 
-The function you pass to `reduce(..)` to perform the reduction is typically called a reducer. A reducer has a different signature from the mapper and predicate functions we looked at earlier. Reducers primarily receive the current reduction result as well as the next value to reduce it with. The current result at each step of the reduction is often referred to as the accumulator.
+你传递给 `reduce(..)` 来执行递减的函数通常称为一个递减函数（reducer）。递减函数的签名与我们早先看到的映射和判定函数不同。递减器主要接收当前的递减结果以及下一个用于与之递减的值。在递减每一步中的结果经常被称为收集器（accumulator）。
 
-For example, consider the steps involved in multiply-reducing the numbers `5`, `10`, and `15`, with an `initialValue` of `3`:
+例如，考虑将 `3` 作为 `initialValue` 对数字 `5`、`10`、和 `15` 进行乘法递减时的步骤：
 
 1. `3` * `5` = `15`
 2. `15` * `10` = `150`
 3. `150` * `15` = `2250`
 
-Expressed in JavaScript using the built-in `reduce(..)` method on arrays:
+在 JavaScript 中使用内建在数组上的 `reduce(..)` 来表达的话：
 
 ```js
 [5,10,15].reduce( (product,v) => product * v, 3 );
 // 2250
 ```
 
-But a standalone implementation of `reduce(..)` might look like this:
+一个独立的 `reduce(..)` 的实现可能像是这样：
 
 ```js
 function reduce(reducerFn,initialValue,arr) {
@@ -412,9 +412,9 @@ function reduce(reducerFn,initialValue,arr) {
 }
 ```
 
-Just as with `map(..)` and `filter(..)`, the reducer function is also passed the lesser-common `idx` and `arr` arguments in case that's useful to the reduction. I would say I don't typically use these, but I guess it's nice to have them available.
+和 `map(..)` 与 `filter(..)` 一样，递减函数也会被传入不太常用的 `idx` 和 `arr` 参数以备递减中的不时之需。我不常用这些东西，但我猜它们可以随时取用是一件不错的事情。
 
-Recall in Chapter 4, we discussed the `compose(..)` utility and showed an implementation with `reduce(..)`:
+回忆一下第四章，我们讨论了 `compose(..)` 工具而且展示了一种使用 `reduce(..)` 的实现：
 
 ```js
 function compose(...fns) {
@@ -426,7 +426,7 @@ function compose(...fns) {
 }
 ```
 
-To illustrate `reduce(..)`-based composition differently, consider a reducer that will compose functions left-to-right (like `pipe(..)` does), to use in an array chain:
+为了以一种不同的方式展示基于 `reduce(..)` 的组合，考虑一个从左到右（像 `pipe(..)` 那样）组合函数的递减函数，它用于一个数组链中：
 
 ```js
 var pipeReducer = (composedFn,fn) => pipe( composedFn, fn );
@@ -440,9 +440,9 @@ fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
 fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
-`pipeReducer(..)` is unfortunately not point-free (see "No Points" in Chapter 3), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
+不幸的是 `pipeReducer(..)` 不是无点的（参见第三章的 “无点”），但我们不能简单地将 `pipe(..)` 作为递减函数本身传递，因为它是参数可变的；`reduce(..)` 传递给递减函数的额外参数（`idx` 和 `arr`）可能会引起问题。
 
-Earlier we talked about using `unary(..)` to limit a `mapperFn(..)` or `predicateFn(..)` to just a single argument. It might be handy to have a `binary(..)` that does something similar but limits to two arguments, for a `reducerFn(..)` function:
+早先我们谈到过使用 `unary(..)` 来将 `mapperFn(..)` 和 `predicateFn(..)` 限定为一个参数。对于一个 `reducerFn(..)` 来说，要是有一个与之相似但限定为两个参数的 `binary(..)` 可能会很方便：
 
 ```js
 var binary =
@@ -451,7 +451,7 @@ var binary =
 			fn( arg1, arg2 );
 ```
 
-Using `binary(..)`, our previous example is a little cleaner:
+使用 `binary(..)`，我们的前一个例子会干净一些：
 
 ```js
 var pipeReducer = binary( pipe );
@@ -465,7 +465,7 @@ fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
 fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
-Unlike `map(..)` and `filter(..)` whose order of passing through the array wouldn't actually matter, `reduce(..)` definitely uses left-to-right processing. If you want to reduce right-to-left, JavaScript provides a `reduceRight(..)`, with all other behaviors the same as `reduce(..)`:
+对 `map(..)` 和 `filter(..)` 来说遍历数组的顺序实际上不重要，与此不同的是，`reduce(..)` 绝对是按照从左到右的顺序处理。如果你想要从右到左地递减，JavaScript 提供了一个 `reduceRight(..)`，除了顺序以外其他一切行为都与 `reduce(..)` 相同：
 
 ```js
 var hyphenate = (str,char) => str + "-" + char;
@@ -477,7 +477,7 @@ var hyphenate = (str,char) => str + "-" + char;
 // "c-b-a"
 ```
 
-Where `reduce(..)` works left-to-right and thus acts naturally like `pipe(..)` in composing functions, `reduceRight(..)`'s right-to-left ordering is natural for performing a `compose(..)`-like operation. So, let's revisit `compose(..)` using `reduceRight(..)`:
+`reduce(..)` 从左到右地工作，因此在组合函数时很自然地像 `pipe(..)` 一样动作，而 `reduceRight(..)` 从右到左的顺序对于 `compose(..)` 一样的操作来说更自然。那么，让我们使用 `reduceRight(..)` 来重温 `compose(..)`：
 
 ```js
 function compose(...fns) {
@@ -489,11 +489,11 @@ function compose(...fns) {
 }
 ```
 
-Now, we don't need to do `fns.reverse()`; we just reduce from the other direction!
+现在我们不需要 `fns.reverse()` 了；我们只要从另一个方向递减即可！
 
 ### Map As Reduce
 
-The `map(..)` operation is iterative in its nature, so it can also be represented as a reduction (`reduce(..)`). The trick is to realize that the `initialValue` of `reduce(..)` can be itself an (empty) array, in which case the result of a reduction can be another list!
+`map(..)` 操作天生就是迭代性的，所以它也可以表达为一种递减（`reduce(..)`）。这其中的技巧是要理解 `reduce(..)` 的 `initialValue` 本身可以是一个（空）数组，这样递减的结果就可以是另一个列表！
 
 ```js
 var double = v => v * 2;
@@ -510,13 +510,13 @@ var double = v => v * 2;
 // [2,4,6,8,10]
 ```
 
-**Note:** We're cheating with this reducer and allowing a side effect by allowing `list.push(..)` to mutate the list that was passed in. In general, that's not a good idea, obviously, but since we know the `[]` list is being created and passed in, it's less dangerous. You could be more formal -- yet less performant! -- by creating a new list with the val `concat(..)`d onto the end. We'll come back to this cheat in Appendix A.
+**注意：** 我们在欺骗这个递减函数，并通过 `list.push(..)` 改变被传入的列表引入了副作用。一般来说，这不是个好主意，但是因为我们知道 `[]` 是被新建并传入的，所以这没那么危险。你可以更正式一些 —— 性能也差一些！—— 将值 `concat(..)` 在一个新列表的末尾。我们将在附录A中再次回到这个问题上。
 
-Implementing `map(..)` with `reduce(..)` is not on its surface an obvious step or even an improvement. However, this ability will be a crucial recognition for more advanced techniques like those we'll cover in Appendix A "Transducing".
+使用 `reduce(..)` 实现 `map(..)` 在表面上看来不是显而易见的，它甚至不是一种改进。然而，对于我们将在附录A中讲解的 “转导（Transducing）” 这样的更高级的技术来说，这种能力将是一种关键的识别方法。
 
 ### Filter As Reduce
 
-Just as `map(..)` can be done with `reduce(..)`, so can `filter(..)`:
+就像 `map(..)` 可以用 `reduce(..)` 完成一样，`filter(..)` 也能：
 
 ```js
 var isOdd = v => v % 2 == 1;
@@ -533,7 +533,7 @@ var isOdd = v => v % 2 == 1;
 // [1,3,5]
 ```
 
-**Note:** More impure reducer cheating here. Instead of `list.push(..)`, we could have done `list.concat(..)` and returned the new list. We'll come back to this cheat in Appendix A.
+**注意：** 这里使用了更不纯粹的递减函数。我们本可以用 `list.concat(..)` 并返回一个新列表来取代 `list.push(..)`。我们将在附录A中回到这个问题。
 
 ## Advanced List Operations
 
