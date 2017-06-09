@@ -539,9 +539,13 @@ var isOdd = v => v % 2 == 1;
 
 Now that we feel somewhat comfortable with the foundational list operations `map(..)`, `filter(..)`, and `reduce(..)`, let's look at a few more-sophisticated operations you may find useful in various situations. These are generally utilities you'll find in various FP libraries.
 
+现在我们对基础的列表操作 `map(..)`、`filter(..)`、和 `reduce(..)` 有些熟悉了，让我们看几个你可能会在各种情景下觉得很有用的更加精巧的操作。它们通常都是你可以在各种 FP 库中找到的工具。
+
 ### Unique
 
 Filtering a list to include only unique values, based on `indexOf(..)` searching ( which uses `===` strict equality comparision):
+
+基于 `indexOf(..)` 搜索（它使用 `===` 严格等价比较），过滤一个列表使之仅包含唯一的值：
 
 ```js
 var unique =
@@ -554,7 +558,11 @@ var unique =
 
 This technique works by observing that we should only include the first occurrence of an item from `arr` into the new list; when running left-to-right, this will only be true if its `idx` position is the same as the `indexOf(..)` found position.
 
+这种技术的工作方式是，仅将第一次出现在 `arr` 中的项目加入到新的列表中；当从左到右运行时，这仅在项目的 `idx` 位置与 `indexOf(..)` 找到的位置相同时成立。
+
 Another way to implement `unique(..)` is to run through `arr` and include an item into a new (initially empty) list if that item cannot already be found in the new list. For that processing, we use `reduce(..)`:
+
+另一种实现 `unique(..)` 的方式是遍历 `arr`，如果一个项目没有在新的列表中（初始为空）找到就将它加入这个新的列表。我们为这样的处理使用 `reduce(..)`：
 
 ```js
 var unique =
@@ -568,7 +576,11 @@ var unique =
 
 **Note:** There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
 
+**注意：** 使用诸如循环之类的更具指令式的方式，有许多种其他不同的方法可以实现这个算法，而且其中很多在性能方面可能看起来 “更高效”。然而，上面展示这两种方式有一个优势是它们都是用了既存的列表操作，这使它们与其他列表操作链接/组合起来更容易。我们将会在本章稍后更多地谈到这些问题。
+
 `unique(..)` nicely produces a new list with no duplicates:
+
+`unique(..)` 可以出色地产生一个没有重复的新列表：
 
 ```js
 unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
@@ -579,17 +591,23 @@ unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
 
 From time to time, you may have (or produce through some other operations) an array that's not just a flat list of values, but with nested arrays, such as:
 
+时不时地，你会得到（或者从一些其他操作中得到）一个这样的数组：它不只是一个值的扁平的列表，而是一个嵌套的数组，例如：
+
 ```js
 [ [1, 2, 3], 4, 5, [6, [7, 8]] ]
 ```
 
 What if you'd like to transform it into:
 
+要是你想要将它变形为这样呢？
+
 ```js
 [ 1, 2, 3, 4, 5, 6, 7, 8 ]
 ```
 
 The operation we're looking for is typically called `flatten(..)`, and it could be implemented like this using our swiss army knife `reduce(..)`:
+
+我们在寻求的操作通常称为 `flatten(..)`，它可以使用我们的瑞士军刀 `reduce(..)` 像这样实现：
 
 ```js
 var flatten =
@@ -602,7 +620,11 @@ var flatten =
 
 **Note:** This implementation choice relies on recursion to handle the nesting of lists. More on recursion in a later chapter.
 
+**注意：** 这种实现的选择依赖于用递归处理嵌套的列表。后面的章节中有关于递归的更多内容。
+
 To use `flatten(..)` with an array of arrays (of any nested depth):
+
+要对一个（嵌套人一多层的）数组的数组使用 `flatten(..)`：
 
 ```js
 flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
@@ -610,6 +632,8 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 ```
 
 You might like to limit the recursive flattening to a certain depth. We can handle this by adding an optional `depth` limit argument to the implementaiton:
+
+你可能想要将递归平整限制在一个特定的深度上。我们可以通过为这种实现添加一个可选的 `depth` 限制参数来处理：
 
 ```js
 var flatten =
@@ -628,6 +652,8 @@ var flatten =
 ```
 
 Illustrating the results with different flattening depths:
+
+这是不同平整深度的结果：
 
 ```js
 flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 0 );
@@ -653,6 +679,8 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 5 );
 
 One of the most common usages of `flatten(..)` behavior is when you've mapped a list of elements where each transformed value from the original list is now itself a list of values. For example:
 
+`flatten(..)` 行为的最常见用法之一是在你映射一个列表时，每一个从原数组变形而来的元素本身就是一个值的列表。例如：
+
 ```js
 var firstNames = [
 	{ name: "Jonathan", variations: [ "John", "Jon", "Jonny" ] },
@@ -667,6 +695,8 @@ firstNames
 ```
 
 The return value is an array of arrays, which might be more awkward to work with. If we want a single dimension list with all the names, we can then `flatten(..)` that result:
+
+返回值是一个数组的数组，这使用起来可能很尴尬。如果我们要的是一个所有名字的一维数组，那么就可以 `flatten(..)` 这个结果：
 
 ```js
 flatten(
