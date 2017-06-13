@@ -1,4 +1,4 @@
-# Functional-Light JavaScript
+b# Functional-Light JavaScript
 # Chapter 8: List Operations
 
 你在前一章闭包/对象的兔子洞中玩儿的开心吗？欢迎回来！
@@ -1116,8 +1116,6 @@ var mergeReducer =
 
 ## Fusion
 
-As you roll FP list operations into more of your thinking about code, you'll likely start seeing very quickly chains that combine behavior like:
-
 随着你将 FP 列表操作更多地带入到你对代码的思考中，你很可能很快就会看到像这样组合行为的链条：
 
 ```js
@@ -1127,7 +1125,7 @@ As you roll FP list operations into more of your thinking about code, you'll lik
 .reduce(..);
 ```
 
-And more often than not, you're also probably going to end up with chains with multiple adjacent instances of each operation, like:
+而且你还可能往往会得到每种操作有多个相邻实例的链条，就像：
 
 ```js
 someList
@@ -1139,9 +1137,9 @@ someList
 .reduce(..);
 ```
 
-The good news is the chain-style is declarative and it's easy to read the specific steps that will happen, in order. The downside is that each of these operations loops over the entire list, meaning performance can suffer unnecessarily, especially if the list is longer.
+好消息是这种链式风格是声明式的，而且很容易按顺序读懂将要发生的具体步骤。它的缺点是这些操作的每一个都循环遍历整个列表，这意味着性能可能会有不必要的消耗，特别是在列表很长的时候。
 
-With the alternate standalone style, you might see code like this:
+用另一种独立风格，你可能会看到这样的代码：
 
 ```js
 map(
@@ -1153,11 +1151,11 @@ map(
 );
 ```
 
-With this style, the operations are listed from bottom-to-top, and we still loop over the list 3 times.
+这种风格中，操作由下至上地罗列，而且我们依然循环遍历列表三遍。
 
-Fusion deals with combining adjacent operators to reduce the number of times the list is iterated over. We'll focus here on collapsing adjacent `map(..)`s as it's the most straightforward to explain.
+融合通过组合相邻的操作来减少列表被循环遍历的次数。我们在这里将集中于将相邻的 `map(..)` 压缩在一起，因为它是讲解起来最直接的。
 
-Imagine this scenario:
+想象这种场景：
 
 ```js
 var removeInvalidChars = str => str.replace( /[^\w]*/g, "" );
@@ -1182,9 +1180,9 @@ words
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
 
-Think about each value that goes through this flow of transformations. The first value in the `words` list starts out as `"Mr."`, becomes `"Mr"`, then `"MR"`, and then passes through `elide(..)` unchanged. Another piece of data flows: `"responsible"` -> `"responsible"` -> `"RESPONSIBLE"` -> `"RESPONS..."`.
+考虑一下通过这个变形流程的每一个值。在 `words` 列表中的第一个值从 `"Mr."` 开始，变成 `"Mr"`，然后变成 `"MR"`，然后原封不动地通过 `elide(..)`。另一个数据流是：`"responsible"` -> `"responsible"` -> `"RESPONSIBLE"` -> `"RESPONS..."`。
 
-In other words, you could think of these data transformations like this:
+换言之，你可以这样考虑这些数据变形：
 
 ```js
 elide( upper( removeInvalidChars( "Mr." ) ) );
@@ -1194,7 +1192,7 @@ elide( upper( removeInvalidChars( "responsible" ) ) );
 // "RESPONS..."
 ```
 
-Did you catch the point? We can express the three separate steps of the adjacent `map(..)` calls as a composition of the transformers, since they are all unary functions and each returns the value that's suitable as input to the next. We can fuse the mapper functions using `compose(..)`, and then pass the composed function to a single `map(..)` call:
+你抓住要点了吗？我们可以将这三个相邻的 `map(..)` 调用的分离步骤表达为一个变形函数的组合，因为它们都是一元函数而且每一个的返回值都适合作为下一个的输入。我们可以使用 `compose(..)` 将映射函数融合，然后将组合好的函数传递给一个 `map(..)` 调用：
 
 ```js
 words
@@ -1204,7 +1202,7 @@ words
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
 
-This is another case where `pipe(..)` can be a more convenient form of composition, for its ordering readability:
+这是另一个 `pipe(..)` 可以作为一种更方便的组合形式的例子，由于它在顺序上的可读性：
 
 ```js
 words
@@ -1214,36 +1212,36 @@ words
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
 
-What about fusing two or more `filter(..)` predicate functions? Typically treated as unary functions, they seem suitable for composition. But the wrinkle is they each return a different kind of value (`boolean`) than the next one would want as input. Fusing adjacent `reduce(..)` calls is also possible, but reducers are not unary so that's a bit more challenging; we need more sophisticated tricks to pull this kind of fusion off. We'll cover these advanced techniques in Appendix A "Transducing".
+要是融合两个或更多的 `filter(..)` 判定函数呢？它们经常被视为一元函数，看起来很适于组合。但别扭的地方是它们每一个都返回 `boolean` 种类的值，而这与下一个所期望的输入值不同。融合相邻的 `reduce(..)` 调用也是可能的，但递减函数不是一元的所以更具挑战性；我们需要更精巧的方法来抽离这种融合。我们会在附录A “转导” 中讲解这些高级技术。
 
 ## Beyond Lists
 
-So far we've been discussing operations in the context of the list (array) data structure; it's by far the most common scenario you encounter them. But in a more general sense, these operations can be performed against any collection of values.
+目前为止我们一直在列表（数组）数据结构的语境中讨论各种操作；这无疑是你遇到它们的最常见的场景。但在更一般的意义上，这些操作可以对各种值的集合执行。
 
-Just as we said earlier that array's `map(..)` adapts a single-value operation to all its values, any data structure can provide a `map(..)` operation to do the same. Likewise, it can implement `filter(..)`, `reduce(..)`, or any other operation that makes sense for working with the data structure's values.
+正如我们早先说过的，数组的 `map(..)` 将一个单值操作适配为对它所有值的操作，任何能够提供 `map(..)` 的数据结构都可以做到相同的事情。类似地，它可以实现 `filter(..)`，`reduce(..)`，或者任何其他对于使用这种数据结构的值来说有意义的操作。
 
-The important part to maintain in the spirit of FP is that these operators must behave according to value immutability, meaning that they must return a new data structure rather than mutating the existing one.
+从 FP 的精神上讲，需要维护的最重要的部分是这些操作必须根据值的不可变性进行动作，这意味着它们必须返回一个新的数据结构而非改变既存的。
 
-Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has two references to other nodes (themselves binary trees), typically referred to as *left* and *right* child trees. Each node in the tree holds one value of the overall data structure.
+让我们通过一个广为人知的数据结构 —— 二叉树 —— 来展示一下。一个二叉树是一个节点（就是一个对象），它拥有指向其他节点（本身也是二叉树）的两个引用，通常称为 *左* 和 *右* 子树。树上的每一个节点都持有整个数据结构中的一个值。
 
 <p align="center">
 	<img src="fig7.png" width="250">
 </p>
 
-For ease of illustration, we'll make our binary tree a binary search tree (BST). However, the operations we'll identify work the same for any regular non-BST binary tree.
+为了便于展示，我们使我们的二叉树变为一个二叉检索树（BST）。但是我们将要看到的操作对任何非 BST 二叉树来说工作起来都一样。
 
-**Note:** A binary search tree is a general binary tree with a special constraint on the relationship of values in the tree to each other. Each value of nodes on the left side of a tree is less than the value of the node at the root of that tree, which in turn is less than each value of nodes in the right side of the tree. The notion of "less than" is relative to the kind of data stored; it can be numerical for numbers, lexicographic for strings, etc. BSTs are useful because they make searching for a value in the tree straightforward and more efficient, using a recursive binary search algorithm.
+**注意：** 二叉检索树是一种一般的二叉树，它对树上每一个值之间的关系有一种特殊的限制。在一个树左侧的每一个节点的值都要小于树根节点的值，而树根节点的值要小于树右侧每一个节点的值。“小于” 的概念是相对于被存储的数据的种类的；对于数字它可以是数值上的，对于字符串可以是字典顺序，等等。BST 很有用，因为使用递归的二元检索算法时，它们使在树上检索一个值变得很直接而且更高效。
 
-To make a binary tree node object, let's use this factory function:
+为了制造一个二叉树节点对象，让我们使用这个工厂函数：
 
 ```js
 var BinaryTree =
 	(value,parent,left,right) => ({ value, parent, left, right });
 ```
 
-For convenience, we make each node store the `left` and `right` child trees as well as a reference to its own `parent` node.
+为了方便起见，我们使每个节点都存储 `left` 和 `right` 子树以及一个指向它自己 `parent` 节点的引用。
 
-Let's now define a BST of names of common produce (fruits, vegetables):
+现在让我们定义一个常见作物（水果，蔬菜）名称的 BST：
 
 ```js
 var banana = BinaryTree( "banana" );
@@ -1256,9 +1254,9 @@ var cucumber = cherry.right = BinaryTree( "cucumber", cherry );
 var grape = cucumber.right = BinaryTree( "grape", cucumber );
 ```
 
-In this particular tree structure, `banana` is the root node; this tree could have been set up with nodes in different locations, but still had a BST with the same traversal.
+在这个特别的二叉树中，`banana` 是根节点；这棵树可以使用在不同位置的节点建立，但依然是一个拥有相同遍历过程的 BST。
 
-Our tree looks like:
+我们的树看起来像这样：
 
 <p align="center">
 	<img src="fig8.png" width="450">
@@ -1266,7 +1264,11 @@ Our tree looks like:
 
 There are multiple ways to traverse a binary tree to process its values. If it's a BST (our's is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
 
+遍历一个二叉树来处理它的值有多种方法。如果它是一个 BST（我们的就是！）而且我们进行 *按顺序* 的遍历 —— 总是先访问左侧子树，然后是节点自身，最后是右侧子树 —— 那么我们将会按升序（排序过的顺序）访问所有值。
+
 Since you can't just easily `console.log(..)` a binary tree like you can with an array, let's first define a convenience method, mostly to use for printing. `forEach(..)` will visit the nodes of a binary tree in the same manner as an array:
+
+因为你不能像对一个数组那样简单地 `console.log(..)` 一个二叉树，所以我们先来定义一个主要为了进行打印而生的便利方法。`forEach(..)` 将会像访问一个数组那样访问一个二叉树的节点：
 
 ```js
 // in-order traversal
@@ -1287,9 +1289,15 @@ BinaryTree.forEach = function forEach(visitFn,node){
 
 **Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We'll cover recursion in more detail in a later chapter, where we'll cover recursion in that chapter on recursion.
 
+**注意：** 递归处理对于使用二叉树来说再自然不过了。我们的 `forEach(..)` 工具递归地调用它自己来处理左右子树。我们将在后面的章节中详细讲解递归，就是我们将在关于递归的那一章中讲解递归的那一章。
+
 Recall `forEach(..)` was described at the beginning of this chapter as only being useful for side effects, which is not very typically desired in FP. In this case, we'll use `forEach(..)` only for the side effect of I/O, so it's perfectly reasonable as a helper.
 
+回忆一下本章开头，`forEach(..)` 被描述为仅对副作用有用处，而在 FP 中这通常不理想。在这个例子中，我们仅将 `forEach(..)` 用于 I/O 副作用，所以它作为一个帮助函数还是很合理的。
+
 Use `forEach(..)` to print out values from the tree:
+
+使用 `forEach(..)` 来打印树的值：
 
 ```js
 BinaryTree.forEach( node => console.log( node.value ), banana );
@@ -1301,6 +1309,8 @@ BinaryTree.forEach( node => console.log( node.value ), cherry );
 ```
 
 To operate on our binary tree data structure using FP patterns, let's start by defining a `map(..)`:
+
+为了使用 FP 的模式来操作我们的二叉树结构，让我们从定义一个 `map(..)` 开始：
 
 ```js
 BinaryTree.map = function map(mapperFn,node){
@@ -1326,7 +1336,11 @@ BinaryTree.map = function map(mapperFn,node){
 
 You might have assumed we'd `map(..)` only the node `value` properties, but in general we might actually want to map the tree nodes themselves. So, the `mapperFn(..)` is passed the whole node being visited, and it expects to receive a new `BinaryTree(..)` node back, with the transformation applied. If you just return the same node, this operation will mutate your tree and quite possibly cause unexpected results!
 
+你可能会猜测我们将会仅仅 `map(..)` 节点的 `value` 属性，但一般来说我们可能实际上想要映射树节点本身。所以，整个被访问的节点被传入了 `mapperFn(..)` 函数，而且它期待取回一个带有变形后的值的新 `BinaryTree(..)`。如果你只是返回相同的节点，那么这个操作将会改变你的树而且很可能造成意外的结果！
+
 Let's map our tree to a list of produce with all uppercase names:
+
+让我们将作物的树映射为所有名称大写的列表：
 
 ```js
 var BANANA = BinaryTree.map(
@@ -1340,7 +1354,11 @@ BinaryTree.forEach( node => console.log( node.value ), BANANA );
 
 `BANANA` is a different tree (with all different nodes) than `banana`, just like calling `map(..)` on an array returns a new array. Just like arrays of other objects/arrays, if `node.value` itself references some object/array, you'll also need to handle manually copying it in the mapper function if you want deeper immutability.
 
+`BANANA` 是一个与 `banana` 不同的树（所有节点都不同），就像在一个数组上调用 `map(..)` 会返回一个新数组一样。正如其他对象/数组的数组一样，如果 `node.value` 本身引用了一些对象/数组，那么如果你想要更深层的不可变性的话，你还需要在映射函数中手动拷贝它。
+
 How about `reduce(..)`? Same basic process: do an in-order traversal of the tree nodes. One usage would be to `reduce(..)` our tree to an array of its values, which would be useful in further adapting other typical list operations. Or we can `reduce(..)` our tree to a string concatenation of all its produce names.
+
+那么 `reduce(..)` 呢？相同的基本处理：对树的节点进行按顺序的遍历。
 
 We'll mimic the behavior of the array `reduce(..)`, which makes passing the `initialValue` argument optional. This algorithm is a little trickier, but still manageable:
 
