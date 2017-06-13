@@ -537,13 +537,9 @@ var isOdd = v => v % 2 == 1;
 
 ## Advanced List Operations
 
-Now that we feel somewhat comfortable with the foundational list operations `map(..)`, `filter(..)`, and `reduce(..)`, let's look at a few more-sophisticated operations you may find useful in various situations. These are generally utilities you'll find in various FP libraries.
-
 现在我们对基础的列表操作 `map(..)`、`filter(..)`、和 `reduce(..)` 有些熟悉了，让我们看几个你可能会在各种情景下觉得很有用的更加精巧的操作。它们通常都是你可以在各种 FP 库中找到的工具。
 
 ### Unique
-
-Filtering a list to include only unique values, based on `indexOf(..)` searching ( which uses `===` strict equality comparision):
 
 基于 `indexOf(..)` 搜索（它使用 `===` 严格等价比较），过滤一个列表使之仅包含唯一的值：
 
@@ -556,11 +552,7 @@ var unique =
 		);
 ```
 
-This technique works by observing that we should only include the first occurrence of an item from `arr` into the new list; when running left-to-right, this will only be true if its `idx` position is the same as the `indexOf(..)` found position.
-
 这种技术的工作方式是，仅将第一次出现在 `arr` 中的项目加入到新的列表中；当从左到右运行时，这仅在项目的 `idx` 位置与 `indexOf(..)` 找到的位置相同时成立。
-
-Another way to implement `unique(..)` is to run through `arr` and include an item into a new (initially empty) list if that item cannot already be found in the new list. For that processing, we use `reduce(..)`:
 
 另一种实现 `unique(..)` 的方式是遍历 `arr`，如果一个项目没有在新的列表中（初始为空）找到就将它加入这个新的列表。我们为这样的处理使用 `reduce(..)`：
 
@@ -574,11 +566,7 @@ var unique =
 		, [] );
 ```
 
-**Note:** There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
-
 **注意：** 使用诸如循环之类的更具指令式的方式，有许多种其他不同的方法可以实现这个算法，而且其中很多在性能方面可能看起来 “更高效”。然而，上面展示这两种方式有一个优势是它们都是用了既存的列表操作，这使它们与其他列表操作链接/组合起来更容易。我们将会在本章稍后更多地谈到这些问题。
-
-`unique(..)` nicely produces a new list with no duplicates:
 
 `unique(..)` 可以出色地产生一个没有重复的新列表：
 
@@ -589,23 +577,17 @@ unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
 
 ### Flatten
 
-From time to time, you may have (or produce through some other operations) an array that's not just a flat list of values, but with nested arrays, such as:
-
 时不时地，你会得到（或者从一些其他操作中得到）一个这样的数组：它不只是一个值的扁平的列表，而是一个嵌套的数组，例如：
 
 ```js
 [ [1, 2, 3], 4, 5, [6, [7, 8]] ]
 ```
 
-What if you'd like to transform it into:
-
 要是你想要将它变形为这样呢？
 
 ```js
 [ 1, 2, 3, 4, 5, 6, 7, 8 ]
 ```
-
-The operation we're looking for is typically called `flatten(..)`, and it could be implemented like this using our swiss army knife `reduce(..)`:
 
 我们在寻求的操作通常称为 `flatten(..)`，它可以使用我们的瑞士军刀 `reduce(..)` 像这样实现：
 
@@ -618,11 +600,7 @@ var flatten =
 		, [] );
 ```
 
-**Note:** This implementation choice relies on recursion to handle the nesting of lists. More on recursion in a later chapter.
-
 **注意：** 这种实现的选择依赖于用递归处理嵌套的列表。后面的章节中有关于递归的更多内容。
-
-To use `flatten(..)` with an array of arrays (of any nested depth):
 
 要对一个（嵌套人一多层的）数组的数组使用 `flatten(..)`：
 
@@ -630,8 +608,6 @@ To use `flatten(..)` with an array of arrays (of any nested depth):
 flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 // [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
 ```
-
-You might like to limit the recursive flattening to a certain depth. We can handle this by adding an optional `depth` limit argument to the implementaiton:
 
 你可能想要将递归平整限制在一个特定的深度上。我们可以通过为这种实现添加一个可选的 `depth` 限制参数来处理：
 
@@ -650,8 +626,6 @@ var flatten =
 				)
 		, [] );
 ```
-
-Illustrating the results with different flattening depths:
 
 这是不同平整深度的结果：
 
@@ -677,8 +651,6 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 5 );
 
 #### Mapping, Then Flattening
 
-One of the most common usages of `flatten(..)` behavior is when you've mapped a list of elements where each transformed value from the original list is now itself a list of values. For example:
-
 `flatten(..)` 行为的最常见用法之一是在你映射一个列表时，每一个从原数组变形而来的元素本身就是一个值的列表。例如：
 
 ```js
@@ -694,8 +666,6 @@ firstNames
 //   ["Frederick","Fred","Freddy"] ]
 ```
 
-The return value is an array of arrays, which might be more awkward to work with. If we want a single dimension list with all the names, we can then `flatten(..)` that result:
-
 返回值是一个数组的数组，这使用起来可能很尴尬。如果我们要的是一个所有名字的一维数组，那么就可以 `flatten(..)` 这个结果：
 
 ```js
@@ -707,9 +677,9 @@ flatten(
 //  "Fred","Freddy"]
 ```
 
-Besides being slightly more verbose, the disadvantage of doing the `map(..)` and `flatten(..)` as separate steps is primarily around performance; this approach processes the list twice.
+除了稍稍繁冗之外，将 `map(..)` 和 `flatten(..)` 作为两个步骤分开做的缺点主要关乎性能；这个方式将列表处理了两次。
 
-FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) that does the mapping-then-flattening combined. For consistency and ease of composition (via currying), the `flatMap(..)` / `chain(..)` utility typically matches the `mapperFn, arr` parameter order that we saw earlier with the standalone `map(..)`, `filter(..)`, and `reduce(..)` utilities.
+FP 库中经常定义一个“映射之后平整”组合的 `flatMap(..)`（也常被称为 `chain(..)`）。为了一致性和易于（通过柯里化）组合，这些 `flatMap(..)` / `chain(..)` 工具通常都与我们以前看到的 `map(..)`、`filter(..)`、和 `reduce(..)` 独立工具的 `mapperFn, arr` 参数顺序相吻合。
 
 ```js
 flatMap( entry => [entry.name].concat( entry.variations ), firstNames );
@@ -717,7 +687,7 @@ flatMap( entry => [entry.name].concat( entry.variations ), firstNames );
 //  "Fred","Freddy"]
 ```
 
-The naive implementation of `flatMap(..)` with both steps done separately:
+将两个步骤分开做的 `flatMap(..)` 的幼稚的实现是：
 
 ```js
 var flatMap =
@@ -725,9 +695,9 @@ var flatMap =
 		flatten( arr.map( mapperFn ), 1 );
 ```
 
-**Note:** We use `1` for the flattening-depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
+**注意：** 我们将 `1` 用于平整深度是因为 `flatMap(..)` 的常见定义是仅发生在第一层的浅平整。
 
-Since this approach still processes the list twice resulting in worse performance, we can combine the operations manually, using `reduce(..)`:
+因为这种方式依然将列表处理两次而导致差劲的性能，所以我们可以使用 `reduce(..)` 手动组合这些操作：
 
 ```js
 var flatMap =
@@ -738,20 +708,20 @@ var flatMap =
 		, [] );
 ```
 
-While there's some convenience and performance gained with a `flatMap(..)` utility, there may very well be times when you need other operations like `filter(..)`ing mixed in. If that's the case, doing the `map(..)` and `flatten(..)` separately might still be more appropriate.
+虽然 `flatMap(..)` 工具会带来一些方便与性能上的增益，但有时候你很可能需要混合一些 `filter(..)` 这样的操作。如果是这样，将 `map(..)` 与 `flatten(..)` 分开做可能还是更合适的。
 
 ### Zip
 
-So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of two input lists into sub-lists, called `zip(..)`:
+至此，我们检视过的列表操作都是在一个列表上进行操作的。但是有些情况需要处理多个列表。一个广为人知的操作是从两个输入列表中交替选择值放入子列表中，称为 `zip(..)`：
 
 ```js
 zip( [1,3,5,7,9], [2,4,6,8,10] );
 // [ [1,2], [3,4], [5,6], [7,8], [9,10] ]
 ```
 
-Values `1` and `2` were selected into the sub-list `[1,2]`, then `3` and `4` into `[3,4]`, etc. The definition of `zip(..)` requires a value from each of the two lists. If the two lists are of different lengths, the selection of values will continue until the shorter list has been exhausted, with the extra values in the other list ignored.
+值 `1` 和 `2` 被选入子列表 `[1,2]`，然后 `3` 和 `4` 被选入 `[3,4]`，等等。`zip(..)` 的定义要求从两个列表中各取一个值。如果这两个列表长度不同，那么值的选择将会进行到较短的那个列表耗尽为止，在另一个列表中额外的值将会被忽略。
 
-An implementation of `zip(..)`:
+一种 `zip(..)` 的实现：
 
 ```js
 function zip(arr1,arr2) {
@@ -767,20 +737,20 @@ function zip(arr1,arr2) {
 }
 ```
 
-The `arr1.slice()` and `arr2.slice()` calls ensure `zip(..)` is pure by not causing side effects on the received array references.
+调用 `arr1.slice()` 和 `arr2.slice()` 通过不在收到的数组引用上造成副作用来保证 `zip(..)` 是纯粹的。
 
-**Note:** There are some decidedly un-FP things going on in this implementation. There's an imperative `while`-loop and mutations of lists with both `shift()` and `push(..)`. Earlier in the book, I asserted that it's reasonable for pure functions to use impure behavior inside them (usually for performance), as long as the effects are fully self-contained. This implementation is safely pure.
+**注意：** 在这种实现中毫无疑问地发生了一些非 FP 的事情。这里有一个指令式的 `while` 循环而且使用 `shift()` 和 `push(..)` 改变了列表。在本书早先的部分中，我论证过在纯函数内部（通常是为了性能）使用非纯粹的行为是合理的，只要其造成的效果是完全自包含的就行。
 
 ### Merge
 
-Merging two lists by interleaving values from each source looks like this:
+通过将两个列表中的值穿插来融合它们，看起来就像：
 
 ```js
 mergeLists( [1,3,5,7,9], [2,4,6,8,10] );
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-It may not be obvious, but this result seems similar to what we get if we compose `flatten(..)` and `zip(..)`:
+可能不太明显，但是这个结果看起来很类似于我们将 `flatten(..)` 和 `zip(..)` 组合得到的东西：
 
 ```js
 zip( [1,3,5,7,9], [2,4,6,8,10] );
@@ -794,9 +764,9 @@ flatten( zip( [1,3,5,7,9], [2,4,6,8,10] ) );
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-However, recall that `zip(..)` only selects values until the shorter of two lists is exhausted, ignoring the leftover values; merging two lists would most naturally retain those extra values. Also, `flatten(..)` works recursively on nested lists, but you might expect list-merging to only work shallowly, keeping nested lists.
+然而，回忆一下， `zip(..)` 的值选择仅到较短的列表耗尽为止，而且忽略剩下的值；而融合两个列表时保留那些额外的值将是最自然的。另外，`flatten(..)` 会在嵌套的列表中递归地执行，但你可能希望列表融合仅在浅层工作，保留嵌套的列表。
 
-So, let's define a `mergeLists(..)` that works more like we'd expect:
+那么，然我们定义一个如我们所愿的 `mergeLists(..)`：
 
 ```js
 function mergeLists(arr1,arr2) {
@@ -817,9 +787,9 @@ function mergeLists(arr1,arr2) {
 }
 ```
 
-**Note:** Various FP libraries don't define a `mergeLists(..)` but instead define a `merge(..)` that merges properties of two objects; the results of such a `merge(..)` will differ from our `mergeLists(..)`.
+**注意：** 各种 FP 库不会定义 `mergeLists(..)`，取而代之的是定义了融合两个对象的属性的 `merge(..)`；这样的 `merge(..)` 的结果将与我们的 `mergeLists(..)` 的结果不同。
 
-Alternatively, here's a couple of options to implement the list merging as a reducer:
+此外，还有许多其他选择可以将列表的融合实现为一个递减函数：
 
 ```js
 // via @rwaldron
@@ -836,7 +806,7 @@ var mergeReducer =
 			.concat( v, merged.slice( idx * 2 ) );
 ```
 
-And using a `mergeReducer(..)`:
+使用 `mergeReducer(..)`：
 
 ```js
 [1,3,5,7,9]
@@ -844,13 +814,13 @@ And using a `mergeReducer(..)`:
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-**Tip:** We'll use the `mergeReducer(..)` trick later in the chapter.
+**提示：** 我们将在本章稍后使用这个 `mergeReducer(..)` 技巧。
 
 ## Method vs. Standalone
 
-A common source of frustration for FPers in JavaScript is unifying their strategy for working with utilities when some of them are provided as standalone functions -- think about the various FP utilities we've derived in previous chapters -- and others are methods of the array prototype -- like the ones we've seen in this chapter.
+在 JavaScript 中一个令 FP 程序员们沮丧的源头是，当一些工具作为独立函数被提供 —— 考虑一下我们在前一章中衍生出来的各种工具 —— 而另一些是数组原型的方法时 —— 就像我们在本章中看到的 —— 如何为使用这些工具来统一他们的策略。
 
-The pain of this problem becomes more evident when you consider combining multiple operations:
+当你考虑组合多个操作时，这个问题使人头疼的地方就变得更加明显：
 
 ```js
 [1,2,3,4,5]
@@ -870,15 +840,15 @@ reduce(
 );									// 18
 ```
 
-Both API styles accomplish the same task, but they have very different ergonomics. Many FPers will prefer the latter to the former, but the former is unquestionably more common in JavaScript. One thing specifically that's disliked about the latter is the nesting of the calls. The preference for the method chain style -- typically called a fluent API style, as in jQuery and other tools -- is that it's compact/concise and it reads in declarative top-down order.
+这两种 API 风格都完成相同的任务，但它们在人体工程学上十分的不同。相较于前者许多 FP 程序员偏好后者，但前者毫无疑问地在 JavaScript 中更常见。后者一个特别令人厌恶的东西就是调用的嵌套。方法链风格招人喜欢的地方 —— 常被称为流利的 API 风格，就像在 jQuery 和其他工具中 —— 在于其紧凑/简介，以及它读起来是声明式的从上到下顺序。
 
-The visual order for that manual composition of the standalone style is neither strictly left-to-right (top-to-bottom) nor right-to-left (bottom-to-top); it's inner-to-outer, which harms the readability.
+对于独立函数风格的手动组合来说，它的视觉顺序既不是从左到右（从上到下）也不是从右到左（从下到上）；而是由内而外，这损害了可读性。
 
-Automatic composition normalizes the reading order as right-to-left (bottom-to-top) for both styles. So, to explore the implications of the style differences, let's examine composition specifically; it seems like it should be straightforward, but it's a little awkward in both cases.
+自动组合将两种风格的阅读顺序规范化为从右到左（从下到上）。那么为了探索不同风格可能造成的影响，让我们专门讲解一下组合；这看起来应当很直接，但是实际上在两种情况下都有些尴尬。
 
 ### Composing Method Chains
 
-The array methods receive the implicit `this` argument, so despite their appearance, they can't be treated as unary; that makes composition more awkward. To cope, we'll first need a `this`-aware version of `partial(..)`:
+数组方法接收隐含的 `this` 参数，所以尽管它们没有出现，这些方法也不能被视为一元的；这使得组合更加尴尬。为了应付它，首先我们需要一个 `this` 敏感版本的 `partial(..)`：
 
 ```js
 var partialThis =
@@ -889,7 +859,7 @@ var partialThis =
 		};
 ```
 
-We'll also need a version of `compose(..)` that calls each of the partially applied methods in the context of the chain -- the input value it's being "passed" (via implicit `this`) from the previous step:
+我们还需要另一个版本的 `compose(..)`，它在这个链条的上下文环境中调用每一个被部分应用的方法 —— 从上一个步骤中（通过隐含的 `this`）被 “传递” 过来的输入值：
 
 ```js
 var composeChainedMethods =
@@ -902,7 +872,7 @@ var composeChainedMethods =
 			);
 ```
 
-And using these two `this`-aware utilities together:
+一起使用这两个 `this` 敏感的工具：
 
 ```js
 composeChainedMethods(
@@ -913,11 +883,11 @@ composeChainedMethods(
 ( [1,2,3,4,5] );					// 18
 ```
 
-**Note:** The three `Array.prototype.XXX`-style references are grabbing references to the built-in `Array.prototype.*` methods so that we can reuse them with our own arrays.
+**注意：** 三个 `Array.prototype.XXX` 风格的引用抓住了内建的 `Array.prototype.*` 方法的引用，这样我们就可以对自己的数组复用它们了。
 
 ### Composing Standalone Utilities
 
-Standalone `compose(..)`-style composition of these utilities doesn't need all the `this` contortions, which is its most favorable argument. For example, we could define standalones as:
+这些工具的独立 `compose(..)` 风格组合不需要所有这些扭曲 `this` 的操作，这是它最为人称道的地方。例如，我们可以这样定义独立函数：
 
 ```js
 var filter = (arr,predicateFn) => arr.filter( predicateFn );
@@ -928,7 +898,7 @@ var reduce = (arr,reducerFn,initialValue) =>
 	arr.reduce( reducerFn, initialValue );
 ```
 
-But this particular standalone style suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application to compose them:
+但是这种特别的独立风格有它自己的尴尬之处；层层传递的数组上下文是第一个参数而非最后一个，于是我们不得不使用右侧局部应用来组合它们：
 
 ```js
 compose(
@@ -939,7 +909,7 @@ compose(
 ( [1,2,3,4,5] );					// 18
 ```
 
-That's why FP libraries typically define `filter(..)`, `map(..)`, and `reduce(..)` to alternately receive the array last instead of first. They also typically automatically curry the utilities:
+这就是为什么 FP 库通常将 `filter(..)`、`map(..)`、和 `reduce(..)` 定义为最后接收数组而不是最先接收。它们还经常自动地柯里化这些工具：
 
 ```js
 var filter = curry(
@@ -957,7 +927,7 @@ var reduce = curry(
 		arr.reduce( reducerFn, initialValue );
 ```
 
-Working with the utilities defined in this way, the composition flow is a bit nicer:
+使用这样定义的工具，组合的流程变得好了一些：
 
 ```js
 compose(
@@ -968,11 +938,11 @@ compose(
 ( [1,2,3,4,5] );					// 18
 ```
 
-The cleanliness of this approach is in part why FPers prefer the standalone utility style instead of instance methods. But your mileage may vary.
+这种方式的清晰性在某种程度上就是为什么 FP 程序员喜欢独立的工具风格而不是实例方法。但你的感觉可能会不同。
 
 ### Adapting Methods To Standalones
 
-In the previous definition of `filter(..)` / `map(..)` / `reduce(..)`, you might have spotted the common pattern across all three: they all dispatch to the corresponding native array method. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unboundMethod(..)` to do just that:
+在前面 `filter(..)` / `map(..)` / `reduce(..)` 的定义中，你可能发现了这三者的共同模式：它们都被分发到相应的原生数组方法上。那么，我们能否使用一个工具来生成这些独立适配函数呢？是的！让我们为此制造一个称为 `unboundMethod(..)` 的工具：
 
 ```js
 var unboundMethod =
@@ -986,7 +956,7 @@ var unboundMethod =
 		);
 ```
 
-And to use this utility:
+要使用这个工具：
 
 ```js
 var filter = unboundMethod( "filter", 2 );
@@ -1001,18 +971,18 @@ compose(
 ( [1,2,3,4,5] );					// 18
 ```
 
-**Note:** `unboundMethod(..)` is called `invoker(..)` in Ramda.
+**注意：** `unboundMethod(..)` 在 Ramda 中称为 `invoker(..)`。
 
 ### Adapting Standalones To Methods
 
-If you prefer to work with only array methods (fluent chain style), you have two choices. You can:
+如果你喜欢只使用数组方法（流利的链式风格），你有两个选择。你可以：
 
-1. Extend the built-in `Array.prototype` with additional methods.
-2. Adapt a standalone utility to work as a reducer function and pass it to the `reduce(..)` instance method.
+1. 使用额外的方法扩展内建的 `Array.prototype`。
+2. 适配一个用于递减函数的独立工具，并将它传入 `reduce(..)` 实例方法。
 
-**Don't do (1).** It's never a good idea to extend built-in natives like `Array.prototype` -- unless you define a subclass of `Array`, but that's beyond our discussion scope here. In an effort to discourage bad practices, we won't go any further into this approach.
+**不要选择（1）。** 扩展 `Array.prototype` 这样的原声类型从来都不是一个好主意 —— 除非你定义一个 `Array` 的子类，但这超出了我们在此的讨论范围。为了不鼓励不好的实践，我们不会在这种方式上再前进了。
 
-Let's **focus on (2)** instead. To illustrate this point, we'll convert the recursive `flatten(..)` standalone utility from earlier:
+让我们 **集中于（2）**。为了展示其中的要点，我们将转换之前递归的 `flatten(..)` 独立工具：
 
 ```js
 var flatten =
@@ -1023,7 +993,7 @@ var flatten =
 		, [] );
 ```
 
-Let's pull out the inner `reducer(..)` function as the standalone utility (and adapt it to work without the outer `flatten(..)`):
+让我们将内部的 `reducer(..)` 函数抽离为一个独立工具（并将它适配为可以脱离外部 `flatten(..)` 工作）：
 
 ```js
 // intentionally a function to allow recursion by name
@@ -1034,7 +1004,7 @@ function flattenReducer(list,v) {
 }
 ```
 
-Now, we can use this utility in an array method chain via `reduce(..)`:
+现在，我们可以在一个数组方法链中通过 `reduce(..)` 来使用这个工具了：
 
 ```js
 [ [1, 2, 3], 4, 5, [6, [7, 8]] ]
@@ -1044,9 +1014,9 @@ Now, we can use this utility in an array method chain via `reduce(..)`:
 
 ## Looking For Lists
 
-So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can start to shine: modeling an imperative series of statements declaratively.
+目前为止，绝大多数例子都很琐碎，它们基于简单的数字或字符串列表。现在让我们谈谈列表操作可以闪光的地方：对一系列指令式的语句进行声明式的建模。
 
-Consider this base example:
+考虑这个基本的例子：
 
 ```js
 var getSessionId = partial( prop, "sessId" );
@@ -1062,9 +1032,9 @@ if (userId != null) orders = lookupOrders( userId );
 if (orders != null) processOrders( orders );
 ```
 
-First, let's observe that the five variable declarations and the running series of `if` conditionals guarding the function calls are effectively one big composition of these six calls `getCurrentSession()`, `getSessionId(..)`, `lookupUser(..)`, `getUserId(..)`, `lookupOrders(..)`, and `processOrders(..)`. Ideally, we'd like to get rid of all these variable declarations and imperative conditionals.
+首先，我们观察到那五个变量声明和守护着函数调用的一系列 `if` 条件实质上是这六个调用的一个大组合：`getCurrentSession()`、`getSessionId(..)`、`lookupUser(..)`、`getUserId(..)`、`lookupOrders(..)`、和 `processOrders(..)`。理想上，我们想要摆脱所有这些变量声明和指令式条件。
 
-Unfortunately, the `compose(..)` / `pipe(..)` utilties we explored in Chapter 4 don't by themselves offer a convenient way to express the `!= null` conditionals in the composition. Let's define a utility to help:
+不幸的是，我们在第四章中探索过的 `compose(..)` / `pipe(..)` 工具自身不会在组合中提供一种表达 `!= null` 条件的方便方法。让我们定义一个工具来提供帮助：
 
 ```js
 var guard =
@@ -1073,14 +1043,14 @@ var guard =
 			arg != null ? fn( arg ) : arg;
 ```
 
-This `guard(..)` utility lets us map the five conditional-guarded functions:
+这个 `guard(..)` 工具让我们映射出那五个条件守护着的函数：
 
 ```js
 [ getSessionId, lookupUser, getUserId, lookupOrders, processOrders ]
 .map( guard )
 ```
 
-The result of this mapping is an array of functions that are ready to compose (actually, pipe, in this listed order). We could spread this array to `pipe(..)`, but since we're already doing list operations, let's do it with a `reduce(..)`, using the session value from `getCurrentSession()` as the initial value:
+这个映射的结果是准备好组合的函数的数组（实际上是 pipe，以这个列表的顺序来说）。我们可以将这个数组扩散到 `pipe(..)`，但因为我们已经在做列表操作了，让我们使用一个 `reduce(..)`，将 `getCurrentSession()` 中的 session 值作为初始值：
 
 ```js
 .reduce(
@@ -1089,15 +1059,15 @@ The result of this mapping is an array of functions that are ready to compose (a
 )
 ```
 
-Next, let's observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
+接下来，我们观察到 `getSessionId(..)` 和 `getUserId(..)` 可以被分别表达为值 `"sessId"` 和 `"uId"` 的映射：
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
 ```
 
-But to use these, we'll need to interleave them with the other three functions (`lookupUser(..)`, `lookupOrders(..)`, and `processOrders(..)`) to get the array of five functions to guard / compose as discussed above.
+但为了使用它们，我们需要将它们穿插在其他三个函数中（`lookupUser(..)`、`lookupOrders(..)`、和 `processOrders(..)`），来让这五个函数的数组像上面的讨论中那样守护/组合。
 
-To do the interleaving, we can model this as list merging. Recall `mergeReducer(..)` from earlier in the chapter:
+为了进行穿插，我们可以将此模型化为列表融合。回想一下本章早先的 `mergeReducer`：
 
 ```js
 var mergeReducer =
@@ -1105,19 +1075,19 @@ var mergeReducer =
 		(merged.splice( idx * 2, 0, v ), merged);
 ```
 
-We can use `reduce(..)` (our swiss army knife, remember!?) to "insert" `lookupUser(..)` in the array between the generated `getSessionId(..)` and `getUserId(..)` functions, by merging two lists:
+我们可以使用 `reduce(..)`（记得到我们的瑞士军刀吗！？）通过融合两个列表，来将 `lookupUser(..)` “插入” 到数组的 `getSessionId(..)` 和 `getUserId(..)` 函数之间：
 
 ```js
 .reduce( mergeReducer, [ lookupUser ] )
 ```
 
-Then we'll concatenate `lookupOrders(..)` and `processOrders(..)` onto the end of the running functions array:
+然后我们把 `lookupOrders(..)` 和 `processOrders(..)` 连接到运行中的函数数组的末尾：
 
 ```js
 .concat( lookupOrders, processOrders )
 ```
 
-To review, the generated list of five functions is expressed as:
+检查一下，生成的五个函数的列表被表达为：
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
@@ -1125,7 +1095,7 @@ To review, the generated list of five functions is expressed as:
 .concat( lookupOrders, processOrders )
 ```
 
-Finally, to put it all together, take this list of functions and tack on the guarding and composition from earlier:
+最后，把所有东西放在一起，将函数的列表向前面讨论过的那样添加守护功能并组合：
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
@@ -1138,15 +1108,17 @@ Finally, to put it all together, take this list of functions and tack on the gua
 );
 ```
 
-Gone are all the imperative variable declarations and conditionals, and in their place we have clean and declarative list operations chained together.
+所有的指令式变量声明和条件都不见了，取而代之的是链接在一起的干净且声明式的列表操作。
 
-If this version is harder for you read right now than the original, don't worry. The original is unquestionably the imperative form you're probably more familiar with. Part of your evolution to become a functional programmer is to develop a recognition of FP patterns such as list operations. Over time, these will jump out of the code more readily as your sense of code readability shifts to declarative style.
+如果对你来说这个版本比原来的版本读起来更苦难，不要担心。原来的版本无疑是你可能更加熟悉的指令式形式。你向函数式程序员演变过程的一部分就是发展出能够识别 FP 模式的能力，比如像这样的列表操作。久而久之，随着你对代码可读性的感觉转换为声明式风格，这些东西将会更容易地从代码中跳出来。
 
-Before we leave this topic, let's take a reality check: the example here is heavily contrived. Not all code segments will be straightforwardly modeled as list operations. The pragmatic take-away is to develop the instinct to look for these opportunities, but not get too hung up on code acrobatics; some improvement is better than none. Always step back and ask if you're **improving or harming** code readability.
+在我们结束这个话题之前，让我们看一下现实：这里的例子都是严重造作的。不是所有的代码段都可以简单地模型化为列表操作。务实的要点是，要开发寻找这些可以进行优化的机会，但不要过于沉迷在代码的杂耍中；有些改进是聊胜于无的。总是退一步并问问你自己，你是 **改善了还是损害了** 代码的可读性。
 
 ## Fusion
 
 As you roll FP list operations into more of your thinking about code, you'll likely start seeing very quickly chains that combine behavior like:
+
+随着你将 FP 列表操作更多地带入到你对代码的思考中，你很可能很快就会看到像这样组合行为的链条：
 
 ```js
 ..
