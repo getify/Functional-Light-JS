@@ -1262,11 +1262,7 @@ var grape = cucumber.right = BinaryTree( "grape", cucumber );
 	<img src="fig8.png" width="450">
 </p>
 
-There are multiple ways to traverse a binary tree to process its values. If it's a BST (our's is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
-
 遍历一个二叉树来处理它的值有多种方法。如果它是一个 BST（我们的就是！）而且我们进行 *按顺序* 的遍历 —— 总是先访问左侧子树，然后是节点自身，最后是右侧子树 —— 那么我们将会按升序（排序过的顺序）访问所有值。
-
-Since you can't just easily `console.log(..)` a binary tree like you can with an array, let's first define a convenience method, mostly to use for printing. `forEach(..)` will visit the nodes of a binary tree in the same manner as an array:
 
 因为你不能像对一个数组那样简单地 `console.log(..)` 一个二叉树，所以我们先来定义一个主要为了进行打印而生的便利方法。`forEach(..)` 将会像访问一个数组那样访问一个二叉树的节点：
 
@@ -1287,15 +1283,9 @@ BinaryTree.forEach = function forEach(visitFn,node){
 };
 ```
 
-**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We'll cover recursion in more detail in a later chapter, where we'll cover recursion in that chapter on recursion.
-
 **注意：** 递归处理对于使用二叉树来说再自然不过了。我们的 `forEach(..)` 工具递归地调用它自己来处理左右子树。我们将在后面的章节中详细讲解递归，就是我们将在关于递归的那一章中讲解递归的那一章。
 
-Recall `forEach(..)` was described at the beginning of this chapter as only being useful for side effects, which is not very typically desired in FP. In this case, we'll use `forEach(..)` only for the side effect of I/O, so it's perfectly reasonable as a helper.
-
 回忆一下本章开头，`forEach(..)` 被描述为仅对副作用有用处，而在 FP 中这通常不理想。在这个例子中，我们仅将 `forEach(..)` 用于 I/O 副作用，所以它作为一个帮助函数还是很合理的。
-
-Use `forEach(..)` to print out values from the tree:
 
 使用 `forEach(..)` 来打印树的值：
 
@@ -1307,8 +1297,6 @@ BinaryTree.forEach( node => console.log( node.value ), banana );
 BinaryTree.forEach( node => console.log( node.value ), cherry );
 // cantelope cherry cucumber grape
 ```
-
-To operate on our binary tree data structure using FP patterns, let's start by defining a `map(..)`:
 
 为了使用 FP 的模式来操作我们的二叉树结构，让我们从定义一个 `map(..)` 开始：
 
@@ -1334,11 +1322,7 @@ BinaryTree.map = function map(mapperFn,node){
 };
 ```
 
-You might have assumed we'd `map(..)` only the node `value` properties, but in general we might actually want to map the tree nodes themselves. So, the `mapperFn(..)` is passed the whole node being visited, and it expects to receive a new `BinaryTree(..)` node back, with the transformation applied. If you just return the same node, this operation will mutate your tree and quite possibly cause unexpected results!
-
 你可能会猜测我们将会仅仅 `map(..)` 节点的 `value` 属性，但一般来说我们可能实际上想要映射树节点本身。所以，整个被访问的节点被传入了 `mapperFn(..)` 函数，而且它期待取回一个带有变形后的值的新 `BinaryTree(..)`。如果你只是返回相同的节点，那么这个操作将会改变你的树而且很可能造成意外的结果！
-
-Let's map our tree to a list of produce with all uppercase names:
 
 让我们将作物的树映射为所有名称大写的列表：
 
@@ -1352,15 +1336,11 @@ BinaryTree.forEach( node => console.log( node.value ), BANANA );
 // APPLE APRICOT AVOCADO BANANA CANTELOPE CHERRY CUCUMBER GRAPE
 ```
 
-`BANANA` is a different tree (with all different nodes) than `banana`, just like calling `map(..)` on an array returns a new array. Just like arrays of other objects/arrays, if `node.value` itself references some object/array, you'll also need to handle manually copying it in the mapper function if you want deeper immutability.
-
 `BANANA` 是一个与 `banana` 不同的树（所有节点都不同），就像在一个数组上调用 `map(..)` 会返回一个新数组一样。正如其他对象/数组的数组一样，如果 `node.value` 本身引用了一些对象/数组，那么如果你想要更深层的不可变性的话，你还需要在映射函数中手动拷贝它。
 
-How about `reduce(..)`? Same basic process: do an in-order traversal of the tree nodes. One usage would be to `reduce(..)` our tree to an array of its values, which would be useful in further adapting other typical list operations. Or we can `reduce(..)` our tree to a string concatenation of all its produce names.
+那么 `reduce(..)` 呢？相同的基本处理：对树的节点进行按顺序的遍历。一种用法是将我们的树 `reduce(..)` 到一个它的值的数组中，这对将来适配其他常用的列表操作会很有用。或者我们可以将我们的树 `reduce(..)` 为一个所有作物名称的字符串连接。
 
-那么 `reduce(..)` 呢？相同的基本处理：对树的节点进行按顺序的遍历。
-
-We'll mimic the behavior of the array `reduce(..)`, which makes passing the `initialValue` argument optional. This algorithm is a little trickier, but still manageable:
+我们将模仿数组 `reduce(..)` 的行为，这使得参数 `initialValue` 的传递是可选的。这个算法有些复杂，但依然是可控的：
 
 ```js
 BinaryTree.reduce = function reduce(reducerFn,initialValue,node){
@@ -1398,7 +1378,7 @@ BinaryTree.reduce = function reduce(reducerFn,initialValue,node){
 };
 ```
 
-Let's use `reduce(..)` to make our shopping list (an array):
+让我们使用 `reduce(..)` 来制造我们的购物单（一个数组）：
 
 ```js
 BinaryTree.reduce(
@@ -1410,7 +1390,7 @@ BinaryTree.reduce(
 //   "cherry","cucumber","grape"]
 ```
 
-Finally, let's consider `filter(..)` for our tree. This algorithm is trickiest so far because it effectively (not actually) involves removing nodes from the tree, which requires handling several corner cases. Don't get intimiated by the implementation, though. Just skip over it for now, if you prefer, and focus on how we use it instead.
+最后，让我们来为我们的树考虑一下 `filter(..)`。这是目前为止最复杂的算法，因为它实质上（不是实际上）引入了对树上节点的删除，这要求处理几种极端情况。但不要被它的实现吓到。如果你乐意的话可以先跳过它，而关注与我们如何使用它。
 
 ```js
 BinaryTree.filter = function filter(predicateFn,node){
@@ -1489,9 +1469,9 @@ BinaryTree.filter = function filter(predicateFn,node){
 };
 ```
 
-The majority of this code listing is dedicated to handling the shifting of a node's parent/child references if it's "removed" (filtered out) of the duplicated tree structure.
+这个代码段的绝大部分都用来处理当一个节点从树结构的复本中“被移除”（滤除）时，其父/子引用的移动。
 
-As an example to illustrate using `filter(..)`, let's narrow our produce tree down to only vegetables:
+为了展示 `filter(..)` 使用的例子，让我们将作物树收窄为仅含蔬菜：
 
 ```js
 var vegetables = [ "asparagus", "avocado", "brocolli", "carrot",
@@ -1513,18 +1493,18 @@ BinaryTree.reduce(
 // ["avocado","cucumber"]
 ```
 
-You will likely use most of the list operations from this chapter in the context of simple arrays. But now we've seen that the concepts apply to whatever data structures and operations you might need. That's a powerful expression of how FP can be widely applied to many different application scenarios!
+你很可能在简单的数组上下文环境中使用本章中提到的大多数列表操作。但我们已经看到了，这其中的概念可以应用于任何你可能需要的数据结构和操作中。这是 FP 如何可以广泛地应用于许多不同应用程序场景的有力证明！
 
 ## Summary
 
-Three common and powerful list operations:
+三个常见而且强大的列表操作：
 
-* `map(..)`: transforms values as it projects them to a new list.
-* `filter(..)`: selects or excludes values as it projects them to a new list.
-* `reduce(..)`: combines values in a list to produce some other (usually but not always non-list) value.
+* `map(..)`：将值投射到新列表中时将其变形。
+* `filter(..)`：将值投射到新列表中时选择或排除它。
+* `reduce(..)`：将一个列表中的值结合为另一个值（通常但不总是数组）。
 
-Other more advanced operations that can be very useful in processing lists: `unique(..)`, `flatten(..)`, and `merge(..)`.
+其他几个可能在列表处理中非常有用的高级操作：`unique(..)`、`flatten(..)`、和 `merge(..)`。
 
-Fusion uses function composition techniques to consolidate multiple adjacent `map(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
+融合使用函数组合技术将多个相邻的 `map(..)` 调用合并。这很大程度上是一种性能优化，但也改善了你的列表操作的声明式性质。
 
-Lists are typically visualized as arrays, but can be generalized as any data structure that represents/produces an ordered collection of values. As such, all these "list operations" are actually "data structure operations".
+列表通常在视觉上表现为数组，但也可以被一般化为任何可以表现/产生一个有序的值的序列的集合数据结构。因此，所有这些“列表操作”实际上是“数据结构操作”。
