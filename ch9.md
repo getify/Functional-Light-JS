@@ -3,6 +3,8 @@
 
 On the next page, we're going to jump into the topic of recursion.
 
+在下一页，我们将进入递归的话题。
+
 <hr>
 
 *(rest of the page intentionally left blank)*
@@ -23,15 +25,25 @@ On the next page, we're going to jump into the topic of recursion.
 
 Let's talk about recursion. Before we dive in, consult the previous page for the formal definition.
 
+让我们来谈谈递归。在深入之前，参见前一页来了解其正式的定义。
+
 Weak joke, I know. :)
+
+很弱的玩笑，我知道。:)
 
 Recursion is one of those programming techniques that most developers admit can be very powerful, but also most of them don't like to use it. I'd put it in the same category as regular expressions, in that sense. Powerful, but confusing, and thus seen as *not worth the effort*.
 
+递归是那些大多数开发者都承认其非常强大，但同时也不喜欢使用的技术之一。在这种意义上，我将之与正则表达式归为同一范畴。强大，但令人糊涂，因此看起来 *不值得花那么多力气*。
+
 I'm a big fan of recursion, and you can, too! My goal in this chapter is to convince you that recursion is an important tool that you should bring with you in your FP approach to code. When used properly, recursion is powerfully declarative for complex problems.
+
+我是一个递归的狂热爱好者，而且你也可以是！我在本章的目标就是说服你，递归是一种你应当带入到你 FP 编码方式中的重要工具。当使用得当的时候，递归对于复杂的问题是一种强大的声明式编码。
 
 ## Definition
 
 Recursion is when a function calls itself, and that call does the same, and this cycle continues until a base condition is satisfied and the call loop unwinds.
+
+递归是一个函数调用它自己，而且这个调用也做同样的事情，这种循环一直持续到基准条件达成，然后所有的调用都被展开。
 
 **Warning:** If you don't ensure that a base condition is *eventually* met, recursion will run forever, and crash or lock up your program; the base condition is pretty important to get right!
 
