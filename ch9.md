@@ -1,8 +1,6 @@
 # Functional-Light JavaScript
 # Chapter 9: Recursion
 
-On the next page, we're going to jump into the topic of recursion.
-
 在下一页，我们将进入递归的话题。
 
 <hr>
@@ -23,31 +21,21 @@ On the next page, we're going to jump into the topic of recursion.
 
 <div style="page-break-after: always;"></div>
 
-Let's talk about recursion. Before we dive in, consult the previous page for the formal definition.
-
 让我们来谈谈递归。在深入之前，参见前一页来了解其正式的定义。
-
-Weak joke, I know. :)
 
 很弱的玩笑，我知道。:)
 
-Recursion is one of those programming techniques that most developers admit can be very powerful, but also most of them don't like to use it. I'd put it in the same category as regular expressions, in that sense. Powerful, but confusing, and thus seen as *not worth the effort*.
-
 递归是那些大多数开发者都承认其非常强大，但同时也不喜欢使用的技术之一。在这种意义上，我将之与正则表达式归为同一范畴。强大，但令人糊涂，因此看起来 *不值得花那么多力气*。
-
-I'm a big fan of recursion, and you can, too! My goal in this chapter is to convince you that recursion is an important tool that you should bring with you in your FP approach to code. When used properly, recursion is powerfully declarative for complex problems.
 
 我是一个递归的狂热爱好者，而且你也可以是！我在本章的目标就是说服你，递归是一种你应当带入到你 FP 编码方式中的重要工具。当使用得当的时候，递归对于复杂的问题是一种强大的声明式编码。
 
 ## Definition
 
-Recursion is when a function calls itself, and that call does the same, and this cycle continues until a base condition is satisfied and the call loop unwinds.
-
 递归是一个函数调用它自己，而且这个调用也做同样的事情，这种循环一直持续到基准条件达成，然后所有的调用都被展开。
 
-**Warning:** If you don't ensure that a base condition is *eventually* met, recursion will run forever, and crash or lock up your program; the base condition is pretty important to get right!
+**注意：** 如果你不能确保基准条件会 *最终* 达成，那么递归就会永远运行下去，并使你的程序崩溃或锁住你的程序；搞对基准条件十分重要！
 
-But... that definition is too confusing in its written form. We can do better. Consider this recursive function:
+但是…… 这个定义的书面形式太过模糊。我们可以做得更好。考虑这个递归函数：
 
 ```js
 function foo(x) {
@@ -56,23 +44,23 @@ function foo(x) {
 }
 ```
 
-Let's visualize what happens with this function when we call `foo( 16 )`:
+让我们将调用 `foo(16)` 时这个函数发生的事情图形化一下：
 
 <p align="center">
 	<img src="fig13.png" width="850">
 </p>
 
-In step 2, `x / 2` produces `8`, and that's passed in as the argument so a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
+在第二步中，`x / 2` 产生 `8`，它作为实际参数传入递归的 `foo(..)` 调用。在第三步中，同样的事情，`x / 2` 产生 `4`，而它又作为实际参数被传入另一个 `foo(..)` 调动。但愿这部分看起来相当直截了当。
 
-But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
+但一些人可能会被第四步发生的事情绊倒。一旦我们满足了 `x`（值 `4`）`< 5`的基准条件，我们就不再进行递归调用了，而仅仅（实际上）`return 4`。特别是这幅图中返回 `4` 的虚线简化了那里发生的事情，所以让我们深入这最后一步并将它图形化为这三个子步骤：
 
 <p align="center">
 	<img src="fig14.png" width="850">
 </p>
 
-Once the base condition is satisified, the returned value cascades back through all of the calls (and thus `return`s) in the call stack, eventually `return`ing the final result out.
+一旦基准条件被满足，这个返回值就逐一回溯调用栈中所有的调用（因此这些调用会 `return`），最终 `return` 出最后的结果。
 
-Another recursion example:
+另一个递归的例子：
 
 ```js
 function isPrime(num,divisor = 2){
@@ -87,9 +75,9 @@ function isPrime(num,divisor = 2){
 }
 ```
 
-This prime checking basically works by trying each integer from `2` up to the square root of the `num` being checked, to see if any of them divide evenly (`%` mod returning `0`) into the number. If any do, it's not a prime. Otherwise, it must be prime. The `divisor + 1` uses the recursion to iterate through each possible `divisor` value.
+素数检查的基本工作方式是，尝试从整数 `2` 开始一直到被检查的 `num` 的平方根，看它们中之一是否可以除尽（`%` 模运算返回 `0`）这个数字。如果有，它就不是素数。否则，它一定是一个素数。`divisor + 1` 使用递归来迭代每一个可能的 `divisor` 值。
 
-One of the most famous examples of recursion is calculating a Fibonacci number, where the sequence is defined as:
+递归的最著名的例子之一就是计算斐波那契数列，这个数列被定义为：
 
 ```
 fib( 0 ): 0
@@ -98,9 +86,9 @@ fib( n ):
 	fib( n - 2 ) + fib( n - 1 )
 ```
 
-**Note:** The first several numbers of this sequence are: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... Each number is the addition of the previous two numbers in the sequence.
+**注意：** 这个数列的前几个数字是：0、1、1、2、3、5、8、13、21、34、…… 每一个数字都是数列中前两个数字的和。
 
-The definition of fibonacci expressed directly in code:
+用代码直接表达斐波那契数列的定义：
 
 ```js
 function fib(n) {
@@ -109,17 +97,17 @@ function fib(n) {
 }
 ```
 
-`fib(..)` calls itself recursively twice, which is typically referred to as binary recursion. We'll talk more about binary recursion later.
+`fib(..)` 递归地调用自己两次，这常被称为二元递归。我们稍后将会更多地谈到二元递归。
 
-We'll use `fib(..)` variously throughout this chapter to illustrate ideas around recursion, but one downside to this particular form is that there's an awful lot of duplicated work. `fib(n-1)` and `fib(n-2)` don't share any of their work with each other, but overlap with each other almost entirely, over the entire integer space down to `0`.
+我们将在本章的各个地方使用 `fib(..)` 来展示关于递归的思想，但是这种特殊形式的一个缺点是存在很多重复工作。`fib(n-1)` 和 `fib(n-2)` 并不互相共享它们的任何工作成果，而是在整个整数递减到 `0` 的过程中，几乎完全互相重叠。
 
-We briefly touched on memoization in the "Performance Effects" section of Chapter 5. Here, memoization would allow the `fib(..)` of any given number to be computed only once, instead of being recomputed many times. We won't go further into that topic here, but that performance caveat is important to keep in mind with any algorithm, recursive or not.
+我们在第五章的“性能影响”一节中简要地谈到了墨记。这里，墨记将允许任何给定数字的 `fib(..)` 仅被计算一次，而不是重复计算许多次。我们不会在这个话题上走得太远，但意识到性能上的问题对任何算法都很重要，不管是不是递归。
 
 ### Mutual Recursion
 
-When a function calls itself, specifically, this is referred to as direct recursion. That's what we saw in the previous section with `foo(..)`, `isPrime(..)`, and `fib(..)`. Two or more functions can call each other in a recursive cycle, and this is referred to as mutual recursion.
+当一个函数调用它自己时，被特别地称为直接递归。这是我们在前一节的 `foo(..)`、`isPrime(..)`、和 `fib(..)` 中看到的。两个或更多函数可以在一个递归周期中相互调动，这称为相互递归。
 
-These two functions are mutually recursive:
+这两个函数就是相互递归的：
 
 ```js
 function isOdd(v) {
@@ -133,9 +121,9 @@ function isEven(v) {
 }
 ```
 
-Yes, this is a silly way to calculate if a number is odd or even. But it illustrates the idea that certain algorithms can be defined in terms of mutual recursion.
+是的，这是一个计算数字奇偶性的笨办法。但它展示了特定的算法可以根据互相递归进行定义的想法。
 
-Recall the binary recursive `fib(..)` from the previous section; we could instead have expressed it with mutual recursion:
+回忆一下前一节中的二元递归 `fib(..)`；我们可以使用相互递归来表达它：
 
 ```js
 function fib_(n) {
@@ -149,17 +137,17 @@ function fib(n) {
 }
 ```
 
-**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in "Fibonacci Numbers Using Mutual Recursion" (https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
+**注意：** 这种相互递归的 `fib(..)` 实现摘自“使用相互递归的斐波那契数列”中的研究(https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion)。
 
-While these mutual recursion examples shown are rather contrived, there are more complex use cases where mutual recursion can be very helpful.
+虽然这里展示的相互递归的例子非常造作，但是确实存在相互递归可能非常有用的更复杂的用例。
 
 ### Why Recursion?
 
-Now that we've defined and illustrated recursion, we should examine why recursion is useful.
+现在我们已经定义并展示了递归，我们应当检视一下为什么递归如此有用。
 
-The most commonly cited reason that recursion fits the spirit of FP is because it trades (much of) the explicit tracking of state with implicit state on the call stack. Typically, recursion is most useful when the problem requires conditional branching and back-tracking, and managing that kind of state in a purely iterative environment can be quite tricky; at a minimum, the code is highly imperative and harder to read and verify. But tracking each level of branching as its own scope on the call stack often significantly cleans up the readability of the code.
+最常为人所引用的理由是递归符合 FP 的精神，因为它用调用栈上的隐含状态取代了（绝大多数）明确的状态追踪。递归通常在这样的情况下最有用：当一个问题需要条件分支与回溯，而在一个纯粹的迭代环境中管理这种状态可能十分复杂；至少，这样的代码高度指令化而且很难阅读与验证。但在调用栈上每一层分支自己的作用域中追踪它们，通常会显著地提高代码可读性。
 
-Simple iterative algorithms can trivially be expressed as recursion:
+简单的迭代算法可以很容易地表达为递归：
 
 ```js
 function sum(total,...nums) {
@@ -178,15 +166,19 @@ function sum(num1,...nums) {
 }
 ```
 
-It's not just that the `for`-loop is eliminated in favor of the call stack, but that the incremental partial sums (the intermittent state of `total`) are tracked implicitly across the `return`s of the call stack instead of reassigning `total` each iteration. FPers will often prefer to avoid reassignment of local variables where it's possible to avoid.
+它不仅是调用栈取代并消灭了 `for` 循环，而且递增的部分结果一直在调用栈的 `return` 中隐含地追踪，而不是在每次迭代中给 `total` 重新赋值。FP 程序员经常喜欢在可能的地方避免对本地变量进行重新赋值。
 
-In a basic algorithm like this kind of summation, this difference is minor and nuanced. But the more sophisticated your algorithm, the more you will likely see the payoff of recursion instead of imperative state tracking.
+在像这种求和的基本算法中，其区别是微小和微妙的。但是你的算法越精巧，你就越有可能看到递归取代指令式状态追踪的回报。
 
 ## Declarative Recursion
 
 Mathematicians use the **Σ** symbol as a placeholder to represent the summation of a list of numbers. The primary reason they do that is because it's more cumbersome (and less readable!) if they're working with more complex formulas and they have to write out the summation manually, like `1 + 3 + 5 + 7 + 9 + ..`. Using the notation is declarative math!
 
+数学家们使用 **Σ** 符号作为占位符来表示一个数字列表的求和。他们这么做的主要原因是因为，如果他们在研究更复杂的公式时不得不手动写出像 `1 + 3 + 5 + 7 + 9 + ..` 这样的求和的话，就太麻烦了（也不易读懂！）。使用符号就是声明式的数学！
+
 Recursion is declarative for algorithms in the same sense that **Σ** is declarative for mathematics. Recursion expresses that a problem solution exists, but doesn't necessarily require the reader of the code to understand how that solution works. Let's consider two approaches to finding the highest even number passed as an argument:
+
+递归对算法的声明性，与 **Σ** 对数学的声明性的含义是相同的。递归表达的是一个问题的解决方案存在，但不必要求代码的读者理解这种解决方案是如何工作的。让我们考虑两种找出参数中最大偶数的方式：
 
 ```js
 function maxEven(...nums) {
@@ -206,7 +198,11 @@ function maxEven(...nums) {
 
 This implementation is not particulary intractable, but it's also not readily apparent what its nuances are. How obvious is it that `maxEven()`, `maxEven(1)`, and `maxEven(1,13)` all return `undefined`? Is it quickly clear why the final `if` statement is necessary?
 
+这个实现不是特别的难对付，但看懂它的微妙之处也不是很容易。`maxEven()`、`maxEven(1)`、和 `maxEven(1,13)` 都返回 `undefined` 这件事有多明显？最后一个 `if` 语句为什么必要这件事很快就能搞明白吗？
+
 Let's instead consider a recursive approach, to compare. We could notate the recursion this way:
+
+为了比较，让我们来考虑一种递归的方式。我们可以将递归这样符号化：
 
 ```
 maxEven( nums ):
@@ -215,12 +211,16 @@ maxEven( nums ):
 
 In other words, we can define the max-even of a list of numbers as the max-even of the first number compared to the max-even of the rest of the numbers. For example:
 
+换言之，我们可以将一个数列中的最大偶数定义为，第一个数字与其余数字中的最大偶数相比之下的最大偶数。例如：
+
 ```
 maxEven( 1, 10, 3, 2 ):
 	maxEven( 1, maxEven( 10, maxEven( 3, maxEven( 2 ) ) )
 ```
 
 To implement this recursive definition in JS, one approach is:
+
+要在 JS 中实现这种递归定义，一个方式是：
 
 ```js
 function maxEven(num1,...restNums) {
@@ -236,9 +236,15 @@ function maxEven(num1,...restNums) {
 
 So what advantages does this approach have?
 
+那么这种方式有什么好处？
+
 First, the signature is a little different than before. I intentionally called out `num1` as the first argument name, collecting the rest of the arguments into `restNums`. But why? We could just have collected them all into a single `nums` array and then referred to `nums[0]`.
 
+首先，它的签名与之前稍有不同。我有意地将第一个参数名称叫做 `num1`，将剩余的参数收集到 `restNums` 中。但为什么？我们本可以将它们全部收集到一个 `nums` 数组中，然后引用 `nums[0]`。
+
 This function signature is an intentional hint at the recursive definition. It reads like this:
+
+这个函数签名是对递归定义的一种有意提示。它读起来就像这样：
 
 ```
 maxEven( num1, ...restNums ):
@@ -246,6 +252,8 @@ maxEven( num1, ...restNums ):
 ```
 
 Do you see the symmetry between the signature and the recursive definition?
+
+你看到签名与递归定义之间的对称性了吗？
 
 When we can make the recursive definition more apparent even in the function signature, we improve the declarativeness of the function. And if we can then mirror the recursive definition from the signature to the function body, it gets even better.
 
