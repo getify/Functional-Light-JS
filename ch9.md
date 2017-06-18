@@ -402,21 +402,13 @@ return x ? foo( .. ) : bar( .. );
 
 ## Rearranging Recursion
 
-If you want to use recursion but your problem set could grow enough eventually to exceed the stack limit of the JS engine, you're going to need to rearrange your recursive calls to take advantage of PTC (or avoid nested calls entirely). There are several refactoring strategies that can help, but there are of course tradeoffs to be aware of.
-
 如果你想使用递归，但你的问题最终会增长到超过 JS 引擎的调用栈极限，那么你就需要重新安排你的递归调用来利用 PTC 的优势（或者完全避免嵌套调用）。有几种重构策略可以帮上忙，但自然有一些代价需要注意。
-
-As a word of caution, always keep in mind that code readability is our overall most important goal. If recursion along with some combination of these following strategies results in harder to read/understand code, **don't use recursion**; find another more readable approach.
 
 一句告诫，要时刻记住代码可读性是我们整体上最重要的目标。如果递归与这些后述的策略组合的结果是难以阅读/理解的代码，**那么就不要使用递归**；去寻找另一种可读性更高的方式。
 
 ### Replacing The Stack
 
-The main problem with recursion is its memory usage, keeping around the stack frames to track the state of a function call while it dispatches to the next recursive call iteration. If we can figure out how to rearrange our usage of recursion so that the stack frame doesn't need to be kept, then we can express recursion with PTC and take advantage of the JS engine's optimized handling of tail calls.
-
 递归的主要问题是内存用量，在一个函数调用发起下一个递归调用迭代时保留栈帧以追踪它的状态。如果我们能够搞清如何重新安排递归的使用，以至于栈帧不再需要被保留，那么我们就可以使用 PTC 表达递归并利用 JS 引擎对尾部调用的优化处理。
-
-Let's recall the summation example from earlier:
 
 让我们回忆一下先前的求和的例子：
 
@@ -427,15 +419,9 @@ function sum(num1,...nums) {
 }
 ```
 
-This isn't in PTC form because after the recursive call to `sum(...nums)` is finished, the `total` variable is added to that result. So, the stack frame has to be preserved to keep track of the `total` partial result while the rest of the recursion proceeds.
-
 这不是 PTC 形式，因为在对 `sum(...nums)` 的递归调用完成之后，变量 `total` 被加到了它的结果上。所以，栈帧必须被保留，以便在其余的递归处理运行时追踪这个 `total` 部分结果。
 
-The key recognition point for this refactoring strategy is that we could remove our dependence on the stack by doing the addition *now* instead of *after*, and then forward-passing that partial result as an argument to the recursive call. In other words, instead of keeping `total` in the current function's stack frame, push it into the stack frame of the next recursive call; that frees up the current stack frame to be removed/reused.
-
 这种重构策略关键的特征是，我们可以通过 *现在* 就做加法而非 *以后* 再做，来移除我们队栈的依赖，然后将这个部分结果作为参数向下传递给递归调用。换句话说，与其将 `total` 保留在当前函数的栈帧中，不如将它推到下一个递归调用的栈帧中；这释放了当前的栈帧，使得它可以被移除/重用。
-
-To start, we could alter the signature our `sum(..)` function to have a new first parameter as the partial result:
 
 为了开始，我们可以改变 `sum(..)` 函数的签名，使它拥有一个新的作为部分结果的第一参数：
 
@@ -444,8 +430,6 @@ function sum(result,num1,...nums) {
 	// ..
 }
 ```
-
-Now, we should pre-calculate the addition of `result` and `num1`, and pass that along:
 
 现在，我们应当预计算 `result` 和 `num1` 的加法，并将它传递出去：
 
@@ -459,11 +443,7 @@ function sum(result,num1,...nums) {
 }
 ```
 
-Now our `sum(..)` is in PTC form! Yay!
-
 现在我们的 `sum(..)` 是 PTC 形式的了！ 耶！
-
-But the downside is we now have altered the signature of the function that makes using it stranger. The caller essentially has to pass `0` as the first argument ahead of the rest of the numbers they want to sum.
 
 但缺点是现在我们改变了函数的签名让它使用起来更奇怪。实质上调用方不得不将 `0` 在其余他希望求和的数字之前作为第一个参数传递。
 
@@ -471,13 +451,11 @@ But the downside is we now have altered the signature of the function that makes
 sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
 ```
 
-That's unfortunate.
-
 这很不幸。
 
 Typically, people will solve this by naming their awkward-signature recursive function differently, then defining an interface function that hides the awkwardness:
 
-通常人们会这样解决这个问题：
+通常人们会这样解决这个问题：将他们带有尴尬签名的递归函数命名为不同的东西，然后定义一个接口函数来隐藏这种尴尬：
 
 ```js
 "use strict";
@@ -497,6 +475,8 @@ sum( 3, 1, 17, 94, 8 );								// 123
 
 That's better. Still unfortunate that we've now created multiple functions instead of just one. Sometimes you'll see developers "hide" the recursive function as an inner function, like this:
 
+这好多了。但依然不幸的是我们现在创建了多个函数而不是一个。有时候你会看到一些开发者将递归函数作为一个内部函数“藏”起来，就像这样：
+
 ```js
 "use strict";
 
@@ -514,6 +494,8 @@ sum( 3, 1, 17, 94, 8 );								// 123
 ```
 
 The downside here is that we'll recreate that inner `sumRec(..)` function each time the outer `sum(..)` is called. So, we can go back to them being side-by-side functions, but hide them both inside an IIFE, and expose just the one we want to:
+
+这里的缺陷是我们将在每一次 `sum(..)` 被调用时重新创建那个内部的 `sumRec(..)` 函数。所以，我们可以回到它们是并排存在的函数时的状态，但把它们藏在一个 IIFE 中，让后仅仅暴露我们想要的哪一个：
 
 ```js
 "use strict";
@@ -537,9 +519,15 @@ sum( 3, 1, 17, 94, 8 );								// 123
 
 OK, we've got PTC and we've got a nice clean signature for our `sum(..)` that doesn't require the caller to know about our implementation details. Yay!
 
+好的，我们得到了 PTC 而且我们得到了不要求调用方知道我们实现细节的漂亮干净的签名。耶！
+
 But... wow, our simple recursive function has a lot more noise now. The readability has definitely been reduced. That's unfortunate to say the least. Sometimes, that's just the best we can do.
 
+但是…… 哇哦，我们简单的递归函数现在有了多了不少噪音。可读性绝对是降低了。至少这是很不幸的。有时候，这是我们能做到的最佳状态。
+
 Luckily, in some other cases, like the present one, there's a better way. Let's reset back to this version:
+
+幸运的是，在一些其他情况下，比如当前这种，会有更好的方法。让我们重置为这个版本：
 
 ```js
 "use strict";
@@ -555,6 +543,8 @@ sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
 
 What you might observe is that `result` is a number just like `num1`, which means that we can always treat the first number in our list as our running total; that includes even the first call. All we need is to rename those params to make this clear:
 
+你可能观察到了，`result` 就像 `num1` 一样是一个数字，这意味着我们总是可以将数列中的第一个数字视为我们运行中的和；这甚至包括第一个调用。我们所需的一切就是重命名这些参数是这一点更清晰：
+
 ```js
 "use strict";
 
@@ -569,18 +559,32 @@ sum( 3, 1, 17, 94, 8 );								// 123
 
 Awesome. That's much better, huh!? I think this pattern achieves a good balance between declarative/reasonable and performant.
 
+赞。这好多了，不是吗！？我认为这种模式在声明性/合理性与性能之间取得一个好的平衡。
+
 Let's try refactoring with PTC once more, revisiting our earlier `maxEven(..)` (currently not PTC). We'll observe that similar to keeping the sum as the first argument, we can narrow the list of numbers one at a time, keeping the first argument as the highest even we've come across thus far.
+
+让我们再一次尝试 PTC 重构，回忆我们早先的 `maxEven(..)`（目前还不是 PTC）。我们将看到它也很相似地将总和保持为第一个参数，我们可以每次缩减一个列表中的数字，让第一个参数保持为我们目前为止最大的偶数。
 
 For clarity, the algorithm strategy (similar to what we discussed earlier) we might use:
 
+为了清晰，我们可能用到的算法策略是（与我们之前讨论过的相似）：
+
 1. Start by comparing the first two numbers, `num1` and `num2`.
+1. 一开始先比较头两个数字，`num1` 和 `num2`。
 2. Is `num1` even, and is `num1` greater than `num2`? If so, keep `num1`.
+2. `num1` 是偶数，而且 `num1` 大于 `num2` 吗？如果是，保持 `num1`。
 3. If `num2` is even, keep it (store in `num1`).
+3. 如果 `num2` 是偶数，保持它（存储在 `num1` 中）。
 4. Otherwise, fall back to `undefined` (store in `num1`).
+4. 否则。退回到 `undefined`（存储在 `num1` 中）。
 5. If there are more `nums` to consider, recursively compare them to `num1`.
+5. 如果有更多的 `nums` 要考虑，将它们递归地与 `num1` 进行比较。
 6. Finally, just return whatever value is left in `num1`.
+6. 最后，返回留在 `num1` 中的任何值。
 
 Our code can follow these steps almost exactly:
+
+我们的代码几乎可以原样跟随这些步骤：
 
 ```js
 "use strict";
@@ -598,6 +602,8 @@ function maxEven(num1,num2,...nums) {
 ```
 
 **Note:** The first `maxEven(..)` call is not in PTC position, but since it only passes in `num2`, it only recurses just that one level then returns right back out; this is only a trick to avoid repeating the `%` logic. As such, this call won't increase the growth of the recursive stack, any more than if that call was to an entirely different function. The second `maxEven(..)` call is the legitimate recursive call, and it is in fact in PTC position, meaning our stack won't grow as the recursion proceeds.
+
+**注意：** 第一个 `maxEven(..)` 调用不在 PTC 位置上，但因为它仅传入了 `num2`，所以它仅递归一层然后立即返回出来；这只是一个避免重复 `%` 逻辑的技巧。因此，这个调用不会增长递归调用栈，
 
 It should be repeated that this example is only to illustrate the approach to moving recursion to the PTC form to optimize the stack (memory) usage. The more direct way to express a max-even algorithm might indeed be a filtering of the `nums` list for evens first, followed then by a max bubbling or even a sort.
 
