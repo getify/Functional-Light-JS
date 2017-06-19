@@ -453,8 +453,6 @@ sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
 
 这很不幸。
 
-Typically, people will solve this by naming their awkward-signature recursive function differently, then defining an interface function that hides the awkwardness:
-
 通常人们会这样解决这个问题：将他们带有尴尬签名的递归函数命名为不同的东西，然后定义一个接口函数来隐藏这种尴尬：
 
 ```js
@@ -473,8 +471,6 @@ function sum(...nums) {
 sum( 3, 1, 17, 94, 8 );								// 123
 ```
 
-That's better. Still unfortunate that we've now created multiple functions instead of just one. Sometimes you'll see developers "hide" the recursive function as an inner function, like this:
-
 这好多了。但依然不幸的是我们现在创建了多个函数而不是一个。有时候你会看到一些开发者将递归函数作为一个内部函数“藏”起来，就像这样：
 
 ```js
@@ -492,8 +488,6 @@ function sum(...nums) {
 
 sum( 3, 1, 17, 94, 8 );								// 123
 ```
-
-The downside here is that we'll recreate that inner `sumRec(..)` function each time the outer `sum(..)` is called. So, we can go back to them being side-by-side functions, but hide them both inside an IIFE, and expose just the one we want to:
 
 这里的缺陷是我们将在每一次 `sum(..)` 被调用时重新创建那个内部的 `sumRec(..)` 函数。所以，我们可以回到它们是并排存在的函数时的状态，但把它们藏在一个 IIFE 中，让后仅仅暴露我们想要的哪一个：
 
@@ -517,15 +511,9 @@ var sum = (function IIFE(){
 sum( 3, 1, 17, 94, 8 );								// 123
 ```
 
-OK, we've got PTC and we've got a nice clean signature for our `sum(..)` that doesn't require the caller to know about our implementation details. Yay!
-
 好的，我们得到了 PTC 而且我们得到了不要求调用方知道我们实现细节的漂亮干净的签名。耶！
 
-But... wow, our simple recursive function has a lot more noise now. The readability has definitely been reduced. That's unfortunate to say the least. Sometimes, that's just the best we can do.
-
 但是…… 哇哦，我们简单的递归函数现在有了多了不少噪音。可读性绝对是降低了。至少这是很不幸的。有时候，这是我们能做到的最佳状态。
-
-Luckily, in some other cases, like the present one, there's a better way. Let's reset back to this version:
 
 幸运的是，在一些其他情况下，比如当前这种，会有更好的方法。让我们重置为这个版本：
 
@@ -541,8 +529,6 @@ function sum(result,num1,...nums) {
 sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
 ```
 
-What you might observe is that `result` is a number just like `num1`, which means that we can always treat the first number in our list as our running total; that includes even the first call. All we need is to rename those params to make this clear:
-
 你可能观察到了，`result` 就像 `num1` 一样是一个数字，这意味着我们总是可以将数列中的第一个数字视为我们运行中的和；这甚至包括第一个调用。我们所需的一切就是重命名这些参数是这一点更清晰：
 
 ```js
@@ -557,32 +543,18 @@ function sum(num1,num2,...nums) {
 sum( 3, 1, 17, 94, 8 );								// 123
 ```
 
-Awesome. That's much better, huh!? I think this pattern achieves a good balance between declarative/reasonable and performant.
-
 赞。这好多了，不是吗！？我认为这种模式在声明性/合理性与性能之间取得一个好的平衡。
-
-Let's try refactoring with PTC once more, revisiting our earlier `maxEven(..)` (currently not PTC). We'll observe that similar to keeping the sum as the first argument, we can narrow the list of numbers one at a time, keeping the first argument as the highest even we've come across thus far.
 
 让我们再一次尝试 PTC 重构，回忆我们早先的 `maxEven(..)`（目前还不是 PTC）。我们将看到它也很相似地将总和保持为第一个参数，我们可以每次缩减一个列表中的数字，让第一个参数保持为我们目前为止最大的偶数。
 
-For clarity, the algorithm strategy (similar to what we discussed earlier) we might use:
-
 为了清晰，我们可能用到的算法策略是（与我们之前讨论过的相似）：
 
-1. Start by comparing the first two numbers, `num1` and `num2`.
 1. 一开始先比较头两个数字，`num1` 和 `num2`。
-2. Is `num1` even, and is `num1` greater than `num2`? If so, keep `num1`.
 2. `num1` 是偶数，而且 `num1` 大于 `num2` 吗？如果是，保持 `num1`。
-3. If `num2` is even, keep it (store in `num1`).
 3. 如果 `num2` 是偶数，保持它（存储在 `num1` 中）。
-4. Otherwise, fall back to `undefined` (store in `num1`).
 4. 否则。退回到 `undefined`（存储在 `num1` 中）。
-5. If there are more `nums` to consider, recursively compare them to `num1`.
 5. 如果有更多的 `nums` 要考虑，将它们递归地与 `num1` 进行比较。
-6. Finally, just return whatever value is left in `num1`.
 6. 最后，返回留在 `num1` 中的任何值。
-
-Our code can follow these steps almost exactly:
 
 我们的代码几乎可以原样跟随这些步骤：
 
@@ -601,23 +573,21 @@ function maxEven(num1,num2,...nums) {
 }
 ```
 
-**Note:** The first `maxEven(..)` call is not in PTC position, but since it only passes in `num2`, it only recurses just that one level then returns right back out; this is only a trick to avoid repeating the `%` logic. As such, this call won't increase the growth of the recursive stack, any more than if that call was to an entirely different function. The second `maxEven(..)` call is the legitimate recursive call, and it is in fact in PTC position, meaning our stack won't grow as the recursion proceeds.
+**注意：** 第一个 `maxEven(..)` 调用不在 PTC 位置上，但因为它仅传入了 `num2`，所以它仅递归一层然后立即返回出来；这只是一个避免重复 `%` 逻辑的技巧。因此，这个调用不会增长递归栈，至少不会比这个调用是一个完全不同的函数的情况增长的多。第二个 `maxEven(..)` 调用是一个合法的递归调用，而且它确实位于 PTC 的位置上，这意味着我们的调用栈不会随着递归处理增长。
 
-**注意：** 第一个 `maxEven(..)` 调用不在 PTC 位置上，但因为它仅传入了 `num2`，所以它仅递归一层然后立即返回出来；这只是一个避免重复 `%` 逻辑的技巧。因此，这个调用不会增长递归调用栈，
+应当再次强调的是，这个例子只是为了展示将递归转换为 PTC 形式来优化调用栈（内存）的使用的方式。表达一个最大偶数算法的更直接的方法可能确实是首先将 `nums` 数列过滤为仅含偶数，紧接着一个最大值冒泡或者一个排序。
 
-It should be repeated that this example is only to illustrate the approach to moving recursion to the PTC form to optimize the stack (memory) usage. The more direct way to express a max-even algorithm might indeed be a filtering of the `nums` list for evens first, followed then by a max bubbling or even a sort.
-
-Refactoring recursion into PTC is admittedly a little intrusive on the simple declarative form, but it still gets the job done reasonably. Unfortunately, some kinds of recursion won't work well even with an interface function, so we'll need different strategies.
+不可否认，将递归重构为 PTC 对于简单的声明式形式有点儿侵入性，但它依然可以合理地完成任务。不幸的是，有些种类的递归即便使用接口函数也不能很好地工作，所以我们需要不同的策略。
 
 ### Continuation Passing Style (CPS)
 
-In JavaScript, the word *continuation* is often used to mean a function callback that specifies the next step(s) to execute after a certain function finishes its work. Organizing code so that each function receives another function to execute at its end, is referred to as Continuation Passing Style (CPS).
+在 JavaScript 中，*延续（continuation）* 一词经常用于表示一个函数调用，它指定了一个特定函数完成其工作之后要执行的后续步骤。每个函数接收另一个函数在它的末尾执行，这种组织代码的方式称为延续传递风格（Continuation Passing Style —— CPS）。
 
-Some forms of recursion cannot practically be refactored to pure PTC, especially multiple recursion. Recall the `fib(..)` function earlier, and even the mutual recursion form we derived. In both cases, there are multiple recursive calls, which effectively defeats PTC memory optimizations.
+有些形式的递归不能实际上被重构为纯粹的 PTC，特别是多重递归。回忆一下早先的 `fib(..)` 函数，以及我们衍生出来的相互递归形式。在这两种情况存在多重递归调用，这实质上抵消了 PTC 内存优化。
 
-However, you can perform the first recursive call, and wrap the subsequent recursive calls in a continuation function to pass into that first call. Even though this would mean ultimately many more functions will need to be executed in the stack, as long all of them, continuations included, are in PTC form, stack memory usage will not grow unbounded.
+然而，你可以进行第一个递归调用，而将后续的递归调用包装在一个延续函数中传递给第一个调用。虽然这意味着最终在栈中有更多的函数需要被执行，但只要它们，包括延续，是 PTC 形式的，栈的内存用量就不会无界限地增长。
 
-We could do this for `fib(..)`:
+我们可以这样处理 `fib(..)`
 
 ```js
 "use strict";
@@ -634,27 +604,27 @@ function fib(n,cont = identity) {
 }
 ```
 
-Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our `identity(..)` utility from Chapter 3; remember, it simply returns whatever is passed to it.
+仔细注意这里发生了什么。首先，我们将延续函数 `cont(..)` 的默认值设置为我们第三章中的 `identity(..)` 工具；记住，它简单地返回任何传递给它的东西。
 
-Morever, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
+另外，这里混入的不是一个而是两个延续函数。第一个接收参数 `n2`，它最终接收到值 `fib(n-2)` 的计算结果。下一个内部延续接收参数 `n1`，它最终是 `fib(n-1)` 的值。一旦知道 `n2` 和 `n1` 的值，它们就可以相加在一起（`n2 + n1`），而且这个值被传递给下一个 `cont(..)` 延续步骤。
 
-Perhaps this will help mentally sort out what's going on: just like in the previous discussion when we passed partial results along instead of returning them back after the recursive stack, we're doing the same here, but each step gets wrapped in a continuation, which defers its computation. That trick allows us to perform multiple steps where each is in PTC form.
+也许这有助于在脑海中理清发生的事情：就像在前面的讨论中，我们传递结果的一部分而非在递归栈堆积起来之后将其返回，我们在这里做的是相同的事情，但每一步都被包装在一个延续中，这推迟了它的计算。这种技巧允许我们运行多个步骤，而每个步骤都是 PTC 形式。
 
-In static languages, CPS is often an opportunity for tail calls the compiler can automatically identify and rearrange recursive code to take advantage of. Unfortunately, that doesn't really apply to the nature of JS.
+在静态语言中，CPS 经常是尾部调用的好机会，编译器可以自动识别并重新安排递归代码来利用它。不幸的是，这对 JS 的天性来说不成立。
 
-In JavaScript, you'd likely need to write the CPS form yourself. It's clunkier, for sure; the declarative notation-like form has certainly been obscured. But overall, this form is still more declarative than the `for`-loop imperative implementation.
+在 JavaScript 中，你很可能需要自己编写 CPS 形式。没错，这更笨重；标记一般的声明式形式肯定被模糊了。但总体上，这种形式还是要比 `for` 循环的指令式实现更具声明性。
 
-**Warning:** One major caveat that should be noted is that in CPS, creating the extra inner continuation functions still consumes memory, but of a different sort. Instead of piling up stack frames, the closures just consume free memory (typically, from the heap). Engines don't seem to apply the `RangeError` limits in these cases, but that doesn't mean your memory usage is fixed in scale.
+**警告：** 在 CPS 中应当注意的一个主要问题是，创建额外的内部延续函数依然会消耗内存，但种类不同。与堆砌栈帧不同的是，闭包只会消耗自由内存（通常是堆）。引擎看起来不会在这样的情况下实施 `RangeError` 的限制，但这不意味着你的内存用量是按比例固定的。
 
 ### Trampolines
 
-Where CPS creates continuations and passes them along, another technique for alleviating memory pressure is called trampolines. In this style of code, CPS-like continuations are created, but instead of passed in, they are shallowly returned.
+CPS 创建延续并传递它们，另一种减轻内存压力的技术称为蹦床（trampolines）。在这种风格的代码中，会创建 CPS 形式的延续，但它们不是被传入，而是被浅层地返回。
 
-Instead of functions calling functions, the stack never goes beyond depth of one, because each function just returns the next function that should be called. A loop simply keeps running each returned function until there are no more functions to run.
+与函数调用函数不同，这里的栈深度绝不会超过 1，因为每个函数都只是返回下一个应当被调用的函数。一个循环持续不断地运行每一个被返回的函数，直到没有函数可以运行。
 
-One advantage with trampolines is you aren't limited to environments that support PTC; another is that each function call is regular, not PTC optimized, so it may run quicker.
+蹦床的一个优点是你不被局限在支持 PTC 的环境下；另一个优点是每个函数调用都是普通的，不是 PTC 优化过的，所以它可能运行的快一些。
 
-Let's sketch out a `trampoline(..)` utility:
+让我们画出 `trampoline(..)` 工具的草图：
 
 ```js
 function trampoline(fn) {
@@ -670,9 +640,9 @@ function trampoline(fn) {
 }
 ```
 
-As long as a function is returned, the loop keeps going, executing that function and capturing its return, then checking its type. Once a non-function comes back, the trampoline assumes the function calling is complete, and just gives back the value.
+只要有一个函数被返回，循环就持续运行，执行那个函数并捕获它的返回值，然后检查它的值。一旦一个非函数的值被返回，蹦床就会认为函数调用完成了，然后给出结果值。
 
-Because each continuation needs to return another continuation, we likely we'll need to use the earlier trick of forward-passing the partial result as an argument. Here's how we could use this utility with our earlier example of summation of a list of numbers:
+因为每个延续都需要返回另一个延续，我们很可能需要使用一个之前的技巧：将结果的一部分作为参数向前传递。这是我们如何在早先数列求和的例子中使用这个工具：
 
 ```js
 var sum = trampoline(
@@ -691,9 +661,9 @@ for (let i=0; i<20000; i++) {
 sum( ...xs );					// 199990000
 ```
 
-The downside is that a trampoline requires you to wrap your recursive function in the trampoline driving function; moreover, just like CPS, closures are created for each continuation. However, unlike CPS, each continuation function returned runs and finishes right away, so the engine won't have to accumulate a growing amount of closure memory while the call stack depth of the problem is exhausted.
+蹦床的缺点是它要求你将你的递归函数包装在蹦床的驱动函数中；另外，就像 CPS，每个延续都会创建闭包。然而，与 CPS 不同的是，每一个延续函数都立即被执行并完成，所以虽然要解决的问题的栈深度耗尽了，引擎也不必累积增长的闭包内存。
 
-Beyond execution and memory performance, the advantage of trampolines over CPS is that they're less intrusive on the declarative recursion form, in that you don't have to change the function signature to receive a continuation function argument. Trampolines are not ideal, but they can be effective in your balancing act between imperative looping code and declarative recursion.
+除了执行与内存性能，蹦床超过 CPS 的优势是对声明式递归形式侵入性更小，这样你就不必改变函数签名来接收一个延续函数参数。蹦床不是理想的，但它们可能很有效地帮你在指令式循坏代码和声明式递归之间找到平衡。
 
 ## Summary
 
