@@ -667,12 +667,12 @@ sum( ...xs );					// 199990000
 
 ## Summary
 
-Recursion is when a function recursively calls itself. Heh. A recursive definition for recursion. Get it!?
+递归就是一个函数递归地调用它自己。哼。一个递归的递归定义。明白了！？
 
-Direct recursion is a function that makes at least one call to itself, and it keeps dispatching to itself until it satisifies a base condition. Multiple recursion (like binary recursion) is when a function calls itself multiple times. Mutual recursion is when a two or more functions recursively loop by *mutually* calling each other.
+直接递归是一个函数至少发起对自己的调用一次，而这次调用持续地分发给自己直到满足基准条件。多重递归（比如二元递归）是一个函数调用它自己多次。相互递归是当两个或更多函数通过 *互相地* 调用对方递归地循环。
 
-The upside of recursion is that it's more declarative and thus typically more readable. The downside is usually performance, but more memory constraints even than execution speed.
+递归的好处是它更具声明性而因此通常可读性更强。缺点通常是性能，而在内存上受到的制约要比执行速度更甚。
 
-Tail calls alleviate the memory pressure by reusing/discarding stack frames. JavaScript requires strict mode and proper tail calls (PTC) to take advantage of this "optimization". There are several techniques we can mix-n-match to refactor a non-PTC recursive function to PTC form, or at least avoid the memory constraints by flattening the stack.
+尾部调用通过重用/丢弃栈帧缓和了内存的压力。JavaScript 要求 strict 模式和正确尾部调用（PTC）来利用这种 “优化”。我们可以混合并调整使用几种技术，通过将调用栈扁平化将一个非 PTC 递归函数重构为 PTC 形式，或者至少避免内存的制约。
 
-Remember: recursion should be used to make code more readable. If you misuse or abuse recursion, the readability will end up worse than the imperative form. Don't do that!
+记住：递归应当用于制造可读性更好的代码。如果你误用或滥用递归，可读性最后会变得比指令式形式更差。别这么做！
