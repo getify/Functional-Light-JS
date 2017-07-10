@@ -630,10 +630,10 @@ skipLongWords( unique( words( text ) ) );
 
 ## 重温“点”
 
-现在我们已经彻底地讲解了组合 —— 一种在 FP 的许多领域极其有用的技巧 —— 让我们通过重温第三章“无点”中的无点风格来看看它在实战中的表现，使用一个对于重构来说相当复杂的场景：
+现在我们已经彻底地讲解了组合 —— 一种在 FP 的许多领域极其有用的技巧 —— 让我们通过重温第三章“无点”中的无点风格来看看它在实战中的表现，我们将使用一个对于重构来说相当复杂的场景：
 
 ```js
-// given: ajax( url, data, cb )
+// 已知：ajax( url, data, cb )
 
 var getPerson = partial( ajax, "http://some.api/person" );
 var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
@@ -662,7 +662,7 @@ function prop(name,obj) {
 	return obj[name];
 }
 
-// or the ES6 => form
+// 或者 ES6 => 箭头形式
 var prop =
 	(name,obj) =>
 		obj[name];
@@ -696,7 +696,7 @@ getLastOrder( function orderFound(order){
 } );
 ```
 
-我们如何定义 `outputPersonName(..)`？为了把我们需要的东西可视化表达出来，考虑一下期望的数据流：
+我们如何定义 `outputPersonName(..)`？为了把我们需要的东西可视化表达出来，考虑一下我们期望的数据流：
 
 ```
 output <-- extractName <-- person
@@ -706,7 +706,7 @@ output <-- extractName <-- person
 
 希望你认出了这是一个 `compose(..)` 操作。所以我们可以将 `outputPersonName(..)` 定义为：
 
-```
+```js
 var outputPersonName = compose( output, extractName );
 ```
 
@@ -732,14 +732,14 @@ getLastOrder( function orderFound(order){
 var extractPersonId = partial( prop, "personId" );
 ```
 
-为了构建需要被传递给 `processPerson(..)` 的（`{ id: .. }` 形式的）对象，让我们制造另一个工具来把一个值包装进一个对象的特定属性名，称为 `makeObjProp(..)` ：
+为了构建需要被传递给 `processPerson(..)` 的（`{ id: .. }` 形式的）对象，让我们制造另一个工具来把一个值包装进一个对象的特定属性名中，称为 `makeObjProp(..)` ：
 
 ```js
 function makeObjProp(name,value) {
 	return setProp( name, {}, value );
 }
 
-// or the ES6 => form
+// 或者 ES6 => 箭头形式
 var makeObjProp =
 	(name,value) =>
 		setProp( name, {}, value );
@@ -805,7 +805,7 @@ partial( ajax, "http://some.api/order", { id: -1 } )
 
 ## 总结
 
-函数组合是定义一个函数的模式，这个函数将一个函数调用的输出导入另一个函数调用，然后它的输出在导入另一个函数，以此类推。
+函数组合是定义一个函数的模式，这个函数将一个函数调用的输出导入另一个函数调用，然后它的输出再导入另一个函数，以此类推。
 
 因为 JS 函数只能返回一个值，所以这种模式实质上规定了在这个组合中的所有函数（也许除了第一个调用以外）都必须是一元的，仅从前一个函数的输出中接收一个作为输入。
 
