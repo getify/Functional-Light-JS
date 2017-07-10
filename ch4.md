@@ -157,7 +157,7 @@ var compose2 =
 var uniqueWords = compose2( unique, words );
 ```
 
-### Composition Variation
+### 组合的变种
 
 看起来 `<-- unique <-- words` 的组合可能是这两个函数能够组合的唯一顺序。但实际上我们可以用相反的顺序组合它们来创建一个不同目的的工具：
 
@@ -173,11 +173,11 @@ chars;
 
 必须承认，这是一个造作的例子。但要点是函数的组合不总是单向的。有时我们将灰色的积木块放在蓝色的上面，而有时我们把蓝色的积木块放在上面。
 
-如果糖果工厂试着将包装糖果的机器接入混合并冷却巧克力的机器，它们最好小心些！
+如果糖果工厂试着将包装糖果的机器接入混合并冷却巧克力的机器，他们最好小心些！
 
-### General Composition
+### 泛化组合
 
-如果我们能够定义两个函数的组合，那么我们就能继续支持任意多个函数组合。任意多个函数被组合后的泛化数据流的可视化表现看起来像这样：
+如果我们能够定义两个函数的组合，那么我们就能继续支持任意多个函数的组合。任意多个函数被组合后的泛化数据流的可视化表现看起来像这样：
 
 ```
 finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
@@ -194,12 +194,11 @@ finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```js
 function compose(...fns) {
 	return function composed(result){
-		// copy the array of functions
+		// 拷贝函数的数组
 		var list = fns.slice();
 
 		while (list.length > 0) {
-			// take the last function off the end of the list
-			// and execute it
+			// 从列表中卸下最后一个函数并执行它
 			result = list.pop()( result );
 		}
 
@@ -207,15 +206,14 @@ function compose(...fns) {
 	};
 }
 
-// or the ES6 => form
+// 或者 ES6 => 箭头形式
 var compose =
 	(...fns) =>
 		result => {
 			var list = fns.slice();
 
 			while (list.length > 0) {
-				// take the last function off the end of the list
-				// and execute it
+				// 从列表中卸下最后一个函数并执行它
 				result = list.pop()( result );
 			}
 
@@ -260,8 +258,7 @@ wordsUsed;
 然后，我们可以通过分别使用不同的第一个参数调用 `filterWords(..)` 来多次完成组合：
 
 ```js
-// Note: uses a `<= 4` check instead of the `> 4` check
-// that `skipShortWords(..)` uses
+// 注意：使用 `<= 4` 检查来取代 `skipShortWords(..)` 中使用的 `> 4` 检查
 function skipLongWords(list) { /* .. */ }
 
 var filterWords = partialRight( compose, unique, words );
@@ -283,7 +280,7 @@ shorterWords( text );
 
 **注意：** 因为 `curry(..)` （至少是我们在第三章中实现的方式）有赖于检测元数（`length`），或者手动指定元数，而 `compose(..)` 是一个可变参函数，你将需要手动指定意图中的元数，比如`curry(.. , 3)`。
 
-### Alternate Implementations
+### 替代的实现方式
 
 虽然你很可能从没实现过自己的 `compose(..)` 来用于生产，而只是使用一个库所提供的实现，但我发现理解它底层的工作方式实际上会很好地帮助我们夯实 FP 的一般概念。
 
@@ -304,7 +301,7 @@ function compose(...fns) {
 	};
 }
 
-// or the ES6 => form
+// 或者 ES6 => 箭头形式
 var compose = (...fns) =>
 	result =>
 		fns.reverse().reduce(
@@ -316,7 +313,7 @@ var compose = (...fns) =>
 
 注意 `reduce(..)` 循环会在最终的 `composed(..)` 函数每次运行时发生，而且每个中间的 `result(..)` 都作为下一次调用的输入被传递给下一个迭代。
 
-这种实现的优势是代码更简洁，并使用了众所周知的 FP 解构：`reduce(..)`。而且这种实现的性能也接近于原始的 `for` 循环版本。
+这种实现的优势是代码更简洁，并使用了众所周知的 FP 结构：`reduce(..)`。而且这种实现的性能也接近于原始的 `for` 循环版本。
 
 然而，这种实现的局限性在于组合后的外部函数（也就是组合中的第一个函数）只能接收一个参数。大多数其他种类的实现都会传递所有的参数给第一个调用。如果在组合中的每一个函数都是一元的，这就不是什么大问题。但如果你需要给第一个调用传递多个参数，你就会想要一种不同实现。
 
@@ -331,7 +328,7 @@ function compose(...fns) {
 	} );
 }
 
-// or the ES6 => form
+// 或者 ES6 => 箭头形式
 var compose =
 	(...fns) =>
 		fns.reverse().reduce( (fn1,fn2) =>
@@ -346,7 +343,7 @@ var compose =
 
 当你调用最终组合好的函数并提供了一个或多个参数时，这个大的嵌套函数的所有层，从内到外，按照反向的顺序被执行。
 
-它在性能上的特点将潜在地与前一种基于 `reduce(..)` 的实现不同。这里，`reduce(..)` 仅运行一次来产生一个大的组合函数，然后这个组合好的函数的每次调用只是执行它所有的嵌套函数。在前一个版本中，`reduce(..)` 将会在每次调用中运行。
+它在性能上的特点潜在地与前一种基于 `reduce(..)` 的实现不同。这里，`reduce(..)` 仅运行一次来产生一个大的组合函数，然后这个组合好的函数的每次调用只是执行它所有的嵌套函数。在前一个版本中，`reduce(..)` 将会在每次调用中运行。
 
 哪一种实现更好因人而异，但是要记住后一种实现不像前一种那样受参数数量的限制。
 
@@ -362,7 +359,7 @@ compose( compose(fn1,fn2, .. fnN-1), fnN );
 
 ```js
 function compose(...fns) {
-	// pull off the last two arguments
+	// 卸下最后两个参数
 	var [ fn1, fn2, ...rest ] = fns.reverse();
 
 	var composedFn = function composed(...args){
@@ -374,10 +371,10 @@ function compose(...fns) {
 	return compose( ...rest.reverse(), composedFn );
 }
 
-// or the ES6 => form
+// 或者 ES6 => 箭头形式
 var compose =
 	(...fns) => {
-		// pull off the last two arguments
+		// 卸下最后两个参数
 		var [ fn1, fn2, ...rest ] = fns.reverse();
 
 		var composedFn =
@@ -390,11 +387,11 @@ var compose =
 	};
 ```
 
-我认为递归实现的一个好处几乎是概念上的。我个人发现将一个重复的动作以递归的形式表示，要比在一个我不得不追踪运行中结果的循环要容易得多，所以我比较喜欢用这种方式表达的代码。
+我认为递归实现的一个好处几乎是概念上的。我个人发现将一个重复的动作以递归的形式表示，要比一个我不得不追踪运行中结果的循环要容易得多，所以我比较喜欢用这种方式表达的代码。
 
 另一些人认为递归方式在思维上兜的圈子有点儿更吓人。我请你作出自己的评价。
 
-## Reordered Composition
+## 重排组合
 
 我们早先谈过了标准 `compose(..)` 实现的从右到左的顺序。它的优势是会按照手动进行组合时参数（函数）出现的顺序来罗列它们。
 
@@ -402,7 +399,7 @@ var compose =
 
 以从左到右的相反顺序进行组合，有一个常见的名称：`pipe(..)`。人们说这个名字来自于 Unix/Linux 世界，通过将第一个程序的输出作为第二个程序的输入“导入”（`|` 操作符），多个程序串联起来（比如 `ls -la | grep "foo" | less`）。
 
-除了以从左至右顺序处理一个函数的列表以外，`pipe(..)` 与 `compose(..)` 是完全相同的：
+除了按从左至右顺序处理一个函数的列表以外，`pipe(..)` 与 `compose(..)` 是完全相同的：
 
 ```js
 function pipe(...fns) {
@@ -410,8 +407,7 @@ function pipe(...fns) {
 		var list = fns.slice();
 
 		while (list.length > 0) {
-			// take the first function from the list
-			// and execute it
+			// 从列表中拿出第一个函数并执行它
 			result = list.shift()( result );
 		}
 
@@ -456,11 +452,11 @@ var filterWords = partial( pipe, words, unique );
 
 正如你可能还记得的那样，第三章 `partialRight(..)` 的定义中在底层使用了 `reverseArgs(..)`，与我们现在 `pipe(..)` 做的一样。所以两种方法都会得到相同的结果。
 
-在这种特定的情况下 `pipi(..)` 在性能上有一些轻微的优势，因为我们没有试图通过右侧局部应用来保留 `compose(..)` 的从右至左的参数顺序，使用 `pipe(..)` 我们不需要像 `partialRight(..)`中那样将参数顺序反转回来。所以 `partial(pipe, ..)` 在这里要比 `partialRight(compose, ..)` 好一些。
+在这种特定的情况下 `pipe(..)` 在性能上有一些轻微的优势，因为我们没有试图通过右侧局部应用来保留 `compose(..)` 的从右至左的参数顺序，使用 `pipe(..)` 我们不需要像 `partialRight(..)`中那样将参数顺序反转回来。所以 `partial(pipe, ..)` 在这里要比 `partialRight(compose, ..)` 好一些。
 
 一般来说，当使用一个完善的 FP 库时，`pipe(..)` 与 `compose(..)` 在性能上不会有任何显著的差异。
 
-## Abstraction
+## 抽象
 
 抽象经常被定义为从两个或多个任务之间抽出一般性。一般的部分被定义一次，以此避免重复。为了实施每个任务特化的部分，一般的部分会被参数化。
 
@@ -502,7 +498,7 @@ function trackEvent(evt) {
 }
 ```
 
-一般化的任务 —— 引用一个对象上的一个属性（或数组的，多亏 JS 方便的 `[]` 操作符重载）并设置它的值 —— 被抽象到一个它自己的函数 `storeData(..)`。虽然这个工具现在只有一行代码，但我们可以预见其他横跨两个任务一般化行为，比如生成唯一的数字 ID 或者与值一起存储一个时间戳。
+一般化的任务 —— 引用一个对象上的一个属性（或数组的，多亏 JS 方便的 `[]` 操作符重载）并设置它的值 —— 被抽象到一个它自己的函数 `storeData(..)` 中。虽然这个工具现在只有一行代码，但我们可以预见其他横跨两个任务一般化行为，比如生成唯一的数字 ID 或者与值一起存储一个时间戳。
 
 如果我们在多个地方重复这种常见的一般化行为，我们就会承担维护的风险 —— 修改了一些地方而忘记了修改其他地方。在这种类型的抽象中有一个原则在发挥作用，经常成为 DRY（don't repeat yourself）。
 
@@ -534,29 +530,27 @@ function trackEvent(evt) {
 }
 ```
 
-为了努力达成 DRY 并且避免重复 `if` 语句，我们将条件性部分移动到一般化的抽象中。我们还假定我们可能会在程序的其他地方检查非空字符串或者非 `undefined` 值，所以我们也可能把这些 DRY 出去！
+为了努力达成 DRY 并且避免重复 `if` 语句，我们将条件性的部分移动到一般化的抽象中。我们还假定我们可能会在程序的其他地方检查非空字符串或者非 `undefined` 值，所以我们也可能把这些 DRY 出去！
 
 这段代码 *确实* 更 DRY 了，但是到了一个做过头的程度。程序员必须在他们程序中的每一个部分小心地实施恰当水平的抽象，不多，也不少。
 
-对于我们在这一章中关于函数组合的更大的讨论来说，它可能看起来正是从这种 DRY 抽象中获益的。但让我们先不要这么快得出结论，因为我认为在我们的代码中组合实际上服务于一个更加重要的目的。
+对于我们在这一章中关于函数组合的更大的讨论来说，它可能看起来正是从这种 DRY 抽象中获益的。但让我们先不要这么快得出结论，因为我认为在我们代码中的组合实际上服务于一个更加重要的目的。
 
 另外，**组合甚至会在某些东西仅出现一次的情况下都很有用**（没有重复的东西可以 DRY 出去）。
 
 除了一般化和特殊化，我想抽象还有另外一种更有用的定义，正如这段引文中所揭示的：
 
-> ……抽象是一种由程序员进行的处理，他们把一个名称与一个潜在的复杂程序片段联系起来，之后这个片段就可以用一个函数的目的来考虑，而不是以这个函数是如何实现的来考虑。通过将无关的细节隐藏起来，抽象降低的概念的复杂性，使程序员在任意特定时间将注意力集中在一段可控的程序文本子集中成为可能。
+> ……抽象是一种由程序员进行的处理，他们把一个名称与一个潜在的复杂程序片段联系起来，之后这个片段就可以用一个函数的目的来考虑，而不是以这个函数是如何实现的来考虑。通过将无关的细节隐藏起来，抽象降低的概念的复杂性，使程序员在任意特定时间内将注意力集中在一段可控的程序文本子集中成为可能。
 >
 > Programming Language Pragmatics, Michael L Scott
 >
 > https://books.google.com/books?id=jM-cBAAAQBAJ&pg=PA115&lpg=PA115&dq=%22making+it+possible+for+the+programmer+to+focus+on+a+manageable+subset%22&source=bl&ots=yrJ3a-Tvi6&sig=XZwYoWwbQxP2w5qh2k2uMAPj47k&hl=en&sa=X&ved=0ahUKEwjKr-Ty35DSAhUJ4mMKHbPrAUUQ6AEIIzAA#v=onepage&q=%22making%20it%20possible%20for%20the%20programmer%20to%20focus%20on%20a%20manageable%20subset%22&f=false
 
-// TODO: make a proper reference to this book/quote, or at least find a better online link
-
 这段引文的要点是，抽象 —— 一般来说，就是讲一段代码抽出到它自己的函数中 —— 所服务的主要目的是将两块功能分离开，以至于每一块都可以独立于另一块被集中地考虑。
 
 注意，在这种意义上的抽象不是试图 *隐藏* 细节，好像将事情看做一个黑盒那样。那种概念与封装的编程原则联系得更紧密。**我们抽象不是为了隐藏，而是为了分离以改进集中性**。
 
-回忆一下本书开始时我描述过的 FP 的目标：创建更具可读性的，更易理解的代码。做到这一点的一个有效方法是，将交织在一起 —— 就像仅仅纠缠在一起的绳子 —— 的代码解开，成为分离的、更简单 —— 松散地绑在一起 —— 的代码块。这样，读者就不会在寻找某一部分的细节时被另一部分的细节分心了。
+回忆一下本书开始时我描述过的 FP 的目标：创建更具可读性的，更易理解的代码。做到这一点的一个有效方法是，将交织在一起 —— 就像紧紧纠缠在一起的绳子 —— 的代码解开，成为分离的、更简单 —— 松散地绑在一起 —— 的代码块。这样，读者就不会在寻找某一部分的细节时被另一部分的细节分心了。
 
 我们更高的目标不是像 DRY 的思维模式那样，把某些东西仅实现一次。事实上，有时我们将会在代码中重复我们自己。取而代之的是，我们寻求的是将分离的东西分离地实现。我们在努力改善集中性，因为那样会改进可读性。
 
@@ -564,7 +558,7 @@ function trackEvent(evt) {
 
 换言之，声明式代码将 *什么* 从 *如何* 之中抽象出来。典型的声明式代码倾向于可读性而非指令式，虽然没有程序（当然除了 1 和 0 的机械码）曾经完全是其中的一种或另一种。程序员必须在它们之间寻求平衡。
 
-ES6 增加了许多语法能力来将老式的指令式操作变形为新的声明式形式。也许其中最清楚的就是解构了。解构是一种赋值范例，它描述一个复合值（对象，数组）如何被分解构成它的值。
+ES6 增加了许多语法能力来将老式的指令式操作变形为新的声明式形式。也许其中最清楚的就是解构了。解构是一种赋值范例，它描述一个复合值（对象，数组）如何被分解为构成它的值。
 
 这是一个数组解构的例子：
 
@@ -573,12 +567,12 @@ function getData() {
 	return [1,2,3,4,5];
 }
 
-// imperative
+// 指令式
 var tmp = getData();
 var a = tmp[0];
 var b = tmp[3];
 
-// declarative
+// 声明式
 var [ a ,,, b ] = getData();
 ```
 
@@ -588,19 +582,19 @@ var [ a ,,, b ] = getData();
 
 相反，你阅读 `[ a ,,, b ] = ..` 并看到赋值范例只不过告诉了你 *什么* 将要发生。数组解构是一个声明式抽象的例子。
 
-### Composition As Abstraction
+### 作为抽象的组合
 
 所有这些与函数组合有什么关系？函数组合也是一种声明式抽象。
 
 回想一下早先 `shorterWords(..)` 的例子。让我们比较一下它的指令式与声明式定义：
 
 ```js
-// imperative
+// 指令式
 function shorterWords(text) {
 	return skipLongWords( unique( words( text ) ) );
 }
 
-// declarative
+// 声明式
 var shorterWords = compose( skipLongWords, unique, words );
 ```
 
@@ -632,9 +626,9 @@ skipLongWords( unique( words( text ) ) );
 
 函数组合不只是关于使用 DRY 来节省代码。即使 `shorterWords(..)` 的使用仅在一个地方发生 —— 因此没有重复去避免！—— 将 *如何* 从 *什么* 之中分离出来依然可以改善我们的代码。
 
-组合是一种强大的抽象工具，它将指令式代码变形为更具可读性的声明式代码。
+组合是一种强大的抽象工具，它将指令式代码变形为可读性更好的声明式代码。
 
-## Revisiting Points
+## 重温“点”
 
 现在我们已经彻底地讲解了组合 —— 一种在 FP 的许多领域极其有用的技巧 —— 让我们通过重温第三章“无点”中的无点风格来看看它在实战中的表现，使用一个对于重构来说相当复杂的场景：
 
@@ -809,7 +803,7 @@ partial( ajax, "http://some.api/order", { id: -1 } )
 
 这段代码当然不那么繁冗，但与每个操作都有自己变量的前一个代码段比起来，我认为它的可读性差一些。不管哪种方式，组合都在无点风格上帮到了我们。
 
-## Summary
+## 总结
 
 函数组合是定义一个函数的模式，这个函数将一个函数调用的输出导入另一个函数调用，然后它的输出在导入另一个函数，以此类推。
 
