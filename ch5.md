@@ -520,13 +520,13 @@ list.push( 6 );
 simpleList( median );		// 3.5
 ```
 
-当我们改版这个数组时，`simpleList(..)` 调用改变了它的输出。那么，`simpleList(..)` 是纯粹的还是不纯粹的？这要看你的角度。对于给定的一组假设来说它是纯粹的。在任何没有 `list.push(6)` 变化的程序中它都可以使纯粹的。
+当我们改变这个数组时，`simpleList(..)` 调用改变了它的输出。那么，`simpleList(..)` 是纯粹的还是不纯粹的？这要看你的角度。对于给定的一组假设来说它是纯粹的。在任何没有 `list.push(6)` 变化的程序中它都可以是纯粹的。
 
 我们可以通过改变 `rememberNumbers(..)` 的定义来防止这种不纯粹性。一种方式是复制 `nums` 数组：
 
 ```js
 function rememberNumbers(nums) {
-	// make a copy of the array
+	// 制造一个数组的拷贝
 	nums = nums.slice();
 
 	return function caller(fn){
@@ -540,7 +540,7 @@ function rememberNumbers(nums) {
 ```js
 var list = [1,2,3,4,5];
 
-// make `list[0]` be a getter with a side effect
+// 使 `list[0]` 成为一个带有副作用的 getter
 Object.defineProperty(
 	list,
 	0,
@@ -576,7 +576,7 @@ var simpleList = rememberNumbers( ...list );
 但要是改变更难以发现呢？将一个纯函数与一个非纯函数组合 **总是** 产生一个非纯函数。如果我们将一个不纯粹的函数传入本来是纯粹的 `simpleList(..)`，那么它现在就是不纯粹的了：
 
 ```js
-// yes, a silly contrived example :)
+// 没错，一个矫揉造作的例子 :)
 function firstValue(nums) {
 	return nums[0];
 }
@@ -592,22 +592,22 @@ list;						// [1,2,3,4,5] -- OK!
 simpleList( lastValue );	// 1
 ```
 
-**注意：** 尽管 `reverse()` 返回了一个反向的数组而看起来安全（就像其他 JS 的数组方法一样），它其实改变了数组而不是创建了一个新的。
+**注意：** 尽管 `reverse()` 返回了一个反向的数组而且看起来安全（就像其他 JS 的数组方法一样），但它其实改变了数组而不是创建了一个新的。
 
 我们需要一个更健壮的 `rememberNumbers(..)` 定义来防止 `fn(..)` 通过引用来改变它闭包着的 `nums`：
 
 ```js
 function rememberNumbers(...nums) {
 	return function caller(fn){
-		// send in a copy!
+		// 发送一个拷贝！
 		return fn( nums.slice() );
 	};
 }
 ```
 
-那么 `simpleList(..)` 纯粹的可靠了！？**没有。** :(
+那么 `simpleList(..)` 可靠地纯粹了！？**没有。** :(
 
-我们只防御了我么可控的副作用（通过引用进行改变）。我们传递的任何函数都可能有另外的副作用会污染 `simpleList(..)` 的纯粹性：
+我们只防御了我们可控的副作用（通过引用进行改变）。我们传递的任何函数都可能有另外的副作用会污染 `simpleList(..)` 的纯粹性：
 
 ```js
 simpleList( function impureIO(nums){
@@ -615,21 +615,21 @@ simpleList( function impureIO(nums){
 } );
 ```
 
-事实上，没有办法能定义 `rememberNumbers(..)` 而使 `simpleList(..)` 称为成为一个完美的纯函数。
+事实上，没有办法能定义 `rememberNumbers(..)` 而使 `simpleList(..)` 成为一个完美的纯函数。
 
 纯粹性就是信心。但在许多情况下我们不得不承认，**我们感到的信心实际上都是相对于我们程序的上下文环境**，以及我们对它知道多少。在（JavaScript 的）实际应用中，函数纯粹性的问题不是关于是否绝对纯粹，而是关于对它纯粹性的信心的范围。
 
-越纯粹越好。你在使一个函数变得纯粹上付出的努力越多，你就在阅读使用它的代码时越有信心，而这将会使这部分代码更具可读性。
+越纯粹越好。你在使一个函数变得纯粹上付出的努力越多，你就在阅读使用它的代码时越有信心，而这将会使这部分代码可读性更好。
 
-## There Or Not
+## 在或不在
 
 至此，我们将函数纯粹性定义为一个没有侧因/副作用的函数，以及一个只要给出相同输入就总是产生相同输出的函数。这些只是看待一个相同性质的两种不同方式。
 
 但是第三种看待函数纯粹性的方式，而且也许是最广为人接受的定义是，纯函数拥有引用透明性。
 
-引用透明性是指一个函数的调用可以用它的输出值替换，而整个程序的行为不会改变。换句话说，程序的执行发起了对这个函数的调用，还是它的返回值被内联地写在了函数被调用的地方 —— 是不可能知道的。
+引用透明性是指一个函数的调用可以用它的输出值替换，而整个程序的行为不会改变。换句话说，是程序的执行发起了对这个函数的调用，还是它的返回值被内联地写在了函数被调用的地方 —— 是不可能知道的。
 
-从引用透明性的视角出发，这两个程序都因为使用了纯函数建造而具有相同的行为
+从引用透明性的视角出发，这两个程序都因为在建造时使用了纯函数而具有相同的行为
 
 ```js
 function calculateAverage(list) {
@@ -663,13 +663,13 @@ var avg = 9;
 console.log( "The average is:", avg );		// The average is: 9
 ```
 
-这两个代码段的唯一区别是，在后者中我们跳过了 `calculateAverage(nums)` 调用而只是内联了它的输出（`9`）。因为程序其余部分的行为完全一样，所以 `calculateAverage(..)` 拥有引用透明性，因此是一个纯函数。
+这两个代码段的唯一区别是，在后者中我们跳过了 `calculateAverage(nums)` 调用而只是内联了它的输出（`9`）。因为程序其余部分的行为完全一样，所以 `calculateAverage(..)` 具有引用透明性，因此是一个纯函数。
 
-### Mentally Transparent
+### 思维上透明
 
 一个引用透明的纯函数 *可以* 被它的输出替换的概念不意味着它 *就应当被* 替换掉。远远不是。
 
-我们在程序中建造函数而不使用提前计算好的魔法常量，不只是为了对数据的改变作出反应，还是为了恰当抽象的可读性等等。与只是进行明确赋值的那一行比起来，计算那一组数组的平均值的调用使程序的那一部分更具可读性。它给读者讲述了一个故事，`avg` 从何而来，它是什么意思等等。
+我们在程序中建造函数而不使用提前计算好的魔法常量，不只是为了对数据的改变作出反应，还是为了恰当抽象的可读性等等。与只是进行明确赋值的那一行比起来，计算那一组数值的平均值的调用使程序的那一部分更具可读性。它给读者讲述了一个故事，`avg` 从何而来，它是什么意思等等。
 
 引用透明性的真正含义是，在你阅读一个程序时，一旦你在思维上计算出了一个纯函数调用的输出是什么，你就不再需要在代码中看到它时考虑这个函数调用究竟在做什么，特别是当它出现许多次的时候。
 
@@ -679,9 +679,9 @@ console.log( "The average is:", avg );		// The average is: 9
 
 读者不应该总是重新计算某些不会改变（以及不需要改变）的结果。如果你定义了一个引用透明的纯函数，读者就不必这么做。
 
-### Not So Transparent?
+### 没那么透明？
 
-如果一个函数有副作用，但是这种副作用永远不会被观察到，或者程序的其他地方永远不会依赖于这种副作用呢？这个函数依然拥有引用透明性吗？
+如果一个函数有副作用，但是这种副作用永远不会被观察到，或者程序的其他地方永远不会依赖于这种副作用呢？这个函数依然拥具有引用透明性吗？
 
 这里有一个：
 
@@ -703,13 +703,13 @@ var avg = calculateAverage( nums );
 
 `sum` 是一个 `calculateAverage(..)` 用来完成工作的外部自由变量。但是，每次我们用相同的列表调用 `calculateAverage(..)` 都会得到输出 `9`。而且就程序行为上而言，将 `calculateAverage(nums)` 调用替换为值 `9` 是没有区别的。程序中没有其他任何部分在乎变量 `sum`，所以它是一个不可观测的副作用。
 
-一个不可观测的侧因/副作用像这棵树一样吗？
+一个不可观测的侧因/副作用像下面这棵树一样吗？
 
 > 如果一棵树在森林中倒下，但周围没有人听到，那么它发出倒下声音了吗？
 
 根据引用透明性的最狭义的定义，我认为你不得不承认 `calculateAverage(..)` 依然是一个纯函数。但因为我们一直试着使我们的学习不仅学术化，而且要与实用主义平衡，我想这个结论需要更多的观察角度。让我们探索一下。
 
-#### Performance Effects
+#### 性能上的影响
 
 通常，你会发现这些不可观测的副作用被用来优化一个操作的性能。举例来说：
 
@@ -717,8 +717,8 @@ var avg = calculateAverage( nums );
 var cache = [];
 
 function specialNumber(n) {
-	// if we've already calculated this special number,
-	// skip the work and just return it from the cache
+	// 如果我们已经计算过这个特殊的数字，
+	// 那么就跳过计算工作而直接从缓存中返回它
 	if (cache[n] !== undefined) {
 		return cache[n];
 	}
@@ -743,11 +743,11 @@ specialNumber( 987654321 );		// 493827162
 
 这个呆萌的 `specialNumber(..)` 算法是确定性的，而且从对相同的输入总是给出相同的输出这个定义上讲是纯粹的。它从引用透明性的角度上讲也是纯粹的 —— 使用 `22` 替换所有 `specialNumber(42)`，程序的最终结果是相同的。
 
-然而，为了计算某些大一点儿数字这个函数不得不做相当多的工作，特别是 `987654321` 这个输入。如果我们需要在程序中多次取得这个特别的数字，缓存（`cache`）结果可以使后续的调用高效得多。
+然而，为了计算某些大一点儿的数字这个函数不得不做相当多的工作，特别是 `987654321` 这个输入。如果我们需要在程序中多次取得这个特别的数字，缓存（`cache`）结果可以使后续的调用高效得多。
 
 **注意：** 一个值得深思的有趣的事情：即使对于最纯粹的函数/程序来说，在执行任何给定的操作时 CPU 产生的热量是一种不可避免的副作用吗？那么 CPU 在一个纯粹的操作上花费时间，而使另一个操作发生的延迟呢？
 
-被那么快就假定你可以运行 `specialNumber(987654321)` 计算一次并手动把结果贴在某个变量/常量上。程序通常是高度模块化的，而且全局的可访问作用域通常不是你想要在那些独立的部分之间共享状态的方式。让 `specialNumber(..)` 实现它的自己的缓存（尽管它刚好是使用一个全局变量这么做的！）是这种状态共享的更好的抽象。
+别那么快就假定你可以运行 `specialNumber(987654321)` 计算一次并手动把结果贴在某个变量/常量上。程序通常是高度模块化的，而且全局的可访问作用域通常不是你想要在那些独立的部分之间共享状态的方式。让 `specialNumber(..)` 实现它的自己的缓存（尽管它刚好是使用一个全局变量这么做的！）是这种状态共享的更好的抽象。
 
 重点是如果 `specialNumber(..)` 是程序中唯一可以访问和更新 `cache` 侧因/副作用的部分，那么引用透明性看起来就是成立的，而且这可能看起来可以作为实现纯函数典范的一种可接受的实用的“作弊”手段。
 
@@ -762,8 +762,8 @@ var specialNumber = (function memoization(){
 	var cache = [];
 
 	return function specialNumber(n){
-		// if we've already calculated this special number,
-		// skip the work and just return it from the cache
+		// 如果我们已经计算过这个特殊的数字，
+		// 那么就跳过计算工作而直接从缓存中返回它
 		if (cache[n] !== undefined) {
 			return cache[n];
 		}
@@ -790,19 +790,19 @@ var specialNumber = (function memoization(){
 
 > 如果一棵树在森林中倒下，但周围没有人听到，那么它发出倒下声音了吗？
 
-我在这个类比中得到的启示是：无论有没有发出声音，最好是我们绝不制树倒下而我们不在场的场景；在一棵树倒下时我们将总是听到声响。
+我在这个类比中得到的启示是：无论有没有发出声音，最好是我们绝不制造树倒下而我们不在场的场景；在一棵树倒下时我们将总是听到声响。
 
 减少侧因/副作用的行为本质上不是去制造一个人们无法观察到的程序，而是为了设计一个侧因/副作用尽可能少的程序，因为这会使程序更易于推理。一段带有侧因/副作用的程序 *碰巧* 没有被观察到，对于达成一个 *不能* 观察到它们的程序的目标来说根本没有效果。
 
 如果侧因/副作用可能发生，那么作者与读者就必须在思维上演练它们。如果使它们不可能发生，那么作者与读者就将会对在任何地方什么会发生和什么不会发生有更多的信心。
 
-## Purifying
+## 纯粹化
 
 如果你有一个你无法将之重构为纯函数的非纯函数，你该怎么做？
 
-你需要搞清楚这个函数有什么种类的侧因/副作用。侧因/副作用可能来自于各种途径，词法自由变量、通过引用的修改、或者甚至是 `this` 绑定。我们将看一看解决这些场的方式。
+你需要搞清楚这个函数有什么种类的侧因/副作用。侧因/副作用可能来自于各种途径，词法自由变量、通过引用的修改、或者甚至是 `this` 绑定。我们将看一看解决这些场景的方式。
 
-### Containing Effects
+### 牵制副作用
 
 如果我们关心的侧因/副作用来自于词法自由变量，而且你可以修改周围的代码，那么你就可以使用作用域来封装它们。
 
@@ -822,19 +822,19 @@ function fetchUserData(userId) {
 
 ```js
 function safer_fetchUserData(userId,users) {
-	// simple, naive ES6+ shallow object copy, could also
-	// be done w/ various libs or frameworks
+	// 简单、幼稚的 ES6+ 对象浅拷贝，
+	// 也可以通过各种库或框架做到
 	users = Object.assign( {}, users );
 
 	fetchUserData( userId );
 
-	// return the copied state
+	// 返回拷贝的状态
 	return users;
 
 
 	// ***********************
 
-	// original untouched impure function:
+	// 没有被碰过的原版非纯函数：
 	function fetchUserData(userId) {
 		ajax( "http://some.api/user/" + userId, function onUserData(userData){
 			users[userId] = userData;
@@ -843,7 +843,7 @@ function safer_fetchUserData(userId,users) {
 }
 ```
 
-`userId` 与 `users` 都是原始 `fetchUserData` 的输入，而且 `users` 还是输出。`safer_fetchUserData(..)` 接收这两个输入，并返回 `users`。为了确保我们没有在后面修改 `users` 时没有制造副作用，我们制造了一个 `users` 的本地拷贝。
+`userId` 与 `users` 都是原始 `fetchUserData` 的输入，而且 `users` 还是输出。`safer_fetchUserData(..)` 接收这两个输入，并返回 `users`。为了确保我们没有在后面修改 `users` 时制造副作用，我们制造了一个 `users` 的本地拷贝。
 
 这种技术几乎只有有限的用处，因为如果你不能把函数本身修改为纯粹的，那么你也不太可能修改它周围的代码。然而，在可能的情况下探索它一下还是有帮助的，因为它是我们的修改中最简单的一种。
 
@@ -851,10 +851,9 @@ function safer_fetchUserData(userId,users) {
 
 但是要非常小心。程序中任何不纯粹的部分，即便它被一个纯函数包装而且仅为纯函数所用，也是潜在的 bug 以及代码读者困惑的源头。我们的总体目标是尽可能减少副作用，而不是仅将它们藏起来。
 
-### Covering Up Effects
+### 掩盖副作用
 
 很多时候你都不能通过修改代码来将词法自由变量封装在一个包装函数的作用域中。例如，非纯函数存在于一个不可控的第三方库的文件中，包含这样一些东西：
-
 
 ```js
 var nums = [];
@@ -888,34 +887,34 @@ function generateMoreRandoms(count) {
 
 ```js
 function safer_generateMoreRandoms(count,initial) {
-	// (1) save original state
+	// (1) 保存原始状态
 	var orig = {
 		nums,
 		smallCount,
 		largeCount
 	};
 
-	// (2) setup initial pre-side effects state
+	// (2) 建立副作用之前的初始状态
 	nums = initial.nums.slice();
 	smallCount = initial.smallCount;
 	largeCount = initial.largeCount;
 
-	// (3) beware impurity!
+	// (3) 小心不纯粹性！
 	generateMoreRandoms( count );
 
-	// (4) capture side effect state
+	// (4) 捕获副作用状态
 	var sides = {
 		nums,
 		smallCount,
 		largeCount
 	};
 
-	// (5) restore original state
+	// (5) 重置原始状态
 	nums = orig.nums;
 	smallCount = orig.smallCount;
 	largeCount = orig.largeCount;
 
-	// (6) expose side effect state directly as output
+	// (6) 将副作用直接暴露为输出
 	return sides;
 }
 ```
@@ -941,7 +940,7 @@ largeCount;		// 0
 
 **注意：** 这种技术其实只会在你对付同步代码时有效。异步代码不能用这种方式可靠地管理，因为它不能防止程序其他部分临时地访问/修改状态变量。
 
-### Evading Effects
+### 回避副作用
 
 当我们要对付的副作用的性质是通过引用修改了一个直接输入值（对象，数组等等），我们同样可以创建一个接口函数来与之互动，从而取代原始的非纯函数。
 
@@ -951,7 +950,7 @@ largeCount;		// 0
 function handleInactiveUsers(userList,dateCutoff) {
 	for (let i = 0; i < userList.length; i++) {
 		if (userList[i].lastLogin == null) {
-			// remove the user from the list
+			// 从列表中移除用户
 			userList.splice( i, 1 );
 			i--;
 		}
@@ -966,25 +965,25 @@ function handleInactiveUsers(userList,dateCutoff) {
 
 ```js
 function safer_handleInactiveUsers(userList,dateCutoff) {
-	// make a copy of both the list and its user objects
+	// 为列表以及它的用户对象制造一个拷贝
 	let copiedUserList = userList.map( function mapper(user){
-		// copy a `user` object
+		// 拷贝一个 `user` 对象
 		return Object.assign( {}, user );
 	} );
 
-	// call the original function with the copy
+	// 使用拷贝调用原版函数
 	handleInactiveUsers( copiedUserList, dateCutoff );
 
-	// expose the mutated list as a direct output
+	// 将被改变的列表作为直接的输出
 	return copiedUserList;
 }
 ```
 
 这种技术的成功取决于你对值的 *拷贝* 进行得多彻底。这里 `userList.slice()` 不好用，因为它只创建了 `userList` 数组本身的一个浅拷贝。数组中的每一个元素都是一个需要被拷贝的对象，所以我们得额外地花些心思。当然，如果这些对象内部还有对象（有可能！），那么拷贝就需要更加健壮。
 
-#### `this` Revisited
+#### 重温 `this`
 
-另外一种由引用引起的侧因/副作用是在 `this` 敏感的函数中使用 `this` 作为一种隐含的输入。关于为什么 `this` 关键字对 FP 程序员来说是个问题，详见第二章的“This是什么”。
+另外一种由引用引起的侧因/副作用是在 `this` 敏感的函数中使用 `this` 作为一种隐含的输入。关于为什么 `this` 关键字对 FP 程序员来说是个问题，详见第二章的“This 是什么”。
 
 考虑如下代码：
 
@@ -1014,11 +1013,11 @@ safer_generate( { prefix: "foo" } );
 
 实质上，我们没有真正地消灭侧因/副作用，而是包容并限制它们，以使我们的代码更禁得住检验和可靠。如果稍后我们的程序出现 bug，那么我们就知道代码中依然使用侧因/副作用的部分最有可能是罪魁祸首。
 
-## Summary
+## 总结
 
 副作用对代码的可读性与质量是有害的，因为它们使你的代码更难于理解。副作用还是程序中最常见的 bug *起因* 之一，因为搬弄它们很困难。幂等性是一种通过创建实质上一次性的操作来限制副作用的策略。
 
-纯函数是我们最好的避免副作用的方式。一个纯函数总是对相同的输入返回相同的输出，而且没有侧因或副作用。引用透明性进一步说明，一个出函数调用可以用它的输出替换 —— 更多地是思维上的行使而非真这么做 —— 而程序的行为不会有变化。
+纯函数是我们最好的避免副作用的方式。一个纯函数总是对相同的输入返回相同的输出，而且没有侧因或副作用。引用透明性进一步说明，一个纯函数调用可以用它的输出替换 —— 更多地是思维上的行使而非真这么做 —— 而程序的行为不会有变化。
 
 将一个非纯函数重构为纯函数是不错的选择。但如果那不可能，就可以封装侧因/副作用，或者创建一个纯粹的接口来防护它们。
 
