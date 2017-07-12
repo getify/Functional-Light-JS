@@ -1,5 +1,5 @@
-# Functional-Light JavaScript
-# Chapter 7: Closure vs Object
+# 轻量函数式 JavaScript
+# 第七章：闭包 vs 对象
 
 多年以前，Anton van Straaten 编写了一个名声显赫而且广为流传的 [禅家公案](https://www.merriam-webster.com/dictionary/koan)，描绘并挑起了闭包与对象之间一种重要的紧张状态。
 
@@ -7,7 +7,7 @@
 >
 > 被训斥的 Anton 告别他的师父返回自己的房间，开始有意地学习闭包。他仔细地阅读了整部 “Lamda：终极……” 系列书籍以及其姊妹篇，并且使用一个基于闭包的对象系统实现了一个小的 Scheme 解释器。他学到了很多，希望向他的师父报告自己的进步。
 >
-> 当他再次与 Qc Na 散步时，Anton 试图给师傅一个好印象，说：“师父，经过勤奋的学习，现在我我理解了对象确实是简化的闭包。” Qc Na 用他的拐杖打了 Anton 作为回应，他说：“你到底什么时候才能明白？闭包只是简化的对象。” 此时此刻，Anton 茅塞顿开。
+> 当他再次与 Qc Na 散步时，Anton 试图给师傅一个好印象，说：“师父，经过勤奋的学习，现在我理解了对象确实是简化的闭包。” Qc Na 用他的拐杖打了 Anton 作为回应，他说：“你到底什么时候才能明白？闭包只是简化的对象。” 此时此刻，Anton 茅塞顿开。
 >
 > Anton van Straaten 6/4/2003
 >
@@ -17,13 +17,13 @@
 
 我见过许多读过这段公案的人都对它的聪明机智表现出一丝假笑，然后并没有改变太多他们的想法就离开了。然而，一个公案的目的（从佛教禅的角度而言）就是刺激读者对其中矛盾的真理上下求索。所以，回头再读一遍。然后再读一遍。
 
-它到底是什么？闭包是简化的对象，或者对象是简化的闭包？或都不是？或都是？难道唯一重点是闭包和对象在某种意义上是等价的？
+它到底是什么？闭包是简化的对象，或者对象是简化的闭包？或都不是？或都是？难道唯一的重点是闭包和对象在某种意义上是等价的？
 
 而且这与函数式编程有什么关系？拉一把椅子深思片刻。如果你乐意的话，这一章将是一次有趣的绕路远足。
 
-## The Same Page
+## 同一轨道
 
-首先，让我们确保当我们谈到闭包和对象时我们都在统一轨道上。显然我们的语境是 JavaScript 如何应对这两种机制，而且具体来说谈到的是简单的函数闭包（参见第二章的“保持作用域”）与简单对象（键值对的集合）。
+首先，让我们确保当我们谈到闭包和对象时我们都在同一轨道上。显然我们的语境是 JavaScript 如何应对这两种机制，而且具体来说谈到的是简单的函数闭包（参见第二章的“保持作用域”）与简单对象（键值对的集合）。
 
 一个简单的函数闭包：
 
@@ -57,11 +57,11 @@ function three(outer) {
 three( obj );		// 3
 ```
 
-当你提到“闭包”时，很多人都会都会在脑中唤起许多额外的东西，比如异步回调，甚至是带有封装的模块模式和信息隐藏。相似地，“对象”会把类带到思维中，`this`、原型、以及一大堆其他的工具和模式。
+当你提到“闭包”时，很多人都会在脑中唤起许多额外的东西，比如异步回调，甚至是带有封装的模块模式和信息隐藏。相似地，“对象”会把类带到思维中，`this`、原型、以及一大堆其他的工具和模式。
 
 随着我们向前迈进，我们将小心地解说这种重要外部语境的一部分，但就目前来说，只要抓住“闭包”与“对象”的最简单的解释就好 —— 这将使我们的探索少一些困惑。
 
-## Look Alike
+## 看起来很像
 
 闭包与对象是如何联系在一起的，这可能不太明显。所以让我们首先来探索一下它们的相似性。
 
@@ -72,7 +72,7 @@ three( obj );		// 3
 
 换句话说，我们可以认为闭包和对象是同一种东西的两种不同表现形式。
 
-### State
+### 状态
 
 考虑这段从上面引用的代码：
 
@@ -158,7 +158,7 @@ function outer() {
 var person = outer();
 ```
 
-让我们实践一下从另一个方向走，闭包到对象：
+让我们实践一下从另一个方向走，由闭包到对象：
 
 ```js
 function point(x1,y1) {
@@ -195,9 +195,9 @@ pointDistance(
 
 `point` 状态对象被明确地传入，取代了隐含地持有这个状态的闭包。
 
-#### Behavior, Too!
+#### 行为也是！
 
-对象和闭包不仅代表表达状态的集合的方式，它们还可以通过函数/方法包含行为。将数据与它的行为打包有一个炫酷的名字：封装。
+对象和闭包不仅代表表达状态集合的方式，它们还可以通过函数/方法包含行为。将数据与它的行为打包有一个炫酷的名字：封装。
 
 考虑如下代码：
 
@@ -238,7 +238,7 @@ birthdayBoy.happyBirthday();
 
 我们仍然使用 `happyBirthday()` 函数来表达状态数据的封装，但使用一个对象而不是闭包。而且我们不必向一个函数明确地传入一个对象（比如前一个例子）；JavaScript 的 `this` 绑定很容易地创建了一个隐含绑定。
 
-另一种分析这种关系的方式：一个闭包将一个函数与一组状态联系起来，而一个持有相同状态的对象可以有任意多个操作这些状态的函数。
+另一种分析这种关系的方式是：一个闭包将一个函数与一组状态联系起来，而一个持有相同状态的对象可以有任意多个操作这些状态的函数。
 
 事实上，你甚至可以使用一个闭包作为接口暴露多个方法。考虑一个带有两个方法的传统对象：
 
@@ -294,11 +294,11 @@ person( "first" ) + " " + person( "last" );
 
 虽然这些程序在人体工程学上的观感不同，但它们实际上只是相同程序行为的不同种类实现。
 
-### (Im)mutability
+### （不）可变性
 
 许多人一开始认为闭包和对象在可变性方面表现不同；闭包可以防止外部改变而对象不能。但是，事实表明，两种形式具有完全相同的可变性行为。
 
-这是因为我们关心的，正如第六章中讨论的，是 **值** 的可变性，而它是值本身的性质，与它在哪里以及如何被赋值无关。
+这是因为我们关心的，正如第六章中所讨论的，是 **值** 的可变性，而它是值本身的性质，与它在哪里以及如何被赋值无关。
 
 ```js
 function outer() {
@@ -350,14 +350,13 @@ var xyPublic = {
 
 不管你是用嵌套的对象表示状态，还是用嵌套的闭包表示状态，被持有的值都是不可变的。
 
-### Isomorphic
+### 同构
 
-如今 “同构” 这个词经常被扔到 JavaScript 旁边，它通常用来指代可以在服务器与浏览器中使用/共享的代码。一段时间以前我写过一篇博客，称对 “同构” 这一词的这种用法是一种捏造，它实际上有一种明确和重要的含义被掩盖了。
-
+如今 “同构” 这个词经常被扔到 JavaScript 旁边，它通常用来指代可以在服务器与浏览器中使用/共享的代码。一段时间以前我写过一篇博客，声称对 “同构” 这一词的这种用法是一种捏造，它实际上有一种明确和重要的含义被掩盖了。
 
 > 同构意味着什么？好吧，我们可以从数学上，或社会学上，或生物学上讨论它。同构的一般概念是，你有两个东西，它们虽然不同但在结构上有相似之处。
 >
-> 在所有这些用法中，同构与等价以这样的方式被区分开：如果两个值在所有的方面都完全相，那么它们就是等价的。但如果它们表现不同，却仍然拥有 1 对 1 的、双向的映射关系，那么它们就是同构的。
+> 在所有这些用法中，同构与等价以这样的方式被区分开：如果两个值在所有的方面都完全相等，那么它们就是等价的。但如果它们表现不同，却仍然拥有 1 对 1 的、双向的映射关系，那么它们就是同构的。
 >
 > 换言之，如果你能够从 A 映射（转换）到 B 而后又可以从用反向的映射从 B 走回到 A，那么 A 和 B 就是同构的。
 
@@ -373,7 +372,7 @@ var xyPublic = {
 
 当一下次你听到某些人说 “X 与 Y 是同构的”，那么他们的意思是，“X 和 Y 可以在两个方向上从一者转换为另一者，并保持相同的行为。”
 
-### Under The Hood
+### 底层
 
 那么，从我们可以编写的代码的角度讲，我们可以认为对象是闭包的一种同构表现形式。但我们还可以发现，一个闭包系统实际上可能 —— 而且很可能 —— 用对象来实现！
 
@@ -410,7 +409,7 @@ Object.setPrototypeOf( scopeOfInner, scopeOfOuter );
 return scopeOfInner.x;
 ```
 
-`scopeOfInner` 没有属性 `x`，但它 `[[Prototype]]` 链接着拥有属性 `x` 的 `scopeOfOuter`。通过原型委托访问 `scopeOfOuter.x` 的结果就是值 `1` 被返回了。
+`scopeOfInner` 没有属性 `x`，但它 `[[Prototype]]` 链接着拥有属性 `x` 的 `scopeOfOuter`。通过原型委托访问 `scopeOfOuter.x` 的结果，于是值 `1` 被返回了。
 
 以这种方式，我们可以看到为什么 `outer()` 即使是在运行完成之后它的作用域也会被（通过闭包）保留下来：因为对象 `scopeOfInner` 链接着对象 `scopeOfOuter`，因此这可以使这个对象和它的属性完整地保留。
 
@@ -418,25 +417,25 @@ return scopeOfInner.x;
 
 许多语言确实是通过对象实现闭包的。而另一些语言以闭包的形式实现对象。但至于它们如何工作，我们还是让读者发挥他们的想象力吧。
 
-## Two Roads Diverged In A Wood...
+## 分道扬镳
 
 那么闭包和对象是等价的，对吧？不完全是。我打赌它们要比你在读这一章之前看起来相似多了，但它们依然有重要的不同之处。
 
-这些不同不应视为弱点或用法上的争议；那是错误的视角。它们应当被视为使其中一者比另一者更适于（而且更合理！）某种特定任务的特性或优势。
+这些不同不应视为弱点或用法上的争议；那是错误的视角。它们应当被视为使其中一者比另一者具有更适于（而且更合理！）某种特定任务的特性或优势。
 
-### Structural Mutability
+### 结构可变性
 
 从概念上讲，一个闭包的结构是不可变的。
 
-换言之，你绝不可能像一个闭包添加或移除状态。闭包是一种变量被声明的位置（在编写/编译时固定）的性质，而且对任何运行时条件都不敏感 —— 当然，假定你使用 strict 模式而且/或者没有使用 `eval(..)` 这样的东西作弊！
+换言之，你绝不可能向一个闭包添加或移除状态。闭包是一种变量被声明的位置（在编写/编译时固定）的性质，而且对任何运行时条件都不敏感 —— 当然，这假定你使用 strict 模式而且/或者没有使用 `eval(..)` 这样的东西作弊！
 
 **注意：** JS 引擎在技术上可以加工一个闭包来剔除任何在它作用域中的不再被使用的变量，但这对于开发者来说是一个透明的高级优化。无论引擎实际上是否会做这些种类的优化，我想对于开发者来说最安全的做法是假定闭包是以作用域为单位的，而非以变量为单位的。如果你不想让它存留下来，就不要闭包它！
 
-然而，对象默认是相当可变的。只要这个对象还没有被冻结（`Object.freeze(..)`），你可以自由地向一个对象添加或移除（`delete`）属性/下标。
+然而，对象默认是相当可变的。只要这个对象还没有被冻结（`Object.freeze(..)`），你就可以自由地向一个对象添加或移除（`delete`）属性/下标。
 
 能够根据程序中运行时的条件来追踪更多（或更少）的状态，可能是代码的一种优势。
 
-例如，让我们想象一个游戏中击键事件的追踪。几乎可以肯定，你想要使用一个数组来这样做：
+例如，让我们想象一个游戏中对击键事件的追踪。几乎可以肯定，你想要使用一个数组来这样做：
 
 ```js
 function trackEvent(evt,keypresses = []) {
@@ -448,7 +447,7 @@ var keypresses = trackEvent( newEvent1 );
 keypresses = trackEvent( newEvent2, keypresses );
 ```
 
-**注意：** 你有没有发现，为什么我使用 `concat(..)` 而不是直接向 `keypresses` 中 `push(..)`？因为在 FP 中，我们总是想将数组视为一种不可变的 —— 可以被重现创建并添加新元素 —— 数据结构，而不是直接被改变的。我们用了一个明确的重新复制将副作用的恶果替换掉了（稍后有更多关于这一点的内容）。
+**注意：** 你有没有发现，为什么我使用 `concat(..)` 而不是直接向 `keypresses` 中 `push(..)`？因为在 FP 中，我们总是想将数组视为一种不可变 —— 可以被重新创建并添加新元素 —— 的数据结构，而不是直接被改变的。我们用了一个明确的重新复制将副作用的恶果替换掉了（稍后有更多关于这一点的内容）。
 
 虽然我们没有改变数组的结构，但如果我们想的话就可以。待会儿会详细说明这一点。
 
@@ -468,25 +467,19 @@ keypresses = trackEvent( newEvent2, keypresses );
 
 你发现这里发生了什么吗？
 
-Each time we add a new event to the "list", we create a new closure wrapped around the existing `keypresses()` function (closure), which captures the current `evt`. When we call the `keypresses()` function, it will successively call all the nested functions, building up an intermediate array of all the individually closed-over `evt` objects. Again, closure is the mechanism that's tracking all the state; the array you see is only an implementation detail of needing a way to return multiple values from a function.
-
 每当我们向 “列表” 中添加一个新事件，我们就在既存的 `keypresses()` 函数（闭包） —— 她持有当前的 `evt` 对象 —— 周围创建了一个新的闭包。当我们调用 `keypresses()` 函数时，它将依次调用所有嵌套着的函数，建立起一个所有分别被闭包的 `evt` 对象的中间数组。同样，闭包是追踪所有这些状态的机制；你看到的数组只是为了从一个函数中返回多个值而出现的一个实现细节。
-
-So which one is better suited for our task? No surprise here, the array approach is probably a lot more appropriate. The structural immutability of a closure means our only option is to wrap more closure around it. Objects are by default extensible, so we can just grow the array as needed.
 
 那么哪一个适合我们的任务？不出意料地，数组的方式可能要合适得多。闭包在结构上的不可变性意味着我们唯一的选择是在它之上包裹更多的闭包。对象默认就是可扩展的，所我们只要按需要加长数组即可。
 
-By the way, even though I'm presenting this structural (im)mutability as a clear difference between closure and object, the way we're using the object as an immutable value is actually more similar than dislike.
+顺带一提，虽然我将这种结构上的（不）可变性作为闭包和对象间的一种明显的不同，但是我们将对象作为一个不可变的值来使用的方式实际上更加像是一种相似性。
 
-顺带一提，虽然我将这种结构上的（不）可变性作为闭包和对相间的一种明确的不同，但是
+为每次数组的递增创建一个新数组（通过 `concat(..)`）就是讲数组视为结构上不可变的，这与闭包是结构上不可变的设计初衷在概念上是平行的。
 
-Creating a new array (via `concat(..)`) for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its very design.
+### 私有性
 
-### Privacy
+在分析闭包 vs 对象时，你可能想到的第一个不同就是闭包通过嵌套的词法作用域提供了状态的“私有性”，而对象将所有的东西都作为公共属性暴露出来。这样的私有性有一个炫酷的名字：信息隐藏。
 
-Probably one of the first differences you think of when analyzing closure vs object is that closure offers "privacy" of state through nested lexical scoping, whereas objects expose everything as public properties. Such privacy has a fancy name: information hiding.
-
-Consider lexical closure hiding:
+考虑一下词法闭包隐藏：
 
 ```js
 function outer() {
@@ -502,7 +495,7 @@ var xHidden = outer();
 xHidden();			// 1
 ```
 
-Now the same state in public:
+现在是公有的相同状态：
 
 ```js
 var xPublic = {
@@ -512,30 +505,30 @@ var xPublic = {
 xPublic.x;			// 1
 ```
 
-There's some obvious differences around general software engineering principles -- consider abstraction, the module pattern with public and private APIs, etc -- but let's try to constrain our discussion to the perspective of FP; this is, after all, a book about functional programming!
+对于一般的软件工程原理来说这里有一些明显的不同 —— 考虑到抽象，带有公共和私有 API 的模块模式，等等 —— 但是让我们将我们的讨论限定在 FP 的角度之上；毕竟，这是一本关于函数式编程的书！
 
-#### Visibility
+#### 可见性
 
-It may seem that the ability to hide information is a desired characteristic of state tracking, but I believe the FPer might argue the opposite.
+隐藏信息的能力看起来似乎是一种人们渴望的状态追踪的特性，但是我相信 FP 程序员们可能会持反对意见。
 
-One of the advantages of managing state as public properties on an object is that it's easier to enumerate (and iterate!) all the data in your state. Imagine you wanted to process each keypress event (from the earlier example) to save it to a database, using a utility like:
+将状态作为一个对象上的公共属性进行管理的一个好处是，枚举（并迭代！）状态中所有的数据更简单。想象你想要处理每一个击键事件（早先的一个例子）来将它存入数据库，使用这样一个工具：
 
 ```js
 function recordKeypress(keypressEvt) {
-	// database utility
+	// 数据库工具
 	DB.store( "keypress-events", keypressEvt );
 }
 ```
 
-If you already have an array -- just an object with public numerically-named properties -- this is very straightforward using a built-in JS array utility `forEach(..)`:
+如果你已经拥有了一个数组 —— 一个带有数字命名属性的对象 —— 那么使用一个 JS 内建的数组工具 `forEach(..)` 完成这个任务就非常直接了当：
 
 ```js
 keypresses.forEach( recordKeypress );
 ```
 
-But, if the list of keypresses is hidden inside closure, you'll have to expose a utility on the public API of the closure with privileged access to the hidden data.
+但是，如果击键的列表被隐藏在闭包中的话，你就不得不在闭包的公共 API 上暴露一个工具，并使它拥有访问隐藏数据的特权。
 
-For example, we can give our closure-`keypresses` example its own `forEach`,  like built-in arrays have:
+例如，我们可以给闭包的 `keypresses` 示例一个它自己的 `forEach`，就像数组拥有的内建函数一样：
 
 ```js
 function trackEvent(
@@ -563,41 +556,41 @@ keypresses.list();		// [ evt, evt, .. ]
 keypresses.forEach( recordKeypress );
 ```
 
-The visibility of an object's state data makes using it more straightforward, whereas closure obscures the state making us work harder to process it.
+一对象的状态数据的可见性使得它使用起来更直接，而闭包隐晦的状态使我们不得不做更多的工作来处理它。
 
 #### Change Control
 
-If the lexical variable `x` is hidden inside a closure, the only code that has the freedom to reassign it is also inside that closure; it's impossible to modify `x` from the outside.
+如果词法变量 `x` 隐藏在一个闭包中，那么唯一能够对它进行重新赋值的代码也一定在这个闭包中；从外部修改 `x` 是不可能的。
 
-As we saw in Chapter 6, that fact alone improves the readability of code by reducing the surface area that the reader must consider to predict the behavior of any given variable.
+正如我们在第六章中看到的，仅这一点就改善了代码的可读性，它减小了读者为了判定一个已知变量的行为而必须考虑的代码的表面积。
 
-The local proximity of lexical reassignment is a big reason why I don't find `const` as a feature that helpful. Scopes (and thus closures) should in general be pretty small, and that means there will only be a few lines of code that can affect reassignment. In `outer()` above, we can quickly inspect to see that no line of code reassigns `x`, so for all intents and purposes it's acting as a constant.
+词法上重新赋值的局部接近性是我不觉得 `const` 是一个有用特性的一大原因。作用域（因此闭包也是）一般来说应当都很小，这意味着仅有几行代码可能会影响到重新赋值。在上面的 `outer()` 中，我们可以很快地检视并看到没有代码对 `x` 进行重新赋值，所以对于一切目的和意图来说它都是一个常数。
 
-This kind of guarantee is a powerful contributor to our confidence in the purity of a function, for example.
+这种保证及大地增强了我们在函数的纯粹性上的信心。
 
-On the other hand, `xPublic.x` is a public property, and any part of the program that gets a reference to `xPublic` has the ability, by default, to reassign `xPublic.x` to some other value. That's a lot more lines of code to consider!
+另一方面，`xPublic.x` 是一个公共属性，程序中任何得到 `xPublic` 引用的部分都默认地有能力将 `xPublic.x` 重新赋值为其他的某些值。要考虑的代码行数可要多多了！
 
-That's why in Chapter 6, we looked at `Object.freeze(..)` as a quick-n-dirty means of making all of an object's properties read-only (`writable: false`), so that they can't be reassigned unpredictably.
+这就是为什么在第六章中，我们看到 `Object.freeze(..)` 以一种简单粗暴的方式将一个对象的所有属性都设置为只读（`writable: false`），这样一来它们就不会不可预知地被重新赋值了。
 
-Unfortunately, `Object.freeze(..)` is both all-or-nothing and irreversible.
+不幸的是，`Object.freeze(..)` 会冻结所有属性而且不可逆转。
 
-With closure, you have some code with the privilege to change, and the rest of the program is restricted. When you freeze an object, no part of the code will be able to reassign. Moreover, once an object is frozen, it can't be thawed out, so the properties will remain read-only for the duration of the program.
+使用闭包，你让一些代码拥有改变的特权，而程序的其余部分依然受限。但你冻结一个对象时，程序中没有任何部分能够进行重新赋值。另外，一旦一个对象被冻结，它就不能再被解冻，于是它的属性会在程序运行期间一直保持只读状态。
 
-In places where I want to allow reassignment but restrict its surface area, closures are a more convenient and flexible form than objects. In places where I want no reassignment, a frozen object is a lot more convenient than repeating `const` declarations all over my function.
+在那些我想允许重新赋值但限制它影响范围的地方，闭包就是一种比对象更加方便而且灵活的方式。在我想要禁止重新赋值的地方，一个冻结的对象要比在我的函数中到处重复 `const` 声明方便多了。
 
-Many FPers take a hard-line stance on reassignment: it shouldn't be used. They will tend to use `const` to make all closure variables read-only, and they'll use `Object.freeze(..)` or full immutable data structures to prevent property reassignment. Moreover, they'll try to reduce the amount of explicitly declared/tracked variables and properties wherever possible, perferring value transfer -- function chains, `return` value passed as argument, etc -- instead of intermediate value storage.
+许多 FP 程序员对重新赋值采取了强硬的立场：它就不应当被使用。他们倾向于使用 `const` 将所有闭包变量都成为只读，而且他们使用 `Object.freeze(..)` 或者完全不可变的数据结构来防止属性被重新赋值。另外，他们还会尽可能地减少被明确声明/追踪的属性的数量，使用值的传送 —— 函数链，将 `return` 值作为参数传递，等等 —— 来取代值的临时存储。
 
-This book is about "functional light" programming in JavaScript, and this is one of those cases where I diverge from the core FP crowd.
+这本书讲的是 JavaScript 的“轻量函数式”编程，而这就是我与 FP 的核心人群意见相左的情况之一。
 
-I think variable reassignment can be quite useful and, when used approriately, quite readable in its explicitness. It's certainly been by experience that debugging is a lot easier when you can insert a `debugger` or breakpoint, or track a watch expression.
+我认为变量的重新赋值可以十分有用，而且，如果使用得当，它的明确性相当易读。而且从经验上讲，当你在调试中插入 `debugger` 或断点，或者一个监视表达式的时候，将会更容易。
 
-### Cloning State
+### 状态克隆
 
-As we learned in Chapter 6, one of the best ways we prevent side effects from eroding the predictability of our code is to make sure we treat all state values as immutable, regardless of whether they are actually immutable (frozen) or not.
+正如我们在第六章中学到的，防止副作用损害我们代码的可预见性的最佳方法之一，就是确保我们将所有状态值都视为不可变的，而不管它们实际上是否真的是不可变（被冻结）的。
 
-If you're not using a purpose-built library to provide sophisticated immutable data structures, the simplest approach will suffice: duplicate your objects/arrays each time before making a change.
+如果你没有在使用一个专门为此建造的、提供了精巧的不可变数据结构的库，那么最简单的方法也够了：在每次改变你的对象/数组之前复制它们。
 
-Arrays are easy to clone shallowly: just use the `slice()` method:
+数组很容易浅克隆：使用 `slice()` 方法就行：
 
 ```js
 var a = [ 1, 2, 3 ];
@@ -609,7 +602,7 @@ a;			// [1,2,3]
 b;			// [1,2,3,4]
 ```
 
-Objects can be shallow-cloned relatively easily too:
+对象也可以相对容易地进行浅克隆：
 
 ```js
 var o = {
@@ -617,32 +610,32 @@ var o = {
 	y: 2
 };
 
-// in ES2017+, using object spread:
+// 在 ES2017+ 中，使用对象扩散操作：
 var p = { ...o };
 p.y = 3;
 
-// in ES2015+:
+// 在 ES2015+ 中：
 var p = Object.assign( {}, o );
 p.y = 3;
 ```
 
-If the values in an object/array are themselves non-primitives (objects/arrays), to get deep cloning you'll have to walk each layer manually to clone each nested object. Otherwise, you'll have copies of shared references to those sub-objects, and that's likely to create havoc in your program logic.
+如果在一个对象/数组中的值本身就是非基本类型（对象/数组），那么为了进行深度克隆，你就必须手动遍历并克隆每一个被嵌套的对象。否则，你会得到那些字对象的共享引用的拷贝，而这很可能会在你的程序逻辑中造成灾难。
 
-Did you notice that this cloning is possible only because all these state values are visible and can thus be easily copied? What about a set of state wrapped up in a closure; how would you clone that state?
+你有没有注意到，这种克隆之所以可能，仅仅是由于所有这些状态值都可见，并因此可以很容易拷贝？那么包装在一个闭包中的一组状态呢？你如何拷贝那些状态？
 
-That's much more tedious. Essentially, you'd have to do something similar to our custom `forEach` API method earlier: provide a function inside each layer of the closure with the privilege to extract/copy the hidden values, creating new equivalent closures along the way.
+那可麻烦多了。事实上，你不得不做一些与我们之前自定义的 `forEach` API 方法相似的事情：在闭包的每一层内部都提供一个有权抽取/拷贝隐藏值的函数，一路创建新的等价闭包。
 
-Even though that's theoretically possible -- another exercise for the reader! -- it's far less practical to implement than you're likely to justify for any real program.
+即便这在理论上是可能的 —— 给读者的另一个练习！ —— 但与你对任何真实的程序所作出的可能的调整相比，它也远不切实际。
 
-Objects have a clear advantage when it comes to representing state that we need to be able to clone.
+当对象用来表示我们想要克隆的状态时，它具有明显的好处。
 
-### Performance
+### 性能
 
-One reason objects may be favored over closures, from an implementation perspective, is that in JavaScript objects are often lighter-weight in terms of memory and even computation.
+一个对象可能优于闭包的原因，从实现的角度讲，是在 JavaScript 中对象在内存甚至计算的意义上更轻量。
 
-But be careful with that as a general assertion: there are plenty of things you can do with objects that will erase any performance gains you may get from ignoring closure and moving to object-based state tracking.
+但将之作为一个一般性的结论要小心：在你无视闭包并转向基于对象的状态追踪时可能会得到一些性能的增益，但在你能对对象所做的事情中，有相当一部分可以抹除这些增益。
 
-Let's consider a scenario with both implementations. First, the closure-style implementation:
+让我们使用两种实现考虑同一个场景。首先，闭包风格的实现：
 
 ```js
 function StudentRecord(name,major,gpa) {
@@ -653,15 +646,15 @@ function StudentRecord(name,major,gpa) {
 
 var student = StudentRecord( "Kyle Simpson", "kyle@some.tld", "CS", 4 );
 
-// later
+// 稍后
 
 student();
 // Kyle Simpson, Major: CS, GPA: 4.0
 ```
 
-The inner function `printStudent()` closes over three variables: `name`, `major`, and `gpa`. It maintains this state wherever we transfer a reference to that function -- we call it `student()` in this example.
+内部函数 `printStudent()` 闭包着三个变量 `name`、`major`、和 `gpa`。无论我们在何处传送一个指向这个函数的引用，它都会维护这个状态 —— 在这个例子中我们称之为 `student()`。
 
-Now for the object (and `this`) approach:
+现在轮到对象（和 `this`）的方式了：
 
 ```js
 function StudentRecord(){
@@ -674,7 +667,7 @@ var student = StudentRecord.bind( {
 	gpa: 4
 } );
 
-// later
+// 稍后
 
 student();
 // Kyle Simpson, Major: CS, GPA: 4.0
@@ -682,9 +675,15 @@ student();
 
 The `student()` function -- technically referred to as a "bound function" -- has a hard-bound `this` reference to the object literal we passed in, such that any later call to `student()` will use that object for it `this`, and thus be able to access its encapsulated state.
 
+`student()` 函数 —— 技术上成为一个“被绑定函数” —— 拥有一个硬绑定的 `this` 引用，它指向我们传入的对象字面量，这样稍后对 `student()` 的调用将会使用这个对象作为 `this`，因此可以访问它所封装的状态。
+
 Both implemenations have the same outcome: a function with preserved state. But what about the performance; what differences will there be?
 
+这两种实现都有相同的结果：一个保留着状态的函数。那么性能呢？会有什么不同？
+
 **Note:** Accurately and actionably judging performance of a snippet of JS code is a very dodgy affair. We won't get into all the details here, but I urge you to read the "You Don't Know JS: Async & Performance" book, specifically Chapter 6 "Benchmarking & Tuning", for more details.
+
+**注意：** 准确地、可操作地判断一段 JS 代码的性能是一件非常棘手的事情。我们不会在此深入所有的细节，但我强烈建议你阅读“你不懂 JS：异步与性能”一书，特别是第六章“基准分析与调优”，来了解更多细节。
 
 If you were writing a library that created a pairing of state with its function -- either the call to `StudentRecord(..)` in the first snippet or the call to `StudentRecord.bind(..)` in the second snippet -- you're likely to care most about how those two perform. Inspecting the code, we can see that the former has to create a new function expression each time. The second one uses `bind(..)`, which is not as obvious in its implications.
 
