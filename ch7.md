@@ -558,7 +558,7 @@ keypresses.forEach( recordKeypress );
 
 一对象的状态数据的可见性使得它使用起来更直接，而闭包隐晦的状态使我们不得不做更多的工作来处理它。
 
-#### Change Control
+#### 改变控制
 
 如果词法变量 `x` 隐藏在一个闭包中，那么唯一能够对它进行重新赋值的代码也一定在这个闭包中；从外部修改 `x` 是不可能的。
 
@@ -673,21 +673,15 @@ student();
 // Kyle Simpson, Major: CS, GPA: 4.0
 ```
 
-The `student()` function -- technically referred to as a "bound function" -- has a hard-bound `this` reference to the object literal we passed in, such that any later call to `student()` will use that object for it `this`, and thus be able to access its encapsulated state.
-
 `student()` 函数 —— 技术上成为一个“被绑定函数” —— 拥有一个硬绑定的 `this` 引用，它指向我们传入的对象字面量，这样稍后对 `student()` 的调用将会使用这个对象作为 `this`，因此可以访问它所封装的状态。
-
-Both implemenations have the same outcome: a function with preserved state. But what about the performance; what differences will there be?
 
 这两种实现都有相同的结果：一个保留着状态的函数。那么性能呢？会有什么不同？
 
-**Note:** Accurately and actionably judging performance of a snippet of JS code is a very dodgy affair. We won't get into all the details here, but I urge you to read the "You Don't Know JS: Async & Performance" book, specifically Chapter 6 "Benchmarking & Tuning", for more details.
-
 **注意：** 准确地、可操作地判断一段 JS 代码的性能是一件非常棘手的事情。我们不会在此深入所有的细节，但我强烈建议你阅读“你不懂 JS：异步与性能”一书，特别是第六章“基准分析与调优”，来了解更多细节。
 
-If you were writing a library that created a pairing of state with its function -- either the call to `StudentRecord(..)` in the first snippet or the call to `StudentRecord.bind(..)` in the second snippet -- you're likely to care most about how those two perform. Inspecting the code, we can see that the former has to create a new function expression each time. The second one uses `bind(..)`, which is not as obvious in its implications.
+如果你在编写一个库，它创建一个带有函数的状态 —— 要么是一个代码段中对 `StudentRecord(..)` 的调用，要么是第二个代码段中对 `StudentRecord.bind(..)` 的调用 —— 你最关心的很可能是它们两个如何工作。检视它们的代码，我们可以发现前者不得不每次创建一个新的函数表达式。而第二个使用了 `bind(..)`，这由于它的隐晦而不那么明显。
 
-One way to think about what `bind(..)` does under the covers is that it creates a closure over a function, like this:
+考虑 `bind(..)` 在底层如何工作的一种方式是，它在函数之上创建了一个闭包，就像这样：
 
 ```js
 function bind(orinFn,thisObj) {
@@ -699,22 +693,22 @@ function bind(orinFn,thisObj) {
 var student = bind( StudentRecord, { name: "Kyle.." } );
 ```
 
-In this way, it looks like both implementations of our scenario create a closure, so the performance is likely to be about the same.
+以这种方式，看起来我们这种场景的两种实现都创建了闭包，因此它们的性能很可能是相同的。
 
-However, the built-in `bind(..)` utility doesn't really have to create a closure to accomplish the task. It simply creates a function and manually sets its internal `this` to the specified object. That's potentially a more efficient operation than if we did the closure ourselves.
+然而，内建的 `bind(..)` 工具不必真的创建闭包来完成这个任务。它只是创建一个函数并手动地将它内部的 `this` 设置为指定的对象。这潜在地是一种比我们自己做的闭包更高效的操作。
 
-The kind of performance savings we're talking about here is miniscule on an individual operation. But if your library's critical path is doing this hundreds or thousands of times or more, that savings can add up quickly. Many libraries -- Bluebird being one such example -- have ended up optimizing by removing closures and going with objects, in exactly this means.
+我们在这里讨论的这种性能提升在个别的操作中的影响微乎其微。但如果你的库的关键路径在成百上千次，或更多地重复这件事，那么这种提升的效果就会很快累加起来。许多的库 —— 例如 Bluebird 就是一例 —— 都正是由于这个原因，最终通过移除闭包而使用对象来进行了优化。
 
-Outside of the library use-case, the pairing of the state with its function usually only happens relatively few times in the critical path of an application. By contrast, typically the usage of the function+state -- calling `student()` in either snippet -- is more common.
+在库之外的用例当中，带有自己函数的状态通常只在一个应用程序的关键路径上相对少地出现几次。对比之下，函数 + 状态的用法 —— 在两个代码段中对 `student()` 的调用 —— 通常更常见。
 
-If that's the case for some given situation in your code, you should probably care more about the performance of the latter versus the former.
+如果这正是你代码中的某些已知情况，那么你可能应当更多地关心后者的性能与前者的对比。
 
-Bound functions have historically had pretty lousy performance in general, but have recently been much more highly optimized by JS engines. If you benchmarked these variations a couple of years ago, it's entirely possible you'd get different results repeating the same test with the latest engines.
+长久以来被绑定的函数的性能通常都很烂，但是最近它已经被 JS 引擎进行了相当高度的优化。如果你在几年前曾经对这些种类的函数进行过基准分析，那么你在最新的引擎上重复相同的测试的话，就完全有可能得到不同的结果。
 
-A bound function is now likely to perform at least as good if not better as the equivalent closed-over function. So that's another tick in favor of objects over closures.
+如今，一个被绑定函数性能最差也能与它闭包函数的等价物相同。所以这是另一个首选对象而非闭包的理由。
 
-I just want to reiterate: these performance observations are not absolutes, and the determination of what's best for a given scenario is very complex. Do not just casually apply what you've heard from others or even what you've seen on some other earlier project. Carefully examine whether objects or closures are appropriately efficient for the task.
+我想要重申：这些性能上的观测不是绝对的，而且对于一个已知场景判定什么对它最合适是非常复杂的。不要只是随便地使用一些道听途说的，或者你曾将在以前的项目中见过的东西。要仔细地检查对象或闭包是否能恰当、高效地完成你当前的任务。
 
-## Summary
+## 总结
 
-The truth of this chapter cannot be written out. One must read this chapter to find its truth.
+这一章的真理是无法付诸笔头的。你必须阅读这一章来找出它的真理。
