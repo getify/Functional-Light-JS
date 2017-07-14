@@ -566,7 +566,7 @@ var unique =
 		, [] );
 ```
 
-**注意：** 使用诸如循环之类的更具指令式的方式，有许多种其他不同的方法可以实现这个算法，而且其中很多在性能方面可能看起来 “更高效”。然而，上面展示这两种方式有一个优势是它们都是用了既存的列表操作，这使它们与其他列表操作链接/组合起来更容易。我们将会在本章稍后更多地谈到这些问题。
+**注意：** 使用诸如循环之类的更具指令式的方式，有许多种其他不同的方法可以实现这个算法，而且其中很多在性能方面可能看起来 “更高效”。然而，上面展示的这两种方式有一个优势是它们都使用了既存的列表操作，这使它们与其他列表操作链接/组合起来更容易。我们将会在本章稍后更多地谈到这些问题。
 
 `unique(..)` 可以出色地产生一个没有重复的新列表：
 
@@ -600,9 +600,9 @@ var flatten =
 		, [] );
 ```
 
-**注意：** 这种实现的选择依赖于用递归处理嵌套的列表。后面的章节中有关于递归的更多内容。
+**注意：** 这种实现依赖于使用递归处理嵌套的列表。后面的章节中有关于递归的更多内容。
 
-要对一个（嵌套人一多层的）数组的数组使用 `flatten(..)`：
+要对一个（嵌套多层的）数组的数组使用 `flatten(..)`：
 
 ```js
 flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
@@ -649,7 +649,7 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 5 );
 // [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
 ```
 
-#### Mapping, Then Flattening
+#### Map，之后 Flatten
 
 `flatten(..)` 行为的最常见用法之一是在你映射一个列表时，每一个从原数组变形而来的元素本身就是一个值的列表。例如：
 
@@ -759,12 +759,12 @@ zip( [1,3,5,7,9], [2,4,6,8,10] );
 flatten( [ [1,2], [3,4], [5,6], [7,8], [9,10] ] );
 // [1,2,3,4,5,6,7,8,9,10]
 
-// composed:
+// 组合后：
 flatten( zip( [1,3,5,7,9], [2,4,6,8,10] ) );
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-然而，回忆一下， `zip(..)` 的值选择仅到较短的列表耗尽为止，而且忽略剩下的值；而融合两个列表时保留那些额外的值将是最自然的。另外，`flatten(..)` 会在嵌套的列表中递归地执行，但你可能希望列表融合仅在浅层工作，保留嵌套的列表。
+然而，回忆一下， `zip(..)` 对值的选择仅截止到较短的列表耗尽为止，而且忽略剩下的值；而融合两个列表时保留那些额外的值将是最自然的。另外，`flatten(..)` 会在嵌套的列表中递归地执行，但你可能希望列表融合仅在浅层工作，保留嵌套的列表。
 
 那么，然我们定义一个如我们所愿的 `mergeLists(..)`：
 
@@ -792,13 +792,13 @@ function mergeLists(arr1,arr2) {
 此外，还有许多其他选择可以将列表的融合实现为一个递减函数：
 
 ```js
-// via @rwaldron
+// 由 @rwaldron 编写
 var mergeReducer =
 	(merged,v,idx) =>
 		(merged.splice( idx * 2, 0, v ), merged);
 
 
-// via @WebReflection
+// 由 @WebReflection 编写
 var mergeReducer =
 	(merged,v,idx) =>
 		merged
@@ -816,9 +816,9 @@ var mergeReducer =
 
 **提示：** 我们将在本章稍后使用这个 `mergeReducer(..)` 技巧。
 
-## Method vs. Standalone
+## 方法 vs. 独立函数
 
-在 JavaScript 中一个令 FP 程序员们沮丧的源头是，当一些工具作为独立函数被提供 —— 考虑一下我们在前一章中衍生出来的各种工具 —— 而另一些是数组原型的方法时 —— 就像我们在本章中看到的 —— 如何为使用这些工具来统一他们的策略。
+在 JavaScript 中一个令 FP 程序员们沮丧的根源是，当一些工具作为独立函数被提供 —— 考虑一下我们在前一章中衍生出来的各种工具 —— 而另一些是数组原型的方法时 —— 就像我们在本章中看到的 —— 如何为使用这些工具来统一他们的策略。
 
 当你考虑组合多个操作时，这个问题使人头疼的地方就变得更加明显：
 
@@ -840,20 +840,20 @@ reduce(
 );									// 18
 ```
 
-这两种 API 风格都完成相同的任务，但它们在人体工程学上十分的不同。相较于前者许多 FP 程序员偏好后者，但前者毫无疑问地在 JavaScript 中更常见。后者一个特别令人厌恶的东西就是调用的嵌套。方法链风格招人喜欢的地方 —— 常被称为流利的 API 风格，就像在 jQuery 和其他工具中 —— 在于其紧凑/简介，以及它读起来是声明式的从上到下顺序。
+这两种 API 风格都完成相同的任务，但它们在人体工程学上十分的不同。相较于前者许多 FP 程序员偏好后者，但前者毫无疑问地在 JavaScript 中更常见。后者一个特别令人厌恶的东西就是调用的嵌套。方法链风格招人喜欢的地方 —— 常被称为流利的 API 风格，就像在 jQuery 和其他工具中那样 —— 在于其紧凑/简洁，以及它读起来是声明式的从上到下顺序。
 
 对于独立函数风格的手动组合来说，它的视觉顺序既不是从左到右（从上到下）也不是从右到左（从下到上）；而是由内而外，这损害了可读性。
 
 自动组合将两种风格的阅读顺序规范化为从右到左（从下到上）。那么为了探索不同风格可能造成的影响，让我们专门讲解一下组合；这看起来应当很直接，但是实际上在两种情况下都有些尴尬。
 
-### Composing Method Chains
+### 组合方法链
 
 数组方法接收隐含的 `this` 参数，所以尽管它们没有出现，这些方法也不能被视为一元的；这使得组合更加尴尬。为了应付它，首先我们需要一个 `this` 敏感版本的 `partial(..)`：
 
 ```js
 var partialThis =
 	(fn,...presetArgs) =>
-		// intentionally `function` to allow `this`-binding
+		// 有意地制造一个允许 `this` 绑定的 `function`
 		function partiallyApplied(...laterArgs){
 			return fn.apply( this, [...presetArgs, ...laterArgs] );
 		};
@@ -885,7 +885,7 @@ composeChainedMethods(
 
 **注意：** 三个 `Array.prototype.XXX` 风格的引用抓住了内建的 `Array.prototype.*` 方法的引用，这样我们就可以对自己的数组复用它们了。
 
-### Composing Standalone Utilities
+### 组合独立函数工具
 
 这些工具的独立 `compose(..)` 风格组合不需要所有这些扭曲 `this` 的操作，这是它最为人称道的地方。例如，我们可以这样定义独立函数：
 
@@ -940,7 +940,7 @@ compose(
 
 这种方式的清晰性在某种程度上就是为什么 FP 程序员喜欢独立的工具风格而不是实例方法。但你的感觉可能会不同。
 
-### Adapting Methods To Standalones
+### 将方法适配为独立函数
 
 在前面 `filter(..)` / `map(..)` / `reduce(..)` 的定义中，你可能发现了这三者的共同模式：它们都被分发到相应的原生数组方法上。那么，我们能否使用一个工具来生成这些独立适配函数呢？是的！让我们为此制造一个称为 `unboundMethod(..)` 的工具：
 
@@ -973,14 +973,14 @@ compose(
 
 **注意：** `unboundMethod(..)` 在 Ramda 中称为 `invoker(..)`。
 
-### Adapting Standalones To Methods
+### 将独立函数适配为方法
 
 如果你喜欢只使用数组方法（流利的链式风格），你有两个选择。你可以：
 
 1. 使用额外的方法扩展内建的 `Array.prototype`。
 2. 适配一个用于递减函数的独立工具，并将它传入 `reduce(..)` 实例方法。
 
-**不要选择（1）。** 扩展 `Array.prototype` 这样的原声类型从来都不是一个好主意 —— 除非你定义一个 `Array` 的子类，但这超出了我们在此的讨论范围。为了不鼓励不好的实践，我们不会在这种方式上再前进了。
+**不要选择（1）。** 扩展 `Array.prototype` 这样的原生类型从来都不是一个好主意 —— 除非你定义一个 `Array` 的子类，但这超出了我们在此的讨论范围。为了不鼓励不好的实践，我们不会在这种方式上再前进了。
 
 让我们 **集中于（2）**。为了展示其中的要点，我们将转换之前递归的 `flatten(..)` 独立工具：
 
@@ -996,7 +996,7 @@ var flatten =
 让我们将内部的 `reducer(..)` 函数抽离为一个独立工具（并将它适配为可以脱离外部 `flatten(..)` 工作）：
 
 ```js
-// intentionally a function to allow recursion by name
+// 有意地定义一个允许通过名称进行递归的函数
 function flattenReducer(list,v) {
 	return list.concat(
 		Array.isArray( v ) ? v.reduce( flattenReducer, [] ) : v
@@ -1012,7 +1012,7 @@ function flattenReducer(list,v) {
 // ..
 ```
 
-## Looking For Lists
+## 寻找列表
 
 目前为止，绝大多数例子都很琐碎，它们基于简单的数字或字符串列表。现在让我们谈谈列表操作可以闪光的地方：对一系列指令式的语句进行声明式的建模。
 
@@ -1034,7 +1034,7 @@ if (orders != null) processOrders( orders );
 
 首先，我们观察到那五个变量声明和守护着函数调用的一系列 `if` 条件实质上是这六个调用的一个大组合：`getCurrentSession()`、`getSessionId(..)`、`lookupUser(..)`、`getUserId(..)`、`lookupOrders(..)`、和 `processOrders(..)`。理想上，我们想要摆脱所有这些变量声明和指令式条件。
 
-不幸的是，我们在第四章中探索过的 `compose(..)` / `pipe(..)` 工具自身不会在组合中提供一种表达 `!= null` 条件的方便方法。让我们定义一个工具来提供帮助：
+不幸的是，我们在第四章中探索过的 `compose(..)` / `pipe(..)` 工具自身不会在组合中提供一种表达 `!= null` 条件的简便方法。让我们定义一个工具来提供帮助：
 
 ```js
 var guard =
@@ -1108,13 +1108,13 @@ var mergeReducer =
 );
 ```
 
-所有的指令式变量声明和条件都不见了，取而代之的是链接在一起的干净且声明式的列表操作。
+所有的指令式变量声明和条件都不见了，取而代之的是链接在一起的干净且是声明式的列表操作。
 
-如果对你来说这个版本比原来的版本读起来更苦难，不要担心。原来的版本无疑是你可能更加熟悉的指令式形式。你向函数式程序员演变过程的一部分就是发展出能够识别 FP 模式的能力，比如像这样的列表操作。久而久之，随着你对代码可读性的感觉转换为声明式风格，这些东西将会更容易地从代码中跳出来。
+如果对你来说这个版本比原来的版本读起来更困难，不要担心。原来的版本无疑是你可能更加熟悉的指令式形式。你向函数式程序员演变过程的一部分就是发展出能够识别 FP 模式的能力，比如像这样的列表操作。久而久之，随着你对代码可读性的感觉转换为声明式风格，这些东西将会更容易地从代码中跳出来。
 
 在我们结束这个话题之前，让我们看一下现实：这里的例子都是严重造作的。不是所有的代码段都可以简单地模型化为列表操作。务实的要点是，要开发寻找这些可以进行优化的机会，但不要过于沉迷在代码的杂耍中；有些改进是聊胜于无的。总是退一步并问问你自己，你是 **改善了还是损害了** 代码的可读性。
 
-## Fusion
+## 融合（Fusion）
 
 随着你将 FP 列表操作更多地带入到你对代码的思考中，你很可能很快就会看到像这样组合行为的链条：
 
@@ -1214,7 +1214,7 @@ words
 
 要是融合两个或更多的 `filter(..)` 判定函数呢？它们经常被视为一元函数，看起来很适于组合。但别扭的地方是它们每一个都返回 `boolean` 种类的值，而这与下一个所期望的输入值不同。融合相邻的 `reduce(..)` 调用也是可能的，但递减函数不是一元的所以更具挑战性；我们需要更精巧的方法来抽离这种融合。我们会在附录A “转导” 中讲解这些高级技术。
 
-## Beyond Lists
+## 列表以外
 
 目前为止我们一直在列表（数组）数据结构的语境中讨论各种操作；这无疑是你遇到它们的最常见的场景。但在更一般的意义上，这些操作可以对各种值的集合执行。
 
@@ -1267,7 +1267,7 @@ var grape = cucumber.right = BinaryTree( "grape", cucumber );
 因为你不能像对一个数组那样简单地 `console.log(..)` 一个二叉树，所以我们先来定义一个主要为了进行打印而生的便利方法。`forEach(..)` 将会像访问一个数组那样访问一个二叉树的节点：
 
 ```js
-// in-order traversal
+// 按顺序遍历
 BinaryTree.forEach = function forEach(visitFn,node){
 	if (node) {
 		if (node.left) {
@@ -1293,7 +1293,7 @@ BinaryTree.forEach = function forEach(visitFn,node){
 BinaryTree.forEach( node => console.log( node.value ), banana );
 // apple apricot avocado banana cantelope cherry cucumber grape
 
-// visit only the `cherry`-rooted subtree
+// 访问 `cherry` 作为根的子树
 BinaryTree.forEach( node => console.log( node.value ), cherry );
 // cantelope cherry cucumber grape
 ```
@@ -1345,7 +1345,7 @@ BinaryTree.forEach( node => console.log( node.value ), BANANA );
 ```js
 BinaryTree.reduce = function reduce(reducerFn,initialValue,node){
 	if (arguments.length < 3) {
-		// shift the parameters since `initialValue` was omitted
+		// 更换参数，因为 `initialValue` 被省略了
 		node = initialValue;
 	}
 
@@ -1479,12 +1479,12 @@ var vegetables = [ "asparagus", "avocado", "brocolli", "carrot",
 	"zucchini" ];
 
 var whatToBuy = BinaryTree.filter(
-	// filter the produce list only for vegetables
+	// 过滤作物的列表，使之仅含蔬菜
 	node => vegetables.indexOf( node.value ) != -1,
 	banana
 );
 
-// shopping list
+// 购物单
 BinaryTree.reduce(
 	(result,node) => result.concat( node.value ),
 	[],
@@ -1495,7 +1495,7 @@ BinaryTree.reduce(
 
 你很可能在简单的数组上下文环境中使用本章中提到的大多数列表操作。但我们已经看到了，这其中的概念可以应用于任何你可能需要的数据结构和操作中。这是 FP 如何可以广泛地应用于许多不同应用程序场景的有力证明！
 
-## Summary
+## 总结
 
 三个常见而且强大的列表操作：
 
