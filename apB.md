@@ -90,7 +90,7 @@ Any monad instances of both `Just(..)` and `Nothing()` will all have `map(..)`, 
 
 Maybe is the pairing of these two monads. If a value is non-empty, it's represented by an instance of `Just(..)`; if it's empty, it's represented by an instance of `Nothing()`. Notice there's no imposition here of what "empty" means -- your code gets to decide that. More on that in the next section.
 
-But the value of this kind of monad representation is that whether we have a `Just(..)` instance of a `Nothing()` instance, we'll use it the same. `Nothing()` instances have no-op definitions for all methods. So if such a monad instance shows up in our monadic operations, it has the effect of basically short-circuiting to ignore behavior.
+But the value of this kind of monad representation is that whether we have a `Just(..)` instance or a `Nothing()` instance, we'll use it the same. `Nothing()` instances have no-op definitions for all methods. So if such a monad instance shows up in our monadic operations, it has the effect of basically short-circuiting to ignore behavior.
 
 The power of the Maybe abstraction is to encapsulate that behavior/no-op duality implicitly.
 
