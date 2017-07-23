@@ -1,21 +1,21 @@
-# Functional-Light JavaScript
-# Appendix A: Transducing
+# 轻量函数式 JavaScript
+# 附录 A：Transducing
 
-Transducing is a more advanced technique than we've covered in this book. It extends many of the concepts from Chapter 8 on list operations.
+与我们在本书中所讲解的内容相比，Transducing 是一种更高级的技术。它扩展了第八章中的列表操作的许多概念。
 
-I wouldn't necessarily call this topic strictly "Functional-Light", but more like a bonus on top. I've left this to an appendix because you might very well need to skip the discussion for now and come back to it once you feel fairly comfortable with -- and make sure you've practiced! -- the main book concepts.
+我不认为这个话题是严格的 “轻量函数式”，它更像是在此之上的额外奖励。我将它留作附录是因为你很可能需要暂且跳过关于它的讨论，而在你对本书正文中的概念感到相当适应 —— 并且确实经过实践！ —— 之后再回到这里。
 
-To be honest, even after teaching transducing many times, and writing this chapter, I am still trying to fully wrap my brain around this technique. So don't feel bad if it twists you up. Bookmark this appendix and come back when you're ready.
+老实说，即便是教授了 transducing 许多次，而且编写了这一章之后，我依然在努力地尝试使用这种技术来武装自己的头脑。所以，如果它让你感到很绕也不要灰心。给这一章夹上一个书签，当你准备好了之后再回来。
 
-Transducing means transforming with reduction.
+Transducing 意味着带有变形（transforming）的递减（reduction）。
 
-I know that may sound like a jumble of words that confuses more than it clarifies. But let's take a look at how powerful it can be. I actually think it's one of the best illustrations of what you can do once you grasp the principles of Functional-Light Programming.
+我知道，它听起来就像一个杂乱的词汇 —— 它使人糊涂的地方要比它澄清的东西多。但还是让我们看看它能有多么强大。实际上，我认为一旦你掌握了轻量函数式编程的原理，它就是你能力的最佳展示。
 
-As with the rest of this book, my approach is to first explain *why*, then *how*, then finally boil it down to a simplified, repeatable *what*. That's often backwards of how many teach, but I think you'll learn the topic more deeply this way.
+正如本书的其他部分一样，我的方式是首先解释 *为什么*，然后在讲解 *如何做*，最后归结为一种简化的，可重用的 *什么*。这通常与其他许多人的教授方法相反，但我认为这种方式可以使你更深入地学习。
 
-## Why, First
+## 首先，为什么
 
-Let's start by extending a scenario we covered back in Chapter 3, testing words to see if they're short enough and/or long enough:
+让我们从扩展第三章中的一个场景开始，测试一个单词，看它是否足够短并/或足够长：
 
 ```js
 function isLongEnough(str) {
@@ -27,7 +27,7 @@ function isShortEnough(str) {
 }
 ```
 
-In Chapter 3, we used these predicate functions to test a single word. Then in Chapter 8, we learned how to repeat such tests using list operations like `filter(..)`. For example:
+在第三章中，我们使用了这些判定函数来测试一个单词。然后在第八章中，我们学习了如何使用 `filter(..）` 之类的列表操作重复这样的测试。例如：
 
 ```js
 var words = [ "You", "have", "written", "something", "very", "interesting" ];
@@ -38,13 +38,13 @@ words
 // ["written","something"]
 ```
 
-It may not be obvious, but this pattern of separate adjacent list operations has some non-ideal characteristics. When we're dealing with only a single array of a small number of values, everything is fine. But if there were lots of values in the array, each `filter(..)` processing the list separately can slow down a bit more than we'd like.
+这可能不太明显，不过这种分离且相邻的列表操作模式有些不尽人意的性质。当我们处理仅拥有为数不多的值的单一数组是，一切都很正常。但如果数组中有许多值的时候，分离地处理每个 `filter(..)` 可能会出人意料地降低程序运行的速度。
 
-A similar performance problem arises when our arrays are async/lazy (aka observables), processing values over time in response to events (see Chapter 10). In this scenario, only a single value comes down the event stream at a time, so processing that discrete value with two separate `filter(..)`s function calls isn't really such a big deal.
+当我们的数组是异步/懒惰（也称为 observable）的、在对事件作出相应而跨时段处理值（见第十章）的时候也会出现同样的性能问题。在这种场景下，事件流中每次只会有一个值被传递出来，所以使用两个分离的 `filter(..)` 函数处理这些离散的值也不是什么大问题。
 
-But, what's not obvious is that each `filter(..)` method produces a separate observable. The overhead of pumping a value out of one observable into another can really add up. That's especially true since in these cases, it's not uncommon for thousands or millions of values to be processed; even such small overhead costs add up quickly.
+但微妙的是，每个 `filter(..)` 方法都生成一个分离的 observable。将一个值从一个 observable 中传递到另一个 observable 的开销可能累积起来。特别是在这些情况下成千或上百万的值需要被处理并非不寻常的事；即便是如此之小的开销也会很快地累积起来。
 
-The other downside is readability, especially when we need to repeat the same series of operations against multiple lists (or observables). For example:
+另一个缺陷是可读性，特别是当我们需要对多个列表（或者 observable）重复这一系列操作的时候。例如：
 
 ```js
 zip(
@@ -54,9 +54,9 @@ zip(
 )
 ```
 
-Repetitive, right?
+很啰嗦，对吧？
 
-Wouldn't it be better (both for readability and performacne) if we could combine the `isLongEnough(..)` predicate with the `isShortEnough(..)` predicate? You could do so manually:
+如果我们能够将 `isLongEnough(..)` 和 `isShortEnough(..)` 判定函数结合起来不是更好吗（对于可读性和性能来说）？你可以手动这样做：
 
 ```js
 function isCorrectLength(str) {
@@ -64,9 +64,9 @@ function isCorrectLength(str) {
 }
 ```
 
-But that's not the FP way!
+但这不是 FP 的方式！
 
-In Chapter 8, we talked about fusion -- composing adjacent mapping functions. Recall:
+在第八章中，我们谈到了熔合 —— 组合相邻的映射函数。回想一下：
 
 ```js
 words
@@ -75,15 +75,15 @@ words
 );
 ```
 
-Unfortunately, combining adjacent predicate functions doesn't work as easily as combining adjacent mapping functions. To understand why, think about the "shape" of the predicate function -- a sort of academic way of describing the signature of inputs and output. It takes a single value in, and it returns a `true` or a `false`.
+不幸的是，组合相邻的判定函数不像组合相邻的映射函数那么简单。究其原因，考虑一下判定函数的 “外形（shape）” —— 某种描述输入和输出签名的学术化方式。它接收一个单独的值，并返回一个 `true` 或 `false`。
 
-If you tried `isShortEnough(isLongEnough(str))`, it wouldn't work properly. `isLongEnough(..)` will return `true` / `false`, not the string value that `isShortEnough(..)` is expecting. Bummer.
+如果你试着使用 `isShortEnough(isLongEnough(str))`，它是不会正常工作的。`isLongEnough(..)` 将会返回 `true` / `false`，而不是 `isShortEnough(..)` 所期待的字符串值。烦人。
 
-A similar frustration exists trying to compose two adjacent reducer functions. The "shape" of a reducer is a function that receives two values as input, and returns a single combined value. The output of a reducer as a single value is not suitable for input to another reducer expecting two inputs.
+在组合相邻的递减函数时也存在相似的恼人之处。递减函数的 “外形” 是一个接收两个输入值的函数，并返回一个组合好的值。递减函数的单值输出不适于作为另一个期待两个值的递减函数的输入。
 
-Moreover, the `reduce(..)` helper takes an optional `initialValue` input. Sometimes this can be omitted, but sometimes it has to be passed in. That even further complicates composition, since one reduction might need one `initialValue` and the other reduction might seem like it needs a different `initialValue`. How can we possibly do that if we only make one `reduce(..)` call with some sort of composed reducer?
+另外，`reduce(..)` 帮助函数接收一个可选的输入 `initialValue`。有时它可以被忽略，但有时不得不被传入。这使组合变得更复杂，因为一个递减操作可能需要一个 `initialValue` 而另一个递减操作可能需要一个不同的 `initialValue`。我们如何才能使用某种组合好的递减函数来发起一个 `reduce(..)` 调用呢？
 
-Consider a chain like this:
+考虑一个这样链条：
 
 ```js
 words
@@ -94,21 +94,21 @@ words
 // "WRITTENSOMETHING"
 ```
 
-Can you envision a composition that includes all of these steps: `map(strUppercase)`, `filter(isLongEnough)`, `filter(isShortEnough)`, `reduce(strConcat)`? The shape of each operator is different, so they won't directly compose together. We need to bend their shapes a little bit to fit them together.
+你能想想一个包含所有 `map(strUppercase)`、`filter(isLongEnough)`、`filter(isShortEnough)`、`reduce(strConcat)` 这些步骤的组合吗？每一个操作函数的外形都是不同的，所以它们不能直接组合在一起。我们需要调整一下它们的外形来使它们彼此吻合。
 
-Hopefully these observations have illustrated why simple fusion-style composition isn't up to the task. We need a more powerful technique, and transducing is that tool.
+希望这些观察展示了为什么单纯的熔合式组合不能完成这个任务。我们需要更强大的技术，而 transducing 就是工具。
 
-## How, Next
+## 接下来，如何做
 
-Let's talk about how we might derive a composition of mappers, predicates and/or reducers.
+让我们来谈谈如何才能衍生出一种映射函数、判定函数和/或递减函数的组合。
 
-Don't get too overwhelmed: you won't have to go through all these mental steps we're about to explore in your own programming. Once you understand and can recognize the problem transducing solves, you'll be able just jump straight to using a `transduce(..)` utility from a FP library and move on with the rest of your application!
+不要被冲昏了头脑：你不必在你自己的程序中把我们将要探索的所有这些思维步骤都走一遍。一旦你理解并能够认出 trasnducing 解决的问题，你就可以直接跳到使用一个 FP 库的 `transduce(..)` 工具，并继续处理你程序的其余部分！
 
-Let's jump in.
+让我们开始吧。
 
-### Expressing Map/Filter As Reduce
+### 将映射/过滤表达为递减
 
-The first trick we need to perform is expressing our `filter(..)` and `map(..)` calls as `reduce(..)` calls. Recall how we did that in Chapter 8:
+我们要施展的第一个技巧是将 `filter(..)` 和 `map(..)` 调用表达为 `reduce(..)` 调用。回忆一下我们在第八章中是如何做的：
 
 ```js
 function strUppercase(str) { return str.toUpperCase(); }
@@ -137,9 +137,9 @@ words
 // "WRITTENSOMETHING"
 ```
 
-That's a decent improvement. We now have four adjacent `reduce(..)` calls instead of a mixture of three different methods all with different shapes. We still can't just `compose(..)` those four reducers, however, because they accept two arguments instead of one.
+这是个相当好的改进。我们现在有了四个相邻的 `reduce(..)` 调用而不是拥有不同外形的三种不同方法的混合。但是，我们依然不能简单地 `compose(..)` 这四个递减函数，因为它们接收两个参数而不是一个。
 
-In Chapter 8, we sort of cheated and used `list.push(..)` to mutate as a side effect rather than calling `list.concat(..)` to return a whole new array. Let's be a bit more formal for now:
+在第八章中，我们作弊并使用了 `list.push(..)` 作为一种副作用进行改变，而不是调用 `list.concat(..)` 来返回一个全新的数组。现在让我们更正式一些：
 
 ```js
 function strUppercaseReducer(list,str) {
@@ -157,11 +157,11 @@ function isShortEnoughReducer(list,str) {
 }
 ```
 
-Later, we'll look at whether `concat(..)` is necessary here or not.
+稍后，我们将看看 `concat(..)` 在这里是否必要。
 
-### Parameterizing The Reducers
+### 将递减函数参数化
 
-Both filter reducers are almost identical, except they use a different predicate function. Let's parameterize that so we get one utility that can define any filter-reducer:
+两个过滤递减函数除了使用一个不同的判定函数以外几乎是相同的。让我们将此参数化，这样我们就得到一个可以定义任意过滤递-减函数的工具：
 
 ```js
 function filterReducer(predicateFn) {
@@ -175,7 +175,7 @@ var isLongEnoughReducer = filterReducer( isLongEnough );
 var isShortEnoughReducer = filterReducer( isShortEnough );
 ```
 
-Let's do the same parameterization of the `mapperFn(..)` for a utility to produce any map-reducer:
+为了得到一个能够生成任意映射-递减函数的工具，让我们对 `mapperFn(..)` 进行相同的参数化：
 
 ```js
 function mapReducer(mapperFn) {
@@ -187,7 +187,7 @@ function mapReducer(mapperFn) {
 var strToUppercaseReducer = mapReducer( strUppercase );
 ```
 
-Our chain still looks the same:
+我们链条看起来没变：
 
 ```js
 words
@@ -197,20 +197,20 @@ words
 .reduce( strConcat, "" );
 ```
 
-### Extracting Common Combination Logic
+### 抽取共通的组合逻辑
 
-Look very closely at the above `mapReducer(..)` and `filterReducer(..)` functions. Do you spot the common functionality shared in each?
+极其仔细地观察上面的 `mapReducer(..)` 和 `filterReducer(..)` 函数。你发现它们共享的共通功能了吗？
 
-This part:
+这一部分：
 
 ```js
 return list.concat( .. );
 
-// or
+// 或者
 return list;
 ```
 
-Let's define a helper for that common logic. But what shall we call it?
+让我们为这个共同逻辑定义一个帮助函数。但我们如何称呼它？
 
 ```js
 function WHATSITCALLED(list,val) {
@@ -218,7 +218,7 @@ function WHATSITCALLED(list,val) {
 }
 ```
 
-If you examine what that `WHATSITCALLED(..)` function does, it takes two values (an array and another value) and it "combines" them by concatenating the value onto the end of the array, returning a new array. Very uncreatively, we could name this `listCombination(..)`:
+检视一下 `WHATSITCALLED(..)` 函数在做什么，它接收两个值（一个数组和另一个值）并通过将值连接到数组末尾来将它们 “组合”，再返回一个新数组。非常没有创意，但我们可以将它命名为 `listCombination(..)`：
 
 ```js
 function listCombination(list,val) {
@@ -226,7 +226,7 @@ function listCombination(list,val) {
 }
 ```
 
-Let's now re-define our reducer helpers to use `listCombination(..)`:
+现在让我们重新定义递减函数的帮助函数，来使用 `listCombination(..)`：
 
 ```js
 function mapReducer(mapperFn) {
@@ -243,11 +243,11 @@ function filterReducer(predicateFn) {
 }
 ```
 
-Our chain still looks the same (so we won't repeat it).
+我们的链条依然没变（所以我们不在啰嗦这一点）。
 
-### Parameterizing The Combination
+### 将组合参数化
 
-Our simple `listCombination(..)` utility is only one possible way that we might combine two values. Let's parameterize the use of it to make our reducers more generalized:
+我们简单的 `listCombination(..)` 工具只是我们结合两个值的一种可能的方式。让我们将使用它的过程参数化，来时我们的递减函数更加一般化：
 
 ```js
 function mapReducer(mapperFn,combinationFn) {
@@ -264,7 +264,7 @@ function filterReducer(predicateFn,combinationFn) {
 }
 ```
 
-To use this form of our helpers:
+要使用这种形式的帮助函数：
 
 ```js
 var strToUppercaseReducer = mapReducer( strUppercase, listCombination );
@@ -272,7 +272,7 @@ var isLongEnoughReducer = filterReducer( isLongEnough, listCombination );
 var isShortEnoughReducer = filterReducer( isShortEnough, listCombination );
 ```
 
-Defining these utilities to take two arguments instead of one is less convenient for composition, so let's use our `curry(..)` approach:
+将这些工具定义为接收两个参数而非一个对于组合来说不太方便，所以让我们使用我们的 `curry(..)` 方法：
 
 ```js
 var curriedMapReducer = curry( function mapReducer(mapperFn,combinationFn){
@@ -296,15 +296,15 @@ var isShortEnoughReducer =
 	curriedFilterReducer( isShortEnough )( listCombination );
 ```
 
-That looks a bit more verbose, and probably doesn't seem very useful.
+这看起来烦冗了一些，而且看起来可能不是非常有用。
 
-But this is actually necessary to get to the next step of our derivation. Remember, our ultimate goal here is to be able to `compose(..)` these reducers. We're almost there.
+但是为了进行到我们衍生物的下一步来说这实际上是必要的。记住，我们这里的终极目标是能够 `compose(..)` 这些递减函数，我们就快成功了。
 
-### Composing Curried
+### 组合柯里化后的函数
 
-This step is the trickiest of all to visualize. So read slowly and pay close attention here.
+这一步是所有思考中最刁钻的一步。所以这里要慢慢读并集中注意力。
 
-Let's consider the curried functions from above, but without the `listCombination(..)` function having been passed in to each:
+让我们考虑一下上面柯里化后的函数，但不带 `listCombination(..)` 函数被传入的部分：
 
 ```js
 var x = curriedMapReducer( strUppercase );
@@ -312,9 +312,9 @@ var y = curriedFilterReducer( isLongEnough );
 var z = curriedFilterReducer( isShortEnough );
 ```
 
-Think about the shape of all three of these intermediate functions, `x(..)`, `y(..)`, and `z(..)`. Each one expects a single combination function, and produces a reducer function with it.
+考虑所有这三个中间函数的外形，`x(..)`、`y(..)`、和 `z(..)`。每一个都期待一个单独的组合函数，并为它生成一个递减函数。
 
-Remember, if we wanted the independent reducers from all these, we could do:
+记住，如果我们想要得到所有这些函数的独立的递减函数，我们可以这样做：
 
 ```js
 var upperReducer = x( listCombination );
@@ -322,7 +322,7 @@ var longEnoughReducer = y( listCombination );
 var shortEnoughReducer = z( listCombination );
 ```
 
-But what would you get back if you called `y(z)`? Basically, what happens when passing `z` in as the `combinationFn(..)` for the `y(..)` call? That returned reducer function internally looks kinda like this:
+但如果调用了 `y(z)` 你会得到什么？基本上是说，当将 `z` 作为 `y(..)` 的 `combinationFn(..)`传入时发生了什么？这会返回一个内部看起来像这样的递减函数：
 
 ```js
 function reducer(list,val) {
@@ -331,38 +331,38 @@ function reducer(list,val) {
 }
 ```
 
-See the `z(..)` call inside? That should look wrong to you, because the `z(..)` function is supposed to receive only a single argument (a `combinationFn(..)`), not two arguments (`list` and `val`). The shapes don't match. That won't work.
+看到内部的 `z(..)` 调用了吗？这在你看来应当是错的，因为 `z(..)` 函数本应只接收一个参数（一个 `combinationFn(..)`），不是两个（`list` 和 `val`）。外形不匹配。这不能工作。
 
-Let's instead look at the composition `y(z(listCombination))`. We'll break that down into two separate steps:
+相反让我们看看组合 `y(z(listCombination))`。我们将它分解为两个分离的步骤：
 
 ```js
 var shortEnoughReducer = z( listCombination );
 var longAndShortEnoughReducer = y( shortEnoughReducer );
 ```
 
-We create `shortEnoughReducer(..)`, then we pass *it* in as the `combinationFn(..)` to `y(..)`, producing `longAndShortEnoughReducer(..)`. Re-read that a few times until it clicks.
+我们创建了 `shortEnoughReducer(..)`，然后我们将它作为 `combinationFn(..)` 传递给 `y(..)`，生成了 `longAndShortEnoughReducer(..)`。将这一句重读即便，直到你领悟为止。
 
-Now consider: what do `shortEnoughReducer(..)` and `longAndShortEnoughReducer(..)` look like internally? Can you see them in your mind?
+现在考虑一下：`shortEnoughReducer(..)` 和 `longAndShortEnoughReducer(..)`内部看起来什么样？你能在思维中看到它们吗？
 
 ```js
-// shortEnoughReducer, from z(..):
+// shortEnoughReducer，来自 z(..):
 function reducer(list,val) {
 	if (isShortEnough( val )) return listCombination( list, val );
 	return list;
 }
 
-// longAndShortEnoughReducer, from y(..):
+// longAndShortEnoughReducer，来自 y(..):
 function reducer(list,val) {
 	if (isLongEnough( val )) return shortEnoughReducer( list, val );
 	return list;
 }
 ```
 
-Do you see how `shortEnoughReducer(..)` has taken the place of `listCombination(..)` inside `longAndShortEnoughReducer(..)`? Why does that work?
+你看到 `shortEnoughReducer(..)` 是如何在 `longAndShortEnoughReducer(..)` 内部取代了 `listCombination(..)` 吗？为什么这个好用？
 
-Because **the shape of a `reducer(..)` and the shape of `listCombination(..)` are the same.** In other words, a reducer can be used as a combination function for another reducer; that's how they compose! The `listCombination(..)` function makes the first reducer, then *that reducer* can be as the combination function to make the next reducer, and so on.
+因为 **一个 `reducer(..)` 的外形和 `listCombination(..)` 的外形是相同的。** 换言之，一个递减函数可以被用作另一个递减函数的组合函数；这就是它们如何组合的！`listCombination(..)` 函数制造了第一个递减函数，然后这个递减函数可以作为组合函数来制造下一个递减函数，以此类推。
 
-Let's test out our `longAndShortEnoughReducer(..)` with a few different values:
+让我们使用几个不同的值来测试一下我们的 `longAndShortEnoughReducer(..)`：
 
 ```js
 longAndShortEnoughReducer( [], "nope" );
@@ -377,9 +377,15 @@ longAndShortEnoughReducer( [], "hello world" );
 
 The `longAndShortEnoughReducer(..)` utility is filtering out both values that are not long enough and values that are not short enough, and it's doing both these filterings in the same step. It's a composed reducer!
 
+`longAndShortEnoughReducer(..)` 工具滤除了既不够长也不够短的值，而且它是在同一个步骤中做了这两个过滤的。它是一个组合的递减函数！
+
 Take another moment to let that sink in. It still kinda blows my mind.
 
+再花点儿时间让它消化吸收。它还是有些让我混乱。
+
 Now, to bring `x(..)` (the uppercase reducer producer) into the composition:
+
+现在，把 `x(..)` （大写递减函数生成器）带入组合之中：
 
 ```js
 var longAndShortEnoughReducer = y( z( listCombination) );
@@ -387,6 +393,8 @@ var upperLongAndShortEnoughReducer = x( longAndShortEnoughReducer );
 ```
 
 As the name `upperLongAndShortEnoughReducer(..)` implies, it does all three steps at once -- a mapping and two filters! What it kinda look likes internally:
+
+正如 `upperLongAndShortEnoughReducer(..)` 这个名字所暗示的，它一次完成所有三个步骤 —— 一个映射和两个过滤！它内部看起来就像这样：
 
 ```js
 // upperLongAndShortEnoughReducer:
@@ -397,9 +405,15 @@ function reducer(list,val) {
 
 A string `val` is passed in, uppercased by `strUppercase(..)` and then passed along to `longAndShortEnoughReducer(..)`. *That* function only conditionally adds this uppercased string to the `list` if it's both long enough and short enough. Otherwise, `list` will remain unchanged.
 
+一个字符串 `val` 被传入，由 `strUppercase(..)` 改为大写，然后被传递给 `longAndShortEnoughReducer(..)`。这个函数仅条件性地 —— 如果这个字符串长短合适 —— 将这个大写字符串添加到 `list`，否则 `list` 保持不变。
+
 It took my brain weeks to fully understand the implications of that juggling. So don't worry if you need to stop here and re-read a few (dozen!) times to get it. Take your time.
 
+我的大脑花了好几周才完全理解了这套杂耍的含义。所以如果你需要在这里停下并重读几遍（几十遍！）来搞明白它也不要担心。慢慢来。
+
 Now let's verify:
+
+现在我们验证一下：
 
 ```js
 upperLongAndShortEnoughReducer( [], "nope" );
@@ -414,7 +428,11 @@ upperLongAndShortEnoughReducer( [], "hello world" );
 
 This reducer is the composition of the map and both filters! That's amazing!
 
+这个递减函数是一个映射函数和两个过滤函数的组合！这真令人吃惊！
+
 Let's recap where we're at so far:
+
+概括一下我们目前身在何处：
 
 ```js
 var x = curriedMapReducer( strUppercase );
@@ -429,7 +447,11 @@ words.reduce( upperLongAndShortEnoughReducer, [] );
 
 That's pretty cool. But let's make it even better.
 
+这很酷。但是我们可以做得更好。
+
 `x(y(z( .. )))` is a composition. Let's skip the intermediate `x` / `y` / `z` variable names, and just express that composition directly:
+
+`x(y(z( .. )))` 是一个组合。让我们跳过中间的变量名 `x` / `y` / `z`，直接表达这个组合：
 
 ```js
 var composition = compose(
@@ -446,7 +468,10 @@ words.reduce( upperLongAndShortEnoughReducer, [] );
 
 Think about the flow of "data" in that composed function:
 
+考虑一下这个组合函数的 “数据” 流：
+
 1. `listCombination(..)` flows in as the combination function to make the filter-reducer for `isShortEnough(..)`.
+1. 
 2. *That* resulting reducer function then flows in as the combination function to make the filter-reducer for `isLongEnough(..)`.
 3. Finally, *that* resulting reducer function flows in as the combination function to make the map-reducer for `strUppercase(..)`.
 
