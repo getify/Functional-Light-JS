@@ -478,7 +478,7 @@ function trackEvent(evt) {
 
 这两个工具都在一个数据源中存储值。这就是一般性。特殊性在于，它们中的一个将值贴在一个数组的末尾，而另一个将值设置在一个对象的属性名上。
 
-那么然我们来抽象一下：
+那么让我们来抽象一下：
 
 ```js
 function storeData(store,location,value) {
