@@ -287,15 +287,15 @@ getCurrentUser( function foundUser(user){ /* .. */ } );
 
 Instead of taking all the arguments at once (like `ajax(..)`), or some of the arguments up-front and the rest later (via `partial(..)`), this `curriedAjax(..)` function receives one argument at a time, each in a separate function call.
 
-Currying is similar to partial application in that each successive curried call kind of partially applies another argument to the original function, until all arguments have been passed.
+Currying is similar to partial application in that each successive curried call partially applies another argument to the original function, until all arguments have been passed.
 
-The main difference is that `curriedAjax(..)` will explicitly return a function (we call `curriedGetPerson(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
+The main difference is that `curriedAjax(..)` will return a function (we call `curriedGetPerson(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
 
 If an original function expected 5 arguments, the curried form of that function would take just the first argument, and return a function to accept the second. That one would take just the second argument, and return a function to accept the third. And so on.
 
-So currying unwinds a higher-arity function into a series of chained unary functions.
+So currying unwinds a single higher-arity function into a series of chained unary functions.
 
-How might we define a utility to do this currying? We're going to use some tricks from Chapter 2.
+How might we define a utility to do this currying? We're going to use some tricks from Chapter 2. Let's take a look:
 
 ```js
 function curry(fn,arity = fn.length) {
@@ -333,7 +333,7 @@ var curry =
 		)( [] );
 ```
 
-The approach here is to start a collection of arguments in `prevArgs` as an empty `[]` array, and add each received `nextArg` to that, calling the concatenation `args`. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), make and return another `curried(..)` function to collect the next `nextArg` argument, passing the running `args` collection along as `prevArgs`. Once we have enough `args`, execute the original `fn(..)` function with them.
+The approach here is to start a collection of arguments in `prevArgs` as an empty `[]` array, and add each received `nextArg` to that, calling the concatenation `args`. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), make and return another `curried(..)` function to collect the next `nextArg` argument, passing the running `args` collection along as its `prevArgs`. Once we have enough `args`, execute the original `fn(..)` function with them.
 
 By default, this implementation relies on being able to inspect the `length` property of the to-be-curried function to know how many iterations of currying we'll need before we've collected all its expected arguments.
 
@@ -351,9 +351,9 @@ var getCurrentUser = personFetcher( { user: CURRENT_USER_ID } );
 getCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
-Each call adds one more argument to the original `ajax(..)` call, until all three have been provided and `ajax(..)` is executed.
+Each call partially applies one more argument to the original `ajax(..)` call, until all three have been provided and `ajax(..)` is invoked.
 
-Remember our example from earlier about adding `3` to a each value in a list of numbers? Recall that currying is similar to partial application, so we could do that task with currying in almost the same way:
+Remember our example from earlier about adding `3` to each value in a list of numbers? As currying is similar to partial application, we could do that task with currying in almost the same way:
 
 ```js
 [1,2,3,4,5].map( curry( add )( 3 ) );
@@ -390,19 +390,97 @@ var curriedSum = curry( sum, 5 );
 curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
 ```
 
-The advantage of currying here is that each call to pass in an argument produces another function that's more specialized, and we can capture and use *that* new function later in the program. Partial application specifies all the partially applied arguments up front, producing a function that's waiting for all the rest of the arguments.
+The advantage of currying here is that each call to pass in an argument produces another function that's more specialized, and we can capture and use *that* new function later in the program. Partial application specifies all the partially applied arguments up front, producing a function that's waiting for all the rest of the arguments **on the next call**.
 
-If you wanted to use partial application to specify one parameter at a time, you'd have to keep calling `partialApply(..)` on each successive function. Curried functions do this automatically, making working with individual arguments one-at-a-time more ergonomic.
+If you wanted to use partial application to specify one parameter at a time, you'd have to keep calling `partial(..)` on each successive function. Curried functions do this automatically, making working with individual arguments one-at-a-time more ergonomic.
 
-In JavaScript, both currying and partial application use closure to remember the arguments over time until all have been received, and then the original operation can be performed.
+Both currying and partial application use closure to remember the arguments over time until all have been received, and then the original function can be invoked.
+
+### Visualizing Curried Functions
+
+Let's examine more closely the `curriedSum(..)` from the previous section. Recall it's usage: `curriedSum(1)(2)(3)(4)(5)`; five subsequent (chained) function calls.
+
+What if we manually defined a `curriedSum(..)` instead of using `curry(..)`, how would that look?
+
+```js
+function curriedSum(val1) {
+	return function(val2){
+		return function(val3){
+			return function(val4){
+				return function(val5){
+					return sum( val1, val2, val3, val4, val5 );
+				};
+			};
+		};
+	};
+}
+```
+
+Definitely uglier, no question. But this is an important way to visualize what's going on with a curried function. Each nested function call is returning another function that's going to accept the next argument, and that continues until we've specified all the expected arguments.
+
+I've found it helps me tremendously to understand curried functions if I can unwrap them mentally as a series of nested functions like that.
+
+In fact, to reinforce that point, let's consider the same code but written with ES6 arrow functions:
+
+```js
+var curriedSum =
+	val1 =>
+		val2 =>
+			val3 =>
+				val4 =>
+					val5 =>
+						sum( val1, val2, val3, val4, val5 );
+```
+
+And now, all on one line: `curriedSum = val1 => val2 => val3 => val4 => val5 => sum(val1,val2,val3,val4,val5)`.
+
+Depending on your perspective, that form of visualizing the curried function may be more or less helpful to you. For me, it's a fair bit more obscured.
+
+But the reason I show it that way is that it happens to look almost identical to the mathematical notation (and Haskell syntax) for a curried function! That's one reason why those who like mathematical notation (and/or Haskell) like the ES6 arrow function form.
 
 ### Why Currying And Partial Application?
 
-With either currying style (`sum(1)(2)(3)`) or partial application style (`partial(sum,1,2)(3)`), the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we go this direction** when adopting FP? There are multiple layers to answering that question.
+With either style -- currying (`sum(1)(2)(3)`) or partial application (`partial(sum,1,2)(3)`) -- the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we go this direction** when adopting FP? There are multiple layers to answering that question.
 
 The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your code base) when and where separate arguments are specified, whereas traditional function calls require all the arguments to be present up front. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
 
 Another layer to this answer, which applies most specifically to currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs 3 arguments, if curried, becomes a function that needs just one, three times over. That kind of unary function will be a lot easier to work with when we start composing them. We'll tackle this topic later in the text.
+
+But the most important perspective is specialization of generalized functions, and how such abstraction improves readability of code.
+
+Consider our running `ajax(..)` example:
+
+```js
+ajax(
+	"http://some.api/person",
+	{ user: CURRENT_USER_ID },
+	function foundUser(user){ /* .. */ }
+);
+```
+
+The call-site includes all the information necessary to pass to the most generalized version of the utility (`ajax(..)`). The potential readability downside is that it may be the case that the URL and the data are not relevant information at this point in the program, but yet that information is cluttering up the call-site nonetheless.
+
+Now consider:
+
+```js
+var getCurrentUser = partial(
+	ajax,
+	"http://some.api/person",
+	{ user: CURRENT_USER_ID }
+);
+
+// later
+
+getCurrentUser( function foundUser(user){ /* .. */ } );
+```
+
+In this version, we define a `getCurrentUser(..)` function ahead of time that already has known information like URL and data preset. The call-site for `getCurrentUser(..)` then isn't cluttered by information that **at that point of the code** isn't relevant.
+
+Moreover, the semantic name for the function `getCurrentUser(..)` more accurately depicts what is happening than just `ajax(..)` with a URL and data would.
+
+That's what abstraction is all about: separating two sets of details -- in this case, the *how* of getting a current user and the *what* we do with that user -- and inserting a semantic boundary between them, which eases the reasoning of each part independently.
+
+Whether you use currying or partial application, creating specialized functions from generalized ones is a powerful technique for semantic abstraction and improved readability.
 
 ### Currying More Than One Argument?
 
