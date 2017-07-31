@@ -322,7 +322,7 @@ var longEnoughReducer = y( listCombination );
 var shortEnoughReducer = z( listCombination );
 ```
 
-But what would you get back if you called `y(z)`? Basically, what happens when passing `z` in as the `combinationFn(..)` for the `y(..)` call? That returned reducer function internally looks kinda like this:
+But what would you get back if you called `y(z)`, instead of `y(listCombination)`? Basically, what happens when passing `z` in as the `combinationFn(..)` for the `y(..)` call? That returned reducer function internally looks kinda like this:
 
 ```js
 function reducer(list,val) {
@@ -340,18 +340,18 @@ var shortEnoughReducer = z( listCombination );
 var longAndShortEnoughReducer = y( shortEnoughReducer );
 ```
 
-We create `shortEnoughReducer(..)`, then we pass *it* in as the `combinationFn(..)` to `y(..)`, producing `longAndShortEnoughReducer(..)`. Re-read that a few times until it clicks.
+We create `shortEnoughReducer(..)`, then we pass *it* in as the `combinationFn(..)` to `y(..)` instead of calling `y(listCombination)`; this new call produces `longAndShortEnoughReducer(..)`. Re-read that a few times until it clicks.
 
 Now consider: what do `shortEnoughReducer(..)` and `longAndShortEnoughReducer(..)` look like internally? Can you see them in your mind?
 
 ```js
-// shortEnoughReducer, from z(..):
+// shortEnoughReducer, from calling z(..):
 function reducer(list,val) {
 	if (isShortEnough( val )) return listCombination( list, val );
 	return list;
 }
 
-// longAndShortEnoughReducer, from y(..):
+// longAndShortEnoughReducer, from calling y(..):
 function reducer(list,val) {
 	if (isLongEnough( val )) return shortEnoughReducer( list, val );
 	return list;
@@ -360,7 +360,7 @@ function reducer(list,val) {
 
 Do you see how `shortEnoughReducer(..)` has taken the place of `listCombination(..)` inside `longAndShortEnoughReducer(..)`? Why does that work?
 
-Because **the shape of a `reducer(..)` and the shape of `listCombination(..)` are the same.** In other words, a reducer can be used as a combination function for another reducer; that's how they compose! The `listCombination(..)` function makes the first reducer, then *that reducer* can be as the combination function to make the next reducer, and so on.
+Because **the shape of a `reducer(..)` and the shape of `listCombination(..)` are the same.** In other words, a reducer can be used as a combination function for another reducer; that's how they compose! The `listCombination(..)` function makes the first reducer, then *that reducer* can be used as the combination function to make the next reducer, and so on.
 
 Let's test out our `longAndShortEnoughReducer(..)` with a few different values:
 
@@ -623,7 +623,7 @@ The composed function in this snippet is named `transformer` instead of `transdu
 
 `transducers.map(..)` and `transducers.filter(..)` are special helpers that adapt regular predicate or mapper functions into functions that produce a special transform object (with the transducer function wrapped underneath); the library uses these transform objects for transducing. The extra capabilities of this transform object abstraction are beyond what we'll explore, so consult the library's documentation for more information.
 
-Since calling `transformer(..)` produces a transform object and not a typical two-arity transduce-reducer function, the library also provides `toFn(..)` to adapt the transform object to be useable by native array `reduce(..)`:
+Since calling `transformer(..)` produces a transform object and not a typical binary transduce-reducer function, the library also provides `toFn(..)` to adapt the transform object to be useable by native array `reduce(..)`:
 
 ```js
 words.reduce(
@@ -655,4 +655,4 @@ We use transducing to compose adjacent `map(..)`, `filter(..)`, and `reduce(..)`
 
 Transducing primarily improves performance, which is especially obvious if used on a lazy sequence (async observable).
 
-But more broadly, transducing is how we express a more declarative composition of functions that would otherwise not be directly composable. The result, if used appropriately as with all other techniques in this book, is clearer, more readable code! A single `reduce(..)` call with a transducer is easier to reason about than tracking multiple `reduce(..)` calls.
+But more broadly, transducing is how we express a more declarative composition of functions that would otherwise not be directly composable. The result, if used appropriately as with all other techniques in this book, is clearer, more readable code! A single `reduce(..)` call with a transducer is easier to reason about than tracing through multiple `reduce(..)` calls.
