@@ -450,9 +450,7 @@ Think about the flow of "data" in that composed function:
 2. *That* resulting reducer function then flows in as the combination function to make the filter-reducer for `isLongEnough(..)`.
 3. Finally, *that* resulting reducer function flows in as the combination function to make the map-reducer for `strUppercase(..)`.
 
-In the previous snippet, `composition(..)` is a composed function expecting a combination function to make a reducer; `composition(..)` has a special label: transducer. Providing the combination function to a transducer produces the composed reducer:
-
-// TODO: fact-check if the transducer *produces* the reducer or *is* the reducer
+In the previous snippet, `composition(..)` is a composed function expecting a combination function to make a reducer; `composition(..)` here has a special name: transducer. Providing the combination function to a transducer produces the composed reducer:
 
 ```js
 var transducer = compose(
@@ -512,7 +510,7 @@ words
 
 That's pretty good, but we have one final trick up our sleeve with transducing. And frankly, I think this part is what makes all this mental effort you've expended thus far, actually worth it.
 
-Can we somehow "compose" these two `reduce(..)` calls to get it down to just one `reduce(..)`? Unfortunately, we can't just add `strConcat(..)` into the `compose(..)` call; its shape is not correct for that kind of composition.
+Can we somehow "compose" these two `reduce(..)` calls to get it down to just one `reduce(..)`? Unfortunately, we can't just add `strConcat(..)` into the `compose(..)` call; since its a reducer and not a combination-expecting function, its shape is not correct for the composition.
 
 But let's look at these two functions side-by-side:
 
