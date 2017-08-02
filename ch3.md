@@ -360,7 +360,7 @@ Remember our example from earlier about adding `3` to each value in a list of nu
 // [4,5,6,7,8]
 ```
 
-The difference between the two? `partial(add,3)` vs `curry(add)(3)`. Why might you choose `curry(..)` over partial? It might be helpful in the case where you know ahead of time that `add(..)` is the function to be adapted, but the value `3` isn't known yet:
+The difference between the two? `partial(add,3)` vs `curry(add)(3)`. Why might you choose `curry(..)` over `partial(..)`? It might be helpful in the case where you know ahead of time that `add(..)` is the function to be adapted, but the value `3` isn't known yet:
 
 ```js
 var adder = curry( add );
