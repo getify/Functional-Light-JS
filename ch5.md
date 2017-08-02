@@ -395,7 +395,7 @@ a[a.length] = 42;
 person.lastUpdated = Date.now();
 ```
 
-Remember: the notion of idempotence here is that each idempotent operation (like `obj.count = 2`) could be repeated multiple times and not change the program operation beyond the first update. The non-idempotent operations change the state each time.
+Remember: the notion of idempotence here is that each idempotent operation (like `obj.count = 2`) could be repeated multiple times and not change the program state beyond the first update. The non-idempotent operations change the state each time.
 
 What about DOM updates?
 
