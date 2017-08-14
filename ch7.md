@@ -37,7 +37,7 @@ And what does any of this have to do with functional programming? Pull up a chai
 
 First, let's make sure we're all on the same page when we refer to closures and objects. We're obviously in the context of how JavaScript deals with these two mechanisms, and specifically talking about simple function closure (see "Keeping Scope" in Chapter 2) and simple objects (collections of key-value pairs).
 
-A simple function closure:
+For the record, here's an illustration of a simple function closure:
 
 ```js
 function outer() {
@@ -54,7 +54,7 @@ var three = outer();
 three();			// 3
 ```
 
-A simple object:
+And an illustration of a simple object:
 
 ```js
 var obj = {
@@ -71,7 +71,7 @@ three( obj );		// 3
 
 Many people conjur lots of extra things when you mention "closure", such as the asynchronous callbacks or even the module pattern with encapsulation and information hiding. Similarly, "object" brings to mind classes, `this`, prototypes, and a whole slew of other utilities and patterns.
 
-As we go along, we'll carefully address the parts of this external context that matter, but for now, try to just stick to the simplest interpretations of "closure" and "object" -- it'll make this exploration less confusing.
+As we go along, we'll carefully address the parts of this external context that matter, but for now, try to just stick to the simplest interpretations of "closure" and "object" as illustrated here; it'll make our exploration less confusing.
 
 ## Look Alike
 
@@ -207,7 +207,7 @@ pointDistance(
 
 The `point` object state explicitly passed in replaces the closure that implicitly held that state.
 
-#### Behavior, Too!
+### Behavior, Too!
 
 It's not just that objects and closures represent ways to express collections of state, but also that they can include behavior via functions/methods. Bundling data with its behavior has a fancy name: encapsulation.
 
@@ -380,11 +380,11 @@ But instead of thinking about numbers, let's relate isomorphism to code. Again q
 
 > [W]hat would isomorphic JS be if there were such a thing? Well, it could be that you have one set of JS code that is converted to another set of JS code, and that (importantly) you could convert from the latter back to the former if you wanted.
 
-As we asserted earlier with our examples of closures-as-objects and objects-as-closures, these representative alternations go either way. In this respect, they are isomorphisms of each other.
+As we asserted earlier with our examples of closures-as-objects and objects-as-closures, these representative alternations go either way. In this respect, they are isomorphisms to each other.
 
 Put simply, closures and objects are isomorphic representations of state (and its associated functionality).
 
-The next time you hear someone say "X is isomorphic with Y", what they mean is, "X and Y can be converted from either one to the other in either direction, and maintain the same behavior regardless."
+The next time you hear someone say "X is isomorphic to Y", what they mean is, "X and Y can be converted from either one to the other in either direction, and not lose information."
 
 ### Under The Hood
 
@@ -485,7 +485,7 @@ Each time we add a new event to the "list", we create a new closure wrapped arou
 
 So which one is better suited for our task? No surprise here, the array approach is probably a lot more appropriate. The structural immutability of a closure means our only option is to wrap more closure around it. Objects are by default extensible, so we can just grow the array as needed.
 
-By the way, even though I'm presenting this structural (im)mutability as a clear difference between closure and object, the way we're using the object as an immutable value is actually more similar than dislike.
+By the way, even though I'm presenting this structural (im)mutability as a clear difference between closure and object, the way we're using the object as an immutable value is actually more similar than not.
 
 Creating a new array (via `concat(..)`) for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its very design.
 
@@ -596,7 +596,7 @@ Many FPers take a hard-line stance on reassignment: it shouldn't be used. They w
 
 This book is about "functional light" programming in JavaScript, and this is one of those cases where I diverge from the core FP crowd.
 
-I think variable reassignment can be quite useful and, when used approriately, quite readable in its explicitness. It's certainly been by experience that debugging is a lot easier when you can insert a `debugger` or breakpoint, or track a watch expression.
+I think variable reassignment can be quite useful and, when used approriately, quite readable in its explicitness. It's certainly been my experience that debugging is a lot easier when you can insert a `debugger` or breakpoint, or track a watch expression.
 
 ### Cloning State
 
@@ -726,3 +726,13 @@ I just want to reiterate: these performance observations are not absolutes, and 
 ## Summary
 
 The truth of this chapter cannot be written out. One must read this chapter to find its truth.
+
+----
+
+Coining some Zen wisdom here was my attempt at being clever. But, you deserve a proper summary of this chapter's message.
+
+Objects and closures are isomorphic to each other, which means that can be used somewhat interchangably to represent state and behavior in your program.
+
+Representation as a closure has certain benefits, like granular change control and automatic privacy. Representation as an object has other benefits, like easier cloning of state.
+
+The critically thinking FPer should be able to conceive any segment of state and behavior in the program with either representation, and pick the representation that's most appropriate for the task at hand.
