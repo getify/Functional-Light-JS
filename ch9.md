@@ -1,7 +1,5 @@
 # Functional-Light JavaScript
-# Chapter 8: List Operations
-
-Did you have fun down our little closures/objects rabbit hole in the previous chapter? Welcome back!
+# Chapter 9: List Operations
 
 > If you can do something awesome, keep doing it repeatedly.
 

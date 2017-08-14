@@ -1,5 +1,7 @@
 # Functional-Light JavaScript
-# Chapter 9: Recursion
+# Chapter 8: Recursion
+
+Did you have fun down our little closures/objects rabbit hole in the previous chapter? Welcome back!
 
 On the next page, we're going to jump into the topic of recursion.
 
