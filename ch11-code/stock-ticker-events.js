@@ -6,13 +6,16 @@ var formatChange = pipe( formatDecimal, formatSign );
 var processNewStock = pipe( addStockName, formatStockNumbers );
 var observableMapperFns = [ processNewStock, formatStockNumbers ];
 var makeObservableFromEvent = curry( Rx.Observable.fromEvent, 2 )( server );
+var mapObservable = uncurry( map );
+
+var stockEventNames = [ "stock", "stock-update" ];
 
 var [ newStocks, stockUpdates ] = pipe(
 	map( makeObservableFromEvent ),
 	curry( zip )( observableMapperFns ),
-	map( spreadArgs( transformObservable ) )
+	map( spreadArgs( mapObservable ) )
 )
-( [ "stock", "stock-update" ] );
+( stockEventNames );
 
 
 // *********************
@@ -22,7 +25,7 @@ function addStockName(stock) {
 }
 
 function formatStockNumbers(stock) {
-	var updateTuples = [
+	var stockDataUpdates = [
 		[ "price", formatPrice( stock.price ) ],
 		[ "change", formatChange( stock.change ) ]
 	];
@@ -31,7 +34,7 @@ function formatStockNumbers(stock) {
 		return setProp( propName, stock, val );
 	} )
 	( stock )
-	( updateTuples );
+	( stockDataUpdates );
 }
 
 function formatSign(val) {
@@ -43,8 +46,4 @@ function formatSign(val) {
 
 function formatCurrency(val) {
 	return `$${val}`;
-}
-
-function transformObservable(mapperFn,obsv){
-	return obsv.map( mapperFn );
 }

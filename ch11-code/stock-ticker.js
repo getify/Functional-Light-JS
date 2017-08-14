@@ -6,7 +6,7 @@ var stockTickerUI = {
 		var getDataVal = curry( reverseArgs( prop ), 2 )( data );
 		var extractInfoChildElemVal = pipe(
 			getClassName,
-			stripPrefix( /\bstock-/i ),
+			curry( stripPrefix )( /\bstock-/i ),
 			getDataVal
 		);
 		var orderedDataVals =
@@ -62,7 +62,7 @@ var stockTickerUI = {
 		// !!SIDE EFFECTS!!
 		stockTickerUI.updateStockElems( infoChildElems, data );
 		reduce( appendDOMChild )( stockElem )( infoChildElems );
-		tickerElem.appendChild( stockElem );
+		appendDOMChild( tickerElem, stockElem );
 	}
 
 };
@@ -77,29 +77,28 @@ var getDOMChildren = pipe(
 	)
 );
 var createElement = document.createElement.bind( document );
-var getElemAttrByName = curry( reverseArgs( getElemAttr ), 2 );
+var getElemAttrByName = curry( getElemAttr, 2 );
 var getStockId = getElemAttrByName( "data-stock-id" );
 var getClassName = getElemAttrByName( "class" );
+var isMatchingStock = curry( matchingStockId, 2 );
 var ticker = document.getElementById( "stock-ticker" );
 var stockTickerUIMethodsWithDOMContext = map(
 	curry( reverseArgs( partial ), 2 )( ticker )
 )
 ( [ stockTickerUI.addStock, stockTickerUI.updateStock ] );
 var subscribeToObservable =
-	pipe( uncurry, spreadArgs )( unboundMethod( "subscribe" ) );
+	pipe( unboundMethod, uncurry )( "subscribe" );
 var stockTickerObservables = [ newStocks, stockUpdates ];
 
 // !!SIDE EFFECTS!!
-each( subscribeToObservable )
+each( spreadArgs( subscribeToObservable ) )
 ( zip( stockTickerUIMethodsWithDOMContext, stockTickerObservables ) );
 
 
 // *********************
 
-function stripPrefix(prefixRegex) {
-	return function mapperFn(val) {
-		return val.replace( prefixRegex, "" );
-	};
+function stripPrefix(prefixRegex,val) {
+	return val.replace( prefixRegex, "" );
 }
 
 function listify(listOrItem) {
@@ -113,7 +112,7 @@ function isTextNode(node) {
 	return node && node.nodeType == 3;
 }
 
-function getElemAttr(elem,prop) {
+function getElemAttr(prop,elem) {
 	return elem.getAttribute( prop );
 }
 
@@ -122,10 +121,8 @@ function setElemAttr(elem,prop,val) {
 	return elem.setAttribute( prop, val );
 }
 
-function matchingStockId(id) {
-	return function isStock(node){
-		return getStockId( node ) == id;
-	};
+function matchingStockId(id,node) {
+	return getStockId( node ) == id;
 }
 
 function isStockInfoChildElem(elem) {
@@ -136,7 +133,7 @@ function getStockElem(tickerElem,stockId) {
 	return pipe(
 		getDOMChildren,
 		filterOut( isTextNode ),
-		filterIn( matchingStockId( stockId ) )
+		filterIn( isMatchingStock( stockId ) )
 	)
 	( tickerElem );
 }
