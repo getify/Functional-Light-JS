@@ -1,13 +1,21 @@
-# Functional-Light JavaScript
-# Appendix B: The Humble Monad
+# 轻量函数式 JavaScript
+# 附录 B：谦逊的单子（Monad）
 
 Let me just start off this appendix by admitting: I did not know much about what a monad was before starting to write the following. And it took a lot of mistakes to get something sensible. If you don't believe me, go look at the commit history of this appendix in the Git repo for this book (https://github.com/getify/Functional-Light-JS)!
 
+让我通过承认一个事实来开始这篇附录：在我开始写下后续这些内容之前，我对单子（monad）知之甚少。而且为了写出一些有道理的东西犯了不少错误。如果你不信，就去看看这本书的 Git 仓库中关于这篇附录的提交履历 (https://github.com/getify/Functional-Light-JS)！
+
 I am including the topic of monads in the book because it's part of the journey that every developer will encounter while learning FP, just as I have in this book writing.
+
+我在这本书中引入单子的话题，是因为它是每一个开发者在学习 FP 的旅程中都会遇到的一部分，就像我在编写这本书时遇到的情况一样。
 
 We're basically ending this book with a brief glimpse at monads, whereas most other FP literature kinda almost starts with monads! I do not encounter in my "functional light" programming much of a need to think explicitly in terms of monads, so that's why this material is more bonus than main core. But that's not to say monads aren't useful or prevalent -- they very much are.
 
+我们基本上是在用对单子的简要一瞥来结束这本书，而其他大多数 FP 文献在某种意义上几乎是以单子作为开始的！在我的 “轻量函数式” 编程中，我没有遇到太多需要明确以单子的角度来思考的东西，所以这就是为什么这篇附录更像是额外的内容而非核心。但这不是说单子没用或不流行 —— 它们非常有用而且普遍。
+
 There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite-of-passage. Over the years, monads have variously been depicted as burritos, onions, and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here!
+
+在 JavaScript FP 世界中有一个小笑话，
 
 > A monad is just a monoid in the category of endofunctors.
 
