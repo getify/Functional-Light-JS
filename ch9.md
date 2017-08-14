@@ -600,7 +600,7 @@ var flatten =
 		, [] );
 ```
 
-**Note:** This implementation choice relies on recursion to handle the nesting of lists. More on recursion in a later chapter.
+**Note:** This implementation choice relies on recursion as we saw in Chapter 8.
 
 To use `flatten(..)` with an array of arrays (of any nested depth):
 
@@ -1285,7 +1285,7 @@ BinaryTree.forEach = function forEach(visitFn,node){
 };
 ```
 
-**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We'll cover recursion in more detail in a later chapter, where we'll cover recursion in that chapter on recursion.
+**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We already covered recursion in Chapter 8, where we covered recursion in the chapter on recursion.
 
 Recall `forEach(..)` was described at the beginning of this chapter as only being useful for side effects, which is not very typically desired in FP. In this case, we'll use `forEach(..)` only for the side effect of I/O, so it's perfectly reasonable as a helper.
 

@@ -45,7 +45,12 @@
 	* The Same Page
 	* Look Alike
 	* Two Roads Diverged In A Wood...
-* Chapter 8: List Operations
+* Chapter 8: Recursion
+	* Definition
+	* Declarative Recursion
+	* Stack
+	* Rearranging Recursion
+* Chapter 9: List Operations
 	* Non-FP List Processing
 	* Map
 	* Filter
@@ -55,11 +60,6 @@
 	* Looking For Lists
 	* Fusion
 	* Beyond Lists
-* Chapter 9: Recursion
-	* Definition
-	* Declarative Recursion
-	* Stack
-	* Rearranging Recursion
 * Chapter 10: Functional Async
 	* Time As State
 	* Eager vs Lazy

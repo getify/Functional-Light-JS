@@ -80,7 +80,7 @@ Ramda is a very popular and powerful library. It's a really good place to start 
 
 Lodash is one of the most popular libraries in the entire JS ecosystem. They publish an "FP friendly" version of their API as ["lodash/fp"](https://github.com/lodash/lodash/wiki/FP-Guide).
 
-In Chapter 8, we looked at composing standalone list operations (`map(..)`, `filter(..)`, and `reduce(..)`). Here's how we could do it with "lodash/fp":
+In Chapter 9, we looked at composing standalone list operations (`map(..)`, `filter(..)`, and `reduce(..)`). Here's how we could do it with "lodash/fp":
 
 ```js
 var sum = (x,y) => x + y;

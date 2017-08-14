@@ -356,7 +356,7 @@ We could also define `compose(..)` using recursion. The recursive definition for
 compose( compose(fn1,fn2, .. fnN-1), fnN );
 ```
 
-**Note:** We will cover recursion in deep detail in Chapter 9, so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
+**Note:** We will cover recursion in deep detail in Chapter 8, so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
 
 Here's how we implement	`compose(..)` with recursion:
 

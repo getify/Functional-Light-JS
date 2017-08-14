@@ -29,7 +29,7 @@ I'm going to use the notion of data structures very loosely here, and assert tha
 
 A monad is a data structure. It's a type. It's a set of behaviors that are specifically designed to make working with a value predictable.
 
-Recall in Chapter 8 that we talked about functors: a value along with a map-like utility to perform an operation on all its constitute data members. A monad is a functor that includes some additional behavior.
+Recall in Chapter 9 that we talked about functors: a value along with a map-like utility to perform an operation on all its constitute data members. A monad is a functor that includes some additional behavior.
 
 ## Loose Interface
 
@@ -82,7 +82,7 @@ Don't worry if most of this doesn't make sense right now. We're not gonna obsess
 
 All monad instances will have `map(..)`, `chain(..)` (also called `bind(..)` or `flatMap(..)`), and `ap(..)` methods. The purpose of these methods and their behavior is to provide a standardized way of multiple monad instances working together.
 
-Let's look first at the monadic `map(..)` function. Like `map(..)` on an array (see Chapter 8) that calls a mapper function with its value(s) and produces a new array, a monad's `map(..)` calls a mapper function with the monad's value, and whatever is returned is wrapped in a new Just instance:
+Let's look first at the monadic `map(..)` function. Like `map(..)` on an array (see Chapter 9) that calls a mapper function with its value(s) and produces a new array, a monad's `map(..)` calls a mapper function with the monad's value, and whatever is returned is wrapped in a new Just instance:
 
 ```js
 var A = Just( 10 );

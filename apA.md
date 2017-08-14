@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Appendix A: Transducing
 
-Transducing is a more advanced technique than we've covered in this book. It extends many of the concepts from Chapter 8 on list operations.
+Transducing is a more advanced technique than we've covered in this book. It extends many of the concepts from Chapter 9 on list operations.
 
 I wouldn't necessarily call this topic strictly "Functional-Light", but more like a bonus on top. I've left this to an appendix because you might very well need to skip the discussion for now and come back to it once you feel fairly comfortable with -- and make sure you've practiced! -- the main book concepts.
 
@@ -27,7 +27,7 @@ function isShortEnough(str) {
 }
 ```
 
-In Chapter 3, we used these predicate functions to test a single word. Then in Chapter 8, we learned how to repeat such tests using list operations like `filter(..)`. For example:
+In Chapter 3, we used these predicate functions to test a single word. Then in Chapter 9, we learned how to repeat such tests using list operations like `filter(..)`. For example:
 
 ```js
 var words = [ "You", "have", "written", "something", "very", "interesting" ];
@@ -66,7 +66,7 @@ function isCorrectLength(str) {
 
 But that's not the FP way!
 
-In Chapter 8, we talked about fusion -- composing adjacent mapping functions. Recall:
+In Chapter 9, we talked about fusion -- composing adjacent mapping functions. Recall:
 
 ```js
 words
@@ -108,7 +108,7 @@ Let's jump in.
 
 ### Expressing Map/Filter As Reduce
 
-The first trick we need to perform is expressing our `filter(..)` and `map(..)` calls as `reduce(..)` calls. Recall how we did that in Chapter 8:
+The first trick we need to perform is expressing our `filter(..)` and `map(..)` calls as `reduce(..)` calls. Recall how we did that in Chapter 9:
 
 ```js
 function strUppercase(str) { return str.toUpperCase(); }
@@ -139,7 +139,7 @@ words
 
 That's a decent improvement. We now have four adjacent `reduce(..)` calls instead of a mixture of three different methods all with different shapes. We still can't just `compose(..)` those four reducers, however, because they accept two arguments instead of one.
 
-In Chapter 8, we sort of cheated and used `list.push(..)` to mutate as a side effect rather than calling `list.concat(..)` to return a whole new array. Let's be a bit more formal for now:
+In Chapter 9, we sort of cheated and used `list.push(..)` to mutate as a side effect rather than calling `list.concat(..)` to return a whole new array. Let's be a bit more formal for now:
 
 ```js
 function strUppercaseReducer(list,str) {
