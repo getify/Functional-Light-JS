@@ -167,13 +167,13 @@ In both cases, `PI` and `bar` are not part of the state of the program. They're 
 
 #### Randomness
 
-You may never have considered it before, but randomness is impure. A function that uses `Math.random()` can never be pure, because you cannot ensure/predict its output based on its input. So any code that generates unique random IDs/etc will by definition be considered reliant on your program's side causes.
+You may never have considered it before, but randomness is a side cause. A function that uses `Math.random()` cannot have predictable output based on its input. So any code that generates unique random IDs/etc will by definition be considered reliant on the program's side causes.
 
 In computing, we use what's called pseudo-random algorithms for generation. Turns out true randomness is pretty hard, so we just kinda fake it with complex algorithms that produce values that seem observably random. These algorithms calculate long streams of numbers, but the secret is, the sequence is actually predictable if you know the starting point. This starting point is referred to as a seed.
 
 Some languages let you specify the seed value for the random number generation. If you always specify the same seed, you'll always get the same sequence of outputs from subsequent "random number" generations. This is incredibly useful for testing purposes, for example, but incredibly dangerous for real world application usage.
 
-In JS, the randomness of `Math.random()` calculated is based on an indirect input, because you cannot specify the seed. As such, we have to treat built-in random number generation as an impure side cause.
+In JS, the randomness of `Math.random()` calculated is based on an indirect input, because you cannot specify the seed. As such, we have to treat built-in random number generation as a side cause.
 
 ### I/O Effects
 
@@ -280,7 +280,7 @@ There are multiple different strategies for avoiding/fixing side causes/effects.
 
 If you must make side effect changes to state, one class of operations that's useful for limiting the potential trouble is idempotence. If your update of a value is idempotent, then data will be resilient to the case where you might have multiple such updates from different side effect sources.
 
-The definition of idempotence is a little confusing; mathematicians use a slightly different meaning than programmers typically do. However, both perspectives are useful for the functional programmer.
+If you try to research it, the definition of idempotence can be a little confusing; mathematicians use a slightly different meaning than programmers typically do. However, both perspectives are useful for the functional programmer.
 
 First, let's give a counter example that is neither mathematically nor programmingly idempotent:
 
@@ -481,6 +481,8 @@ Another common way to articulate a function's purity is: **given the same input(
 If a function *can* produce a different output each time it's given the same inputs, it is impure. Even if such a function always `return`s the same value, if it produces an indirect output side effect, the program state is changed each time it's called; this is impure.
 
 Impure functions are undesirable because they make all of their calls harder to reason about. A pure function's call is perfectly predictable. When someone reading the code sees multiple `circleArea(3)` calls, they won't have to spend any extra effort to figure out what its output will be *each time*.
+
+**Note:** An interesting thing to ponder: is the heat produced by the CPU while performing any given operation an unavoidable side effect of even the most pure functions/programs? What about just the CPU time delay as it spends time on a pure operation before it can do another one?
 
 ### Purely Relative
 
@@ -703,7 +705,7 @@ Did you spot it?
 
 `sum` is an outer free variable that `calculateAverage(..)` uses to do its work. But, every time we call `calculateAverage(..)` with the same list, we're going to get `9` as the output. And this program couldn't be distinguished in terms of behavior from a program that replaced the `calculateAverage(nums)` call with the value `9`. No other part of the program cares about the `sum` variable, so it's an unobserved side effect.
 
-Is a side cause/effect that's unobserved like this tree?
+Is a side cause/effect that's unobserved like this tree:
 
 > If a tree falls in the forest, but no one is around to hear it, does it still make a sound?
 
@@ -711,7 +713,7 @@ By the narrowest definition of referential transparency, I think you'd have to s
 
 #### Performance Effects
 
-Often times, you'll find these kind of side-effects-that-go-unobserved being used to optimize the performance of an operation. For example:
+You'll generally find these kind of side-effects-that-go-unobserved being used to optimize the performance of an operation. For example:
 
 ```js
 var cache = [];
@@ -744,8 +746,6 @@ specialNumber( 987654321 );		// 493827162
 This silly `specialNumber(..)` algorithm is deterministic and thus pure from the definition that it always gives the same output for the same input. It's also pure from the referential transparency perspective -- replace any call to `specialNumber(42)` with `22` and the end result of the program is the same.
 
 However, the function has to do quite a bit of work to calculate some of the bigger numbers, especially the `987654321` input. If we needed to get that particular special number multiple times throughout our program, the `cache`ing of the result means that subsequent calls are far more efficient.
-
-**Note:** An interesting thing to ponder: is the heat produced by the CPU while performing any given operation an unavoidable side effect of even the most pure functions/programs? What about just the CPU time delay as it spends time on a pure operation before it can do another one?
 
 Don't be so quick to assume that you could just run the `specialNumber(987654321)` calculation once and manually stick that result in some variable / constant. Programs are often highly modularized and globally accessible scopes are not usually the way you want to go around sharing state between those independent pieces. Having `specialNumber(..)` do its own caching (even though it happens to be using a global variable to do so!) is a more preferable abstraction of that state sharing.
 
@@ -786,19 +786,57 @@ We've contained the `cache` side causes/effects of `specialNumber(..)` inside th
 
 That last sentence may seem like a subtle point, but actually I think it might be **the most important point of the entire chapter**. Read it again.
 
-Back to this philosophical musing:
+Recall this philosophical musing:
 
 > If a tree falls in the forest, but no one is around to hear it, does it still make a sound?
 
 Going with the metaphor, what I'm getting at is: whether the sound is made or not, it would be better if we never create a scenario where the tree can fall without us being around; we'll always hear the sound when a tree falls.
 
-The purpose of reducing side causes/effects is not per se to have a program where they aren't observed, but to design a program where fewer of them are possible, because this makes the code easier to reason about. A program with side causes/effects that *happen* to not be observed is not nearly as effective in this goal as a program that *cannot* observe them.
+The purpose of reducing side causes/effects is not per se to have a program where they aren't observed, but to design a program where fewer of them are possible, because this makes the code easier to reason about. A program with side causes/effects that *just happen* to not be observed is not nearly as effective in this goal as a program that *cannot* observe them.
 
-If side causes/effect can happen, the writer and reader must mentally juggle them. Make it so they can't happen, and both writer and reader will find more confidence over what can and cannot happen in any part.
+If side causes/effects can happen, the writer and reader must mentally juggle them. Make it so they can't happen, and both writer and reader will find more confidence over what can and cannot happen in any part.
 
 ## Purifying
 
-What can you do if you have an impure function that you cannot refactor to be pure?
+The first best option in writing functions is that you design them from the beginning to be pure. But you'll spend plenty of time maintaining existing code, where those kinds of decisions were already made; you'll run across a lot of impure functions.
+
+If possible, refactor the impure function to be pure. Sometimes you can just shift the side effects out of a function to the part of the program where the call of that function happens. The side effect wasn't eliminated, but it was made more obvious by showing up at the call-site.
+
+Consider this trivial example:
+
+```js
+function addMaxNum(arr) {
+	var maxNum = Math.max( ...arr );
+	arr.push( maxNum + 1 );
+}
+
+var nums = [4,2,7,3];
+
+addMaxNum( nums );
+
+nums;		// [4,2,7,3,8]
+```
+
+The `nums` array needs to be modified, but we don't have to obscure that side effect by containing it in `addMaxNum(..)`. Let's move the `push(..)` mutation out, so that `addMaxNum(..)` becomes a pure function, and the side effect is now more obvious:
+
+```js
+function addMaxNum(arr) {
+	var maxNum = Math.max( ...arr );
+	return maxNum + 1;
+}
+
+var nums = [4,2,7,3];
+
+nums.push(
+	addMaxNum( nums )
+);
+
+nums;		// [4,2,7,3,8]
+```
+
+**Note:** Another technique for this kind of task could be to use an immutable data structure, which we cover in the next chapter.
+
+But what can you do if you have an impure function where the refactoring is not as easy?
 
 You need to figure what kind of side causes/effects the function has. It may be that the side causes/effects come variously from lexical free variables, mutations-by-reference, or even `this` binding. We'll look at approaches that address each of these scenarios.
 
@@ -842,6 +880,8 @@ function safer_fetchUserData(userId,users) {
 	}
 }
 ```
+
+**Warning:** `safer_fetchUserData(..)` is *more* pure, but is not strictly pure in that it still relies on the I/O of making an Ajax call. There's no getting around the fact that an Ajax call is an impure side effect, so we'll just leave that detail unaddressed.
 
 Both `userId` and `users` are input for the original `fetchUserData`, and `users` is also output. The `safer_fetchUserData(..)` takes both of these inputs, and returns `users`. To make sure we're not creating a side effect on the outside when `users` is mutated, we make a local copy of `users`.
 
@@ -981,7 +1021,7 @@ function safer_handleInactiveUsers(userList,dateCutoff) {
 
 The success of this technique will be dependent on the thoroughness of the *copy* you make of the value. Using `userList.slice()` would not work here, since that only creates a shallow copy of the `userList` array itself. Each element of the array is an object that needs to be copied, so we need to take extra care. Of course, if those objects have objects inside them (they might!), the copying needs to be even more robust.
 
-#### `this` Revisited
+### `this` Revisited
 
 Another variation of the via-reference side cause/effect is with `this`-aware functions having `this` as an implicit input. See "What's This" in Chapter 2 for more info on why the `this` keyword is problematic for FPers.
 
@@ -1021,4 +1061,4 @@ Pure functions are how we best avoid side effects. A pure function is one that a
 
 Refactoring an impure function to be pure is the preferred option. But if that's not possible, try encapsulating the side causes/effects, or creating a pure interface against them.
 
-No program can be entirely free of side effects. But prefer pure functions in as many places as that's practical. Collect impure functions side effects together as much as possible, so that it's easier to identify and audit the most likely culprits of bugs when they arise.
+No program can be entirely free of side effects. But prefer pure functions in as many places as that's practical. Collect impure functions side effects together as much as possible, so that it's easier to identify and audit these most likely culprits of bugs when they arise.
