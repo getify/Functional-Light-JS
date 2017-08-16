@@ -139,10 +139,85 @@ Mori is heavily inspired by ClojureScript. Its API will be very familiar if you 
 
 But I really like the standalone function design instead of methods on values. Mori also has some functions that automatically return regular JS arrays, which is a nice convenience.
 
+## Bonus: FPO
+
+In both Chapter 2, we introduced a pattern for dealing with arguments called "named arguments", which in JS means using an object at the call-site to map properties to destructured function parameters:
+
+```js
+function foo( {x,y} = {} ) {
+	console.log( x, y );
+}
+
+foo( {
+	y: 3
+} );					// undefined 3
+```
+
+Then in Chapter 3, we talked about extending our ideas of currying and partial application to work with named arguments, like this:
+
+```js
+function foo({ x, y, z } = {}) {
+	console.log( `x:${x} y:${y} z:${z}` );
+}
+
+var f1 = curryProps( foo, 3 );
+
+f1( {y: 2} )( {x: 1} )( {z: 3} );
+```
+
+One major benefit of this style is being able to pass arguments (even with currying or partial application!) in any order without needing to do `reverseArgs(..)`-style juggling of parameters. Another is being able to omit an optional argument by simply not specifying it, instead of passing an ugly placeholder.
+
+In my journey learning FP, I've regularly been frustrated by both of those irritations of functions with traditional positional arguments; thus I've really appreciated the named arguments style for addressing those concerns.
+
+One day, I was musing about with this style of FP coding, and wondered what it would be like if a whole FP library had all its API methods exposed in this style. I started experimenting, showed those experiments to a few FP folks, and got some positive feedback.
+
+From those experiments, eventually the FPO (pronounced "eff-poh") library (https://github.com/getify/fpo) was born; FPO stands for FP-with-Objects, in case you were wondering.
+
+From the documentation:
+
+```js
+// Ramda's `reduce(..)`
+R.reduce(
+	(acc,v) => acc + v,
+	0,
+	[3,7,9]
+);  // 19
+
+// FPO named-argument method style
+FPO.reduce({
+	arr: [3,7,9],
+	fn: ({acc,v}) => acc + v
+}); // 19
+```
+
+With traditional library implementations of `reduce(..)` (like Ramda), the initial value parameter is in the middle, and not optional. FPO's `reduce(..)` method can take the arguments in any order, and you can omit the optional initial value if desired.
+
+As with most other FP libraries, FPO's API methods are automatically loose-curried, so you can not only provide arguments in any order, but specialize the function by providing its arguments over multiple calls:
+
+```js
+var f = FPO.reduce({ arr: [3,7,9] });
+
+// later
+
+f({ fn: ({acc,v}) => acc + v });	// 19
+```
+
+Lastly, all of FPO's API methods are also exposed using the traditional positional arguments style -- you'll find they're all very similar to Ramda and other libraries -- under the `FPO.std.*` namespace:
+
+```js
+FPO.std.reduce(
+	(acc,v) => acc + v,
+	undefined,
+	[3,7,9]
+);  // 19
+```
+
+If FPO's named argument form of FP appeals to you, perhaps check out the library and see what you think. It has a full test suite and most of the major FP functionality you'd expect, including everything we covered in this text to get you up and going with Functional-Light JavaScript!
+
 ## Summary
 
 JavaScript is not particularly designed as an FP language. However, it does have enough of the basics (like function values, closures, etc) for us to make it FP-friendly. And the libraries we've examined here will help you do that.
 
-Armed with the concepts from this book, you're ready to start tackling real world code. Find a good FP library and jump in. Practice, practice, practice!
+Armed with the concepts from this book, you're ready to start tackling real world code. Find a good, comfortable FP library and jump in. Practice, practice, practice!
 
-So... that's it. I've shared what I have for you, for now. I hereby officially certify you as a "Functional-Light JavaScript" programmer! It's time to close out this "chapter" of our story of learning FP together. But my learning journey continues; I hope your's does, too!
+So... that's it. I've shared what I have for you, for now. I hereby officially certify you as a "Functional-Light JavaScript" programmer! It's time to close out this "chapter" of our story of learning FP together. But my learning journey still continues; I hope your's does, too!

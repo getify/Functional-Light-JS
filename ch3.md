@@ -897,6 +897,8 @@ f2( { z: 3, x: 1 } );
 
 Order doesn't matter anymore! We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances. Cool!
 
+**Note:** If this style of function arguments seems useful or interesting to you, check out my coverage of the "FPO" library in Appendix C.
+
 ### Spreading Properties
 
 Unfortunately, this only works because we have control over the signature of `foo(..)` and defined it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature?
