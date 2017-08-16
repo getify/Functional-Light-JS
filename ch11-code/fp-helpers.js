@@ -82,18 +82,7 @@ function zip(arr1,arr2) {
 	return zipped;
 }
 
-function compose(...fns) {
-	return function composed(result){
-		// copy the array of functions
-		var list = fns.slice();
-
-		while (list.length > 0) {
-			result = list.pop()( result );
-		}
-
-		return result;
-	};
-}
+const compose = (...fns) => (x) => fns.reduce((v, f) => f(v), x)
 
 function pipe(...fns) {
 	return function piped(result){
