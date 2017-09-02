@@ -171,9 +171,33 @@ var D = C.ap( B );
 D.inspect();				// Just(13)
 ```
 
-The value `10` came out of `C`, and `3` came out of `B`, and `sum(..)` added them together to `13` and wrapped that in the monad `D`.
+The value `10` came out of `C`, and `3` came out of `B`, and `sum(..)` added them together to `13` and wrapped that in the monad `D`. Let's put the two steps together so you can see their connection more clearly:
 
-If the *how* of this discussion is unclear so far, go back and re-read. If the *why* is elusive, just hang in there. Monads so easily confound developers, that's *just* how it is!
+```js
+var D = A.map( curry( sum ) ).ap( B );
+
+D.inspect();				// Just(13)
+```
+
+To illustrate what `ap(..)` is helping us with, we could have achieved the same result this way:
+
+```js
+var D = B.map( A.chain( curry( sum ) ) );
+
+D.inspect();				// Just(13);
+```
+
+And that of course is just a composition (see Chapter 4):
+
+```js
+var D = compose( B.map, A.chain, curry )( sum );
+
+D.inspect();				// Just(13)
+```
+
+Cool, huh!?
+
+If the *how* of this discussion on monad methods is unclear so far, go back and re-read. If the *why* is elusive, just hang in there. Monads so easily confound developers, that's *just* how it is!
 
 ## Maybe
 
