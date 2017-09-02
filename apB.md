@@ -80,9 +80,9 @@ Don't worry if most of this doesn't make sense right now. We're not gonna obsess
 
 ### Working With Monad Methods
 
-All monad instances will have `map(..)`, `chain(..)` (also called `bind(..)` or `flatMap(..)`), and `ap(..)` methods. The purpose of these methods and their behavior is to provide a standardized way of multiple monad instances working together.
+All monad instances will have `map(..)`, `chain(..)` (also called `bind(..)` or `flatMap(..)`), and `ap(..)` methods. The purpose of these methods and their behavior is to provide a standardized way of multiple monad instances interacting with each other.
 
-Let's look first at the monadic `map(..)` function. Like `map(..)` on an array (see Chapter 9) that calls a mapper function with its value(s) and produces a new array, a monad's `map(..)` calls a mapper function with the monad's value, and whatever is returned is wrapped in a new Just instance:
+Let's look first at the monadic `map(..)` function. Like `map(..)` on an array (see Chapter 9) that calls a mapper function with its value(s) and produces a new array, a monad's `map(..)` calls a mapper function with the monad's value, and whatever is returned is wrapped in a new Just monad instance:
 
 ```js
 var A = Just( 10 );
@@ -91,19 +91,48 @@ var B = A.map( v => v * 2 );
 B.inspect();				// Just(20)
 ```
 
-`chain(..)` does the same thing as `map(..)` except not the last part about wrapping in a new instance of the monad. One way you can use `chain(..)` is in combination with the `identity(..)` utility (see Chapter 3), to extract a value from a monad:
+Monadic `chain(..)` kinda does the same thing as `map(..)`, but then it sort of unwraps the resulting value from its new monad. However, instead of thinking informally about "unwrapping" a monad, the more formal explanation would be that `chain(..)` flattens the monad. Consider:
+
+```js
+var A = Just( 10 );
+var eleven = A.chain( v => v + 1 );
+
+eleven;					// 11
+typeof eleven;				// "number"
+```
+
+`eleven` is the actual primitive number `11`, not a monad holding that value.
+
+To connect this `chain(..)` method conceptually to stuff we've already learned, we'll point out that many monad implementations name this method `flatMap(..)`. Now, recall from Chapter 9 what `flatMap(..)` does (as compared to `map(..)`) with an array:
+
+```js
+var x = [3];
+
+map( v => [v,v+1], x );			// [[3,4]]
+flatMap( v => [v,v+1], x );		// [3,4]
+```
+
+See the difference? The mapper function `v => [v,v+1]` results in a `[3,4]` array, which ends up in the single first position of the outer array, so we get `[[3,4]]`. But `flatMap(..)` flattens out the inner array into the outer array, so we get just `[3,4]` instead.
+
+That's the same kind of thing going on with a monad's `chain(..)` (aka `flatMap(..)`). Instead of getting a monad holding the value as `map(..)` does, `chain(..)` additionally flattens the monad into the underlying value. Actually, instead of creating that intermediate monad only to immediately flatten it, `chain(..)` is generally implemented more performantly to just take a shortcut and not create the monad in the first place. Either way, the end result is the same.
+
+One way to illustrate `chain(..)` in this manner is in combination with the `identity(..)` utility (see Chapter 3), to effectively extract a value from a monad:
 
 ```js
 var identity = v => v;
 
-B.chain( identity );		// 20
+A.chain( identity );		// 10
 ```
 
-Both `map(..)` and `chain(..)` likely feel fairly intuitive and reasonable to you at this point.
+`A.chain(..)` calls `identity(..)` with the value in `A`, and whatever value `identity(..)` returns (`10` in this case) just comes right out without any intervening monad. In other words, from that earlier `Just(..)` code listing, we wouldn't actually need to include that optional `inspect(..)` helper, as `chain(inspect)` accomplishes the same goal; it's purely for ease of debugging as we learn monads.
 
-By contrast, `ap(..)` is much less intuitive at first glance. It seems like a strange contortion of interaction, but there's deep and important reasoning behind the design. Let's take a moment to break it down.
+At this point, hopefully both `map(..)` and `chain(..)` feel fairly reasonable to you.
 
-`ap(..)` takes the value wrapped in a monad and "applies" it to another monad using that other monad's `map(..)`. However, `map(..)` always expects a function. So that means the monad you call `ap(..)` on has to contain a function as its value, to pass to that other monad's `map(..)`.
+By contrast, a monad's `ap(..)` method will likely be much less intuitive at first glance. It will seem like a strange contortion of interaction, but there's deep and important reasoning behind the design. Let's take a moment to break it down.
+
+`ap(..)` takes the value wrapped in a monad and "applies" it to another monad using that other monad's `map(..)`. OK, fine so far.
+
+However, `map(..)` always expects a function. So that means the monad you call `ap(..)` on has to actually contain a function as its value, to pass to that other monad's `map(..)`.
 
 Confused? Yeah, not what you might have expected. We'll try to briefly illuminate, but just expect that these things will be fuzzy for awhile until you've had a lot more exposure and practice with monads.
 
@@ -144,7 +173,7 @@ D.inspect();				// Just(13)
 
 The value `10` came out of `C`, and `3` came out of `B`, and `sum(..)` added them together to `13` and wrapped that in the monad `D`.
 
-If the *how* of this discussion is unclear so far, go back and re-read. If the *why* is eludsive, just hang in there. Monads so easily confound developers, that's *just* how it is!
+If the *how* of this discussion is unclear so far, go back and re-read. If the *why* is elusive, just hang in there. Monads so easily confound developers, that's *just* how it is!
 
 ## Maybe
 
@@ -273,7 +302,7 @@ alice.inspect();			// Nothing
 
 The `MaybeHumble( 39 + 3 )` call creates a `Nothing()` monad instance to return back from the `chain(..)` call, so now Alice doesn't qualify as humble anymore.
 
-Now, let's use a few monads them together:
+Now, let's use a few monads together:
 
 ```js
 var bob = MaybeHumble( 41 );
@@ -287,7 +316,7 @@ bob.map( teamMembers ).ap( alice );
 // Our humble team's egos: 41 39
 ```
 
-Reviewing the usage of `ap(..)` from earlier, we can explain how this code works.
+Recalling the usage of `ap(..)` from earlier, we can now explain how this code works.
 
 Since `teamMembers(..)` is curried, the `bob.map(..)` call passes in the `bob` ego level (`41`), and creates a monad instance with the remaining function wrapped up. Calling `ap(alice)` on *that* monad calls `alice.map(..)` and passes to it the function from the monad. The effect is that both the `bob` and `alice` monad's numeric values have been provided to `teamMembers(..)` function, printing out the message as shown.
 
@@ -332,11 +361,12 @@ learner
 // Learned closures.
 // Learned side effects.
 // Learned recursion.
+// ..nothing else..
 ```
 
 Unfortunately, the learning process seems to have been cut short. You see, I've found that learning a bunch of stuff without sharing with others: inflates your ego too much and is not good for your skills.
 
-Let's try a better approach:
+Let's try a better approach to learning:
 
 ```js
 var share = egoChange( -2 );
