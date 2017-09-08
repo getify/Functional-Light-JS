@@ -441,6 +441,51 @@ Unfortunately, for historical reasons, quite a few other array methods are impur
 
 It should not be seen as *forbidden* to use these kinds utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
 
+Recall one of the implementations of `compose(..)` from Chapter 4:
+
+```js
+function compose(...fns) {
+	return function composed(result){
+		// copy the array of functions
+		var list = fns.slice();
+
+		while (list.length > 0) {
+			// take the last function off the end of the list
+			// and execute it
+			result = list.pop()( result );
+		}
+
+		return result;
+	};
+}
+```
+
+The `...fns` gather parameter is making a new local array from the passed in arguments, so it's not an array that we could create an outside side effect on. It would be reasonable then to assume that it's safe for us to mutate it locally. But the subtle gotcha here is that the inner `composed(..)` which closes over `fns` is not "local" in this sense.
+
+Consider this different version which doesn't make a copy:
+
+```js
+function compose(...fns) {
+	return function composed(result){
+		while (fns.length > 0) {
+			// take the last function off the end of the list
+			// and execute it
+			result = fns.pop()( result );
+		}
+
+		return result;
+	};
+}
+
+var f = compose( x => x / 3, x => x + 1, x => x * 2 );
+
+f( 4 );		// 3
+
+f( 4 );		// 4 <-- uh oh!
+```
+
+The second usage of `f(..)` here wasn't correct, since we mutated that `fns` during the first call, which affected any subsequent uses. Depending on the circumstances, making a copy of an array like `list = fns.slice()` may or may not be necessary. But I think it's safest to assume you need it -- even if only for readability sake! -- unless you can prove you don't, rather than the other way around.
+
 Be disciplined and always treat *received values* as immutable, whether they are or not. That effort will improve the readability and trustability of your code.
 
 ## Summary
