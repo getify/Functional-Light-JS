@@ -141,7 +141,7 @@ But I really like the standalone function design instead of methods on values. M
 
 ## Bonus: FPO
 
-In both Chapter 2, we introduced a pattern for dealing with arguments called "named arguments", which in JS means using an object at the call-site to map properties to destructured function parameters:
+In Chapter 2, we introduced a pattern for dealing with arguments called "named arguments", which in JS means using an object at the call-site to map properties to destructured function parameters:
 
 ```js
 function foo( {x,y} = {} ) {
@@ -213,6 +213,95 @@ FPO.std.reduce(
 ```
 
 If FPO's named argument form of FP appeals to you, perhaps check out the library and see what you think. It has a full test suite and most of the major FP functionality you'd expect, including everything we covered in this text to get you up and going with Functional-Light JavaScript!
+
+## Bonus #2: fasy
+
+FP iterations (`map(..)`, `filter(..)`, etc) are almost always modeled as synchronous operations, meaning we eagerly run through all the steps of the iteration immediately. As a matter of fact, other FP patterns like composition and even transducing are also iterations, and are also modeled exactly this way.
+
+But what happens if one or more of the steps in an iteration needs to complete asynchronously? You might jump to thinking that observables (see Chapter 10) is the natural answer, but they're not what we need.
+
+Let me quickly illustrate.
+
+Imagine you have a list of URLs that represent images you want to load into a web page. The fetching of the images is asynchronous, obviously. So, this isn't going to work quite like you'd hope:
+
+```js
+var imageURLs = [
+    "https://some.tld/image1.png",
+    "https://other.tld/image2.png",
+    "https://various.tld/image3.png"
+];
+
+var images = imageURLs.map( fetchImage );
+```
+
+The `images` array won't contain the images. Depending on the behavior of `fetchImage(..)`, it probably returns a promise for the image object once it finishes downloading. So `images` would now be a list of promises.
+
+Of course, you could then use `Promise.all(..)` to wait for all those promises to resolve, and then unwrap an array of the image object results at its completion:
+
+```js
+Promise.all( images )
+.then(function allImages(imgObjs){
+	// ..
+});
+```
+
+Unfortunately, this "trick" only works if you're going to do all the asynchronous steps concurrently (rather than serially, one after the other), and only if the operation is a `map(..)` call as shown. If you want serial asynchrony, or you want to, for example, do a `filter(..)` concurrently, this won't quite work; it's possible, but it's messier.
+
+And some operations naturally require serial asynchrony, like for example an asynchronous `reduce(..)`, which clearly needs to work left-to-right one at a time; those steps can't be run concurrently and have that operation make any sense.
+
+As I said, observables (see Chapter 10) aren't the answer to these kinds of tasks. The reason is, an observable's coordination of asynchrony is between separate operations, not between steps/iterations in at a single level of operation.
+
+Another way to visualize this distinction is that observables support "vertical asynchrony", whereas what I'm talking about would be "horizontal asynchrony".
+
+Consider:
+
+```js
+var obsv = Rx.Observable.from( [1,2,3,4,5] );
+
+obsv
+.map( x => x * 2 )
+.delay( 100 )        // <-- vertical asynchrony
+.map( x => x + 1 )
+.subscribe( v => console.log );
+// {after 100 ms}
+// 3
+// 5
+// 7
+// 9
+// 11
+```
+
+If for some reason I wanted to ensure that there was a delay of 100ms between when `1` was processed by the first `map(..)` and when `2` was processed, that would be the "horizontal asynchrony" I'm referring to. There's not really a clean way to model that.
+
+And of course, I'm using an arbitrary delay in that description, but in practice that would more likely be serial-asynchrony like an asynchronous reduce, where each step in that reduction iteration could take some time before it completes and lets the next step be processed.
+
+So, how do we support both serial and concurrent iteration across asynchronous operations?
+
+**fasy** (pronounced like "Tracy" but with an "f") is a little utility library I built for supporting exactly those kinds of tasks. You can find more information about it here: https://github.com/getify/fasy
+
+To illustrate **fasy**, let's consider a concurrent `map(..)` versus a serial `map(..)`:
+
+```js
+FA.concurrent.map( fetchImage, imageURLs )
+.then( function allImages(imgObjs){
+	// ..
+} );
+
+FA.serial.map( fetchImage, imageURLs )
+.then( function allImages(imgObjs){
+	// ..
+} );
+```
+
+In both cases, the `then(..)` handler will only be invoked once all the fetches have fully completed. The difference is whether the fetches will all initiate concurrently (aka, "in parallel") or go out one at a time.
+
+Your instinct might be that concurrent would always be preferable, and while that may be common, it's not always the case.
+
+For example, what if `fetchImage(..)` maintains a cache of fetched images, and it checks the cache before making the actual network request? What if also, the list of `imageURLs` could have duplicates in it? You'd certainly want the first fetch of an image URL to complete (and populate the cache) before doing the check on the duplicate image URL later in the list.
+
+Again, there will inevitably be cases where whether concurrent or serial asynchrony will be called for. Asynchronous reductions will always be serial, whereas asynchronous mappings may likely tend to be more concurrent but can also need to be serial in some cases. That's why **fasy** supports all these options.
+
+Alongside observables, hopefully **fasy** helps you extend FP patterns and principles to asynchronous operations.
 
 ## Summary
 
