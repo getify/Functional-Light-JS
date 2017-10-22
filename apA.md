@@ -139,25 +139,25 @@ words
 
 That's a decent improvement. We now have four adjacent `reduce(..)` calls instead of a mixture of three different methods all with different shapes. We still can't just `compose(..)` those four reducers, however, because they accept two arguments instead of one.
 
-In Chapter 9, we sort of cheated and used `list.push(..)` to mutate as a side effect rather than calling `list.concat(..)` to return a whole new array. Let's be a bit more formal for now:
+In Chapter 9, we sort of cheated and used `list.push(..)` to mutate as a side effect rather than creating a whole new array to concatenate onto. Let's step back and be a bit more formal for now:
 
 ```js
 function strUppercaseReducer(list,str) {
-	return list.concat( [strUppercase( str )] );
+	return [ ...list, strUppercase( str ) ];
 }
 
 function isLongEnoughReducer(list,str) {
-	if (isLongEnough( str )) return list.concat( [str] );
+	if (isLongEnough( str )) return [ ...list, str ];
 	return list;
 }
 
 function isShortEnoughReducer(list,str) {
-	if (isShortEnough( str )) return list.concat( [str] );
+	if (isShortEnough( str )) return [ ...list, str ];
 	return list;
 }
 ```
 
-Later, we'll look at whether `concat(..)` is necessary here or not.
+Later, we'll revisit whether creating a new array to concatenate onto (e.g., `[...list,str]`) is necessary here or not.
 
 ### Parameterizing The Reducers
 
@@ -166,7 +166,7 @@ Both filter reducers are almost identical, except they use a different predicate
 ```js
 function filterReducer(predicateFn) {
 	return function reducer(list,val){
-		if (predicateFn( val )) return list.concat( [val] );
+		if (predicateFn( val )) return [ ...list, val ];
 		return list;
 	};
 }
@@ -180,7 +180,7 @@ Let's do the same parameterization of the `mapperFn(..)` for a utility to produc
 ```js
 function mapReducer(mapperFn) {
 	return function reducer(list,val){
-		return list.concat( [mapperFn( val )] );
+		return [ ...list, mapperFn( val ) ];
 	};
 }
 
@@ -204,7 +204,7 @@ Look very closely at the above `mapReducer(..)` and `filterReducer(..)` function
 This part:
 
 ```js
-return list.concat( .. );
+return [ ...list, .. ];
 
 // or
 return list;
@@ -214,15 +214,15 @@ Let's define a helper for that common logic. But what shall we call it?
 
 ```js
 function WHATSITCALLED(list,val) {
-	return list.concat( [val] );
+	return [ ...list, val ];
 }
 ```
 
-If you examine what that `WHATSITCALLED(..)` function does, it takes two values (an array and another value) and it "combines" them by concatenating the value onto the end of the array, returning a new array. Very uncreatively, we could name this `listCombination(..)`:
+If you examine what that `WHATSITCALLED(..)` function does, it takes two values (an array and another value) and it "combines" them by creating a new array and concatenating the value onto the end of it. Very uncreatively, we could name this `listCombination(..)`:
 
 ```js
 function listCombination(list,val) {
-	return list.concat( [val] );
+	return [ ...list, val ];
 }
 ```
 
@@ -472,13 +472,13 @@ As a quick aside, let's revisit our `listCombination(..)` combination function i
 
 ```js
 function listCombination(list,val) {
-	return list.concat( [val] );
+	return [ ...list, val ];
 }
 ```
 
-While this approach is pure, it has negative consequences for performance. First, it creates the `[..]` temporary array wrapped around `val`. Then, `concat(..)` creates a whole new array to append this temporary array onto. For each step in our composed reduction, that's a lot of arrays being created and thrown away, which is not only bad for CPU but also GC memory churn.
+While this approach is pure, it has negative consequences for performance: for each step in the reduction, we're creating a whole new array to append the value onto, effectively throwing away the previous array. That's a lot of arrays being created and thrown away, which is not only bad for CPU but also GC memory churn.
 
-The better-performing, impure version:
+By contrast, look again at the better-performing but impure version:
 
 ```js
 function listCombination(list,val) {

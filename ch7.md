@@ -453,7 +453,7 @@ For example, let's imagine tracking the keypress events in a game. Almost certai
 
 ```js
 function trackEvent(evt,keypresses = []) {
-	return keypresses.concat( evt );
+	return [ ...keypresses, evt ];
 }
 
 var keypresses = trackEvent( newEvent1 );
@@ -461,7 +461,7 @@ var keypresses = trackEvent( newEvent1 );
 keypresses = trackEvent( newEvent2, keypresses );
 ```
 
-**Note:** Did you spot why I used `concat(..)` instead of `push(..)`ing directly to `keypresses`? Because in FP, we typically want to treat arrays as immutable data structures that can be recreated and added to, but not directly changed. We trade out the evil of side-effects for an explicit reassignment (more on that later).
+**Note:** Did you spot why I didn't `push(..)` directly to `keypresses`? Because in FP, we typically want to treat arrays as immutable data structures that can be recreated and added to, but not directly changed. We trade out the evil of side-effects for an explicit reassignment (more on that later).
 
 Though we're not changing the structure of the array, we could if we wanted to. More on this in a moment.
 
@@ -487,7 +487,7 @@ So which one is better suited for our task? No surprise here, the array approach
 
 By the way, even though I'm presenting this structural (im)mutability as a clear difference between closure and object, the way we're using the object as an immutable value is actually more similar than not.
 
-Creating a new array (via `concat(..)`) for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its very design.
+Creating a new array for each addition to the array is treating the array as structurally immutable, which is conceptually symmetrical to closure being structurally immutable by its very design.
 
 ### Privacy
 

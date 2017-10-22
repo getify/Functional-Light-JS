@@ -301,7 +301,7 @@ How might we define a utility to do this currying? We're going to use some trick
 function curry(fn,arity = fn.length) {
 	return (function nextCurried(prevArgs){
 		return function curried(nextArg){
-			var args = prevArgs.concat( [nextArg] );
+			var args = [ ...prevArgs, nextArg ];
 
 			if (args.length >= arity) {
 				return fn( ...args );
@@ -321,7 +321,7 @@ var curry =
 	(fn, arity = fn.length, nextCurried) =>
 		(nextCurried = prevArgs =>
 			nextArg => {
-				var args = prevArgs.concat( [nextArg] );
+				var args = [ ...prevArgs, nextArg ];
 
 				if (args.length >= arity) {
 					return fn( ...args );
@@ -520,7 +520,7 @@ We can adapt our previous currying implementation to this common looser definiti
 function looseCurry(fn,arity = fn.length) {
 	return (function nextCurried(prevArgs){
 		return function curried(...nextArgs){
-			var args = prevArgs.concat( nextArgs );
+			var args = [ ...prevArgs, nextArgs ];
 
 			if (args.length >= arity) {
 				return fn( ...args );

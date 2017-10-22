@@ -596,7 +596,7 @@ var flatten =
 	arr =>
 		arr.reduce(
 			(list,v) =>
-				list.concat( Array.isArray( v ) ? flatten( v ) : v )
+				[ ...list, Array.isArray( v ) ? flatten( v ) : v ]
 		, [] );
 ```
 
@@ -616,14 +616,14 @@ var flatten =
 	(arr,depth = Infinity) =>
 		arr.reduce(
 			(list,v) =>
-				list.concat(
+				[ ...list,
 					depth > 0 ?
 						(depth > 1 && Array.isArray( v ) ?
 							flatten( v, depth - 1 ) :
 							v
 						) :
 						[v]
-				)
+				]
 		, [] );
 ```
 
@@ -661,7 +661,7 @@ var firstNames = [
 ];
 
 firstNames
-.map( entry => [entry.name].concat( entry.variations ) );
+.map( entry => [ entry.name, ...entry.variations ] );
 // [ ["Jonathan","John","Jon","Jonny"], ["Stephanie","Steph","Stephy"],
 //   ["Frederick","Fred","Freddy"] ]
 ```
@@ -671,18 +671,18 @@ The return value is an array of arrays, which might be more awkward to work with
 ```js
 flatten(
 	firstNames
-	.map( entry => [entry.name].concat( entry.variations ) )
+	.map( entry => [ entry.name, ...entry.variations ] )
 );
 // ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
 //  "Fred","Freddy"]
 ```
 
-Besides being slightly more verbose, the disadvantage of doing the `map(..)` and `flatten(..)` as separate steps is primarily around performance; this approach processes the list twice.
+Besides being slightly more verbose, the disadvantage of doing the `map(..)` and `flatten(..)` as separate steps is primarily around performance; this approach processes the list twice, and creates an intermediate list that's then thrown away.
 
 FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) that does the mapping-then-flattening combined. For consistency and ease of composition (via currying), the `flatMap(..)` / `chain(..)` utility typically matches the `mapperFn, arr` parameter order that we saw earlier with the standalone `map(..)`, `filter(..)`, and `reduce(..)` utilities.
 
 ```js
-flatMap( entry => [entry.name].concat( entry.variations ), firstNames );
+flatMap( entry => [ entry.name, ...entry.variations ], firstNames );
 // ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
 //  "Fred","Freddy"]
 ```
@@ -704,6 +704,8 @@ var flatMap =
 	(mapperFn,arr) =>
 		arr.reduce(
 			(list,v) =>
+				// note: concat(..) used here since it automatically
+				// flattens an array into the concatenation
 				list.concat( mapperFn( v ) )
 		, [] );
 ```
@@ -989,6 +991,8 @@ var flatten =
 	arr =>
 		arr.reduce(
 			(list,v) =>
+				// note: concat(..) used here since it automatically
+				// flattens an array into the concatenation
 				list.concat( Array.isArray( v ) ? flatten( v ) : v )
 		, [] );
 ```
@@ -998,6 +1002,8 @@ Let's pull out the inner `reducer(..)` function as the standalone utility (and a
 ```js
 // intentionally a function to allow recursion by name
 function flattenReducer(list,v) {
+	// note: concat(..) used here since it automatically
+	// flattens an array into the concatenation
 	return list.concat(
 		Array.isArray( v ) ? v.reduce( flattenReducer, [] ) : v
 	);
@@ -1384,7 +1390,7 @@ Let's use `reduce(..)` to make our shopping list (an array):
 
 ```js
 BinaryTree.reduce(
-	(result,node) => result.concat( node.value ),
+	(result,node) => [ ...result, node.value ],
 	[],
 	banana
 );
@@ -1487,7 +1493,7 @@ var whatToBuy = BinaryTree.filter(
 
 // shopping list
 BinaryTree.reduce(
-	(result,node) => result.concat( node.value ),
+	(result,node) => [ ...result, node.value ],
 	[],
 	whatToBuy
 );

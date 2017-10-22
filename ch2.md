@@ -223,6 +223,8 @@ Think of `...` in this symmetric sense: in a value-list position, it *spreads*. 
 
 Whichever behavior you invoke, `...` makes working with arrays of arguments much easier. Gone are the days of `slice(..)`, `concat(..)` and `apply(..)` to wrangle our argument value arrays.
 
+**Tip:** Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But we certainly have a lot of places where `...` will be much more declaratively readable, and preferable as a result.
+
 #### Parameter Tricks
 
 As of ES6, parameters can have declared *default values*. In the case where the argument for that parameter is not passed, or it's passed as the value `undefined`, the default assignment expression takes over.
