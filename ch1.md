@@ -224,3 +224,5 @@ You may have a variety reasons for starting to read this book, and different exp
 Functional programming is about writing code that is based on proven principles so we can gain a level of confidence and trust over the code we write and read. We shouldn't be content to write code that we hope works, and then breathe a sigh of relief when the test suite seems to verify that. We should *know* what it will do before we run it, and we should be absolutely confident that we've communicated all these ideas in our code for the benefit of other readers (including our future selves).
 
 This is the heart of Functional-Light JavaScript. The goal is to learn to effectively communicate with our code but not have to suffocate under mountains of notation or terminology to get there. I hope this book jumpstarts your journey!
+
+To start learning functional programming, you'll need to start by learning what a function *really* is. That's what we tackle in the next chapter.
