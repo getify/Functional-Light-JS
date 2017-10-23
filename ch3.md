@@ -224,7 +224,7 @@ cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 Instead of manually using `reverseArgs(..)` (twice!) for this purpose, we can define a `partialRight(..)` which partially applies from the right, using the same reverse-partial apply-reverse trick:
 
 ```js
-function partialRight( fn, ...presetArgs ) {
+function partialRight(fn,...presetArgs) {
 	return reverseArgs(
 		partial( reverseArgs( fn ), ...presetArgs.reverse() )
 	);
@@ -260,6 +260,23 @@ f( 1, 2, 3, 4 );	// 1 2 3 [4,"z:last"]
 ```
 
 The value `"z:last"` is only applied to the `z` parameter in the case where `f(..)` is called with exactly two arguments (matching `x` and `y` parameters). In all other cases, the `"z:last"` will just be the right-most argument, however many arguments precede it.
+
+Another more straightforward implementation of `partialRight(..)` that doesn't need the double-reverse trick:
+
+```js
+function partialRight(fn,...presetArgs) {
+	return function partiallyApplied(...laterArgs) {
+		return fn( ...laterArgs, ...presetArgs );
+	};
+}
+
+// or the ES6 => arrow form
+var partialRight =
+	(fn,...presetArgs) =>
+		(...laterArgs) =>
+			fn( ...laterArgs, ...presetArgs );
+```
+
 
 ## One At A Time
 

@@ -83,7 +83,7 @@ var getClassName = getElemAttrByName( "class" );
 var isMatchingStock = curry( matchingStockId, 2 );
 var ticker = document.getElementById( "stock-ticker" );
 var stockTickerUIMethodsWithDOMContext = map(
-	curry( reverseArgs( partial ), 2 )( ticker )
+	curry( partialRight, 2 )( ticker )
 )
 ( [ stockTickerUI.addStock, stockTickerUI.updateStock ] );
 var subscribeToObservable =

@@ -43,6 +43,12 @@ function partial(fn,...presetArgs) {
 	};
 }
 
+function partialRight(fn,...presetArgs) {
+	return function partiallyApplied(...laterArgs) {
+		return fn( ...laterArgs, ...presetArgs );
+	};
+}
+
 function curry(fn,arity = fn.length) {
 	return (function nextCurried(prevArgs){
 		return function curried(nextArg){

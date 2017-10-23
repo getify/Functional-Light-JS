@@ -900,7 +900,7 @@ var reduce = (arr,reducerFn,initialValue) =>
 	arr.reduce( reducerFn, initialValue );
 ```
 
-But this particular standalone style suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application to compose them:
+But this particular standalone approach, with the `arr` as the first parameter, suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application to compose them:
 
 ```js
 compose(
@@ -911,7 +911,7 @@ compose(
 ( [1,2,3,4,5] );					// 18
 ```
 
-That's why FP libraries typically define `filter(..)`, `map(..)`, and `reduce(..)` to alternately receive the array last instead of first. They also typically automatically curry the utilities:
+That's why FP libraries typically define `filter(..)`, `map(..)`, and `reduce(..)` to instead receive the array last, not first. They also typically automatically curry the utilities:
 
 ```js
 var filter = curry(
@@ -926,7 +926,8 @@ var map = curry(
 
 var reduce = curry(
 	(reducerFn,initialValue,arr) =>
-		arr.reduce( reducerFn, initialValue );
+		arr.reduce( reducerFn, initialValue )
+);
 ```
 
 Working with the utilities defined in this way, the composition flow is a bit nicer:
