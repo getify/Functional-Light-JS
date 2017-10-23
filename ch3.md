@@ -7,6 +7,25 @@ I recommended in that discussion that you try to design functions with a single 
 
 We now want to turn our attention to more sophisticated and powerful patterns for wrangling function inputs in these scenarios.
 
+## Defaulting Parameters
+
+As of ES6, parameters can have declared *default values*. In the case where the argument for that parameter is not passed, or it's passed as the value `undefined`, the default assignment expression takes over.
+
+Consider:
+
+```js
+function foo(x = 3) {
+	console.log( x );
+}
+
+foo();					// 3
+foo( undefined );		// 3
+foo( null );			// null
+foo( 0 );				// 0
+```
+
+**Note:** We won't cover it here in any more detail, but the default value expression is lazy, meaning it's not evaluated unless and until needed. Also, it can be any valid JS expression, even a function call. Many cool tricks are possible with this capability. For example, you could declare `x = required()` in your parameter list, and in the `required()` function simply `throw "This argument is required."` to make sure someone always calls your function with that argument/parameter specified.
+
 ## Some Now, Some Later
 
 If a function takes multiple arguments, you may want to specify some of those upfront and leave the rest to be specified later.
@@ -277,7 +296,6 @@ var partialRight =
 			fn( ...laterArgs, ...presetArgs );
 ```
 
-
 ## One At A Time
 
 Let's examine a technique similar to partial application, where a function that expects multiple arguments is broken down into successive chained functions that each take a single argument (arity: 1) and return another function to accept the next argument.
@@ -312,7 +330,7 @@ If an original function expected 5 arguments, the curried form of that function 
 
 So currying unwinds a single higher-arity function into a series of chained unary functions.
 
-How might we define a utility to do this currying? We're going to use some tricks from Chapter 2. Let's take a look:
+How might we define a utility to do this currying? Consider:
 
 ```js
 function curry(fn,arity = fn.length) {
@@ -752,21 +770,53 @@ p1.then( foo ).then( constant( p2 ) ).then( bar );
 
 **Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
 
-## Spread 'Em Out
+## Parameter Destructuring
 
-In Chapter 2, we briefly looked at parameter array destructuring. Recall this example:
+Consider a variadic `foo(..)` that can receive any number of inputs:
 
 ```js
-function foo( [x,y,...args] ) {
+function foo(...args) {
+	// ..
+}
+
+foo( ...[1,2,3] );
+```
+
+What if we wanted to change that interaction so the caller of our function passes in an array of values instead of individual argument values? Just drop the two `...` usages:
+
+```js
+function foo(args) {
 	// ..
 }
 
 foo( [1,2,3] );
 ```
 
-In the parameter list of `foo(..)`, we declare that we're expecting a single array argument that we want to break down -- or in effect, spread out -- into individually named parameters `x` and `y`. Any other values in the array beyond those first two positions are gathered into an `args` array with the `...` operator.
+Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability. Destructuring is the answer:
 
-This trick is handy if an array must be passed in but you want to treat its contents as individual parameters.
+```js
+function foo( [x,y,...args] = [] ) {
+	// ..
+}
+
+foo( [1,2,3] );
+```
+
+Do you spot the `[ .. ]` brackets around the parameter list now? You may now recognize that as array destructuring.
+
+In this example, destructuring tells the engine that an array is expected in this assignment position (aka parameter). The pattern says to take the first value of that array and assign to a local parameter variable called `x`, the second to `y`, and whatever is left is *gathered* into `args`.
+
+### Adapting Arguments To Parameters
+
+Recall that the term arity refers to how many parameters a function expects to receive. A function with arity of 1 is also referred to as a unary function. In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
+
+Recall the function signature from the previous snippet:
+
+```js
+function foo( [x,y,...args] = [] ) {
+```
+
+This pattern is handy if an array must be passed in but you want to treat its contents as individual parameters. `foo(..)` is technically unary -- when it's executed, only one argument (an array) will be passed to it. But inside the function, you get to address different inputs (`x`, `y`, etc) individually.
 
 However, sometimes you won't have the ability to change the declaration of the function to use parameter array destructuring. For example, imagine these functions:
 
@@ -786,7 +836,7 @@ Do you spot why `bar(foo)` fails?
 
 The array `[3,9]` is sent in as a single value to `fn(..)`, but `foo(..)` expects `x` and `y` separately. If we could change the declaration of `foo(..)` to be `function foo([x,y]) { ..`, we'd be fine. Or, if we could change the behavior of `bar(..)` to make the call as `fn(...[3,9])`, the values `3` and `9` would be passed in individually.
 
-There will be occasions when you have two functions that are imcompatible in this way, and you won't be able to change their declarations/definitions for various external reasons. So, how do you use them together?
+There will be occasions when you have two functions that are imcompatible in this way, and you won't be able to change their declarations/definitions. So, how can you use them together?
 
 We can define a helper to adapt a function so that it spreads out a single received array as its individual arguments:
 
@@ -804,7 +854,7 @@ var spreadArgs =
 			fn( ...argsArr );
 ```
 
-**Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's often called `apply(..)`.
+**Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's commonly called `apply(..)`.
 
 Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
 
@@ -812,9 +862,7 @@ Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input t
 bar( spreadArgs( foo ) );			// 12
 ```
 
-It won't seem clear yet why these occassions will arise, but trust me, they do. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
-
-When function output becomes input to another function, this is called composition; we'll cover this topic in detail in Chapter 4.
+It won't seem clear yet why these occassions will arise, but you will see them often. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
 
 While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
 
@@ -845,7 +893,61 @@ function combineFirstTwo([ v1, v2 ]) {
 // 15
 ```
 
-## Order Matters
+## Destructuring Is Declarative
+
+Consider the `foo(..)` from earlier:
+
+```js
+function foo( [x,y,...args] ) {
+	// ..
+}
+```
+
+You could have processed the parameters manually:
+
+```js
+function foo(params) {
+	var x = params[0];
+	var y = params[1];
+	var args = params.slice( 2 );
+
+	// ..
+}
+```
+
+But now we start to dig into a principle we only glanced at previously: declarative code generally communicates more effectively than imperative code.
+
+Declarative code -- for example, the destructuring in the former snippet -- focuses on what the outcome of a piece of code should be. Imperative code -- the manual assignments in the latter snippet -- focuses more on how to get the outcome. If you later read the code, you have to mentally execute it to understand the desired outcome. The outcome is *coded* there, but it's not as clear.
+
+Wherever possible, and to whatever degrees our language and our libraries/frameworks will let us, **we should be striving for declarative and self-explanatory code.**
+
+### Named Arguments
+
+Just as we can destructure array parameters, we can destructure object parameters:
+
+```js
+function foo( {x,y} = {} ) {
+	console.log( x, y );
+}
+
+foo( {
+	y: 3
+} );					// undefined 3
+```
+
+We pass in an object as the single argument, and it's destructured into two separate parameter variables `x` and `y`, which are assigned the values of those corresponding property names from the object passed in. It didn't matter that the `x` property wasn't on the object; it just ended up as a variable with `undefined` like you'd expect.
+
+But the part of parameter object destructuring I want you to pay attention to is the object being passed into `foo(..)`.
+
+With a normal call-site like `foo(undefined,3)`, position is used to map from argument to parameter; we put the `3` in the second position to get it assigned to a `y` parameter. But at this new kind of call-site where parameter destructuring is involved, a simple object-property indicates which parameter (`y`) the argument value `3` should be assigned to.
+
+We didn't have to account for `x` in *that* call-site because in effect we didn't care about `x`. We just omitted it, instead of having to do something distracting like passing `undefined` as a positional placeholder.
+
+Some languages have a direct feature for this behavior: named arguments. In other words, at the call-site, labeling an input value to indicate which parameter it maps to. JavaScript doesn't have named arguments, but parameter object destructuring is the next best thing. We'll look at this again in just a bit.
+
+The FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that in Chapter 4.
+
+#### Order Matters
 
 One of the frustrating things about currying and partial application of functions with multiple parameters is all the juggling we have to do with our arguments to get them into the right order. Sometimes we define a function with parameters in the order that we would want to curry them, but other times that order is incompatible and we have to jump through hoops to reorder.
 
@@ -853,7 +955,7 @@ The frustration is not merely that we need to use some utility to juggle the pro
 
 Is there anything we can do to free ourselves from this argument ordering tyranny!?
 
-In Chapter 2, we looked at the named-argument destructuring pattern. Recall:
+Let's revisit the named-argument destructuring pattern:
 
 ```js
 function foo( {x,y} = {} ) {
@@ -914,11 +1016,11 @@ f2( { z: 3, x: 1 } );
 
 Order doesn't matter anymore! We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances. Cool!
 
-**Note:** If this style of function arguments seems useful or interesting to you, check out my coverage of the "FPO" library in Appendix C.
+**Tip:** If this style of function arguments seems useful or interesting to you, check out my coverage of the "FPO" library in Appendix C.
 
-### Spreading Properties
+#### Spreading Properties
 
-Unfortunately, this only works because we have control over the signature of `foo(..)` and defined it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature?
+Unfortunately, we can only take advantage of currying with named arguments if we have control over the signature of `foo(..)` and define it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature? For example:
 
 ```js
 function bar(x,y,z) {
@@ -970,9 +1072,7 @@ f4( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-A word of caution: the object parameters/named arguments pattern I'm showing here clearly improves readability by reducing the clutter of argument order juggling, but to my knowledge, no mainstream FP libraries are using this approach. It comes at the expense of being far less familiar than how most JavaScript FP is done.
-
-Also, usage of functions defined in this style requires you to know what each argument's name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'."
+Usage of functions defined in this style requires you to know what each argument's name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'."
 
 Weigh these tradeoffs carefully.
 

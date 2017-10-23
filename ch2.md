@@ -5,19 +5,17 @@ Functional Programming is **not just programming with the `function` keyword.** 
 
 But, how sure are you that you know what *function* means?
 
-In this chapter, we're going to lay the groundwork for the rest of the book by covering all the foundational aspects of functions. In some ways, the content here is a review of all the things even a non-FP programmer should know about functions. But if we want to get the most out learning FP concepts, we've got to *know* functions inside and out.
+In this chapter and the next, we're going to lay the groundwork for the rest of the book by covering all the foundational aspects of functions. In some ways, the content here is a review of all the things even a non-FP programmer should know about functions. But if we want to get the most out learning FP concepts, we've got to *know* functions inside and out.
 
 Brace yourself, because there's a lot more to the function than you may have realized.
 
 ## What Is A Function?
 
-The most natural place I can think of to start tackling functional programming is with the *function*. That may seem too simplistic and obvious, but I think our journey needs a solid first step.
-
 So... what is a function?
 
 ### Brief Math Review
 
-I know I've promised we'd stay away from math as much as possible, but bear with me for a moment as we quickly observe some fundamental things about functions and graphs from algebra before we move on.
+I know I've promised we'd stay away from math as much as possible, but bear with me for a moment as we quickly observe some fundamental things about functions and graphs from algebra before we proceed.
 
 Do you remember learning anything about `f(x)` back in school? What about the equation `y = f(x)`?
 
@@ -27,23 +25,25 @@ Let's say an equation is defined like this: <code>f(x) = 2x<sup>2</sup> + 3</cod
 
 What you can notice is that for any value of `x`, say `2`, if you plug it into the equation, you get `11`. What is `11`, though? It's the *return value* of the `f(x)` function, which earlier we said represents a `y` value.
 
-In other words, there's a point at `(2,11)` on that curve in the graph. And for every value of `x` we plug in, we get another `y` value that pairs with it as a coordinate for a point. Another is `(0,3)`, and another is `(-1,5)`. Put all those points together, and you have the graph of that parabolic curve as shown above.
+In other words, we can choose to interpret the input and output values as a point at `(2,11)` on that curve in the graph. And for every value of `x` we plug in, we get another `y` value that pairs with it as a coordinate for a point. Another is `(0,3)`, and another is `(-1,5)`. Put all those points together, and you have the graph of that parabolic curve as shown above.
 
 So what's any of this got to do with FP?
 
 In math, a function always takes input(s), and always gives an output. A term you'll often hear around FP is "morphism"; this is a fancy way of describing a set of values that maps to another set of values, like the inputs of a function related to the outputs of that function.
 
-In algebraic math, those inputs and outputs are often interpreted as parts of coordinates to be graphed. In our programs, however, we can define functions with all sorts of input(s) and output(s), and they need not have any relationship to a visually plotted curve on a graph.
+In algebraic math, those inputs and outputs are often interpreted as components of coordinates to be graphed. In our programs, however, we can define functions with all sorts of input(s) and output(s), even though they'll rarely be interpreted as a visually plotted curve on a graph.
 
 ### Function vs Procedure
 
 So why all the talk of math and graphs? Because in a sense functional programming is about embracing using functions as *functions* in this mathematical sense.
 
-You may be more accustomed to thinking of functions as procedures. What's the difference? An arbitrary collection of functionality. It may have inputs, it may not. It may have an output (`return` value), it may not.
+You may be more accustomed to thinking of functions as procedures. What's the difference? A procedure is an arbitrary collection of functionality. It may have inputs, it may not. It may have an output (`return` value), it may not.
 
 A function takes input(s) and definitely always has a `return` value.
 
-If you plan to do functional programming, **you should be using functions as much as possible**, and not procedures. All your `function`s should take input(s) and return output(s). Why? The answer to that will have many levels of meaning that we'll uncover throughout this book.
+If you plan to do functional programming, **you should be using functions as much as possible**, and trying to avoid procedures wherever possible. All your `function`s should take input(s) and return output(s).
+
+Why? The answer to that will have many levels of meaning that we'll uncover throughout this book.
 
 ## Function Input
 
@@ -69,7 +69,7 @@ foo( a, a * 2 );
 
 ### Counting Inputs
 
-The number of arguments a function "expects" -- how many arguments you'll probably want to pass to it -- is determined by the number of parameters that are declared.
+The number of arguments a function "expects" -- how many arguments you'll likely want to pass to it -- is determined by the number of parameters that are declared.
 
 ```js
 function foo(x,y,z) {
@@ -110,7 +110,7 @@ else if (fn.length == 3) {
 
 **Tip:** The `length` property of a function is read-only and it's determined at the time you declare the function. It should be thought of as essentially a piece of metadata that describes something about the intended usage of the function.
 
-One gotcha to be aware of is that certain kinds of parameter list variations can make the `length` property of the function report something different than you might expect. Don't worry, we'll explain each of these (ES6-introduced) features later in this chapter:
+One gotcha to be aware of is that certain kinds of parameter list variations can make the `length` property of the function report something different than you might expect. Don't worry, we'll explain each of these (ES6-introduced) features later in this chapter and the next chapter. Consider:
 
 ```js
 function foo(x,y = 2) {
@@ -130,7 +130,7 @@ bar.length;				// 1
 baz.length;				// 1
 ```
 
-If you use any of these forms of parameters, be aware that your function's `length` value may surprise you.
+**Warning:** If you use any of these forms of parameters, be aware that your function's `length` value may surprise you.
 
 What about counting the number of arguments the current function call received? This used to be trivial, but now the situation is slightly more complicated. Each function has an `arguments` object (array-like) available that holds a reference to each of the arguments passed in. You can then inspect the `length` property of `arguments` to figure out how many were actually passed:
 
@@ -142,7 +142,7 @@ function foo(x,y,z) {
 foo( 3, 4 );
 ```
 
-As of ES5 (and strict mode, specifically), `arguments` is considered by some to be soft-deprecated; many will avoid using it if possible. It'll never be removed -- in JS we "never" break backwards-compatibility no matter how convenient that may be -- but it's strongly suggested for several reasons that you avoid using it whenever possible.
+As of ES5 (and strict mode, specifically), `arguments` is considered by some to be soft-deprecated; many will avoid using it if possible. It'll never be removed -- in JS we "never" break backwards-compatibility no matter how convenient that may be -- but it's strongly suggested that you avoid using it whenever possible.
 
 However, I suggest that `arguments.length`, and only that, is OK to keep using for those cases where you need to care about the passed number of arguments. A future version of JS might possibly add a feature that restores the ability to determine the number of arguments passed without `arguments.length`; if that happens, then we can fully drop usage of `arguments`.
 
@@ -193,11 +193,9 @@ function foo(...args) {
 
 Now `args` will be the full array of arguments, whatever they are, and you can use `args.length` to know exactly how many arguments have been passed in. And you're safe to use `args[1]` or `args[317]` if you so choose. Please don't pass in 318 arguments, though.
 
-Speaking of ES6 goodies, there's a few other tricks you may want to know about with your function arguments and parameters. For more information beyond this brief overview, see Chapter 2 of my "[You Don't Know JS: ES6 & Beyond](https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20&%20beyond/README.md#you-dont-know-js-es6--beyond)" book.
+### Arrays Of Arguments
 
-#### Argument Tricks
-
-What if you wanted to pass along an array of values as the arguments in your function call?
+What if you wanted to pass along an array of values as the arguments to a function call?
 
 ```js
 function foo(...args) {
@@ -209,7 +207,7 @@ var arr = [ 1, 2, 3, 4, 5 ];
 foo( ...arr );						// 4
 ```
 
-Our new friend `...` is used, but not just in the parameter list; it's also used in the argument list at the call-site. It has the opposite behavior in this context. In a parameter list, we said it *gathered* arguments together. In an argument list, it *spreads* them out. So the contents of `arr` are actually spread out as individual arguments to the `foo(..)` call. Do you see how that's different from just passing in a reference to the whole `arr` array?
+Our new friend `...` is used, but now not just in the parameter list; it's also used in the argument list at the call-site. It has the opposite behavior in this context. In a parameter list, we said it *gathered* arguments together. In an argument list, it *spreads* them out. So the contents of `arr` are actually spread out as individual arguments to the `foo(..)` call. Do you see how that's different from just passing in a reference to the whole `arr` array?
 
 By the way, multiple values and `...` spreadings can be interleaved, as you see fit:
 
@@ -224,107 +222,6 @@ Think of `...` in this symmetric sense: in a value-list position, it *spreads*. 
 Whichever behavior you invoke, `...` makes working with arrays of arguments much easier. Gone are the days of `slice(..)`, `concat(..)` and `apply(..)` to wrangle our argument value arrays.
 
 **Tip:** Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But we certainly have a lot of places where `...` will be much more declaratively readable, and preferable as a result.
-
-#### Parameter Tricks
-
-As of ES6, parameters can have declared *default values*. In the case where the argument for that parameter is not passed, or it's passed as the value `undefined`, the default assignment expression takes over.
-
-Consider:
-
-```js
-function foo(x = 3) {
-	console.log( x );
-}
-
-foo();					// 3
-foo( undefined );		// 3
-foo( null );			// null
-foo( 0 );				// 0
-```
-
-**Note:** We won't cover it here in any more detail, but the default value expression is lazy, meaning it's not evaluated unless and until needed. Also, it can be any valid JS expression, even a function call. Many cool tricks are possible with this capability. For example, you could declare `x = required()` in your parameter list, and in the `required()` function simply `throw "This argument is required."` to make sure someone always calls your function with that argument/parameter specified.
-
-Another ES6 trick we can use with our parameters is called "destructuring". We'll only glance briefly at it because this topic is much more complex than we have space to cover here. But again, refer to my "[ES6 & Beyond](https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20&%20beyond/README.md#you-dont-know-js-es6--beyond)" book for lots more info.
-
-Remember our `foo(..)` from before that could receive as many as 318 arguments!?
-
-```js
-function foo(...args) {
-	// ..
-}
-
-foo( ...[1,2,3] );
-```
-
-What if we wanted to change that interaction so the caller of our function passes in an array of values instead of individual argument values? Just drop the two `...` usages:
-
-```js
-function foo(args) {
-	// ..
-}
-
-foo( [1,2,3] );
-```
-
-Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability. Destructuring is the answer:
-
-```js
-function foo( [x,y,...args] = [] ) {
-	// ..
-}
-
-foo( [1,2,3] );
-```
-
-Do you spot the `[ .. ]` brackets around the parameter list now? That's array destructuring. Destructuring is a way to declaratively describe a *pattern* for the kind of structure (object, array, etc) that you expect to see, and how decomposition (assignment) of its individual parts should happen.
-
-In this example, destructuring tells the engine that an array is expected in this assignment position (aka parameter). The pattern says to take the first value of that array and assign to a local parameter variable called `x`, the second to `y`, and whatever is left is *gathered* into `args`.
-
-You could have done that same thing manually like this:
-
-```js
-function foo(params) {
-	var x = params[0];
-	var y = params[1];
-	var args = params.slice( 2 );
-
-	// ..
-}
-```
-
-But now we start to uncover the first bits of a principle that we'll come back to many more times in this text: declarative code often communicates more cleanly than imperative code.
-
-Declarative code, like destructuring in the earlier snippet, focuses on what the outcome of a piece of code should be. Imperative code, like the manual assignments just shown, focuses more on how to get the outcome. If you later read the code, you have to mentally execute it to understand the desired outcome. The outcome is *coded* there, but it's not as clear.
-
-Wherever possible, and to whatever degrees our language and our libraries/frameworks will let us, **we should be striving for declarative and self-explanatory code.**
-
-Just as we can destructure arrays, we can destructure object parameters:
-
-```js
-function foo( {x,y} = {} ) {
-	console.log( x, y );
-}
-
-foo( {
-	y: 3
-} );					// undefined 3
-```
-
-We pass in an object as the single argument, and it's destructured into two separate parameter variables `x` and `y`, which are assigned the values of those corresponding property names from the object passed in. It didn't matter that the `x` property wasn't on the object; it just ended up as a variable with `undefined` like you'd expect.
-
-But the part of parameter object destructuring I want you to pay attention to is the object being passed into `foo(..)`.
-
-With a normal call-site like `foo(undefined,3)`, position is used to map from argument to parameter; we put the `3` in the second position to get it assigned to a `y` parameter. But at this new kind of call-site where parameter destructuring is involved, a simple object-property indicates which parameter (`y`) the argument value `3` should be assigned to.
-
-We didn't have to account for `x` in *that* call-site because in effect we didn't care about `x`. We just omitted it, instead of having to do something distracting like passing `undefined` as a positional placeholder.
-
-Some languages have a direct feature for this behavior: named arguments. In other words, at the call-site, labeling an input value to indicate which parameter it maps to. JavaScript doesn't have named arguments, but parameter object destructuring is the next best thing.
-
-The FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that later.
-
-Recall that the term arity refers to how many parameters a function expects to receive. A function with arity of 1 is also referred to as a unary function. In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
-
-**Note:** In Chapter 3, we'll revisit this named-argument destructuring trick to deal with annoying issues around parameter ordering.
 
 ### Functions Varying By Input
 
@@ -391,7 +288,9 @@ function foo() {
 }
 ```
 
-Just like destructuring lets us de-construct array/object values in parameters, we can also do so in regular assignments:
+ES6 destructuring is a way to declare a *pattern* for the kind of structure (object, array, etc) that you expect to see, and how decomposition (assignment) of its individual parts should be processed.
+
+Here, we'll assign `x` and `y` from two respective items in the array that comes back from `foo()`:
 
 ```js
 function foo() {
