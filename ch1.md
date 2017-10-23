@@ -11,7 +11,76 @@ Functional Programming (FP) is not a new concept by any means. It's been around 
 
 But that's all changing. A groundswell of interest is growing around FP, not just at the languages level but even in libraries and frameworks. You very well might be reading this text because you've finally realized FP is something you can't ignore any longer. Or maybe you're like me and you've tried to learn FP many times before but struggled to wade through all the terms or mathematical notation.
 
-Whatever your reason for reading this book, welcome to the party!
+This first chapter's purpose is to lay the groundwork to answer questions like: "Why should I use FP style with my code?" and "How does Functional-Light JavaScript compare to what others say about FP?" Starting with Chapter 2 throughout the rest of the book, we'll begin uncovering, piece by piece, the techniques and patterns of writing JS in functional-light style.
+
+## At A Glance
+
+Let's briefly illustrate the notion of "Functional-Light JavaScript" with a before-and-after snapshot of code. Consider:
+
+```js
+var numbers = [4,10,0,27,42,17,15,-6,58];
+var faves = [];
+var magicNumber = 0;
+
+pickFavoriteNumbers();
+calculateMagicNumber();
+
+var msg = `The magic number is: ${magicNumber}`;
+
+console.log( msg );      // The magic number is: 42
+
+// ***************
+
+function calculateMagicNumber() {
+	for (var i = 0; i < faves.length; i++) {
+		magicNumber = magicNumber + faves[i];
+	}
+}
+
+function pickFavoriteNumbers() {
+	for (var i = 0; i < numbers.length; i++) {
+		if (numbers[i] >= 10 && numbers[i] <= 20) {
+			faves.push( numbers[i] );
+		}
+	}
+}
+```
+
+Now compare that code to this version:
+
+```js
+var sumFavoriteNums = FP.compose( [
+	FP.filterReducer( FP.gte( 10 ) ),
+	FP.filterReducer( FP.lte( 20 ) )
+] )( sum );
+
+var printMagicNumber = FP.pipe( [
+	FP.reduce( sumFavoriteNums, 0 ),
+	constructMsg,
+	console.log
+] );
+
+var numbers = [4,10,0,27,42,17,15,-6,58];
+
+printMagicNumber( numbers );      // The magic number is: 42
+
+// ***************
+
+function sum(x,y) { return x + y; }
+function constructMsg(v) { return `The magic number is: ${v}`; }
+```
+
+I'll make a few quick remarks about this illustration, and then we'll set it aside and focus our attention for the rest of the book on digging deep into the concepts therein.
+
+* It's likely that for many readers, the former snippet feels closer to comfortable/readable/maintainable than the latter snippet. It's entirely OK if that's the case. You're in exactly the right spot. I feel quite confident that if you stick it out through the whole book, and practice everything we talk about, that second snippet will eventually become a lot more natural, maybe even preferable!
+
+* Maybe you would have done the task significantly or entirely different from either snippet. That's OK, too. This book won't be prescriptive in telling you that you should do something a specific way, or shouldn't do another thing. Our goal is to illustrate the pros/cons of various patterns and enable you to make those decisions. I think maybe by the end of this book, how you would approach the task may fall a little closer to the second snippet than it does right now.
+
+* It's also possible that you're already a seasoned FP developer who's scanning through the start of this book to see if it has anything useful for you to read. That second snippet certainly has some bits that are quite familiar. But I'm also betting that you thought, "Hmmm, I wouldn't have done it *that* way..." a couple of times. That's OK, and entirely reasonable.
+
+    This is not a traditional, canonical FP book. We'll at times seem quite heretical in our approaches. We're seeking to strike a pragmatic balance between the clear undeniable benefits of FP, and the need to ship workable, maintainable JS without first tackling a daunting mountain of math/notation/terminology. This is not your FP, it's "Functional-Light JavaScript".
+
+Whatever your reasons for reading this book, welcome to the party!
 
 ## Confidence
 
@@ -135,7 +204,7 @@ Some other authors and content you should check out:
 
 ### Libraries
 
-The code snippets in this book do not use libraries. Each operation that we discover, we'll derive how to implement it in standalone, plain ol' JavaScript. However, as you begin to build more of your real code with FP, you'll quickly want a library to provide optimized and highly reliable versions of these commonly accepted utilities.
+The code snippets in this book largely do not rely on libraries. Each operation that we discover, we'll derive how to implement it in standalone, plain ol' JavaScript. However, as you begin to build more of your real code with FP, you'll quickly want a library to provide optimized and highly reliable versions of these commonly accepted utilities.
 
 By the way, you'll want to make sure you check the documentation for the library functions you use to make sure you know how they work. There will be a lot of similarities in many of them to the code we build on in this text, but there will undoubtedly be some differences, even between popular libraries.
 
@@ -146,8 +215,12 @@ Here are a few popular FP libraries for JavaScript that are a great place to sta
 * [functional.js](http://functionaljs.com/)
 * [Immutable.js](https://github.com/facebook/immutable-js)
 
-Appendix C illustrates some of these libraries using various examples from the text.
+Appendix C takes a deeper look at these libraries and others.
 
 ## Summary
 
-This is Functional-Light JavaScript. The goal is to learn to communicate with our code but not suffocate under mountains of notation or terminology to get there. I hope this book jumpstarts your journey!
+You may have a variety reasons for starting to read this book, and different expectations of what you'll get out of it. This chapter explains why I want you to read the book and what I want you to get out of the journey.
+
+Functional programming is about writing code that is based on proven principles so we can gain a level of confidence and trust over the code we write and read. We shouldn't be content to write code that we hope works, and then breathe a sigh of relief when the test suite seems to verify that. We should *know* what it will do before we run it, and we should be absolutely confident that we've communicated all these ideas in our code for the benefit of other readers (including our future selves).
+
+This is the heart of Functional-Light JavaScript. The goal is to learn to effectively communicate with our code but not have to suffocate under mountains of notation or terminology to get there. I hope this book jumpstarts your journey!
