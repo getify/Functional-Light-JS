@@ -1,30 +1,9 @@
 # Functional-Light JavaScript
 # Chapter 3: Managing Function Inputs
 
-In "Function Inputs" in Chapter 2, we talked about the basics of function parameters and arguments. We even looked at some syntactic tricks for easing their use such as the `...` operator and destructuring.
+In "Function Inputs" in Chapter 2, we talked about the basics of function parameters and arguments. We now want to turn our attention to more sophisticated and powerful patterns for wrangling function inputs.
 
-I recommended in that discussion that you try to design functions with a single parameter if at all possible. The fact is, this won't always be possible, and you won't always be in control of function signatures that you need to work with.
-
-We now want to turn our attention to more sophisticated and powerful patterns for wrangling function inputs in these scenarios.
-
-## Defaulting Parameters
-
-As of ES6, parameters can have declared *default values*. In the case where the argument for that parameter is not passed, or it's passed as the value `undefined`, the default assignment expression takes over.
-
-Consider:
-
-```js
-function foo(x = 3) {
-	console.log( x );
-}
-
-foo();					// 3
-foo( undefined );		// 3
-foo( null );			// null
-foo( 0 );				// 0
-```
-
-**Note:** We won't cover it here in any more detail, but the default value expression is lazy, meaning it's not evaluated unless and until needed. Also, it can be any valid JS expression, even a function call. Many cool tricks are possible with this capability. For example, you could declare `x = required()` in your parameter list, and in the `required()` function simply `throw "This argument is required."` to make sure someone always calls your function with that argument/parameter specified.
+// TODO -- need better chapter intro
 
 ## Some Now, Some Later
 

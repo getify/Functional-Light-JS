@@ -67,6 +67,25 @@ foo( a, a * 2 );
 
 **Note:** In JavaScript, there's no requirement that the number of *arguments* matches the number of *parameters*. If you pass more *arguments* than you have declared *parameters* to receive them, the values pass in just fine untouched. These values can be accessed in a few different ways, including the old-school `arguments` object you may have heard of before. If you pass fewer *arguments* than the declared *parameters*, each unaccounted-for parameter is an "undefined" variable, meaning it's present and available in the scope of the function, but just starts out with the empty `undefined` value.
 
+### Defaulting Parameters
+
+As of ES6, parameters can declare *default values*. In the case where the argument for that parameter is not passed, or it's passed the value `undefined`, the default assignment expression is substituted.
+
+Consider:
+
+```js
+function foo(x = 3) {
+	console.log( x );
+}
+
+foo();					// 3
+foo( undefined );		// 3
+foo( null );			// null
+foo( 0 );				// 0
+```
+
+It's always a good practice to think about any default cases that can aide the usability of your functions. However, defaulting parameters can lead to more complexity in terms of reading and understanding the variations of how a function is called. Be judicious in how much you rely on this feature.
+
 ### Counting Inputs
 
 The number of arguments a function "expects" -- how many arguments you'll likely want to pass to it -- is determined by the number of parameters that are declared.
@@ -110,7 +129,7 @@ else if (fn.length == 3) {
 
 **Tip:** The `length` property of a function is read-only and it's determined at the time you declare the function. It should be thought of as essentially a piece of metadata that describes something about the intended usage of the function.
 
-One gotcha to be aware of is that certain kinds of parameter list variations can make the `length` property of the function report something different than you might expect. Don't worry, we'll explain each of these (ES6-introduced) features later in this chapter and the next chapter. Consider:
+One gotcha to be aware of is that certain kinds of parameter list variations can make the `length` property of the function report something different than you might expect.
 
 ```js
 function foo(x,y = 2) {
@@ -129,8 +148,6 @@ foo.length;				// 1
 bar.length;				// 1
 baz.length;				// 1
 ```
-
-**Warning:** If you use any of these forms of parameters, be aware that your function's `length` value may surprise you.
 
 What about counting the number of arguments the current function call received? This used to be trivial, but now the situation is slightly more complicated. Each function has an `arguments` object (array-like) available that holds a reference to each of the arguments passed in. You can then inspect the `length` property of `arguments` to figure out how many were actually passed:
 
