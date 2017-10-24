@@ -65,7 +65,7 @@ var a = 3;
 foo( a, a * 2 );
 ```
 
-`a` and `a * 2` (actually, the result of that expression, `6`) are the *arguments* to the `foo(..)` call. `x` and `y` are the *parameters* that receive the argument values (`3` and `6`, respectively).
+`a` and `a * 2` (actually, the result of `a * 2`, which is `6`) are the *arguments* to the `foo(..)` call. `x` and `y` are the *parameters* that receive the argument values (`3` and `6`, respectively).
 
 **Note:** In JavaScript, there's no requirement that the number of *arguments* matches the number of *parameters*. If you pass more *arguments* than you have declared *parameters* to receive them, the values pass in just fine untouched. These values can be accessed in a few different ways, including the old-school `arguments` object you may have heard of before. If you pass fewer *arguments* than the declared *parameters*, each unaccounted-for parameter is an "undefined" variable, meaning it's present and available in the scope of the function, but just starts out with the empty `undefined` value.
 
@@ -185,7 +185,7 @@ function foo(x,y,z,...args) {
 }
 ```
 
-See the `...args` in the parameter list? That's a new ES6 declarative form that tells the engine to collect (ahem, "gather") all remaining arguments (if any) not assigned to named parameters, and put them in a real array named `args`. `args` will always be an array, even if it's empty. But it **will not** include values that are assigned to the `x`, `y`, and `z` parameters, only anything else that's passed in beyond those first three values.
+See the `...args` in the parameter list? That's an ES6 declarative form that tells the engine to collect (ahem, "gather") all remaining arguments (if any) not assigned to named parameters, and put them in a real array named `args`. `args` will always be an array, even if it's empty. But it **will not** include values that are assigned to the `x`, `y`, and `z` parameters, only anything else that's passed in beyond those first three values.
 
 ```js
 function foo(x,y,z,...args) {
@@ -242,44 +242,9 @@ Whichever behavior you invoke, `...` makes working with arrays of arguments much
 
 **Tip:** Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But we certainly in most places, `...` will be much more declaratively readable, and preferable as a result.
 
-### Functions Varying By Input
-
-Consider this function:
-
-```js
-function foo(x,y) {
-	if (typeof x == "number" && typeof y == "number") {
-		return x * y;
-	}
-	else {
-		return x + y;
-	}
-}
-```
-
-Obviously, this contrived example is going to behave differently depending on what inputs you pass in.
-
-For example:
-
-```js
-foo( 3, 4 );			// 12
-
-foo( "3", 4 );			// "34"
-```
-
-One reason programmers define functions like this is because it can be more convenient to *overload* different behaviors into a single function. The most well-known example is the `$(..)` function provided by many major JS libraries like jQuery. The "dollar sign" function has about a dozen very different kinds of behaviors -- from DOM element lookup to DOM element creation to deferring a function until the `DOMContentLoaded` event -- depending on what arguments you pass to it.
-
-The perceived advantage is learning a smaller API (just one `$(..)` function), but the obvious downside is in reading code and having to carefully inspect exactly what's being passed in to try to decipher what a call will do.
-
-This technique of overloading a function with lots of behaviors based on its inputs is called ad hoc polymorphism.
-
-Another manifestation of this design pattern is making a function that has different outputs (see the next section for more detail) under different scenarios.
-
-**Warning:** Be very careful of the *convenience* temptation here. Just because you can design a function in this way, and even though there may be immediate perceived wins, the long-term costs of this design decision can be unpleasant.
-
 ### Parameter Destructuring
 
-Consider a variadic `foo(..)` that can receive any number of inputs:
+Consider the variadic `foo(..)` from the previous section:
 
 ```js
 function foo(...args) {
@@ -299,7 +264,9 @@ function foo(args) {
 foo( [1,2,3] );
 ```
 
-Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability. Destructuring is the answer:
+Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability.
+
+Thankfully, destructuring is the answer:
 
 ```js
 function foo( [x,y,...args] = [] ) {
@@ -309,11 +276,11 @@ function foo( [x,y,...args] = [] ) {
 foo( [1,2,3] );
 ```
 
-Do you spot the `[ .. ]` brackets around the parameter list now? You may now recognize that as array destructuring.
+Do you spot the `[ .. ]` brackets around the parameter list now? This is called array parameter destructuring.
 
 In this example, destructuring tells the engine that an array is expected in this assignment position (aka parameter). The pattern says to take the first value of that array and assign to a local parameter variable called `x`, the second to `y`, and whatever is left is *gathered* into `args`.
 
-## Destructuring Is Declarative
+## The Importance Of Declarative Style
 
 Considering the `foo(..)` we just looked at, we could instead have processed the parameters manually:
 
@@ -329,9 +296,11 @@ function foo(params) {
 
 But now we can dig into a principle we only glanced at in Chapter 1: declarative code communicates more effectively than imperative code.
 
-Declarative code -- for example, the destructuring in the earlier `foo(..)` snippet -- focuses on what the outcome of a piece of code should be. Imperative code -- the manual assignments in the latter snippet -- focuses more on how to get the outcome. If you later read such imperative code, you have to mentally execute all of it to understand the desired outcome. The outcome is *coded* there, but it's not as clear because it's clouded by the details of *how* we get there.
+Declarative code -- for example, the destructuring in the earlier `foo(..)` snippet, or the `...` operator usages -- focuses on what the outcome of a piece of code should be.
 
-The earlier `foo(..)` is regarded as more readable, because the destructuring hides the unnecessary details of *how* to manage the parameter inputs; the reader is free to focus only on *what* we will do with those parameters. That's the important part and it's what the reader should be focused on to understand the code most completely.
+Imperative code -- such as the manual assignments in the latter snippet -- focuses more on how to get the outcome. If you later read such imperative code, you have to mentally execute all of it to understand the desired outcome. The outcome is *coded* there, but it's not as clear because it's clouded by the details of *how* we get there.
+
+The earlier `foo(..)` is regarded as more readable, because the destructuring hides the unnecessary details of *how* to manage the parameter inputs; the reader is free to focus only on *what* we will do with those parameters. That's clearly the most important concern, so it's what the reader should be focused on to understand the code most completely.
 
 Wherever possible, and to whatever degrees our language and our libraries/frameworks will let us, **we should be striving for declarative, self-explanatory code.**
 
@@ -948,6 +917,8 @@ I think most FPers are going to blink and wave off these concerns. They love ano
 ## What's This?
 
 If you're not familiar with the `this` binding rules in JavaScript, I recommend you check out my "You Don't Know JS: this & Object Prototypes" book. For the purposes of this section, I'll assume you know how `this` gets determined for a function call (one of the four rules). But even if you're still fuzzy on *this*, the good news is we're going to conclude that you shouldn't be using `this` if you're trying to do FP.
+
+**Note:** We're tackling a topic that we'll ultimiately conclude we shouldn't use. So.. why!? Because the topic of `this` has implications for other topics covered later in this book. For example, our notions of function purity are impacted by `this` being essentially an implicit input to a function (see Chapter 5). Additionally, our perspective on `this` affects whether we choose array methods (`arr.map(..)`) versus standalone utilities (`map(..,arr)`) (see Chapter 9). Understanding `this` is essential to understanding why `this` really should *not* be part of your FP!
 
 JavaScript `function`s have a `this` keyword that's automatically bound per function call. The `this` keyword can be described in many different ways, but I prefer to say it provides an object context for the function to run against.
 
