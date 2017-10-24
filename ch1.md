@@ -76,7 +76,7 @@ Once you understand FP and Functional-Light, this is likely how you'd *read* and
 
 > We're first creating a function called `sumOnlyFavorites(..)` that's a combination of three other functions. We combine two filters, one checking if a value is greater-than-or-equal to 10 and one for less-than-or-equal to 20. Then we include the `sum(..)` reducer in the transducer composition. The resulting `sumOnlyFavorites(..)` function is a reducer that checks if a value passes both filters, and if so, adds the value to an accumulator value.
 >
-> Then we make another function called `printMagicNumber(..)` which first reduces a list of numbers using that `sumOnlyFavorites(..)` reducer we just defined, resulting in a sum of only numbers that passed the *favorite* checks. Then `printMagicNumber(..)` pipes that final sum into `constructMsg(..)`, which creates a string value that finally goes into `console.log(..)`."
+> Then we make another function called `printMagicNumber(..)` which first reduces a list of numbers using that `sumOnlyFavorites(..)` reducer we just defined, resulting in a sum of only numbers that passed the *favorite* checks. Then `printMagicNumber(..)` pipes that final sum into `constructMsg(..)`, which creates a string value that finally goes into `console.log(..)`.
 
 All those moving pieces *speak* to an FP developer in declarative, verifiable ways that may seem highly unfamiliar to you right now. This book will help you *speak* that same kind of reasoning so that it's as readable to you as any other code, if not more so!
 
@@ -84,7 +84,7 @@ I'll just make a few other quick remarks about this code comparison, and then we
 
 * It's likely that for many readers, the former snippet feels closer to comfortable/readable/maintainable than the latter snippet. It's entirely OK if that's the case. You're in exactly the right spot. I'm confident that if you stick it out through the whole book, and practice everything we talk about, that second snippet will eventually become a lot more natural, maybe even preferable!
 
-* Maybe you would have done the task significantly or entirely different from either snippet presented. That's OK, too. This book won't be prescriptive in telling you that you should do something a specific way. Our goal is to illustrate the pros/cons of various patterns and enable you to make those decisions. I believe by the end of this book, how you would approach the task may fall a little closer to the second snippet than it does right now.
+* Maybe you would have done the task significantly or entirely different from either snippet presented. That's OK, too. This book won't be prescriptive in telling you that you should do something a specific way. Our goal is to illustrate the pros/cons of various patterns and enable you to make those decisions. By the end of this book, how you would approach the task may fall a little closer to the second snippet than it does right now.
 
 * It's also possible that you're already a seasoned FP developer who's scanning through the start of this book to see if it has anything useful for you to read. That second snippet certainly has some bits that are quite familiar. But I'm also betting that you thought, "Hmmm, I wouldn't have done it *that* way..." a couple of times. That's OK, and entirely reasonable.
 
@@ -98,7 +98,7 @@ I have a very simple premise that sort of underlies everything I do as a teacher
 
 What do I mean by trust? I mean that you can verify, by reading and reasoning, not just executing, that you understand what a piece of code *will* do; you aren't just relying on what it *should* do. Perhaps more often than we should, we tend to rely on verification of our program's correctness by running test suites. I don't mean to suggest tests are bad. But I do think we should aspire to be able to understand our code well enough that we know the test suite will pass before it runs.
 
-I believe the techniques that form the foundation of FP are designed from the mindset of having far more confidence over our programs just by reading them. Someone who understands FP, and who diligently uses it in their programs, will write code that they can read and verify, by the principles they have already proven to be true, that the program will do what they want.
+The techniques that form the foundation of FP are designed from the mindset of having far more confidence over our programs just by reading them. Someone who understands FP, and who diligently uses it in their programs, will write code that they can read and verify, by the principles they have already proven to be true, that the program will do what they want.
 
 Confidence is also increased when we use techniques that avoid or minimize likely sources of bugs. That's perhaps one of the biggest selling points of FP: FP programs often have fewer bugs, and the bugs that do exist are often in more obvious places, so they're easier to find and fix. FP code tends to be more bug resistant -- certainly not bug proof, though.
 
@@ -114,11 +114,11 @@ I believe very deeply that the vastly more important role of code is as a means 
 
 You probably know by experience that an awful lot of your time spent "coding" is actually spent reading existing code. Very few of us are so privileged as to spend all or most of our time simply banging out all new code and never dealing with code that others (or our past selves) wrote.
 
-It's widely cited that developers spend 70% of code maintenance time on reading to understand it? I find that very compelling. 70%. No wonder the global average for a programmer's lines of code written per day is about 10. We spend the other 7 hours and 30 minutes of the day just reading the code to figure out where those 10 lines should go!
+It's widely estimated that developers spend 70% of code maintenance time on reading to understand it? That is eye-opening. 70%. No wonder the global average for a programmer's lines of code written per day is about 10. We spend 7 hours and 30 minutes of our day just reading the code to figure out where those 10 lines should go!
 
-I think we should focus a lot more on the readability of our code. And by the way, readability is not just about fewer characters. Readability is actually most affected by familiarity. [1]
+I think we should focus a lot more on the readability of our code. And by the way, readability is not just about fewer characters. Readability is actually most impacted by familiarity. [1]
 
-So, if we are going to spend our time concerned with making code that will be more readable and understandable, FP is really effective in that effort. The principles of FP are well established, deeply studied and vetted, and provably verifiable. Taking the time to learn and employ these FP principles will ultimately lead to more readily and recognizably familiar code for you and others. The increase in code familiarity, and the expediency of that recognition, will increase code readability.
+If we are going to spend our time concerned with making code that will be more readable and understandable, FP is central in that effort. The principles of FP are well established, deeply studied and vetted, and provably verifiable. Taking the time to learn and employ these FP principles will ultimately lead to more readily and recognizably familiar code for you and others. The increase in code familiarity, and the expediency of that recognition, will increase code readability.
 
 For example, once you learn what `map(..)` does, you'll be able to almost instantly spot and understand it when you see it in any program. But every time you see a `for` loop, you're going to have to read the whole loop to understand it. The syntax of the `for` loop may be familiar, but the substance of what it's doing is not; that has to be *read*, every time.
 
@@ -144,21 +144,21 @@ I understand asking you to believe that at this point is a leap of faith. But ha
 
 Let me share a painful fact, one that I've been trying to swallow the whole time I've worked on this book: it often takes a lot more effort, and sometimes more code, to improve the readability of your code and to minimize or eliminate most of the places where you might write bugs.
 
-If you're hoping that your FP code refactoring will immediately make your code more graceful, elegant, clever, resiliant, and concise -- that it will come easy in the short term -- that's just not a realistic expectation, at least not at first.
+If you're hoping that your FP code refactoring will quickly make your code more graceful, elegant, clever, resiliant, and concise -- that it will come easy in the short term -- that's just not a realistic expectation, at least not at first.
 
 FP is a very different way of thinking about how code should be structured, to make the flow of data much more obvious and to help your reader follow your thinking. This effort is eminently worthwhile, but it can be an arduous journey, and the code you end up with will not seem more readable until you've spent a lot more time conditioning yourself to FP.
 
-Also, my experience has been that it sometimes takes multiple attempts at turning a snippet of imperative code into more declarative FP, before I end up with something that's clear enough for me to understand. For me, writing FP is more like a process than a binary flip from one paradigm to another.
+Also, my experience has been that it sometimes takes multiple attempts at refactoring a snippet of imperative code into more declarative FP, before I end up with something that's clear enough for me to understand. For me, writing FP is more like a slow process than a quick binary flip from one paradigm to another.
 
-I also apply the "read it later" test to every piece of FP code I write. I write it, then leave the code alone for a few hours or a day, then come back and try to read it with fresh eyes. Usually, it's confusing as hell, so I tweak it and repeat.
+I also apply the "teach it later" test to every piece of FP code I write. I write it, then leave the code alone for a few hours or a day, then come back and try to read it with fresh eyes, and pretend as if I would teach or explain it to someone else. Usually, it's confusing as hell the first few passes, so I tweak it and repeat.
 
-Functional programming has not, for me, been like a single elegant brush stroke on the artist's canvas that leaves the audience in awe. Rather, it's a painstaking, detailed, sometimes treacherous hack through the weeds of a neglected field.
+Functional programming has not, for me, been like a single elegant brush stroke on an artist's canvas that leaves the audience in awe. Rather, it's a painstaking, detailed, sometimes treacherous hack through the weeds of a neglected field.
 
 But I'm not trying to dampen your spirits. I really want you to hack through those weeds. I am glad I have. I can finally start to see the curve bending upward towards more readability. The effort has been worth it. It will be for you, too.
 
 ## Perspective
 
-We're going to approach FP from the ground up, and uncover the basic foundational principles that I believe formal FPers would admit are the scaffolding for everything they do. But for the most part we'll stay arms length away from most of the intimidating terminology or mathematical notation that can so easily frustrate learners.
+We're going to approach FP from the ground up -- it seems to me most other FP texts go the opposite direction, top-down -- and uncover the basic foundational principles that I believe formal FPers would admit are the scaffolding for everything they do. But for the most part we'll stay arms length away from most of the intimidating terminology or mathematical notation that can so easily frustrate learners.
 
 I believe it's less important what you call something and more important that you understand what it is and how it works. That's not to say there's no importance to shared terminology -- it undoubtedly eases communication among seasoned professionals. But for the learner, I've found it can be somewhat distracting.
 
@@ -168,7 +168,7 @@ I call the less formal practice herein "Functional-Light Programming" because I 
 
 I know many FPers who believe that the formalism itself helps learning. But I think there's clearly a cliff where that only becomes true once you reach a certain comfort with the formalism. If you happen to already have a math background or even some flavors of CS experience, this may come more naturally to you. But some of us don't, and no matter how hard we try, the formalism keeps getting in the way.
 
-So this book introduces the concepts that I believe FP is built on, but comes at it by giving you a boost to climb up the cliff wall rather than throwing you straight at it to figure out how to climb as you go.
+So this book introduces the concepts that I believe FP is built on, but comes at it by giving you a boost to climb up the cliff wall rather than shouting down at you from the top to get you to figure out how to climb as you go.
 
 ## How To Find Balance
 
