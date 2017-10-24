@@ -10,7 +10,7 @@
 	* Take
 	* YAGNI
 	* Resources
-* Chapter 2: Foundations of Functional Functions
+* Chapter 2: The Nature Of Functions
 	* What Is A Function?
 	* Function Input
 	* Function Output

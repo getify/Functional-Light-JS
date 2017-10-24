@@ -1,9 +1,13 @@
 # Functional-Light JavaScript
 # Chapter 3: Managing Function Inputs
 
-In "Function Inputs" in Chapter 2, we talked about the basics of function parameters and arguments. We now want to turn our attention to more sophisticated and powerful patterns for wrangling function inputs.
+Chapter 2 explored the core nature of JS `function`s, and lays the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions, to bend them to our will.
 
-// TODO -- need better chapter intro
+Specifically, our attention for this chapter will focus on the parameter inputs of functions. As you bring functions of all different shapes together in your programs, you'll quickly face incompatibilities in the number/order/type of inputs, as well the need to specify some inputs at different times than others.
+
+As a matter of fact, for stylistic purposes of readability, sometimes you'll want to define functions in a way that hides their inputs entirely.
+
+These kinds of techniques are absolutely essential to making functions truly *function*al.
 
 ## Some Now, Some Later
 
@@ -351,7 +355,7 @@ The approach here is to start a collection of arguments in `prevArgs` as an empt
 
 By default, this implementation relies on being able to inspect the `length` property of the to-be-curried function to know how many iterations of currying we'll need before we've collected all its expected arguments.
 
-If you use this implementation of `curry(..)` with a function that doesn't have an accurate `length` property -- if the function's parameter signature includes default parameter values, parameter destructuring, or it's variadic with `...args`; see Chapter 2 -- you'll need to pass the `arity` (the second parameter of `curry(..)`) to ensure `curry(..)` works correctly.
+**Note:** If you use this implementation of `curry(..)` with a function that doesn't have an accurate `length` property, you'll need to pass the `arity` (the second parameter of `curry(..)`) to ensure `curry(..)` works correctly. `length` will be inaccurate if the function's parameter signature includes default parameter values, parameter destructuring, or is variadic with `...args` (see Chapter 2).
 
 Here's how we would use `curry(..)` for our earlier `ajax(..)` example:
 
@@ -606,7 +610,7 @@ Probably the more common case of using `uncurry(..)` is not with a manually curr
 
 ## All For One
 
-Imagine you're passing a function to a utility where it will send multiple arguments to your function. But you may only want to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
+Imagine you're passing a function to a utility, where it will send multiple arguments to that function. But you may only want it to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
 
 We can design a simple utility that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
 
@@ -747,57 +751,23 @@ p1.then( foo ).then( () => p2 ).then( bar );
 p1.then( foo ).then( constant( p2 ) ).then( bar );
 ```
 
-**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, Chapter 5 "Reducing Side Effects".
+**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, in Chapter 5 "Reducing Side Effects".
 
-## Parameter Destructuring
+## Adapting Arguments To Parameters
 
-Consider a variadic `foo(..)` that can receive any number of inputs:
+Recall that the term arity refers to how many parameters a function expects to receive. A function with arity of 1 is also referred to as a unary function.
 
-```js
-function foo(...args) {
-	// ..
-}
+In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
 
-foo( ...[1,2,3] );
-```
-
-What if we wanted to change that interaction so the caller of our function passes in an array of values instead of individual argument values? Just drop the two `...` usages:
-
-```js
-function foo(args) {
-	// ..
-}
-
-foo( [1,2,3] );
-```
-
-Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability. Destructuring is the answer:
-
-```js
-function foo( [x,y,...args] = [] ) {
-	// ..
-}
-
-foo( [1,2,3] );
-```
-
-Do you spot the `[ .. ]` brackets around the parameter list now? You may now recognize that as array destructuring.
-
-In this example, destructuring tells the engine that an array is expected in this assignment position (aka parameter). The pattern says to take the first value of that array and assign to a local parameter variable called `x`, the second to `y`, and whatever is left is *gathered* into `args`.
-
-### Adapting Arguments To Parameters
-
-Recall that the term arity refers to how many parameters a function expects to receive. A function with arity of 1 is also referred to as a unary function. In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
-
-Recall the function signature from the previous snippet:
+Recall this function signature from Chapter 2 which highlights using array parameter destructuring:
 
 ```js
 function foo( [x,y,...args] = [] ) {
 ```
 
-This pattern is handy if an array must be passed in but you want to treat its contents as individual parameters. `foo(..)` is technically unary -- when it's executed, only one argument (an array) will be passed to it. But inside the function, you get to address different inputs (`x`, `y`, etc) individually.
+This pattern is handy if an array will be passed in but you want to treat its contents as individual parameters. `foo(..)` is technically unary -- when it's executed, only one argument (an array) will be passed to it. But inside the function, you get to address different inputs (`x`, `y`, etc) individually.
 
-However, sometimes you won't have the ability to change the declaration of the function to use parameter array destructuring. For example, imagine these functions:
+However, sometimes you won't have the ability to change the declaration of the function to use array parameter destructuring. For example, imagine these functions:
 
 ```js
 function foo(x,y) {
@@ -872,83 +842,17 @@ function combineFirstTwo([ v1, v2 ]) {
 // 15
 ```
 
-## Destructuring Is Declarative
+## Order Matters
 
-Consider the `foo(..)` from earlier:
+In Chapter 2, we explored the named arguments pattern. One primary advantage of named arguments is not needing to juggle argument ordering, thereby improving readability.
 
-```js
-function foo( [x,y,...args] ) {
-	// ..
-}
-```
+But earlier in this chapter, we looked at the advantages of using currying/partial application to provide individual arguments to a function separately. The downside is that these techniques are traditionally based on positional arguments; argument ordering is thus an inevitable headache.
 
-You could have processed the parameters manually:
+Utilities like `reverseArgs(..)` (and others) are necessary to juggle arguments to get them into the right order. Sometimes we get lucky and define a function with parameters in the order that we later want to curry them, but other times that order is incompatible and we have to jump through hoops to reorder.
 
-```js
-function foo(params) {
-	var x = params[0];
-	var y = params[1];
-	var args = params.slice( 2 );
+The frustration is not merely that we need to use some utility to juggle the properties, but the fact that the usage of the utility clutters up our code a bit with extra noise. These kinds of things are like little paper cuts; one here or there isn't a showstopper, but the pain can certainly add up.
 
-	// ..
-}
-```
-
-But now we start to dig into a principle we only glanced at previously: declarative code generally communicates more effectively than imperative code.
-
-Declarative code -- for example, the destructuring in the former snippet -- focuses on what the outcome of a piece of code should be. Imperative code -- the manual assignments in the latter snippet -- focuses more on how to get the outcome. If you later read the code, you have to mentally execute it to understand the desired outcome. The outcome is *coded* there, but it's not as clear.
-
-Wherever possible, and to whatever degrees our language and our libraries/frameworks will let us, **we should be striving for declarative and self-explanatory code.**
-
-### Named Arguments
-
-Just as we can destructure array parameters, we can destructure object parameters:
-
-```js
-function foo( {x,y} = {} ) {
-	console.log( x, y );
-}
-
-foo( {
-	y: 3
-} );					// undefined 3
-```
-
-We pass in an object as the single argument, and it's destructured into two separate parameter variables `x` and `y`, which are assigned the values of those corresponding property names from the object passed in. It didn't matter that the `x` property wasn't on the object; it just ended up as a variable with `undefined` like you'd expect.
-
-But the part of parameter object destructuring I want you to pay attention to is the object being passed into `foo(..)`.
-
-With a normal call-site like `foo(undefined,3)`, position is used to map from argument to parameter; we put the `3` in the second position to get it assigned to a `y` parameter. But at this new kind of call-site where parameter destructuring is involved, a simple object-property indicates which parameter (`y`) the argument value `3` should be assigned to.
-
-We didn't have to account for `x` in *that* call-site because in effect we didn't care about `x`. We just omitted it, instead of having to do something distracting like passing `undefined` as a positional placeholder.
-
-Some languages have a direct feature for this behavior: named arguments. In other words, at the call-site, labeling an input value to indicate which parameter it maps to. JavaScript doesn't have named arguments, but parameter object destructuring is the next best thing. We'll look at this again in just a bit.
-
-The FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that in Chapter 4.
-
-#### Order Matters
-
-One of the frustrating things about currying and partial application of functions with multiple parameters is all the juggling we have to do with our arguments to get them into the right order. Sometimes we define a function with parameters in the order that we would want to curry them, but other times that order is incompatible and we have to jump through hoops to reorder.
-
-The frustration is not merely that we need to use some utility to juggle the properties, but the fact that the usage of it clutters up our code a little bit with some extra noise. These kinds of things are like little paper cuts; one here or there isn't a showstopper, but the pain can certainly add up.
-
-Is there anything we can do to free ourselves from this argument ordering tyranny!?
-
-Let's revisit the named-argument destructuring pattern:
-
-```js
-function foo( {x,y} = {} ) {
-	console.log( x, y );
-}
-
-foo( {
-	y: 3
-} );					// undefined 3
-```
-
-We destructure the first parameter of the `foo(..)` function -- it's expected to be an object -- into individual parameters `x` and `y`. Then, at the call-site, we pass in that single object argument, and provide properties as desired, "named arguments" to map to parameters.
-
-The primary advantage of named arguments is not needing to juggle argument ordering, thereby improving readability. We can exploit this to improve currying/partial application if we invent alternate utilities that work with object properties:
+Can we improve currying/partial application to free it from these ordering concerns? Let's apply the tricks from named arguments style and invent some helper utilities for this adaptation:
 
 ```js
 function partialProps(fn,presetArgsObj) {
@@ -974,9 +878,9 @@ function curryProps(fn,arity = 1) {
 }
 ```
 
-We don't even need a `partialPropsRight(..)` because we don't need care about what order properties are being mapped; the name mappings make that ordering concern moot!
+**Tip:** We don't even need a `partialPropsRight(..)` because we don't need care about what order properties are being mapped; the name mappings make that ordering concern moot!
 
-Here's how we use those utilities:
+Here's how we use those helpers:
 
 ```js
 function foo({ x, y, z } = {}) {
@@ -993,11 +897,9 @@ f2( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-Order doesn't matter anymore! We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances. Cool!
+Even with currying or partial application, order doesn't matter anymore! We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances. Cool!
 
-**Tip:** If this style of function arguments seems useful or interesting to you, check out my coverage of the "FPO" library in Appendix C.
-
-#### Spreading Properties
+### Spreading Properties
 
 Unfortunately, we can only take advantage of currying with named arguments if we have control over the signature of `foo(..)` and define it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature? For example:
 
@@ -1051,7 +953,7 @@ f4( { z: 3, x: 1 } );
 // x:1 y:2 z:3
 ```
 
-Usage of functions defined in this style requires you to know what each argument's name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'."
+While order is no longer a concern, usage of functions defined in this style requires you to know what each argument's exact name is. You can't just remember, "oh, the function goes in as the first argument" anymore. Instead you have to remember, "the function parameter is called 'fn'." Conventions can create consistency of naming that lessens this burden, but it's still something to be aware of.
 
 Weigh these tradeoffs carefully.
 
@@ -1235,6 +1137,8 @@ Partial Application is a technique for reducing the arity -- expected number of 
 
 Currying is a special form of partial application where the arity is reduced to 1, with a chain of successive chained function calls, each which takes one argument. Once all arguments have been specified by these function calls, the original function is executed with all the collected arguments. You can also undo a currying.
 
-Other important operations like `unary(..)`, `identity(..)`, and `constant(..)` are part of the base toolbox for FP.
+Other important utilities like `unary(..)`, `identity(..)`, and `constant(..)` are part of the base toolbox for FP.
 
 Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making easier to read/understand code.
+
+All of these techniques twist functions around so they can work together more naturally. The next chapter will teach you how to combine these functions to model the flows of data through your program.

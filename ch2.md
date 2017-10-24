@@ -1,17 +1,19 @@
 # Functional-Light JavaScript
-# Chapter 2: Foundations of Functional Functions
+# Chapter 2: The Nature Of Functions
 
-Functional Programming is **not just programming with the `function` keyword.** Oh if only it was that easy, I could end the book right here! But importantly, the function really *is* at the center of FP. And it's how we use functions that makes our code *functional*.
+Functional Programming is **not just programming with the `function` keyword.** Oh if only it was that easy, I could end the book right here! Nevertheless, functions really *are* at the center of FP. And it's how we use functions that makes our code *functional*.
 
-But, how sure are you that you know what *function* means?
+But, how sure are you that you know what *function* really means?
 
-In this chapter and the next, we're going to lay the groundwork for the rest of the book by covering all the foundational aspects of functions. In some ways, the content here is a review of all the things even a non-FP programmer should know about functions. But if we want to get the most out learning FP concepts, we've got to *know* functions inside and out.
+In this chapter, we're going to lay the groundwork for the rest of the book by exploring all the foundational aspects of functions. Actually, this is a review of all the things even a non-FP programmer should know about functions. But certainly if we want to get the most out of FP concepts, it's essential we *know* functions inside and out.
 
 Brace yourself, because there's a lot more to the function than you may have realized.
 
 ## What Is A Function?
 
-So... what is a function?
+On its surface, the question, "What is a function?", seems to have an obvious answer: a function is a collection of code that can be executed one or more times.
+
+While this definition is reasonable, it's missing some very important essence that is the core of a *function* as it applies to FP. So let's dig below the surface to understand functions more completely.
 
 ### Brief Math Review
 
@@ -47,9 +49,9 @@ Why? The answer to that will have many levels of meaning that we'll uncover thro
 
 ## Function Input
 
-From this definition, all functions need input.
+So far, we can conclude that functions must expect input. But let's dig into how function inputs work.
 
-You sometimes hear people refer to them as "arguments" and sometimes as "parameters". So what's that all about?
+You sometimes hear people refer to these inputs as "arguments" and sometimes as "parameters". So what's that all about?
 
 *Arguments* are the values you pass in, and *parameters* are the named variables inside the function that receive those passed in values. Example:
 
@@ -129,7 +131,7 @@ else if (fn.length == 3) {
 
 **Tip:** The `length` property of a function is read-only and it's determined at the time you declare the function. It should be thought of as essentially a piece of metadata that describes something about the intended usage of the function.
 
-One gotcha to be aware of is that certain kinds of parameter list variations can make the `length` property of the function report something different than you might expect.
+One gotcha to be aware of is that certain kinds of parameter list variations can make the `length` property of the function report something different than you might expect:
 
 ```js
 function foo(x,y = 2) {
@@ -159,11 +161,11 @@ function foo(x,y,z) {
 foo( 3, 4 );
 ```
 
-As of ES5 (and strict mode, specifically), `arguments` is considered by some to be soft-deprecated; many will avoid using it if possible. It'll never be removed -- in JS we "never" break backwards-compatibility no matter how convenient that may be -- but it's strongly suggested that you avoid using it whenever possible.
+As of ES5 (and strict mode, specifically), `arguments` is considered by some to be sort-of-deprecated; many avoid using it if possible. In JS, we "never" break backwards-compatibility no matter how helpful that may be for future progress, so `arguments` never be removed. But it's now commonly suggested that you avoid using it whenever possible.
 
-However, I suggest that `arguments.length`, and only that, is OK to keep using for those cases where you need to care about the passed number of arguments. A future version of JS might possibly add a feature that restores the ability to determine the number of arguments passed without `arguments.length`; if that happens, then we can fully drop usage of `arguments`.
+However, I suggest that `arguments.length`, and only that, is OK to keep using for those cases where you need to care about the passed number of arguments. A future version of JS might possibly add a feature that offers the ability to determine the number of arguments passed without consulting `arguments.length`; if that happens, then we can fully drop usage of `arguments`!
 
-Be careful: **never** access arguments positionally, like `arguments[1]`. Stick to `arguments.length` only, if you must.
+Be careful: **never** access arguments positionally, like `arguments[1]`. Stick to `arguments.length` only, and only if you must.
 
 Except... how will you access an argument that was passed in a position beyond the declared parameters? I'll answer that in a moment; but first, take a step back and ask yourself, "Why would I want to do that?". Seriously. Think about that closely for a minute.
 
@@ -238,7 +240,7 @@ Think of `...` in this symmetric sense: in a value-list position, it *spreads*. 
 
 Whichever behavior you invoke, `...` makes working with arrays of arguments much easier. Gone are the days of `slice(..)`, `concat(..)` and `apply(..)` to wrangle our argument value arrays.
 
-**Tip:** Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But we certainly have a lot of places where `...` will be much more declaratively readable, and preferable as a result.
+**Tip:** Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But we certainly in most places, `...` will be much more declaratively readable, and preferable as a result.
 
 ### Functions Varying By Input
 
@@ -275,7 +277,113 @@ Another manifestation of this design pattern is making a function that has diffe
 
 **Warning:** Be very careful of the *convenience* temptation here. Just because you can design a function in this way, and even though there may be immediate perceived wins, the long-term costs of this design decision can be unpleasant.
 
+### Parameter Destructuring
+
+Consider a variadic `foo(..)` that can receive any number of inputs:
+
+```js
+function foo(...args) {
+	// ..
+}
+
+foo( ...[1,2,3] );
+```
+
+What if we wanted to change that interaction so the caller of our function passes in an array of values instead of individual argument values? Just drop the two `...` usages:
+
+```js
+function foo(args) {
+	// ..
+}
+
+foo( [1,2,3] );
+```
+
+Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability. Destructuring is the answer:
+
+```js
+function foo( [x,y,...args] = [] ) {
+	// ..
+}
+
+foo( [1,2,3] );
+```
+
+Do you spot the `[ .. ]` brackets around the parameter list now? You may now recognize that as array destructuring.
+
+In this example, destructuring tells the engine that an array is expected in this assignment position (aka parameter). The pattern says to take the first value of that array and assign to a local parameter variable called `x`, the second to `y`, and whatever is left is *gathered* into `args`.
+
+## Destructuring Is Declarative
+
+Considering the `foo(..)` we just looked at, we could instead have processed the parameters manually:
+
+```js
+function foo(params) {
+	var x = params[0];
+	var y = params[1];
+	var args = params.slice( 2 );
+
+	// ..
+}
+```
+
+But now we can dig into a principle we only glanced at in Chapter 1: declarative code communicates more effectively than imperative code.
+
+Declarative code -- for example, the destructuring in the earlier `foo(..)` snippet -- focuses on what the outcome of a piece of code should be. Imperative code -- the manual assignments in the latter snippet -- focuses more on how to get the outcome. If you later read such imperative code, you have to mentally execute all of it to understand the desired outcome. The outcome is *coded* there, but it's not as clear because it's clouded by the details of *how* we get there.
+
+The earlier `foo(..)` is regarded as more readable, because the destructuring hides the unnecessary details of *how* to manage the parameter inputs; the reader is free to focus only on *what* we will do with those parameters. That's the important part and it's what the reader should be focused on to understand the code most completely.
+
+Wherever possible, and to whatever degrees our language and our libraries/frameworks will let us, **we should be striving for declarative, self-explanatory code.**
+
+### Named Arguments
+
+Just as we can destructure array parameters, we can destructure object parameters:
+
+```js
+function foo( {x,y} = {} ) {
+	console.log( x, y );
+}
+
+foo( {
+	y: 3
+} );					// undefined 3
+```
+
+We pass in an object as the single argument, and it's destructured into two separate parameter variables `x` and `y`, which are assigned the values of those corresponding property names from the object passed in. It didn't matter that the `x` property wasn't on the object; it just ended up as a variable with `undefined` like you'd expect.
+
+But the part of parameter object destructuring I want you to pay attention to is the object being passed into `foo(..)`.
+
+With a normal call-site like `foo(undefined,3)`, position is used to map from argument to parameter; we put the `3` in the second position to get it assigned to a `y` parameter. But at this new kind of call-site where parameter destructuring is involved, a simple object-property indicates which parameter (`y`) the argument value `3` should be assigned to.
+
+We didn't have to account for `x` in *that* call-site because in effect we didn't care about `x`. We just omitted it, instead of having to do something distracting like passing `undefined` as a positional placeholder.
+
+Some languages have a direct feature for this behavior: named arguments. In other words, at the call-site, labeling an input value to indicate which parameter it maps to. JavaScript doesn't have named arguments, but parameter object destructuring is the next best thing.
+
+Another FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that in Chapter 4.
+
+#### Unordered Parameters
+
+Another key benefit is that named arguments, by virtue of being specified as object properties, are not fundamentally ordered. That means we can specify inputs in whatever order we want:
+
+```js
+function foo( {x,y} = {} ) {
+	console.log( x, y );
+}
+
+foo( {
+	y: 3
+} );					// undefined 3
+```
+
+We're skipping the `x` parameter by simply omitting it. Or we could specify an `x` argument if we cared to, even if we listed it after `y` in the object literal. The call-site is no longer cluttered by ordered-placeholders like `undefined` to skip a parameter.
+
+Named arguments are much more flexible, and attractive from a readability perspective, especially when the function in question can take 3, 4, or more inputs.
+
+**Tip:** If this style of function arguments seems useful or interesting to you, check out my coverage of the "FPO" library in Appendix C.
+
 ## Function Output
+
+Let's shift our attention from a function's inputs to its output.
 
 In JavaScript, functions always return a value. These three functions all have identical `return` behavior:
 
@@ -958,3 +1066,5 @@ Functions inside of functions can have closure over outer variables and remember
 Be careful of anonymous functions, especially `=>` arrow functions. They're convenient to write, but they shift the cost from author to reader. The whole reason we're studying FP here is to write more readable code, so don't be so quick to jump on that bandwagon.
 
 Don't use `this`-aware functions. Just don't.
+
+You should now be developing a clear and colorful perspective in your mind of what *function* means in Functional Programming. It's time to start wrangling functions to get them to interoperate, and the next chapter teaches you a variety of critical techniques you'll need on this journey.

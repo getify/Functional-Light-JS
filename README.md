@@ -19,7 +19,7 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 * [Foreword](foreword.md) (by [Brian Lonsdorf aka "Prof Frisby"](https://twitter.com/DrBoolean))
 * [Preface](preface.md)
 * [Chapter 1: Why Functional Programming?](ch1.md)
-* [Chapter 2: Foundations of Functional Functions](ch2.md)
+* [Chapter 2: The Nature Of Functions](ch2.md)
 * [Chapter 3: Managing Function Inputs](ch3.md)
 * [Chapter 4: Composing Functions](ch4.md)
 * [Chapter 5: Reducing Side Effects](ch5.md)

@@ -138,9 +138,9 @@ You, dear reader, may just find yourself experiencing this curve as you work thr
 
 We'll explore this more in the next chapter, but imperative code is the code you probably already write, like `if` statements and `for`-loops. It's focused on precisely instructing the computer *how* to do something. Declarative code, and moreover the kind of code we'll be striving to learn to write that adheres to FP principles, is code that's more focused on describing the *what* outcome.
 
-Consider the two code snippets earlier in this chapter: the first one is more imperative and the second one is more declarative. I'm claiming that the declarative is more readable, but you may still feel the opposite, that the initial imperative snippet was easier to understand. That's because you're more used to it. But once you internalize the benefits of the second snippet's declarative approach, you'll see that it's not just equally readable, but more so than the first snippet.
+Consider the two code snippets earlier in this chapter: the first one is more imperative and the second one is more declarative. I'm claiming that the declarative form is more readable, but you may still feel the opposite, that the initial imperative snippet was easier to understand. That's because you're more used to it. Once you internalize the benefits of the second snippet's declarative approach, you'll see that it's not just as readable, but more so than the first snippet.
 
-I understand that asking you to believe that at this point is a leap of faith. But hang in there!
+I understand asking you to believe that at this point is a leap of faith. But hang in there!
 
 Let me share a painful fact, one that I've been trying to swallow the whole time I've worked on this book: it often takes a lot more effort, and sometimes more code, to improve the readability of your code and to minimize or eliminate most of the places where you might write bugs.
 
@@ -243,7 +243,7 @@ Functional programming is about writing code that is based on proven principles 
 
 This is the heart of Functional-Light JavaScript. The goal is to learn to effectively communicate with our code but not have to suffocate under mountains of notation or terminology to get there.
 
-To start learning functional programming, you'll need to deeply understand what a function *really* is. That's what we tackle in the next chapter.
+To start learning functional programming, you'll need to deeply understand the nature of what a function is. That's what we tackle in the next chapter.
 
 ----
 
