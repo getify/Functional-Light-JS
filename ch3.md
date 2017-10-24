@@ -1,13 +1,239 @@
 # Functional-Light JavaScript
 # Chapter 3: Managing Function Inputs
 
-Chapter 2 explored the core nature of JS `function`s, and lays the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions, to bend them to our will.
+Chapter 2 explored the core nature of JS `function`s, and layed the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions -- to bend them to our will.
 
-Specifically, our attention for this chapter will focus on the parameter inputs of functions. As you bring functions of all different shapes together in your programs, you'll quickly face incompatibilities in the number/order/type of inputs, as well the need to specify some inputs at different times than others.
+Specifically, our attention for this chapter will be on the parameter inputs of functions. As you bring functions of all different shapes together in your programs, you'll quickly face incompatibilities in the number/order/type of inputs, as well the need to specify some inputs at different times than others.
 
-As a matter of fact, for stylistic purposes of readability, sometimes you'll want to define functions in a way that hides their inputs entirely.
+As a matter of fact, for stylistic purposes of readability, sometimes you'll want to define functions in a way that hides their inputs entirely!
 
 These kinds of techniques are absolutely essential to making functions truly *function*al.
+
+## All For One
+
+Imagine you're passing a function to a utility, where it will send multiple arguments to that function. But you may only want it to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
+
+We can design a simple utility that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
+
+```js
+function unary(fn) {
+	return function onlyOneArg(arg){
+		return fn( arg );
+	};
+}
+
+// or the ES6 => arrow form
+var unary =
+	fn =>
+		arg =>
+			fn( arg );
+```
+
+We saw the `map(..)` utility eariler. It calls the provided mapping function with three arguments: `value`, `index`, and `list`. If you want your mapping function to only receive one of these, like `value`, use the `unary(..)` utility:
+
+```js
+var adder = looseCurry( sum, 2 );
+
+// oops:
+[1,2,3,4,5].map( adder( 3 ) );
+// ["41,2,3,4,5", "61,2,3,4,5", "81,2,3,4,5", "101, ...
+
+// fixed with `unary(..)`:
+[1,2,3,4,5].map( unary( adder( 3 ) ) );
+// [4,5,6,7,8]
+```
+
+Another commonly cited example using `unary(..)` is:
+
+```js
+["1","2","3"].map( parseFloat );
+// [1,2,3]
+
+["1","2","3"].map( parseInt );
+// [1,NaN,NaN]
+
+["1","2","3"].map( unary( parseInt ) );
+// [1,2,3]
+```
+
+For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an `index` in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is not mistaken as the `radix`.
+
+### One On One
+
+Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that takes one argument and does nothing but return the value untouched:
+
+```js
+function identity(v) {
+	return v;
+}
+
+// or the ES6 => arrow form
+var identity =
+	v =>
+		v;
+```
+
+This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
+
+For example, imagine you'd like split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (covered in detail later in the text) with `identity(..)` as the predicate:
+
+```js
+var words = "   Now is the time for all...  ".split( /\s|\b/ );
+words;
+// ["","Now","is","the","time","for","all","...",""]
+
+words.filter( identity );
+// ["Now","is","the","time","for","all","..."]
+```
+
+Since `identity(..)` simply returns the value passed to it, JS coerces each value into either `true` or `false`, and that decides to keep or exclude each value in the final array.
+
+**Tip:** Another unary function that can be used as the predicate in the previous example is JS's own `Boolean(..)` function, which explicitly coerces the values to `true` or `false`.
+
+Another example of using `identity(..)` is as a default function in place of a transformation:
+
+```js
+function output(msg,formatFn = identity) {
+	msg = formatFn( msg );
+	console.log( msg );
+}
+
+function upper(txt) {
+	return txt.toUpperCase();
+}
+
+output( "Hello World", upper );		// HELLO WORLD
+output( "Hello World" );			// Hello World
+```
+
+If `output(..)` didn't have a default for `formatFn`, we could bring our earlier friend `partialRight(..)`:
+
+```js
+var specialOutput = partialRight( output, upper );
+var simpleOutput = partialRight( output, identity );
+
+specialOutput( "Hello World" );		// HELLO WORLD
+simpleOutput( "Hello World" );		// Hello World
+```
+
+You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in Chapter 9.
+
+### Unchanging One
+
+Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function just returns the value. One such API is the `then(..)` method on JS Promises. Many claim that ES6 `=>` arrow functions are the "solution". But there's an FP utility that's perfectly suited for the task:
+
+```js
+function constant(v) {
+	return function value(){
+		return v;
+	};
+}
+
+// or the ES6 => form
+var constant =
+	v =>
+		() =>
+			v;
+```
+
+With this tidy little utility, we can solve our `then(..)` annoyance:
+
+```js
+p1.then( foo ).then( () => p2 ).then( bar );
+
+// vs
+
+p1.then( foo ).then( constant( p2 ) ).then( bar );
+```
+
+**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, in Chapter 5 "Reducing Side Effects".
+
+## Adapting Arguments To Parameters
+
+In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
+
+Recall this function signature from Chapter 2 which highlights using array parameter destructuring:
+
+```js
+function foo( [x,y,...args] = [] ) {
+```
+
+This pattern is handy if an array will be passed in but you want to treat its contents as individual parameters. `foo(..)` is thus technically unary -- when it's executed, only one argument (an array) will be passed to it. But inside the function, you get to address different inputs (`x`, `y`, etc) individually.
+
+However, sometimes you won't have the ability to change the declaration of the function to use array parameter destructuring. For example, imagine these functions:
+
+```js
+function foo(x,y) {
+	console.log( x + y );
+}
+
+function bar(fn) {
+	fn( [ 3, 9 ] );
+}
+
+bar( foo );			// fails
+```
+
+Do you spot why `bar(foo)` fails?
+
+The array `[3,9]` is sent in as a single value to `fn(..)`, but `foo(..)` expects `x` and `y` separately. If we could change the declaration of `foo(..)` to be `function foo([x,y]) { ..`, we'd be fine. Or, if we could change the behavior of `bar(..)` to make the call as `fn(...[3,9])`, the values `3` and `9` would be passed in individually.
+
+There will be occasions when you have two functions that are imcompatible in this way, and you won't be able to change their declarations/definitions. So, how can you use them together?
+
+We can define a helper to adapt a function so that it spreads out a single received array as its individual arguments:
+
+```js
+function spreadArgs(fn) {
+	return function spreadFn(argsArr) {
+		return fn( ...argsArr );
+	};
+}
+
+// or the ES6 => arrow form
+var spreadArgs =
+	fn =>
+		argsArr =>
+			fn( ...argsArr );
+```
+
+**Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's commonly called `apply(..)`.
+
+Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
+
+```js
+bar( spreadArgs( foo ) );			// 12
+```
+
+It won't seem clear yet why these occassions will arise, but you will see them often. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
+
+While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
+
+```js
+function gatherArgs(fn) {
+	return function gatheredFn(...argsArr) {
+		return fn( argsArr );
+	};
+}
+
+// or the ES6 => arrow form
+var gatherArgs =
+	fn =>
+		(...argsArr) =>
+			fn( argsArr );
+```
+
+**Note:** In Ramda, this utility is referred to as `unapply(..)`, being that it's the opposite of `apply(..)`. I think the "spread" / "gather" terminology is a little more descriptive for what's going on.
+
+We can use this utility to gather individual arguments into a single array, perhaps because we want to adapt a function with array parameter destructuring to another utility that passes arguments separately. We will cover `reduce(..)` in Chapter 9, but briefly: it repeatedly calls its reducer function with two individual parameters, which we can now *gather* together:
+
+```js
+function combineFirstTwo([ v1, v2 ]) {
+	return v1 + v2;
+}
+
+[1,2,3,4,5].reduce( gatherArgs( combineFirstTwo ) );
+// 15
+```
 
 ## Some Now, Some Later
 
@@ -607,240 +833,6 @@ uncurriedSum( 1, 2, 3 )( 4 )( 5 );			// 15
 ```
 
 Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a function that comes out curried as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
-
-## All For One
-
-Imagine you're passing a function to a utility, where it will send multiple arguments to that function. But you may only want it to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
-
-We can design a simple utility that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
-
-```js
-function unary(fn) {
-	return function onlyOneArg(arg){
-		return fn( arg );
-	};
-}
-
-// or the ES6 => arrow form
-var unary =
-	fn =>
-		arg =>
-			fn( arg );
-```
-
-We saw the `map(..)` utility eariler. It calls the provided mapping function with three arguments: `value`, `index`, and `list`. If you want your mapping function to only receive one of these, like `value`, use the `unary(..)` operation:
-
-```js
-function unary(fn) {
-	return function onlyOneArg(arg){
-		return fn( arg );
-	};
-}
-
-var adder = looseCurry( sum, 2 );
-
-// oops:
-[1,2,3,4,5].map( adder( 3 ) );
-// ["41,2,3,4,5", "61,2,3,4,5", "81,2,3,4,5", "101, ...
-
-// fixed with `unary(..)`:
-[1,2,3,4,5].map( unary( adder( 3 ) ) );
-// [4,5,6,7,8]
-```
-
-Another commonly cited example using `unary(..)` is:
-
-```js
-["1","2","3"].map( parseFloat );
-// [1,2,3]
-
-["1","2","3"].map( parseInt );
-// [1,NaN,NaN]
-
-["1","2","3"].map( unary( parseInt ) );
-// [1,2,3]
-```
-
-For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an `index` in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is not mistaken as the `radix`.
-
-### One On One
-
-Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that takes one argument and does nothing but return the value untouched:
-
-```js
-function identity(v) {
-	return v;
-}
-
-// or the ES6 => arrow form
-var identity =
-	v =>
-		v;
-```
-
-This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
-
-For example, imagine you'd like split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (covered in detail later in the text) with `identity(..)` as the predicate:
-
-```js
-var words = "   Now is the time for all...  ".split( /\s|\b/ );
-words;
-// ["","Now","is","the","time","for","all","...",""]
-
-words.filter( identity );
-// ["Now","is","the","time","for","all","..."]
-```
-
-Since `identity(..)` simply returns the value passed to it, JS coerces each value into either `true` or `false`, and that decides to keep or exclude each value in the final array.
-
-**Tip:** Another unary function that can be used as the predicate in the previous example is JS's own `Boolean(..)` function, which explicitly coerces the values to `true` or `false`.
-
-Another example of using `identity(..)` is as a default function in place of a transformation:
-
-```js
-function output(msg,formatFn = identity) {
-	msg = formatFn( msg );
-	console.log( msg );
-}
-
-function upper(txt) {
-	return txt.toUpperCase();
-}
-
-output( "Hello World", upper );		// HELLO WORLD
-output( "Hello World" );			// Hello World
-```
-
-If `output(..)` didn't have a default for `formatFn`, we could bring our earlier friend `partialRight(..)`:
-
-```js
-var specialOutput = partialRight( output, upper );
-var simpleOutput = partialRight( output, identity );
-
-specialOutput( "Hello World" );		// HELLO WORLD
-simpleOutput( "Hello World" );		// Hello World
-```
-
-You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in Chapter 9.
-
-### Unchanging One
-
-Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function just returns the value. One such API is the `then(..)` method on JS Promises. Many claim that ES6 `=>` arrow functions are the "solution". But there's an FP utility that's perfectly suited for the task:
-
-```js
-function constant(v) {
-	return function value(){
-		return v;
-	};
-}
-
-// or the ES6 => form
-var constant =
-	v =>
-		() =>
-			v;
-```
-
-With this tidy little utility, we can solve our `then(..)` annoyance:
-
-```js
-p1.then( foo ).then( () => p2 ).then( bar );
-
-// vs
-
-p1.then( foo ).then( constant( p2 ) ).then( bar );
-```
-
-**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the text, in Chapter 5 "Reducing Side Effects".
-
-## Adapting Arguments To Parameters
-
-Recall that the term arity refers to how many parameters a function expects to receive. A function with arity of 1 is also referred to as a unary function.
-
-In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
-
-Recall this function signature from Chapter 2 which highlights using array parameter destructuring:
-
-```js
-function foo( [x,y,...args] = [] ) {
-```
-
-This pattern is handy if an array will be passed in but you want to treat its contents as individual parameters. `foo(..)` is technically unary -- when it's executed, only one argument (an array) will be passed to it. But inside the function, you get to address different inputs (`x`, `y`, etc) individually.
-
-However, sometimes you won't have the ability to change the declaration of the function to use array parameter destructuring. For example, imagine these functions:
-
-```js
-function foo(x,y) {
-	console.log( x + y );
-}
-
-function bar(fn) {
-	fn( [ 3, 9 ] );
-}
-
-bar( foo );			// fails
-```
-
-Do you spot why `bar(foo)` fails?
-
-The array `[3,9]` is sent in as a single value to `fn(..)`, but `foo(..)` expects `x` and `y` separately. If we could change the declaration of `foo(..)` to be `function foo([x,y]) { ..`, we'd be fine. Or, if we could change the behavior of `bar(..)` to make the call as `fn(...[3,9])`, the values `3` and `9` would be passed in individually.
-
-There will be occasions when you have two functions that are imcompatible in this way, and you won't be able to change their declarations/definitions. So, how can you use them together?
-
-We can define a helper to adapt a function so that it spreads out a single received array as its individual arguments:
-
-```js
-function spreadArgs(fn) {
-	return function spreadFn(argsArr) {
-		return fn( ...argsArr );
-	};
-}
-
-// or the ES6 => arrow form
-var spreadArgs =
-	fn =>
-		argsArr =>
-			fn( ...argsArr );
-```
-
-**Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's commonly called `apply(..)`.
-
-Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
-
-```js
-bar( spreadArgs( foo ) );			// 12
-```
-
-It won't seem clear yet why these occassions will arise, but you will see them often. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
-
-While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
-
-```js
-function gatherArgs(fn) {
-	return function gatheredFn(...argsArr) {
-		return fn( argsArr );
-	};
-}
-
-// or the ES6 => arrow form
-var gatherArgs =
-	fn =>
-		(...argsArr) =>
-			fn( argsArr );
-```
-
-**Note:** In Ramda, this utility is referred to as `unapply(..)`, being that it's the opposite of `apply(..)`. I think the "spread" / "gather" terminology is a little more descriptive for what's going on.
-
-We can use this utility to gather individual arguments into a single array, perhaps because we want to adapt a function with array parameter destructuring to another utility that passes arguments separately. We will cover `reduce(..)` in Chapter 9, but briefly: it repeatedly calls its reducer function with two individual parameters, which we can now *gather* together:
-
-```js
-function combineFirstTwo([ v1, v2 ]) {
-	return v1 + v2;
-}
-
-[1,2,3,4,5].reduce( gatherArgs( combineFirstTwo ) );
-// 15
-```
 
 ## Order Matters
 

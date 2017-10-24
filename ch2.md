@@ -100,6 +100,8 @@ function foo(x,y,z) {
 
 `foo(..)` *expects* three arguments, because it has three declared parameters. This count has a special term: arity. Arity is the number of parameters in a function declaration. The arity of `foo(..)` is `3`.
 
+Furthermore, a function with arity 1 is also called "unary", a function with arity 2 is also called "binary", and a function with arity 3 or higher is called "n-ary".
+
 You may wish to inspect a function reference during the runtime of a program to determine its arity. This can be done with the `length` property of that function reference:
 
 ```js
