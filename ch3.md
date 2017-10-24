@@ -11,7 +11,7 @@ These kinds of techniques are absolutely essential to making functions truly *fu
 
 ## All For One
 
-Imagine you're passing a function to a utility, where it will send multiple arguments to that function. But you may only want it to receive a single argument. This is especially true if you have a loosely curried function like we discussed previously that *can* accept more arguments that you wouldn't want.
+Imagine you're passing a function to a utility, where it will send multiple arguments to that function. But you may only want it to receive a single argument.
 
 We can design a simple utility that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
 
@@ -29,34 +29,21 @@ var unary =
 			fn( arg );
 ```
 
-We saw the `map(..)` utility eariler. It calls the provided mapping function with three arguments: `value`, `index`, and `list`. If you want your mapping function to only receive one of these, like `value`, use the `unary(..)` utility:
+A commonly cited example for using `unary(..)` is with the `map(..)` utility (see Chapter 9) and `parseInt(..)`. `map(..)` calls a mapper function for each item in a list, and each time it invokes the mapper function, it passes it 3 arguments: `value`, `idx`, `arr`.
+
+That's usually not a big deal, unless you're trying to use something as a mapper function that will behave incorrectly if it's passed too many arguments. Consider:
 
 ```js
-var adder = looseCurry( sum, 2 );
-
-// oops:
-[1,2,3,4,5].map( adder( 3 ) );
-// ["41,2,3,4,5", "61,2,3,4,5", "81,2,3,4,5", "101, ...
-
-// fixed with `unary(..)`:
-[1,2,3,4,5].map( unary( adder( 3 ) ) );
-// [4,5,6,7,8]
-```
-
-Another commonly cited example using `unary(..)` is:
-
-```js
-["1","2","3"].map( parseFloat );
-// [1,2,3]
-
 ["1","2","3"].map( parseInt );
 // [1,NaN,NaN]
+```
 
+For the signature `parseInt(str,radix)`, it's clear that when `map(..)` passes an `index` in the second argument position, it's interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is not mistaken as the `radix`.
+
+```js
 ["1","2","3"].map( unary( parseInt ) );
 // [1,2,3]
 ```
-
-For the signature `parseInt(str,radix)`, it's clear that if `map(..)` passes an `index` in the second argument position, it will be interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is not mistaken as the `radix`.
 
 ### One On One
 
