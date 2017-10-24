@@ -67,7 +67,7 @@ foo( a, a * 2 );
 
 `a` and `a * 2` (actually, the result of `a * 2`, which is `6`) are the *arguments* to the `foo(..)` call. `x` and `y` are the *parameters* that receive the argument values (`3` and `6`, respectively).
 
-**Note:** In JavaScript, there's no requirement that the number of *arguments* matches the number of *parameters*. If you pass more *arguments* than you have declared *parameters* to receive them, the values pass in just fine untouched. These values can be accessed in a few different ways, including the old-school `arguments` object you may have heard of before. If you pass fewer *arguments* than the declared *parameters*, each unaccounted-for parameter is an "undefined" variable, meaning it's present and available in the scope of the function, but just starts out with the empty `undefined` value.
+**Note:** In JavaScript, there's no requirement that the number of *arguments* matches the number of *parameters*. If you pass more *arguments* than you have declared *parameters* to receive them, the values pass in just fine untouched. These values can be accessed in a few different ways, including the old-school `arguments` object you may have heard of before. If you pass fewer *arguments* than the declared *parameters*, each umatched parameter is treated as an "undefined" variable, meaning it's present and available in the scope of the function, but just starts out with the empty `undefined` value.
 
 ### Defaulting Parameters
 
@@ -161,7 +161,7 @@ function foo(x,y,z) {
 foo( 3, 4 );
 ```
 
-As of ES5 (and strict mode, specifically), `arguments` is considered by some to be sort-of-deprecated; many avoid using it if possible. In JS, we "never" break backwards-compatibility no matter how helpful that may be for future progress, so `arguments` never be removed. But it's now commonly suggested that you avoid using it whenever possible.
+As of ES5 (and strict mode, specifically), `arguments` is considered by some to be sort-of-deprecated; many avoid using it if possible. In JS, we "never" break backwards-compatibility no matter how helpful that may be for future progress, so `arguments` will never be removed. But it's now commonly suggested that you avoid using it whenever possible.
 
 However, I suggest that `arguments.length`, and only that, is OK to keep using for those cases where you need to care about the passed number of arguments. A future version of JS might possibly add a feature that offers the ability to determine the number of arguments passed without consulting `arguments.length`; if that happens, then we can fully drop usage of `arguments`!
 
@@ -240,7 +240,7 @@ Think of `...` in this symmetric sense: in a value-list position, it *spreads*. 
 
 Whichever behavior you invoke, `...` makes working with arrays of arguments much easier. Gone are the days of `slice(..)`, `concat(..)` and `apply(..)` to wrangle our argument value arrays.
 
-**Tip:** Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But we certainly in most places, `...` will be much more declaratively readable, and preferable as a result.
+**Tip:** Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But certainly in most places, `...` will be much more declaratively readable, and preferable as a result.
 
 ### Parameter Destructuring
 
@@ -266,7 +266,9 @@ foo( [1,2,3] );
 
 Simple enough. But what if now we wanted to give a parameter name to each of the first two values in the passed in array? We aren't declaring individual parameters anymore, so it seems we lost that ability.
 
-Thankfully, destructuring is the answer:
+Thankfully, ES6 destructuring is the answer. Destructuring is a way to declare a *pattern* for the kind of structure (object, array, etc) that you expect to see, and how decomposition (assignment) of its individual parts should be processed.
+
+Consider:
 
 ```js
 function foo( [x,y,...args] = [] ) {
@@ -282,7 +284,7 @@ In this example, destructuring tells the engine that an array is expected in thi
 
 ## The Importance Of Declarative Style
 
-Considering the `foo(..)` we just looked at, we could instead have processed the parameters manually:
+Considering the destructured `foo(..)` we just looked at, we could instead have processed the parameters manually:
 
 ```js
 function foo(params) {
@@ -326,7 +328,7 @@ With a normal call-site like `foo(undefined,3)`, position is used to map from ar
 
 We didn't have to account for `x` in *that* call-site because in effect we didn't care about `x`. We just omitted it, instead of having to do something distracting like passing `undefined` as a positional placeholder.
 
-Some languages have a direct feature for this behavior: named arguments. In other words, at the call-site, labeling an input value to indicate which parameter it maps to. JavaScript doesn't have named arguments, but parameter object destructuring is the next best thing.
+Some languages have an explicit feature for this: named arguments. In other words, at the call-site, labeling an input value to indicate which parameter it maps to. JavaScript doesn't have named arguments, but parameter object destructuring is the next best thing.
 
 Another FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that in Chapter 4.
 
@@ -382,17 +384,9 @@ function foo() {
 }
 ```
 
-ES6 destructuring is a way to declare a *pattern* for the kind of structure (object, array, etc) that you expect to see, and how decomposition (assignment) of its individual parts should be processed.
-
-Here, we'll assign `x` and `y` from two respective items in the array that comes back from `foo()`:
+Then, we'll assign `x` and `y` from two respective items in the array that comes back from `foo()`:
 
 ```js
-function foo() {
-	var retValue1 = 11;
-	var retValue2 = 31;
-	return [ retValue1, retValue2 ];
-}
-
 var [ x, y ] = foo();
 console.log( x + y );			// 42
 ```
@@ -526,9 +520,9 @@ The most obvious output from this function is the sum `124`, which we explicitly
 
 Instead of an `undefined` empty slot value in position `4`, now there's a `0`. The harmless looking `list[i] = 0` operation ended up affecting the array value on the outside, even though we operated on a local `list` parameter variable.
 
-Why? Because `list` holds a reference-copy of the `nums` reference, not a value-copy of the `[1,3,9,..]` array value. Because JS uses references and reference-copies for arrays, objects, and functions, we can create an output from our function all too easily, even if by accident.
+Why? Because `list` holds a reference-copy of the `nums` reference, not a value-copy of the `[1,3,9,..]` array value. JavaScript uses references and reference-copies for arrays, objects, and functions, so we may create an accidental output from our function all too easily.
 
-This implicit function output has a special name in the FP world: side effects. But a function that has *no side effects* also has a special name: pure function. We'll talk a lot more about these in a later chapter, but the punchline is that we'll want to prefer pure functions and avoid side effects if at all possible.
+This implicit function output has a special name in the FP world: side effects. And a function that has *no side effects* also has a special name: pure function. We'll talk a lot more about these in Chapter 5, but the punchline is that we'll want to prefer pure functions and avoid side effects wherever possible.
 
 ## Functions Of Functions
 
@@ -555,34 +549,30 @@ A higher-order function can also output another function, like:
 
 ```js
 function foo() {
-	var fn = function inner(msg){
-		console.log( msg );
+	return function inner(msg){
+		return msg.toUpperCase();
 	};
-
-	return fn;
 }
 
 var f = foo();
 
-f( "Hello!" );			// Hello!
+f( "Hello!" );			// HELLO!
 ```
 
-`return` is not the only way to "output" another function:
+`return` is not the only way to "output" an inner function:
 
 ```js
 function foo() {
-	var fn = function inner(msg){
-		console.log( msg );
-	};
-
-	bar( fn );
+	bar( function inner(msg){
+		return msg.toUpperCase();
+	} );
 }
 
 function bar(func) {
 	func( "Hello!" );
 }
 
-foo();					// Hello!
+foo();					// HELLO!
 ```
 
 Functions that treat other functions as values are higher-order functions by definition. FPers write these all the time!
@@ -591,14 +581,16 @@ Functions that treat other functions as values are higher-order functions by def
 
 One of the most powerful things in all of programming, and especially in FP, is how a function behaves when it's inside another function's scope. When the inner function makes reference to a variable from the outer function, this is called closure.
 
-Defined pragmatically, closure is when a function remembers and accesses variables from outside of its own scope, even when that function is executed in a different scope.
+Defined pragmatically:
+
+> Closure is when a function remembers and accesses variables from outside of its own scope, even when that function is executed in a different scope.
 
 Consider:
 
 ```js
 function foo(msg) {
 	var fn = function inner(){
-		console.log( msg );
+		return msg.toUpperCase();
 	};
 
 	return fn;
@@ -606,7 +598,7 @@ function foo(msg) {
 
 var helloFn = foo( "Hello!" );
 
-helloFn();				// Hello!
+helloFn();				// HELLO!
 ```
 
 The `msg` parameter variable in the scope of `foo(..)` is referenced inside the inner function. When `foo(..)` is executed and the inner function is created, it captures the access to the `msg` variable, and retains that access even after being `return`d.
@@ -616,22 +608,20 @@ Once we have `helloFn`, a reference to the inner function, `foo(..)` has finishe
 Let's look at a few more examples of closure in action:
 
 ```js
-function person(id) {
-	var randNumber = Math.random();
-
+function person(name) {
 	return function identify(){
-		console.log( "I am " + id + ": " + randNumber );
+		console.log( `I am ${name}` );
 	};
 }
 
 var fred = person( "Fred" );
 var susan = person( "Susan" );
 
-fred();					// I am Fred: 0.8331252801601532
-susan();				// I am Susan: 0.3940753308893741
+fred();					// I am Fred
+susan();				// I am Susan
 ```
 
-The inner function `identify()` has closure over two variables, the parameter `id` and the inner variable `randNumber`.
+The inner function `identify()` has closure over the parameter `id`.
 
 The access that closure enables is not restricted to merely reading the variable's original value -- it's not just a snapshot but rather a live link. You can update the value, and that new current state remains remembered until the next access.
 
@@ -652,7 +642,7 @@ score();				// 2
 score( 13 );			// 15
 ```
 
-**Warning:** For reasons that we'll cover more later in the text, this example of using closure to remember a state that changes (`val`) is probably something you'll want to avoid where possible.
+**Warning:** For reasons that we'll cover more later in the book, this example of using closure to remember a state that changes (`val`) is probably something you'll want to avoid where possible.
 
 If you have an operation that needs two inputs, one of which you know now but the other will be specified later, you can use closure to remember the first input:
 
@@ -705,13 +695,15 @@ Specifically, we create two simple unary functions `lower(..)` and `upperFirst(.
 
 **Tip:** Did you spot how `upperFirst(..)` could have used `lower(..)`?
 
-We'll use closure heavily throughout the rest of the text. It may just be the most important foundational practice in all of FP, if not programming as a whole. Get really comfortable with it!
+We'll use closure heavily throughout the rest of the text. It may just be the most important foundational practice in all of FP, if not programming as a whole. Make sure you're really comfortable with it!
 
 ## Syntax
 
 Before we move on from this primer on functions, let's take a moment to discuss their syntax.
 
-More than many other parts of this text, the discussions in this section are mostly opinion and preference, whether you agree with the views presented here or take opposite ones. These ideas are highly subjective, though many people seem to feel rather absolutely about them. Ultimately, you decide.
+More than many other parts of this text, the discussions in this section are mostly opinion and preference, whether you agree with the views presented here or take opposite ones. These ideas are highly subjective, though many people seem to feel rather absolutely about them.
+
+Ultimately, you get to decide.
 
 ### What's In A Name?
 
@@ -743,7 +735,7 @@ If you've ever had to debug a JS program from nothing but a stack trace of an ex
 
 If you name your function expressions, the name is always used. So if you use a good name like `handleProfileClicks` instead of `foo`, you'll get much more helpful stack traces.
 
-As of ES6, anonymous function expressions can be aided by *name inferencing*. Consider:
+As of ES6, anonymous function expressions are in certain cases aided by *name inferencing*. Consider:
 
 ```js
 var x = function(){};
@@ -814,7 +806,7 @@ document.getElementById( "onceBtn" )
 	}, false );
 ```
 
-In all these cases, the named function's name was a useful and reliable self-reference from inside itself.
+In all these cases, the named function's lexical name was a useful and reliable self-reference from inside itself.
 
 Moreover, even in simple cases with one-liner functions, naming them tends to make code more self-explanatory and thus easier to read for those who haven't read it before:
 
@@ -857,7 +849,11 @@ But we're trading ease-of-writing for pain-of-reading. This is not a good trade 
 
 **Name every single function.** And if you sit there stumped, unable to come up with a good name for some function you've written, I'd strongly suggest you don't fully understand that function's purpose yet -- or it's just too broad or abstract. You need to go back and re-design the function until this is more clear. And by that point, a name will become more apparent.
 
-I can testify from my own experience that in the struggle to name something well, I usually have come to understand it better and often even refactor its design for improved readability and maintability. This time investment is well worth it.
+In my practice, if I don't have a good name to use for a function, I name it `TODO` initially. I'm certain that I'll at least catch that later when I search for "TODO" comments before committing code.
+
+I can testify from my own experience that in the struggle to name something well, I usually have come to understand it better, later, and often even refactor its design for improved readability and maintability.
+
+This time investment is well worth it.
 
 ### Functions Without `function`
 
@@ -868,19 +864,20 @@ Compare:
 ```js
 people.map( function getPreferredName(person){
 	return person.nicknames[0] || person.firstName;
-} )
-// ..
+} );
+
+// vs.
 
 people.map( person => person.nicknames[0] || person.firstName );
 ```
 
 Whoa.
 
-The keyword `function` is gone, so is `return`, the `( )` parentheses, the `{ }` curly braces, and the `;` semicolon. For all that, we traded for a so-called fat arrow `=>` symbol.
+The keyword `function` is gone, so is `return`, the `( )` parentheses, the `{ }` curly braces, and the innermost `;` semicolon. In place of all that, we used a so-called fat arrow `=>` symbol.
 
 But there's another thing we omitted. Did you spot it? The `getPreferredName` function name.
 
-That's right; `=>` arrow functions are lexically anonymous; there's no way to syntatically provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values as arguments won't get any assistance in that way.
+That's right; `=>` arrow functions are lexically anonymous; there's no way to syntatically provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values passed as arguments won't get any assistance in that way. Bummer.
 
 If `person.nicknames` isn't defined for some reason, an exception will be thrown, meaning this `(anonymous function)` will be at the top of the stack trace. Ugh.
 
@@ -906,19 +903,19 @@ people.map( person =>
 );
 ```
 
-The case for excitement over `=>` in the FP world is primarily that it follows almost exactly from the mathematical notation for functions, especially around FP languages like Haskell. The shape of `=>` arrow function syntax communicates mathematically.
+The case for excitement over `=>` in the FP world is primarily that it follows almost exactly from the mathematical notation for functions, especially in FP languages like Haskell. The shape of `=>` arrow function syntax communicates mathematically.
 
 Digging even further, I'd suggest that the argument in favor of `=>` is that by using much lighter-weight syntax, we reduce the visual boundaries between functions which lets us use simple function expressions much like we'd use lazy expressions -- another favorite of the FPer.
 
-I think most FPers are going to blink and wave off these concerns. They love anonymous functions and they love saving on syntax. But like I said before: you decide.
+I think most FPers are going to wave off the concerns I'm sharing. They love anonymous functions and they love saving on syntax. But like I said before: you decide.
 
-**Note:** Though I do not prefer to use `=>` in practice in my applications, we will use it in many places throughout the rest of this book -- especially when we present typical FP utilities -- where conciseness is preferred to optimize for the limited physical space in code snippets. Make your own determinations whether this approach will make your own code more or less readable.
+**Note:** Though I do not prefer to use `=>` in practice in my production code, they are useful in quick code explorations. Moreover, we will use arrow functions in many places throughout the rest of this book -- especially when we present typical FP utilities -- where conciseness is preferred to optimize for the limited physical space in code snippets. Make your own determinations whether this approach will make your own production-ready code more or less readable.
 
 ## What's This?
 
 If you're not familiar with the `this` binding rules in JavaScript, I recommend you check out my "You Don't Know JS: this & Object Prototypes" book. For the purposes of this section, I'll assume you know how `this` gets determined for a function call (one of the four rules). But even if you're still fuzzy on *this*, the good news is we're going to conclude that you shouldn't be using `this` if you're trying to do FP.
 
-**Note:** We're tackling a topic that we'll ultimiately conclude we shouldn't use. So.. why!? Because the topic of `this` has implications for other topics covered later in this book. For example, our notions of function purity are impacted by `this` being essentially an implicit input to a function (see Chapter 5). Additionally, our perspective on `this` affects whether we choose array methods (`arr.map(..)`) versus standalone utilities (`map(..,arr)`) (see Chapter 9). Understanding `this` is essential to understanding why `this` really should *not* be part of your FP!
+**Note:** We're tackling a topic that we'll ultimately conclude we shouldn't use. So.. why!? Because the topic of `this` has implications for other topics covered later in this book. For example, our notions of function purity are impacted by `this` being essentially an implicit input to a function (see Chapter 5). Additionally, our perspective on `this` affects whether we choose array methods (`arr.map(..)`) versus standalone utilities (`map(..,arr)`) (see Chapter 9). Understanding `this` is essential to understanding why `this` really should *not* be part of your FP!
 
 JavaScript `function`s have a `this` keyword that's automatically bound per function call. The `this` keyword can be described in many different ways, but I prefer to say it provides an object context for the function to run against.
 
@@ -999,7 +996,7 @@ Login.doLogin( "fred", "123456" );
 
 In case you're having trouble parsing what this code does: we have two separate objects `Login` and `Auth`, where `Login` performs prototype-delegation to `Auth`. Through delegation and the implicit `this` context sharing, these two objects virtually compose during the `this.authorize()` function call, so that properties/methods on `this` are dynamically shared with the `Auth.authorize(..)` function.
 
-*This* code doesn't fit with various principles of FP for a variety of reasons, but one of the obvious hitches is the implicit `this` sharing. We could be more explicit about it and keep code that was easier to push in the FP direction:
+*This* code doesn't fit with various principles of FP for a variety of reasons, but one of the obvious hitches is the implicit `this` sharing. We could be more explicit about it and keep code closer to FP-friendly style:
 
 ```js
 // ..
