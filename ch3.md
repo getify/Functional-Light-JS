@@ -21,15 +21,20 @@ function unary(fn) {
 		return fn( arg );
 	};
 }
+```
 
-// or the ES6 => arrow form
+Many FPers tend to prefer the shorter `=>` arrow function syntax for such code (see Chapter 1 "Syntax"), such as:
+
+```js
 var unary =
 	fn =>
 		arg =>
 			fn( arg );
 ```
 
-A commonly cited example for using `unary(..)` is with the `map(..)` utility (see Chapter 9) and `parseInt(..)`. `map(..)` calls a mapper function for each item in a list, and each time it invokes the mapper function, it passes it 3 arguments: `value`, `idx`, `arr`.
+**Note:** No question this is more terse, sparse even. But I personally feel that whatever it may gain in symmetry with the mathematical notation, it loses more in overall readability with the functions all being anonymous, and by obscuring the scope boundaries making deciphering closure a little more cryptic.
+
+A commonly cited example for using `unary(..)` is with the `map(..)` utility (see Chapter 9) and `parseInt(..)`. `map(..)` calls a mapper function for each item in a list, and each time it invokes the mapper function, it passes in 3 arguments: `value`, `idx`, `arr`.
 
 That's usually not a big deal, unless you're trying to use something as a mapper function that will behave incorrectly if it's passed too many arguments. Consider:
 
@@ -38,7 +43,9 @@ That's usually not a big deal, unless you're trying to use something as a mapper
 // [1,NaN,NaN]
 ```
 
-For the signature `parseInt(str,radix)`, it's clear that when `map(..)` passes an `index` in the second argument position, it's interpreted by `parseInt(..)` as the `radix`, which we don't want. `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is not mistaken as the `radix`.
+For the signature `parseInt(str,radix)`, it's clear that when `map(..)` passes `index` in the second argument position, it's interpreted by `parseInt(..)` as the `radix`, which we don't want.
+
+`unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is never received by `parseInt(..)` to be mistaken as the `radix`:
 
 ```js
 ["1","2","3"].map( unary( parseInt ) );
@@ -107,7 +114,7 @@ You also may see `identity(..)` used as a default transformation function for `m
 
 ### Unchanging One
 
-Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function just returns the value. One such API is the `then(..)` method on JS Promises. Many claim that ES6 `=>` arrow functions are the "solution". But there's an FP utility that's perfectly suited for the task:
+Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function just returns the value. One such API is the `then(..)` method on JS Promises. Many claim that ES6 `=>` arrow functions are the best "solution". But there's an FP utility that's more well suited for the task:
 
 ```js
 function constant(v) {
@@ -137,7 +144,7 @@ p1.then( foo ).then( constant( p2 ) ).then( bar );
 
 ## Adapting Arguments To Parameters
 
-In FP, we'll want our functions to be unary whenever possible, and sometimes we'll even use a variety of functional tricks to transform a function of higher arity to a unary form.
+There are a variety of patterns and tricks we can use to adapt a function's signature to match the kinds of arguments we want to provide to it.
 
 Recall this function signature from Chapter 2 which highlights using array parameter destructuring:
 
@@ -274,9 +281,15 @@ function partial(fn,...presetArgs) {
 		return fn( ...presetArgs, ...laterArgs );
 	};
 }
+
+// or the ES6 => arrow form
+var partial =
+	(fn, ...presetArgs) =>
+		(...laterArgs) =>
+			fn( ...presetArgs, ...laterArgs );
 ```
 
-**Tip:** Don't just take this snippet at face value. Take a few moments to digest what's going on with this utility. Make sure you really *get it*. The pattern here is actually going to come up over and over again throughout the rest of the text, so it's a really good idea to get comfortable with it now.
+**Tip:** Don't just take this snippet at face value. Take a few moments to digest what's going on with this utility. Make sure you really *get it*.
 
 The `partial(..)` function takes an `fn` for which function we are partially applying. Then, any subsequent arguments passed in are gathered into the `presetArgs` array and saved for later.
 
@@ -288,18 +301,7 @@ When the `partiallyApplied(..)` function is later executed somewhere else in you
 
 If any of that was confusing, stop and go re-read it. Trust me, you'll be glad you did as we get further into the text.
 
-As a side note, the FPer will often prefer the shorter `=>` arrow function syntax for such code (see Chapter 1 "Syntax"), such as:
-
-```js
-var partial =
-	(fn, ...presetArgs) =>
-		(...laterArgs) =>
-			fn( ...presetArgs, ...laterArgs );
-```
-
-No question this is more terse, sparse even. But I personally feel that whatever it may gain in symmetry with the mathematical notation, it loses more in overall readability with the functions all being anonymous, and by obscuring the scope boundaries making deciphering closure a little more cryptic.
-
-Whichever syntax approach tickles your fancy, let's now use the `partial(..)` utility to make those earlier partially-applied functions:
+Let's now use the `partial(..)` utility to make those earlier partially-applied functions:
 
 ```js
 var getPerson = partial( ajax, "http://some.api/person" );
@@ -367,7 +369,7 @@ function add(x,y) {
 }
 ```
 
-Now, imagine we'd like take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility built into JS arrays.
+Now, imagine we'd like take a list of numbers and add a certain number to each of them. We'll use the `map(..)` (see Chapter 9) utility built into JS arrays:
 
 ```js
 [1,2,3,4,5].map( function adder(val){
@@ -376,8 +378,6 @@ Now, imagine we'd like take a list of numbers and add a certain number to each o
 // [4,5,6,7,8]
 ```
 
-**Note:** Don't worry if you haven't seen `map(..)` before; we'll cover it in much more detail later in the book. For now, just know that it loops over an array calling a function to produce new values for a new array.
-
 The reason we can't pass `add(..)` directly to `map(..)` is because the signature of `add(..)` doesn't match the mapping function that `map(..)` expects. That's where partial application can help us: we can adapt the signature of `add(..)` to something that will match.
 
 ```js
@@ -385,15 +385,17 @@ The reason we can't pass `add(..)` directly to `map(..)` is because the signatur
 // [4,5,6,7,8]
 ```
 
-The `partial(add,3)` call produces a new unary function which is expecting only one more argument. The `map(..)` utility will loop through the array (`[1,2,3,4,5]`) and repeatedly call this unary function, once for each of those values, respectively. So, the calls made will effectively be `add(3,1)`, `add(3,2)`, `add(3,3)`, `add(3,4)`, and `add(3,5)`. The array of those results is `[4,5,6,7,8]`.
+The `partial(add,3)` call produces a new unary function which is expecting only one more argument.
+
+The `map(..)` utility will loop through the array (`[1,2,3,4,5]`) and repeatedly call this unary function, once for each of those values, respectively. So, the calls made will effectively be `add(3,1)`, `add(3,2)`, `add(3,3)`, `add(3,4)`, and `add(3,5)`. The array of those results is `[4,5,6,7,8]`.
 
 ### `bind(..)`
 
-JavaScript has a built-in utility called `bind(..)`, which is available on all functions. It has two capabilities: presetting the `this` context and partially applying arguments.
+JavaScript functions all have a built-in utility called `bind(..)`. It has two capabilities: presetting the `this` context and partially applying arguments.
 
-I think this is incredibly unfortunate to conflate these two capabilities in one utility. Sometimes you'll want to hard-bind the `this` context and not partially apply arguments. Other times you'll want to partially apply arguments but not care about `this` binding at all. I personally have almost never needed both at the same time.
+I think this is incredibly misguided to conflate these two capabilities in one utility. Sometimes you'll want to hard-bind the `this` context and not partially apply arguments. Other times you'll want to partially apply arguments but not care about `this` binding at all. I have never needed both at the same time.
 
-The latter scenario is awkward because you have to pass an ignorable placeholder for the `this`-binding argument (the first one), usually `null`.
+The latter scenario (partial application without setting `this` context) is awkward because you have to pass an ignorable placeholder for the `this`-binding argument (the first one), usually `null`.
 
 Consider:
 
@@ -401,7 +403,7 @@ Consider:
 var getPerson = ajax.bind( null, "http://some.api/person" );
 ```
 
-That `null` just bugs me to no end. Aside from this *this* annoyance, it's mildly convenient that JS has a built-in utility for partial application. However, most FP programmers prefer using the dedicated `partial(..)` utility in their chosen FP library.
+That `null` just bugs me to no end. Despite this *this* annoyance, it's mildly convenient that JS has a built-in utility for partial application. However, most FP programmers prefer using the dedicated `partial(..)` utility in their chosen FP library.
 
 ### Reversing Arguments
 
@@ -421,7 +423,7 @@ var reverseArgs =
 			fn( ...args.reverse() );
 ```
 
-Now we can reverse the order of the `ajax(..)` arguments, so that we can then partially apply from the right rather than the left. To restore the expected order, we'll then reverse the partially applied function:
+Now we can reverse the order of the `ajax(..)` arguments, so that we can then partially apply from the right rather than the left. To restore the expected order, we'll then reverse the subsequent partially-applied function:
 
 ```js
 var cache = {};
@@ -436,7 +438,7 @@ var cacheResult = reverseArgs(
 cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 ```
 
-Instead of manually using `reverseArgs(..)` (twice!) for this purpose, we can define a `partialRight(..)` which partially applies from the right, using the same reverse-partial apply-reverse trick:
+Instead of manually using `reverseArgs(..)` (twice!) for this purpose, we could define a `partialRight(..)` which partially applies from the right. Under the covers, it could use the same double-reverse trick:
 
 ```js
 function partialRight(fn,...presetArgs) {
@@ -453,13 +455,28 @@ var cacheResult = partialRight( ajax, function onResult(obj){
 cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 ```
 
-This implementation of `partialRight(..)` does not guarantee that a specific parameter will receive a specific partially-applied value; it only ensures that the partially applied value(s) appear as the right-most (aka, last) argument(s) passed to the original function.
+Another more straightforward (and certainly more performant) implementation of `partialRight(..)` that doesn't use the double-reverse trick:
+
+```js
+function partialRight(fn,...presetArgs) {
+	return function partiallyApplied(...laterArgs) {
+		return fn( ...laterArgs, ...presetArgs );
+	};
+}
+
+// or the ES6 => arrow form
+var partialRight =
+	(fn,...presetArgs) =>
+		(...laterArgs) =>
+			fn( ...laterArgs, ...presetArgs );
+```
+
+None of these implementations of `partialRight(..)` guarantee that a specific parameter will receive a specific partially-applied value; it only ensures that the partially-applied value(s) appear as the right-most (aka, last) argument(s) passed to the original function.
 
 For example:
 
 ```js
-function foo(x,y,z) {
-	var rest = [].slice.call( arguments, 3 );
+function foo(x,y,z,...rest) {
 	console.log( x, y, z, rest );
 }
 
@@ -476,22 +493,6 @@ f( 1, 2, 3, 4 );	// 1 2 3 [4,"z:last"]
 
 The value `"z:last"` is only applied to the `z` parameter in the case where `f(..)` is called with exactly two arguments (matching `x` and `y` parameters). In all other cases, the `"z:last"` will just be the right-most argument, however many arguments precede it.
 
-Another more straightforward implementation of `partialRight(..)` that doesn't need the double-reverse trick:
-
-```js
-function partialRight(fn,...presetArgs) {
-	return function partiallyApplied(...laterArgs) {
-		return fn( ...laterArgs, ...presetArgs );
-	};
-}
-
-// or the ES6 => arrow form
-var partialRight =
-	(fn,...presetArgs) =>
-		(...laterArgs) =>
-			fn( ...laterArgs, ...presetArgs );
-```
-
 ## One At A Time
 
 Let's examine a technique similar to partial application, where a function that expects multiple arguments is broken down into successive chained functions that each take a single argument (arity: 1) and return another function to accept the next argument.
@@ -506,7 +507,7 @@ curriedAjax( "http://some.api/person" )
 		( function foundUser(user){ /* .. */ } );
 ```
 
-Perhaps splitting out each of the three calls helps understand what's going on better:
+The three sets of `(..)`s denote 3 chained function calls. But perhaps splitting out each of the three calls helps see what's going on better:
 
 ```js
 var personFetcher = curriedAjax( "http://some.api/person" );
@@ -543,11 +544,8 @@ function curry(fn,arity = fn.length) {
 		};
 	})( [] );
 }
-```
 
-And for the ES6 `=>` fans:
-
-```js
+// or the ES6 => arrow form
 var curry =
 	(fn, arity = fn.length, nextCurried) =>
 		(nextCurried = prevArgs =>
@@ -582,16 +580,18 @@ var getCurrentUser = personFetcher( { user: CURRENT_USER_ID } );
 getCurrentUser( function foundUser(user){ /* .. */ } );
 ```
 
-Each call partially applies one more argument to the original `ajax(..)` call, until all three have been provided and `ajax(..)` is invoked.
+Each call partially applies one more argument to the original `ajax(..)` call, until all three have been provided and `ajax(..)` is actually invoked.
 
-Remember our example from earlier about adding `3` to each value in a list of numbers? As currying is similar to partial application, we could do that task with currying in almost the same way:
+Remember our example from the discussion of partial application about adding `3` to each value in a list of numbers? As currying is similar to partial application, we could do that task with currying in almost the same way:
 
 ```js
 [1,2,3,4,5].map( curry( add )( 3 ) );
 // [4,5,6,7,8]
 ```
 
-The difference between the two? `partial(add,3)` vs `curry(add)(3)`. Why might you choose `curry(..)` over `partial(..)`? It might be helpful in the case where you know ahead of time that `add(..)` is the function to be adapted, but the value `3` isn't known yet:
+The difference between the two? `partial(add,3)` vs `curry(add)(3)`.
+
+Why might you choose `curry(..)` over `partial(..)`? It might be helpful in the case where you know ahead of time that `add(..)` is the function to be adapted, but the value `3` isn't known yet:
 
 ```js
 var adder = curry( add );
@@ -605,11 +605,11 @@ How about another numbers example, this time adding a list of them together:
 
 ```js
 function sum(...args) {
-	var sum = 0;
+	var total = 0;
 	for (let i = 0; i < args.length; i++) {
-		sum += args[i];
+		total += args[i];
 	}
-	return sum;
+	return total;
 }
 
 sum( 1, 2, 3, 4, 5 );						// 15
@@ -621,15 +621,15 @@ var curriedSum = curry( sum, 5 );
 curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
 ```
 
-The advantage of currying here is that each call to pass in an argument produces another function that's more specialized, and we can capture and use *that* new function later in the program. Partial application specifies all the partially applied arguments up front, producing a function that's waiting for all the rest of the arguments **on the next call**.
+The advantage of currying here is that each call to pass in an argument produces another function that's more specialized, and we can capture and use *that* new function later in the program. Partial application specifies all the partially-applied arguments up front, producing a function that's waiting for all the rest of the arguments **on the next call**.
 
-If you wanted to use partial application to specify one parameter at a time, you'd have to keep calling `partial(..)` on each successive function. Curried functions do this automatically, making working with individual arguments one-at-a-time more ergonomic.
+If you wanted to use partial application to specify one parameter (or several!) at a time, you'd have to keep calling `partial(..)` again on each successive partially-applied function. By contrast, curried functions do this automatically, making working with individual arguments one-at-a-time more ergonomic.
 
 Both currying and partial application use closure to remember the arguments over time until all have been received, and then the original function can be invoked.
 
 ### Visualizing Curried Functions
 
-Let's examine more closely the `curriedSum(..)` from the previous section. Recall it's usage: `curriedSum(1)(2)(3)(4)(5)`; five subsequent (chained) function calls.
+Let's examine more closely the `curriedSum(..)` from the previous section. Recall its usage: `curriedSum(1)(2)(3)(4)(5)`; five subsequent (chained) function calls.
 
 What if we manually defined a `curriedSum(..)` instead of using `curry(..)`, how would that look?
 
@@ -671,13 +671,13 @@ But the reason I show it that way is that it happens to look almost identical to
 
 ### Why Currying And Partial Application?
 
-With either style -- currying (`sum(1)(2)(3)`) or partial application (`partial(sum,1,2)(3)`) -- the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we go this direction** when adopting FP? There are multiple layers to answering that question.
+With either style -- currying (`sum(1)(2)(3)`) or partial application (`partial(sum,1,2)(3)`) -- the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we ever go this direction** when adopting FP? There are multiple layers to answering that question.
 
-The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your code base) when and where separate arguments are specified, whereas traditional function calls require all the arguments to be present up front. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
+The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your code base) when and where separate arguments are specified, whereas traditional function calls require all the arguments to be present at the same time. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
 
-Another layer to this answer, which applies most specifically to currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs 3 arguments, if curried, becomes a function that needs just one, three times over. That kind of unary function will be a lot easier to work with when we start composing them. We'll tackle this topic later in the text.
+Another layer to this answer, specifically for currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs 3 arguments, if curried, becomes a function that needs just one, three times over. That kind of unary function will be a lot easier to work with when we start composing them. We'll tackle this topic later in Chapter 4.
 
-But the most important perspective is specialization of generalized functions, and how such abstraction improves readability of code.
+But the most important layer is specialization of generalized functions, and how such abstraction improves readability of code.
 
 Consider our running `ajax(..)` example:
 
@@ -721,7 +721,7 @@ Specifically, if we look briefly at how currying works in Haskell, we can observ
 
 For example, in Haskell:
 
-```
+```js
 foo 1 2 3
 ```
 
@@ -729,9 +729,7 @@ This calls the `foo` function, and has the result of passing in three values `1`
 
 **Note:** In Haskell, `foo (1,2,3)` is not passing in those 3 values at once as three separate arguments, but a tuple (kinda like a JS array) as a single argument. To work, `foo` would need to be altered to handle a tuple in that argument position. As far as I can tell, there's no way in Haskell to pass all three arguments separately with just one function call; each argument gets its own curried-call. Of course, the presence of multiple calls is transparent to the Haskell developer, but it's a lot more syntactically obvious to the JS developer.
 
-For these reasons, I think the earlier `curry(..)` that I demonstrated is a faithful adaptation, or what I might call "strict currying".
-
-However, it's important to note that there's a looser definition used in most popular JavaScript FP libraries.
+For these reasons, I think the earlier `curry(..)` that I demonstrated is a faithful adaptation, or what I might call "strict currying". However, it's important to note that there's a looser definition used in most popular JavaScript FP libraries.
 
 Specifically, JS currying utilities typically allow you to specify multiple arguments for each curried-call. Revisiting our `sum(..)` example from before, this would look like:
 
@@ -742,8 +740,6 @@ curriedSum( 1 )( 2, 3 )( 4, 5 );			// 15
 ```
 
 We see a slight syntax savings of fewer `( )`, and an implied performance benefit of now having three function calls instead of five. But other than that, using `looseCurry(..)` is identical in end result to the narrower `curry(..)` definition from earlier. I would guess the convenience/performance factor is probably why frameworks allow multiple arguments. This seems mostly like a matter of taste.
-
-**Note:** The loose currying *does* give you the ability to send in more arguments than the arity (detected or specified). If you designed your function with optional/variadic arguments, that could be a benefit. For example, if you curry five arguments, looser currying still allows more than five arguments (`curriedSum(1)(2,3,4)(5,6)`), but strict currying wouldn't support `curriedSum(1)(2)(3)(4)(5)(6)`.
 
 We can adapt our previous currying implementation to this common looser definition:
 
@@ -768,7 +764,7 @@ Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave
 
 ### No Curry For Me, Please
 
-It may also be the case that you have a curried function that you'd like to sort of un-curry -- basically, to turn a function like `f(1)(2)(3)` back into a function like `g(1,2,3)`.
+It may also be the case that you have a curried function that you'd like to essentially un-curry -- basically, to turn a function like `f(1)(2)(3)` back into a function like `g(1,2,3)`.
 
 The standard utility for this is (un)shockingly typically called `uncurry(..)`. Here's a simple naive implementation:
 
@@ -825,7 +821,7 @@ Probably the more common case of using `uncurry(..)` is not with a manually curr
 
 In Chapter 2, we explored the named arguments pattern. One primary advantage of named arguments is not needing to juggle argument ordering, thereby improving readability.
 
-But earlier in this chapter, we looked at the advantages of using currying/partial application to provide individual arguments to a function separately. The downside is that these techniques are traditionally based on positional arguments; argument ordering is thus an inevitable headache.
+Now, we've looked at the advantages of using currying/partial application to provide individual arguments to a function separately. But the downside is that these techniques are traditionally based on positional arguments; argument ordering is thus an inevitable headache.
 
 Utilities like `reverseArgs(..)` (and others) are necessary to juggle arguments to get them into the right order. Sometimes we get lucky and define a function with parameters in the order that we later want to curry them, but other times that order is incompatible and we have to jump through hoops to reorder.
 
@@ -859,7 +855,7 @@ function curryProps(fn,arity = 1) {
 
 **Tip:** We don't even need a `partialPropsRight(..)` because we don't need care about what order properties are being mapped; the name mappings make that ordering concern moot!
 
-Here's how we use those helpers:
+Here's how to use those helpers:
 
 ```js
 function foo({ x, y, z } = {}) {
@@ -877,6 +873,8 @@ f2( { z: 3, x: 1 } );
 ```
 
 Even with currying or partial application, order doesn't matter anymore! We can now specify which arguments we want in whatever sequence makes sense. No more `reverseArgs(..)` or other nuisances. Cool!
+
+**Tip:** If this style of function arguments seems useful or interesting to you, check out coverage of my "FPO" library in Appendix C.
 
 ### Spreading Properties
 
@@ -903,7 +901,8 @@ function spreadArgProps(
 	fn,
 	propOrder =
 		fn.toString()
-		.replace( /^(?:(?:function.*\(([^]*?)\))|(?:([^\(\)]+?)\s*=>)|(?:\(([^]*?)\)\s*=>))[^]+$/, "$1$2$3" )
+		.replace( /^(?:(?:function.*\(([^]*?)\))|(?:([^\(\)]+?)
+			\s*=>)|(?:\(([^]*?)\)\s*=>))[^]+$/, "$1$2$3" )
 		.split( /\s*,\s*/ )
 		.map( v => v.replace( /[=\s].*$/, "" ) )
 ) {
@@ -913,7 +912,7 @@ function spreadArgProps(
 }
 ```
 
-**Note:** This utility's parameter parsing logic is far from bullet-proof; we're using regular expressions to parse code, which is already a faulty premise! But our only goal here is to handle the common cases, which this does reasonably well. We only need a sensible default detection of parameter order for functions with simple parameters (as well as those with default parameter values). We don't, for example, need to be able to parse out a complex destructured parameter, because we wouldn't likely be using this utility with such a function, anyway. So, this logic gets the 80% job done; it lets us override the `propOrder` array for any other more complex function signature that wouldn't otherwise be correctly parsed. That's the kind of pragmatic balance this book seeks to find wherever possible.
+**Note:** This utility's parameter parsing logic is far from bullet-proof; we're using regular expressions to parse code, which is already a faulty premise! But our only goal here is to handle the common cases, which this does reasonably well. We only need a sensible default detection of parameter order for functions with simple parameters (including those with default parameter values). We don't, for example, need to be able to parse out a complex destructured parameter, because we wouldn't likely be using this utility with such a function, anyway. So, this logic gets the 80% job done; it lets us override the `propOrder` array for any other more complex function signature that wouldn't otherwise be correctly parsed. That's the kind of pragmatic balance this book seeks to find wherever possible.
 
 Let's illustrate using our `spreadArgProps(..)` utility:
 
@@ -938,7 +937,7 @@ Weigh these tradeoffs carefully.
 
 ## No Points
 
-A popular style of coding in the FP world aims to reduce some of the visual clutter by removing unnecessary parameter-argument mapping. This style is formally called tacit programming, or more commonly: point-free style. The term "point" here is referring to a function's parameter.
+A popular style of coding in the FP world aims to reduce some of the visual clutter by removing unnecessary parameter-argument mapping. This style is formally called tacit programming, or more commonly: point-free style. The term "point" here is referring to a function's parameter input.
 
 **Warning:** Stop for a moment. Let's make sure we're careful not to take this discussion as an unbounded suggestion that you go overboard trying to be point-free in your FP code at all costs. This should be a technique for improving readability, when used in moderation. But as with most things in software development, you can definitely abuse it. If your code gets harder to understand because of the hoops you have to jump through to be point-free, stop. You won't win a blue ribbon just because you found some clever but esoteric way to remove another "point" from your code.
 
@@ -975,12 +974,16 @@ Let's revisit an example from earlier:
 // [1,2,3]
 ```
 
-In this example, `mapper(..)` is actually serving an important purpose, which is to discard the `index` argument that `map(..)` would pass in, because `parseInt(..)` would incorrectly interpret that value as a `radix` for the parsing. This was an example where `unary(..)` helps us out:
+In this example, `mapper(..)` is actually serving an important purpose, which is to discard the `index` argument that `map(..)` would pass in, because `parseInt(..)` would incorrectly interpret that value as a `radix` for the parsing.
+
+If you recall from the beginning of this chapter, this was an example where `unary(..)` helps us out:
 
 ```js
 ["1","2","3"].map( unary( parseInt ) );
 // [1,2,3]
 ```
+
+Point-free!
 
 The key thing to look for is if you have a function with parameter(s) that is/are directly passed to an inner function call. In both the above examples, `mapper(..)` had the `v` parameter that was passed along to another function call. We were able to replace that layer of abstraction with a point-free expression using `unary(..)`.
 
@@ -1075,7 +1078,7 @@ Let's mix `when(..)` with a few other helper utilities we've seen earlier in thi
 var printIf = uncurry( rightPartial( when, output ) );
 ```
 
-Here's how we did it: we right-partially applied the `output` method as the second (`fn`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
+Here's how we did it: we right-partially-applied the `output` method as the second (`fn`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
 
 A chain of multiple (two) function calls like that looks an awful lot like a curried function, so we `uncurry(..)` this result to produce a single function that expects the two `str` and `predicate` arguments together, which matches the original `printIf(predicate,str)` signature.
 
@@ -1120,4 +1123,4 @@ Other important utilities like `unary(..)`, `identity(..)`, and `constant(..)` a
 
 Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making easier to read/understand code.
 
-All of these techniques twist functions around so they can work together more naturally. The next chapter will teach you how to combine these functions to model the flows of data through your program.
+All of these techniques twist functions around so they can work together more naturally. With your functions shaped compatibly now, the next chapter will teach you how to combine them to model the flows of data through your program.

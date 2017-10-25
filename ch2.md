@@ -352,7 +352,7 @@ We're skipping the `x` parameter by simply omitting it. Or we could specify an `
 
 Named arguments are much more flexible, and attractive from a readability perspective, especially when the function in question can take 3, 4, or more inputs.
 
-**Tip:** If this style of function arguments seems useful or interesting to you, check out my coverage of the "FPO" library in Appendix C.
+**Tip:** If this style of function arguments seems useful or interesting to you, check out coverage of my "FPO" library in Appendix C.
 
 ## Function Output
 
