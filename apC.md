@@ -218,7 +218,7 @@ If FPO's named argument form of FP appeals to you, perhaps check out the library
 
 FP iterations (`map(..)`, `filter(..)`, etc) are almost always modeled as synchronous operations, meaning we eagerly run through all the steps of the iteration immediately. As a matter of fact, other FP patterns like composition and even transducing are also iterations, and are also modeled exactly this way.
 
-But what happens if one or more of the steps in an iteration needs to complete asynchronously? You might jump to thinking that observables (see Chapter 10) is the natural answer, but they're not what we need.
+But what happens if one or more of the steps in an iteration needs to complete asynchronously? You might jump to thinking that Observables (see Chapter 10) is the natural answer, but they're not what we need.
 
 Let me quickly illustrate.
 
@@ -249,9 +249,9 @@ Unfortunately, this "trick" only works if you're going to do all the asynchronou
 
 And some operations naturally require serial asynchrony, like for example an asynchronous `reduce(..)`, which clearly needs to work left-to-right one at a time; those steps can't be run concurrently and have that operation make any sense.
 
-As I said, observables (see Chapter 10) aren't the answer to these kinds of tasks. The reason is, an observable's coordination of asynchrony is between separate operations, not between steps/iterations in at a single level of operation.
+As I said, Observables (see Chapter 10) aren't the answer to these kinds of tasks. The reason is, an Observable's coordination of asynchrony is between separate operations, not between steps/iterations in at a single level of operation.
 
-Another way to visualize this distinction is that observables support "vertical asynchrony", whereas what I'm talking about would be "horizontal asynchrony".
+Another way to visualize this distinction is that Observables support "vertical asynchrony", whereas what I'm talking about would be "horizontal asynchrony".
 
 Consider:
 
@@ -301,7 +301,7 @@ For example, what if `fetchImage(..)` maintains a cache of fetched images, and i
 
 Again, there will inevitably be cases where whether concurrent or serial asynchrony will be called for. Asynchronous reductions will always be serial, whereas asynchronous mappings may likely tend to be more concurrent but can also need to be serial in some cases. That's why **fasy** supports all these options.
 
-Alongside observables, hopefully **fasy** helps you extend FP patterns and principles to asynchronous operations.
+Along with Observables, **fasy** will help you extend more FP patterns and principles to your asynchronous operations.
 
 ## Summary
 

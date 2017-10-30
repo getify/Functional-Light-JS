@@ -40,11 +40,11 @@ words
 
 It may not be obvious, but this pattern of separate adjacent list operations has some non-ideal characteristics. When we're dealing with only a single array of a small number of values, everything is fine. But if there were lots of values in the array, each `filter(..)` processing the list separately can slow down a bit more than we'd like.
 
-A similar performance problem arises when our arrays are async/lazy (aka observables), processing values over time in response to events (see Chapter 10). In this scenario, only a single value comes down the event stream at a time, so processing that discrete value with two separate `filter(..)`s function calls isn't really such a big deal.
+A similar performance problem arises when our arrays are async/lazy (aka Observables), processing values over time in response to events (see Chapter 10). In this scenario, only a single value comes down the event stream at a time, so processing that discrete value with two separate `filter(..)`s function calls isn't really such a big deal.
 
 But, what's not obvious is that each `filter(..)` method produces a separate observable. The overhead of pumping a value out of one observable into another can really add up. That's especially true since in these cases, it's not uncommon for thousands or millions of values to be processed; even such small overhead costs add up quickly.
 
-The other downside is readability, especially when we need to repeat the same series of operations against multiple lists (or observables). For example:
+The other downside is readability, especially when we need to repeat the same series of operations against multiple lists (or Observables). For example:
 
 ```js
 zip(
@@ -651,6 +651,6 @@ To transduce means to transform with a reduce. More specifically, a transducer i
 
 We use transducing to compose adjacent `map(..)`, `filter(..)`, and `reduce(..)` operations together. We accomplish this by first expressing `map(..)`s and `filter(..)`s as `reduce(..)`s, and then abstracting out the common combination operation to create unary reducer-producing functions that are easily composed.
 
-Transducing primarily improves performance, which is especially obvious if used on a lazy sequence (async observable).
+Transducing primarily improves performance, which is especially obvious if used on an observable.
 
 But more broadly, transducing is how we express a more declarative composition of functions that would otherwise not be directly composable. The result, if used appropriately as with all other techniques in this book, is clearer, more readable code! A single `reduce(..)` call with a transducer is easier to reason about than tracing through multiple `reduce(..)` calls.
