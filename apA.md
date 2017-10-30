@@ -19,11 +19,11 @@ Let's start by extending a scenario we covered back in Chapter 3, testing words 
 
 ```js
 function isLongEnough(str) {
-	return str.length >= 5;
+    return str.length >= 5;
 }
 
 function isShortEnough(str) {
-	return str.length <= 10;
+    return str.length <= 10;
 }
 ```
 
@@ -48,9 +48,9 @@ The other downside is readability, especially when we need to repeat the same se
 
 ```js
 zip(
-	list1.filter( isLongEnough ).filter( isShortEnough ),
-	list2.filter( isLongEnough ).filter( isShortEnough ),
-	list3.filter( isLongEnough ).filter( isShortEnough )
+    list1.filter( isLongEnough ).filter( isShortEnough ),
+    list2.filter( isLongEnough ).filter( isShortEnough ),
+    list3.filter( isLongEnough ).filter( isShortEnough )
 )
 ```
 
@@ -60,7 +60,7 @@ Wouldn't it be better (both for readability and performance) if we could combine
 
 ```js
 function isCorrectLength(str) {
-	return isLongEnough( str ) && isShortEnough( str );
+    return isLongEnough( str ) && isShortEnough( str );
 }
 ```
 
@@ -71,7 +71,7 @@ In Chapter 9, we talked about fusion -- composing adjacent mapping functions. Re
 ```js
 words
 .map(
-	pipe( removeInvalidChars, upper, elide )
+    pipe( removeInvalidChars, upper, elide )
 );
 ```
 
@@ -115,18 +115,18 @@ function strUppercase(str) { return str.toUpperCase(); }
 function strConcat(str1,str2) { return str1 + str2; }
 
 function strUppercaseReducer(list,str) {
-	list.push( strUppercase( str ) );
-	return list;
+    list.push( strUppercase( str ) );
+    return list;
 }
 
 function isLongEnoughReducer(list,str) {
-	if (isLongEnough( str )) list.push( str );
-	return list;
+    if (isLongEnough( str )) list.push( str );
+    return list;
 }
 
 function isShortEnoughReducer(list,str) {
-	if (isShortEnough( str )) list.push( str );
-	return list;
+    if (isShortEnough( str )) list.push( str );
+    return list;
 }
 
 words
@@ -143,17 +143,17 @@ In Chapter 9, we sort of cheated and used `list.push(..)` to mutate as a side ef
 
 ```js
 function strUppercaseReducer(list,str) {
-	return [ ...list, strUppercase( str ) ];
+    return [ ...list, strUppercase( str ) ];
 }
 
 function isLongEnoughReducer(list,str) {
-	if (isLongEnough( str )) return [ ...list, str ];
-	return list;
+    if (isLongEnough( str )) return [ ...list, str ];
+    return list;
 }
 
 function isShortEnoughReducer(list,str) {
-	if (isShortEnough( str )) return [ ...list, str ];
-	return list;
+    if (isShortEnough( str )) return [ ...list, str ];
+    return list;
 }
 ```
 
@@ -165,10 +165,10 @@ Both filter reducers are almost identical, except they use a different predicate
 
 ```js
 function filterReducer(predicateFn) {
-	return function reducer(list,val){
-		if (predicateFn( val )) return [ ...list, val ];
-		return list;
-	};
+    return function reducer(list,val){
+        if (predicateFn( val )) return [ ...list, val ];
+        return list;
+    };
 }
 
 var isLongEnoughReducer = filterReducer( isLongEnough );
@@ -179,9 +179,9 @@ Let's do the same parameterization of the `mapperFn(..)` for a utility to produc
 
 ```js
 function mapReducer(mapperFn) {
-	return function reducer(list,val){
-		return [ ...list, mapperFn( val ) ];
-	};
+    return function reducer(list,val){
+        return [ ...list, mapperFn( val ) ];
+    };
 }
 
 var strToUppercaseReducer = mapReducer( strUppercase );
@@ -214,7 +214,7 @@ Let's define a helper for that common logic. But what shall we call it?
 
 ```js
 function WHATSITCALLED(list,val) {
-	return [ ...list, val ];
+    return [ ...list, val ];
 }
 ```
 
@@ -222,7 +222,7 @@ If you examine what that `WHATSITCALLED(..)` function does, it takes two values 
 
 ```js
 function listCombination(list,val) {
-	return [ ...list, val ];
+    return [ ...list, val ];
 }
 ```
 
@@ -230,16 +230,16 @@ Let's now re-define our reducer helpers to use `listCombination(..)`:
 
 ```js
 function mapReducer(mapperFn) {
-	return function reducer(list,val){
-		return listCombination( list, mapperFn( val ) );
-	};
+    return function reducer(list,val){
+        return listCombination( list, mapperFn( val ) );
+    };
 }
 
 function filterReducer(predicateFn) {
-	return function reducer(list,val){
-		if (predicateFn( val )) return listCombination( list, val );
-		return list;
-	};
+    return function reducer(list,val){
+        if (predicateFn( val )) return listCombination( list, val );
+        return list;
+    };
 }
 ```
 
@@ -251,16 +251,16 @@ Our simple `listCombination(..)` utility is only one possible way that we might 
 
 ```js
 function mapReducer(mapperFn,combinationFn) {
-	return function reducer(list,val){
-		return combinationFn( list, mapperFn( val ) );
-	};
+    return function reducer(list,val){
+        return combinationFn( list, mapperFn( val ) );
+    };
 }
 
 function filterReducer(predicateFn,combinationFn) {
-	return function reducer(list,val){
-		if (predicateFn( val )) return combinationFn( list, val );
-		return list;
-	};
+    return function reducer(list,val){
+        if (predicateFn( val )) return combinationFn( list, val );
+        return list;
+    };
 }
 ```
 
@@ -276,24 +276,24 @@ Defining these utilities to take two arguments instead of one is less convenient
 
 ```js
 var curriedMapReducer = curry( function mapReducer(mapperFn,combinationFn){
-	return function reducer(list,val){
-		return combinationFn( list, mapperFn( val ) );
-	};
+    return function reducer(list,val){
+        return combinationFn( list, mapperFn( val ) );
+    };
 } );
 
 var curriedFilterReducer = curry( function filterReducer(predicateFn,combinationFn){
-	return function reducer(list,val){
-		if (predicateFn( val )) return combinationFn( list, val );
-		return list;
-	};
+    return function reducer(list,val){
+        if (predicateFn( val )) return combinationFn( list, val );
+        return list;
+    };
 } );
 
 var strToUppercaseReducer =
-	curriedMapReducer( strUppercase )( listCombination );
+    curriedMapReducer( strUppercase )( listCombination );
 var isLongEnoughReducer =
-	curriedFilterReducer( isLongEnough )( listCombination );
+    curriedFilterReducer( isLongEnough )( listCombination );
 var isShortEnoughReducer =
-	curriedFilterReducer( isShortEnough )( listCombination );
+    curriedFilterReducer( isShortEnough )( listCombination );
 ```
 
 That looks a bit more verbose, and probably doesn't seem very useful.
@@ -326,8 +326,8 @@ But what would you get back if you called `y(z)`, instead of `y(listCombination)
 
 ```js
 function reducer(list,val) {
-	if (isLongEnough( val )) return z( list, val );
-	return list;
+    if (isLongEnough( val )) return z( list, val );
+    return list;
 }
 ```
 
@@ -347,14 +347,14 @@ Now consider: what do `shortEnoughReducer(..)` and `longAndShortEnoughReducer(..
 ```js
 // shortEnoughReducer, from calling z(..):
 function reducer(list,val) {
-	if (isShortEnough( val )) return listCombination( list, val );
-	return list;
+    if (isShortEnough( val )) return listCombination( list, val );
+    return list;
 }
 
 // longAndShortEnoughReducer, from calling y(..):
 function reducer(list,val) {
-	if (isLongEnough( val )) return shortEnoughReducer( list, val );
-	return list;
+    if (isLongEnough( val )) return shortEnoughReducer( list, val );
+    return list;
 }
 ```
 
@@ -391,7 +391,7 @@ As the name `upperLongAndShortEnoughReducer(..)` implies, it does all three step
 ```js
 // upperLongAndShortEnoughReducer:
 function reducer(list,val) {
-	return longAndShortEnoughReducer( list, strUppercase( val ) );
+    return longAndShortEnoughReducer( list, strUppercase( val ) );
 }
 ```
 
@@ -433,9 +433,9 @@ That's pretty cool. But let's make it even better.
 
 ```js
 var composition = compose(
-	curriedMapReducer( strUppercase ),
-	curriedFilterReducer( isLongEnough ),
-	curriedFilterReducer( isShortEnough )
+    curriedMapReducer( strUppercase ),
+    curriedFilterReducer( isLongEnough ),
+    curriedFilterReducer( isShortEnough )
 );
 
 var upperLongAndShortEnoughReducer = composition( listCombination );
@@ -454,9 +454,9 @@ In the previous snippet, `composition(..)` is a composed function expecting a co
 
 ```js
 var transducer = compose(
-	curriedMapReducer( strUppercase ),
-	curriedFilterReducer( isLongEnough ),
-	curriedFilterReducer( isShortEnough )
+    curriedMapReducer( strUppercase ),
+    curriedFilterReducer( isLongEnough ),
+    curriedFilterReducer( isShortEnough )
 );
 
 words
@@ -472,7 +472,7 @@ As a quick aside, let's revisit our `listCombination(..)` combination function i
 
 ```js
 function listCombination(list,val) {
-	return [ ...list, val ];
+    return [ ...list, val ];
 }
 ```
 
@@ -482,8 +482,8 @@ By contrast, look again at the better-performing but impure version:
 
 ```js
 function listCombination(list,val) {
-	list.push( val );
-	return list;
+    list.push( val );
+    return list;
 }
 ```
 
@@ -543,16 +543,16 @@ Recall the helpers we defined earlier; let's rename them for clarity:
 
 ```js
 var transduceMap = curry( function mapReducer(mapperFn,combinationFn){
-	return function reducer(list,v){
-		return combinationFn( list, mapperFn( v ) );
-	};
+    return function reducer(list,v){
+        return combinationFn( list, mapperFn( v ) );
+    };
 } );
 
 var transduceFilter = curry( function filterReducer(predicateFn,combinationFn){
-	return function reducer(list,v){
-		if (predicateFn( v )) return combinationFn( list, v );
-		return list;
-	};
+    return function reducer(list,v){
+        if (predicateFn( v )) return combinationFn( list, v );
+        return list;
+    };
 } );
 ```
 
@@ -560,9 +560,9 @@ Also recall that we use them like this:
 
 ```js
 var transducer = compose(
-	transduceMap( strUppercase ),
-	transduceFilter( isLongEnough ),
-	transduceFilter( isShortEnough )
+    transduceMap( strUppercase ),
+    transduceFilter( isLongEnough ),
+    transduceFilter( isShortEnough )
 );
 ```
 
@@ -572,8 +572,8 @@ But to express all these transducing steps more declaratively, let's make a `tra
 
 ```js
 function transduce(transducer,combinationFn,initialValue,list) {
-	var reducer = transducer( combinationFn );
-	return list.reduce( reducer, initialValue );
+    var reducer = transducer( combinationFn );
+    return list.reduce( reducer, initialValue );
 }
 ```
 
@@ -581,9 +581,9 @@ Here's our running example, cleaned up:
 
 ```js
 var transducer = compose(
-	transduceMap( strUppercase ),
-	transduceFilter( isLongEnough ),
-	transduceFilter( isShortEnough )
+    transduceMap( strUppercase ),
+    transduceFilter( isLongEnough ),
+    transduceFilter( isShortEnough )
 );
 
 transduce( transducer, listCombination, [], words );
@@ -601,9 +601,9 @@ Finally, let's illustrate our running example using the `transducers-js` library
 
 ```js
 var transformer = transducers.comp(
-	transducers.map( strUppercase ),
-	transducers.filter( isLongEnough ),
-	transducers.filter( isShortEnough )
+    transducers.map( strUppercase ),
+    transducers.filter( isLongEnough ),
+    transducers.filter( isShortEnough )
 );
 
 transducers.transduce( transformer, listCombination, [], words );
@@ -625,8 +625,8 @@ Since calling `transformer(..)` produces a transform object and not a typical bi
 
 ```js
 words.reduce(
-	transducers.toFn( transformer, strConcat ),
-	""
+    transducers.toFn( transformer, strConcat ),
+    ""
 );
 // WRITTENSOMETHING
 ```

@@ -45,15 +45,15 @@ But... that definition is too confusing in its written form. We can do better. C
 
 ```js
 function foo(x) {
-	if (x < 5) return x;
-	return foo( x / 2 );
+    if (x < 5) return x;
+    return foo( x / 2 );
 }
 ```
 
 Let's visualize what happens with this function when we call `foo( 16 )`:
 
 <p align="center">
-	<img src="fig13.png" width="850">
+    <img src="fig13.png" width="850">
 </p>
 
 In step 2, `x / 2` produces `8`, and that's passed in as the argument so a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
@@ -61,7 +61,7 @@ In step 2, `x / 2` produces `8`, and that's passed in as the argument so a recur
 But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
 
 <p align="center">
-	<img src="fig14.png" width="850">
+    <img src="fig14.png" width="850">
 </p>
 
 Once the base condition is satisified, the returned value cascades back through all of the current function calls (and thus `return`s), eventually `return`ing the final result out.
@@ -69,7 +69,7 @@ Once the base condition is satisified, the returned value cascades back through 
 Another way to visualize this recursion is by considering the function calls in the order they happen (commonly referred to as the call stack):
 
 <p align="center">
-	<img src="fig19.png" width="188">
+    <img src="fig19.png" width="188">
 </p>
 
 More on the call stack later in this chapter.
@@ -78,14 +78,14 @@ Another recursion example:
 
 ```js
 function isPrime(num,divisor = 2){
-	if (num < 2 || (num > 2 && num % divisor == 0)) {
-		return false;
-	}
-	if (divisor <= Math.sqrt( num )) {
-		return isPrime( num, divisor + 1 );
-	}
+    if (num < 2 || (num > 2 && num % divisor == 0)) {
+        return false;
+    }
+    if (divisor <= Math.sqrt( num )) {
+        return isPrime( num, divisor + 1 );
+    }
 
-	return true;
+    return true;
 }
 ```
 
@@ -97,7 +97,7 @@ One of the most famous examples of recursion is calculating a Fibonacci number, 
 fib( 0 ): 0
 fib( 1 ): 1
 fib( n ):
-	fib( n - 2 ) + fib( n - 1 )
+    fib( n - 2 ) + fib( n - 1 )
 ```
 
 **Note:** The first several numbers of this sequence are: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... Each number is the addition of the previous two numbers in the sequence.
@@ -106,8 +106,8 @@ The definition of fibonacci expressed directly in code:
 
 ```js
 function fib(n) {
-	if (n <= 1) return n;
-	return fib( n - 2 ) + fib( n - 1 );
+    if (n <= 1) return n;
+    return fib( n - 2 ) + fib( n - 1 );
 }
 ```
 
@@ -125,13 +125,13 @@ These two functions are mutually recursive:
 
 ```js
 function isOdd(v) {
-	if (v === 0) return false;
-	return isEven( Math.abs( v ) - 1 );
+    if (v === 0) return false;
+    return isEven( Math.abs( v ) - 1 );
 }
 
 function isEven(v) {
-	if (v === 0) return true;
-	return isOdd( Math.abs( v ) - 1 );
+    if (v === 0) return true;
+    return isOdd( Math.abs( v ) - 1 );
 }
 ```
 
@@ -141,13 +141,13 @@ Recall the binary recursive `fib(..)` from the previous section; we could instea
 
 ```js
 function fib_(n) {
-	if (n == 1) return 1;
-	else return fib( n - 2 );
+    if (n == 1) return 1;
+    else return fib( n - 2 );
 }
 
 function fib(n) {
-	if (n == 0) return 0;
-	else return fib( n - 1 ) + fib_( n );
+    if (n == 0) return 0;
+    else return fib( n - 1 ) + fib_( n );
 }
 ```
 
@@ -165,18 +165,18 @@ Simple iterative algorithms can trivially be expressed as recursion:
 
 ```js
 function sum(total,...nums) {
-	for (let num of nums) {
-		total = total + num;
-	}
+    for (let num of nums) {
+        total = total + num;
+    }
 
-	return total;
+    return total;
 }
 
 // vs
 
 function sum(num1,...nums) {
-	if (nums.length == 0) return num1;
-	return num1 + sum( ...nums );
+    if (nums.length == 0) return num1;
+    return num1 + sum( ...nums );
 }
 ```
 
@@ -192,17 +192,17 @@ Recursion is declarative for algorithms in the same sense that **Σ** is declara
 
 ```js
 function maxEven(...nums) {
-	var maxNum = -Infinity;
+    var maxNum = -Infinity;
 
-	for (let num of nums) {
-		if (num % 2 == 0 && num > maxNum) {
-			maxNum = num;
-		}
-	}
+    for (let num of nums) {
+        if (num % 2 == 0 && num > maxNum) {
+            maxNum = num;
+        }
+    }
 
-	if (num !== -Infinity) {
-		return maxNum;
-	}
+    if (num !== -Infinity) {
+        return maxNum;
+    }
 }
 ```
 
@@ -212,27 +212,27 @@ Let's instead consider a recursive approach, to compare. We could notate the rec
 
 ```
 maxEven( nums ):
-	maxEven( nums.0, maxEven( ...nums.1 ) )
+    maxEven( nums.0, maxEven( ...nums.1 ) )
 ```
 
 In other words, we can define the max-even of a list of numbers as the max-even of the first number compared to the max-even of the rest of the numbers. For example:
 
 ```
 maxEven( 1, 10, 3, 2 ):
-	maxEven( 1, maxEven( 10, maxEven( 3, maxEven( 2 ) ) )
+    maxEven( 1, maxEven( 10, maxEven( 3, maxEven( 2 ) ) )
 ```
 
 To implement this recursive definition in JS, one approach is:
 
 ```js
 function maxEven(num1,...restNums) {
-	var maxRest = restNums.length > 0 ?
-			maxEven( ...restNums ) :
-			undefined;
+    var maxRest = restNums.length > 0 ?
+            maxEven( ...restNums ) :
+            undefined;
 
-	return (num1 % 2 != 0 || num1 < maxRest) ?
-		maxRest :
-		num1;
+    return (num1 % 2 != 0 || num1 < maxRest) ?
+        maxRest :
+        num1;
 }
 ```
 
@@ -244,7 +244,7 @@ This function signature is an intentional hint at the recursive definition. It r
 
 ```
 maxEven( num1, ...restNums ):
-	maxEven( num1, maxEven( ...restNums ) )
+    maxEven( num1, maxEven( ...restNums ) )
 ```
 
 Do you see the symmetry between the signature and the recursive definition?
@@ -271,20 +271,20 @@ The depth of a binary tree is the longest path down (either left or right) throu
 
 ```
 depth( node ):
-	1 + max( depth( node.left ), depth( node.right ) )
+    1 + max( depth( node.left ), depth( node.right ) )
 ```
 
 Translating that straightforwardly to a binary recursive function:
 
 ```js
 function depth(node) {
-	if (node) {
-		let depthLeft = depth( node.left );
-		let depthRight = depth( node.right );
-		return 1 + max( depthLeft, depthRight );
-	}
+    if (node) {
+        let depthLeft = depth( node.left );
+        let depthRight = depth( node.right );
+        return 1 + max( depthLeft, depthRight );
+    }
 
-	return 0;
+    return 0;
 }
 ```
 
@@ -298,20 +298,20 @@ Let's revisit the `isOdd(..)` / `isEven(..)` recursion from earlier:
 
 ```js
 function isOdd(v) {
-	if (v === 0) return false;
-	return isEven( Math.abs( v ) - 1 );
+    if (v === 0) return false;
+    return isEven( Math.abs( v ) - 1 );
 }
 
 function isEven(v) {
-	if (v === 0) return true;
-	return isOdd( Math.abs( v ) - 1 );
+    if (v === 0) return true;
+    return isOdd( Math.abs( v ) - 1 );
 }
 ```
 
 In most browsers, if you try this you'll get an error:
 
 ```js
-isOdd( 33333 );			// RangeError: Maximum call stack size exceeded
+isOdd( 33333 );         // RangeError: Maximum call stack size exceeded
 ```
 
 What's going on with this error? The engine throws this error because it's trying to protect your program from running the system out of memory. To explain that, we need to peek a little below the hood at what's going on in the JS engine when function calls happen.
@@ -324,17 +324,17 @@ Consider this program:
 
 ```js
 function foo() {
-	var z = "foo!";
+    var z = "foo!";
 }
 
 function bar() {
-	var y = "bar!";
-	foo();
+    var y = "bar!";
+    foo();
 }
 
 function baz() {
-	var x = "baz!";
-	bar();
+    var x = "baz!";
+    bar();
 }
 
 baz();
@@ -343,7 +343,7 @@ baz();
 Visualizing this program's stack frame step by step:
 
 <p align="center">
-	<img src="fig15.png" width="600">
+    <img src="fig15.png" width="600">
 </p>
 
 **Note:** If these functions didn't call each other, but were just called sequentially -- like `baz(); bar(); foo();`, where each one finishes before the next one starts -- the  frames won't stack up; each function call finishes and removes its frame from the stack before the next one is added.
@@ -365,7 +365,7 @@ Fortunately, a powerful observation was made in those early days that still offe
 The idea is that if a call from function `baz()` to function `bar()` happens at the very end of function `baz()`'s execution -- referred to as a tail call -- the stack frame for `baz()` isn't needed anymore. That means that either the memory can be reclaimed, or even better, simply reused to handle function `bar()`'s execution. Visualizing:
 
 <p align="center">
-	<img src="fig16.png" width="600">
+    <img src="fig16.png" width="600">
 </p>
 
 Tail calls are not really directly related to recursion, per se; this notion holds for any function call. But your manual non-recursion call stacks are unlikely to go beyond maybe 10 levels deep in most cases, so the chances of tail calls impacting your program's memory footprint are pretty low.
@@ -434,8 +434,8 @@ Let's recall the summation example from earlier:
 
 ```js
 function sum(num1,...nums) {
-	if (nums.length == 0) return num1;
-	return num1 + sum( ...nums );
+    if (nums.length == 0) return num1;
+    return num1 + sum( ...nums );
 }
 ```
 
@@ -447,7 +447,7 @@ To start, we could alter the signature our `sum(..)` function to have a new firs
 
 ```js
 function sum(result,num1,...nums) {
-	// ..
+    // ..
 }
 ```
 
@@ -457,9 +457,9 @@ Now, we should pre-calculate the addition of `result` and `num1`, and pass that 
 "use strict";
 
 function sum(result,num1,...nums) {
-	result = result + num1;
-	if (nums.length == 0) return result;
-	return sum( result, ...nums );
+    result = result + num1;
+    if (nums.length == 0) return result;
+    return sum( result, ...nums );
 }
 ```
 
@@ -468,7 +468,7 @@ Now our `sum(..)` is in PTC form! Yay!
 But the downside is we now have altered the signature of the function that makes using it stranger. The caller essentially has to pass `0` as the first argument ahead of the rest of the numbers they want to sum.
 
 ```js
-sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
+sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );        // 123
 ```
 
 That's unfortunate.
@@ -479,16 +479,16 @@ Typically, people will solve this by naming their awkward-signature recursive fu
 "use strict";
 
 function sumRec(result,num1,...nums) {
-	result = result + num1;
-	if (nums.length == 0) return result;
-	return sumRec( result, ...nums );
+    result = result + num1;
+    if (nums.length == 0) return result;
+    return sumRec( result, ...nums );
 }
 
 function sum(...nums) {
-	return sumRec( /*initialResult=*/0, ...nums );
+    return sumRec( /*initialResult=*/0, ...nums );
 }
 
-sum( 3, 1, 17, 94, 8 );								// 123
+sum( 3, 1, 17, 94, 8 );                             // 123
 ```
 
 That's better. Still unfortunate that we've now created multiple functions instead of just one. Sometimes you'll see developers "hide" the recursive function as an inner function, like this:
@@ -497,16 +497,16 @@ That's better. Still unfortunate that we've now created multiple functions inste
 "use strict";
 
 function sum(...nums) {
-	return sumRec( /*initialResult=*/0, ...nums );
+    return sumRec( /*initialResult=*/0, ...nums );
 
-	function sumRec(result,num1,...nums) {
-		result = result + num1;
-		if (nums.length == 0) return result;
-		return sumRec( result, ...nums );
-	}
+    function sumRec(result,num1,...nums) {
+        result = result + num1;
+        if (nums.length == 0) return result;
+        return sumRec( result, ...nums );
+    }
 }
 
-sum( 3, 1, 17, 94, 8 );								// 123
+sum( 3, 1, 17, 94, 8 );                             // 123
 ```
 
 The downside here is that we'll recreate that inner `sumRec(..)` function each time the outer `sum(..)` is called. So, we can go back to them being side-by-side functions, but hide them both inside an IIFE, and expose just the one we want to:
@@ -516,19 +516,19 @@ The downside here is that we'll recreate that inner `sumRec(..)` function each t
 
 var sum = (function IIFE(){
 
-	return function sum(...nums) {
-		return sumRec( /*initialResult=*/0, ...nums );
-	}
+    return function sum(...nums) {
+        return sumRec( /*initialResult=*/0, ...nums );
+    }
 
-	function sumRec(result,num1,...nums) {
-		result = result + num1;
-		if (nums.length == 0) return result;
-		return sumRec( result, ...nums );
-	}
+    function sumRec(result,num1,...nums) {
+        result = result + num1;
+        if (nums.length == 0) return result;
+        return sumRec( result, ...nums );
+    }
 
 })();
 
-sum( 3, 1, 17, 94, 8 );								// 123
+sum( 3, 1, 17, 94, 8 );                             // 123
 ```
 
 OK, we've got PTC and we've got a nice clean signature for our `sum(..)` that doesn't require the caller to know about our implementation details. Yay!
@@ -541,12 +541,12 @@ Luckily, in some other cases, like the present one, there's a better way. Let's 
 "use strict";
 
 function sum(result,num1,...nums) {
-	result = result + num1;
-	if (nums.length == 0) return result;
-	return sum( result, ...nums );
+    result = result + num1;
+    if (nums.length == 0) return result;
+    return sum( result, ...nums );
 }
 
-sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );		// 123
+sum( /*initialResult=*/0, 3, 1, 17, 94, 8 );        // 123
 ```
 
 What you might observe is that `result` is a number just like `num1`, which means that we can always treat the first number in our list as our running total; that includes even the first call. All we need is to rename those params to make this clear:
@@ -555,12 +555,12 @@ What you might observe is that `result` is a number just like `num1`, which mean
 "use strict";
 
 function sum(num1,num2,...nums) {
-	num1 = num1 + num2;
-	if (nums.length == 0) return num1;
-	return sum( num1, ...nums );
+    num1 = num1 + num2;
+    if (nums.length == 0) return num1;
+    return sum( num1, ...nums );
 }
 
-sum( 3, 1, 17, 94, 8 );								// 123
+sum( 3, 1, 17, 94, 8 );                             // 123
 ```
 
 Awesome. That's much better, huh!? I think this pattern achieves a good balance between declarative/reasonable and performant.
@@ -582,14 +582,14 @@ Our code can follow these steps almost exactly:
 "use strict";
 
 function maxEven(num1,num2,...nums) {
-	num1 =
-		(num1 % 2 == 0 && !(maxEven( num2 ) > num1)) ?
-			num1 :
-			(num2 % 2 == 0 ? num2 : undefined);
+    num1 =
+        (num1 % 2 == 0 && !(maxEven( num2 ) > num1)) ?
+            num1 :
+            (num2 % 2 == 0 ? num2 : undefined);
 
-	return nums.length == 0 ?
-		num1 :
-		maxEven( num1, ...nums )
+    return nums.length == 0 ?
+        num1 :
+        maxEven( num1, ...nums )
 }
 ```
 
@@ -613,14 +613,14 @@ We could do this for `fib(..)`:
 "use strict";
 
 function fib(n,cont = identity) {
-	if (n <= 1) return cont( n );
-	return fib(
-		n - 2,
-		n2 => fib(
-			n - 1,
-			n1 => cont( n2 + n1 )
-		)
-	);
+    if (n <= 1) return cont( n );
+    return fib(
+        n - 2,
+        n2 => fib(
+            n - 1,
+            n1 => cont( n2 + n1 )
+        )
+    );
 }
 ```
 
@@ -648,15 +648,15 @@ Let's sketch out a `trampoline(..)` utility:
 
 ```js
 function trampoline(fn) {
-	return function trampolined(...args) {
-		var result = fn( ...args );
+    return function trampolined(...args) {
+        var result = fn( ...args );
 
-		while (typeof result == "function") {
-			result = result();
-		}
+        while (typeof result == "function") {
+            result = result();
+        }
 
-		return result;
-	};
+        return result;
+    };
 }
 ```
 
@@ -666,19 +666,19 @@ Because each continuation needs to return another continuation, we'll need to us
 
 ```js
 var sum = trampoline(
-	function sum(num1,num2,...nums) {
-		num1 = num1 + num2;
-		if (nums.length == 0) return num1;
-		return () => sum( num1, ...nums );
-	}
+    function sum(num1,num2,...nums) {
+        num1 = num1 + num2;
+        if (nums.length == 0) return num1;
+        return () => sum( num1, ...nums );
+    }
 );
 
 var xs = [];
 for (let i=0; i<20000; i++) {
-	xs.push( i );
+    xs.push( i );
 }
 
-sum( ...xs );					// 199990000
+sum( ...xs );                   // 199990000
 ```
 
 The downside is that a trampoline requires you to wrap your recursive function in the trampoline driving function; moreover, just like CPS, closures are created for each continuation. However, unlike CPS, each continuation function returned runs and finishes right away, so the engine won't have to accumulate a growing amount of closure memory while the call stack depth of the problem is exhausted.

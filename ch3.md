@@ -17,9 +17,9 @@ We can design a simple utility that wraps a function call to ensure only one arg
 
 ```js
 function unary(fn) {
-	return function onlyOneArg(arg){
-		return fn( arg );
-	};
+    return function onlyOneArg(arg){
+        return fn( arg );
+    };
 }
 ```
 
@@ -27,9 +27,9 @@ Many FPers tend to prefer the shorter `=>` arrow function syntax for such code (
 
 ```js
 var unary =
-	fn =>
-		arg =>
-			fn( arg );
+    fn =>
+        arg =>
+            fn( arg );
 ```
 
 **Note:** No question this is more terse, sparse even. But I personally feel that whatever it may gain in symmetry with the mathematical notation, it loses more in overall readability with the functions all being anonymous, and by obscuring the scope boundaries making deciphering closure a little more cryptic.
@@ -58,13 +58,13 @@ Speaking of functions with only one argument, another common base operation in t
 
 ```js
 function identity(v) {
-	return v;
+    return v;
 }
 
 // or the ES6 => arrow form
 var identity =
-	v =>
-		v;
+    v =>
+        v;
 ```
 
 This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
@@ -88,16 +88,16 @@ Another example of using `identity(..)` is as a default function in place of a t
 
 ```js
 function output(msg,formatFn = identity) {
-	msg = formatFn( msg );
-	console.log( msg );
+    msg = formatFn( msg );
+    console.log( msg );
 }
 
 function upper(txt) {
-	return txt.toUpperCase();
+    return txt.toUpperCase();
 }
 
-output( "Hello World", upper );		// HELLO WORLD
-output( "Hello World" );			// Hello World
+output( "Hello World", upper );     // HELLO WORLD
+output( "Hello World" );            // Hello World
 ```
 
 If `output(..)` didn't have a default for `formatFn`, we could bring our earlier friend `partialRight(..)`:
@@ -106,8 +106,8 @@ If `output(..)` didn't have a default for `formatFn`, we could bring our earlier
 var specialOutput = partialRight( output, upper );
 var simpleOutput = partialRight( output, identity );
 
-specialOutput( "Hello World" );		// HELLO WORLD
-simpleOutput( "Hello World" );		// Hello World
+specialOutput( "Hello World" );     // HELLO WORLD
+simpleOutput( "Hello World" );      // Hello World
 ```
 
 You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in Chapter 9.
@@ -118,16 +118,16 @@ Certain APIs don't let you pass a value directly into a method, but require you 
 
 ```js
 function constant(v) {
-	return function value(){
-		return v;
-	};
+    return function value(){
+        return v;
+    };
 }
 
 // or the ES6 => form
 var constant =
-	v =>
-		() =>
-			v;
+    v =>
+        () =>
+            v;
 ```
 
 With this tidy little utility, we can solve our `then(..)` annoyance:
@@ -158,14 +158,14 @@ However, sometimes you won't have the ability to change the declaration of the f
 
 ```js
 function foo(x,y) {
-	console.log( x + y );
+    console.log( x + y );
 }
 
 function bar(fn) {
-	fn( [ 3, 9 ] );
+    fn( [ 3, 9 ] );
 }
 
-bar( foo );			// fails
+bar( foo );         // fails
 ```
 
 Do you spot why `bar(foo)` fails?
@@ -178,16 +178,16 @@ We can define a helper to adapt a function so that it spreads out a single recei
 
 ```js
 function spreadArgs(fn) {
-	return function spreadFn(argsArr) {
-		return fn( ...argsArr );
-	};
+    return function spreadFn(argsArr) {
+        return fn( ...argsArr );
+    };
 }
 
 // or the ES6 => arrow form
 var spreadArgs =
-	fn =>
-		argsArr =>
-			fn( ...argsArr );
+    fn =>
+        argsArr =>
+            fn( ...argsArr );
 ```
 
 **Note:** I called this helper `spreadArgs(..)`, but in libraries like Ramda it's commonly called `apply(..)`.
@@ -195,7 +195,7 @@ var spreadArgs =
 Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input to `bar(..)`:
 
 ```js
-bar( spreadArgs( foo ) );			// 12
+bar( spreadArgs( foo ) );           // 12
 ```
 
 It won't seem clear yet why these occassions will arise, but you will see them often. Essentially, `spreadArgs(..)` will allow us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
@@ -204,16 +204,16 @@ While we're talking about a `spreadArgs(..)` utility, let's also define a utilit
 
 ```js
 function gatherArgs(fn) {
-	return function gatheredFn(...argsArr) {
-		return fn( argsArr );
-	};
+    return function gatheredFn(...argsArr) {
+        return fn( argsArr );
+    };
 }
 
 // or the ES6 => arrow form
 var gatherArgs =
-	fn =>
-		(...argsArr) =>
-			fn( argsArr );
+    fn =>
+        (...argsArr) =>
+            fn( argsArr );
 ```
 
 **Note:** In Ramda, this utility is referred to as `unapply(..)`, being that it's the opposite of `apply(..)`. I think the "spread" / "gather" terminology is a little more descriptive for what's going on.
@@ -222,7 +222,7 @@ We can use this utility to gather individual arguments into a single array, perh
 
 ```js
 function combineFirstTwo([ v1, v2 ]) {
-	return v1 + v2;
+    return v1 + v2;
 }
 
 [1,2,3,4,5].reduce( gatherArgs( combineFirstTwo ) );
@@ -237,7 +237,7 @@ Consider this function:
 
 ```js
 function ajax(url,data,callback) {
-	// ..
+    // ..
 }
 ```
 
@@ -249,11 +249,11 @@ What we're going to do is make a new function that still calls `ajax(..)` under 
 
 ```js
 function getPerson(data,cb) {
-	ajax( "http://some.api/person", data, cb );
+    ajax( "http://some.api/person", data, cb );
 }
 
 function getOrder(data,cb) {
-	ajax( "http://some.api/order", data, cb );
+    ajax( "http://some.api/order", data, cb );
 }
 ```
 
@@ -261,7 +261,7 @@ Manually specifying these function call wrappers is certainly possible, but it m
 
 ```js
 function getCurrentUser(cb) {
-	getPerson( { user: CURRENT_USER_ID }, cb );
+    getPerson( { user: CURRENT_USER_ID }, cb );
 }
 ```
 
@@ -277,16 +277,16 @@ Let's define a `partial(..)` utility:
 
 ```js
 function partial(fn,...presetArgs) {
-	return function partiallyApplied(...laterArgs){
-		return fn( ...presetArgs, ...laterArgs );
-	};
+    return function partiallyApplied(...laterArgs){
+        return fn( ...presetArgs, ...laterArgs );
+    };
 }
 
 // or the ES6 => arrow form
 var partial =
-	(fn,...presetArgs) =>
-		(...laterArgs) =>
-			fn( ...presetArgs, ...laterArgs );
+    (fn,...presetArgs) =>
+        (...laterArgs) =>
+            fn( ...presetArgs, ...laterArgs );
 ```
 
 **Tip:** Don't just take this snippet at face value. Take a few moments to digest what's going on with this utility. Make sure you really *get it*.
@@ -313,7 +313,7 @@ Stop and think about the shape/internals of `getPerson(..)`. It will look sorta 
 
 ```js
 var getPerson = function partiallyApplied(...laterArgs) {
-	return ajax( "http://some.api/person", ...laterArgs );
+    return ajax( "http://some.api/person", ...laterArgs );
 };
 ```
 
@@ -322,9 +322,9 @@ The same will be true of `getOrder(..)`. But what about `getCurrentUser(..)`?
 ```js
 // version 1
 var getCurrentUser = partial(
-	ajax,
-	"http://some.api/person",
-	{ user: CURRENT_USER_ID }
+    ajax,
+    "http://some.api/person",
+    { user: CURRENT_USER_ID }
 );
 
 // version 2
@@ -340,20 +340,20 @@ Just to make sure we understand how these two versions will work under the cover
 ```js
 // version 1
 var getCurrentUser = function partiallyApplied(...laterArgs) {
-	return ajax(
-		"http://some.api/person",
-		{ user: CURRENT_USER_ID },
-		...laterArgs
-	);
+    return ajax(
+        "http://some.api/person",
+        { user: CURRENT_USER_ID },
+        ...laterArgs
+    );
 };
 
 // version 2
 var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs) {
-	var getPerson = function innerPartiallyApplied(...innerLaterArgs){
-		return ajax( "http://some.api/person", ...innerLaterArgs );
-	};
+    var getPerson = function innerPartiallyApplied(...innerLaterArgs){
+        return ajax( "http://some.api/person", ...innerLaterArgs );
+    };
 
-	return getPerson( { user: CURRENT_USER_ID }, ...outerLaterArgs );
+    return getPerson( { user: CURRENT_USER_ID }, ...outerLaterArgs );
 }
 ```
 
@@ -365,7 +365,7 @@ Let's take a look at another example of the usefulness of partial application. C
 
 ```js
 function add(x,y) {
-	return x + y;
+    return x + y;
 }
 ```
 
@@ -373,7 +373,7 @@ Now, imagine we'd like take a list of numbers and add a certain number to each o
 
 ```js
 [1,2,3,4,5].map( function adder(val){
-	return add( 3, val );
+    return add( 3, val );
 } );
 // [4,5,6,7,8]
 ```
@@ -411,16 +411,16 @@ Recall that the signature for our Ajax function is: `ajax( url, data, cb )`. Wha
 
 ```js
 function reverseArgs(fn) {
-	return function argsReversed(...args){
-		return fn( ...args.reverse() );
-	};
+    return function argsReversed(...args){
+        return fn( ...args.reverse() );
+    };
 }
 
 // or the ES6 => arrow form
 var reverseArgs =
-	fn =>
-		(...args) =>
-			fn( ...args.reverse() );
+    fn =>
+        (...args) =>
+            fn( ...args.reverse() );
 ```
 
 Now we can reverse the order of the `ajax(..)` arguments, so that we can then partially apply from the right rather than the left. To restore the expected order, we'll then reverse the subsequent partially-applied function:
@@ -429,9 +429,9 @@ Now we can reverse the order of the `ajax(..)` arguments, so that we can then pa
 var cache = {};
 
 var cacheResult = reverseArgs(
-	partial( reverseArgs( ajax ), function onResult(obj){
-		cache[obj.id] = obj;
-	} )
+    partial( reverseArgs( ajax ), function onResult(obj){
+        cache[obj.id] = obj;
+    } )
 );
 
 // later:
@@ -442,13 +442,13 @@ Instead of manually using `reverseArgs(..)` (twice!) for this purpose, we could 
 
 ```js
 function partialRight(fn,...presetArgs) {
-	return reverseArgs(
-		partial( reverseArgs( fn ), ...presetArgs.reverse() )
-	);
+    return reverseArgs(
+        partial( reverseArgs( fn ), ...presetArgs.reverse() )
+    );
 }
 
 var cacheResult = partialRight( ajax, function onResult(obj){
-	cache[obj.id] = obj;
+    cache[obj.id] = obj;
 });
 
 // later:
@@ -459,16 +459,16 @@ Another more straightforward (and certainly more performant) implementation of `
 
 ```js
 function partialRight(fn,...presetArgs) {
-	return function partiallyApplied(...laterArgs) {
-		return fn( ...laterArgs, ...presetArgs );
-	};
+    return function partiallyApplied(...laterArgs) {
+        return fn( ...laterArgs, ...presetArgs );
+    };
 }
 
 // or the ES6 => arrow form
 var partialRight =
-	(fn,...presetArgs) =>
-		(...laterArgs) =>
-			fn( ...laterArgs, ...presetArgs );
+    (fn,...presetArgs) =>
+        (...laterArgs) =>
+            fn( ...laterArgs, ...presetArgs );
 ```
 
 None of these implementations of `partialRight(..)` guarantee that a specific parameter will receive a specific partially-applied value; it only ensures that the partially-applied value(s) appear as the right-most (aka, last) argument(s) passed to the original function.
@@ -477,18 +477,18 @@ For example:
 
 ```js
 function foo(x,y,z,...rest) {
-	console.log( x, y, z, rest );
+    console.log( x, y, z, rest );
 }
 
 var f = partialRight( foo, "z:last" );
 
-f( 1, 2 );			// 1 2 "z:last" []
+f( 1, 2 );          // 1 2 "z:last" []
 
-f( 1 );				// 1 "z:last" undefined []
+f( 1 );             // 1 "z:last" undefined []
 
-f( 1, 2, 3 );		// 1 2 3 ["z:last"]
+f( 1, 2, 3 );       // 1 2 3 ["z:last"]
 
-f( 1, 2, 3, 4 );	// 1 2 3 [4,"z:last"]
+f( 1, 2, 3, 4 );    // 1 2 3 [4,"z:last"]
 ```
 
 The value `"z:last"` is only applied to the `z` parameter in the case where `f(..)` is called with exactly two arguments (matching `x` and `y` parameters). In all other cases, the `"z:last"` will just be the right-most argument, however many arguments precede it.
@@ -503,8 +503,8 @@ To first illustrate, let's imagine we had a curried version of `ajax(..)` alread
 
 ```js
 curriedAjax( "http://some.api/person" )
-	( { user: CURRENT_USER_ID } )
-		( function foundUser(user){ /* .. */ } );
+    ( { user: CURRENT_USER_ID } )
+        ( function foundUser(user){ /* .. */ } );
 ```
 
 The three sets of `(..)`s denote 3 chained function calls. But perhaps splitting out each of the three calls helps see what's going on better:
@@ -531,35 +531,35 @@ How might we define a utility to do this currying? Consider:
 
 ```js
 function curry(fn,arity = fn.length) {
-	return (function nextCurried(prevArgs){
-		return function curried(nextArg){
-			var args = [ ...prevArgs, nextArg ];
+    return (function nextCurried(prevArgs){
+        return function curried(nextArg){
+            var args = [ ...prevArgs, nextArg ];
 
-			if (args.length >= arity) {
-				return fn( ...args );
-			}
-			else {
-				return nextCurried( args );
-			}
-		};
-	})( [] );
+            if (args.length >= arity) {
+                return fn( ...args );
+            }
+            else {
+                return nextCurried( args );
+            }
+        };
+    })( [] );
 }
 
 // or the ES6 => arrow form
 var curry =
-	(fn,arity = fn.length,nextCurried) =>
-		(nextCurried = prevArgs =>
-			nextArg => {
-				var args = [ ...prevArgs, nextArg ];
+    (fn,arity = fn.length,nextCurried) =>
+        (nextCurried = prevArgs =>
+            nextArg => {
+                var args = [ ...prevArgs, nextArg ];
 
-				if (args.length >= arity) {
-					return fn( ...args );
-				}
-				else {
-					return nextCurried( args );
-				}
-			}
-		)( [] );
+                if (args.length >= arity) {
+                    return fn( ...args );
+                }
+                else {
+                    return nextCurried( args );
+                }
+            }
+        )( [] );
 ```
 
 The approach here is to start a collection of arguments in `prevArgs` as an empty `[]` array, and add each received `nextArg` to that, calling the concatenation `args`. While `args.length` is less than `arity` (the number of declared/expected parameters of the original `fn(..)` function), make and return another `curried(..)` function to collect the next `nextArg` argument, passing the running `args` collection along as its `prevArgs`. Once we have enough `args`, execute the original `fn(..)` function with them.
@@ -605,20 +605,20 @@ Let's look at another numbers example, this time adding a list of them together:
 
 ```js
 function sum(...nums) {
-	var total = 0;
-	for (let num of nums) {
-		total += num;
-	}
-	return total;
+    var total = 0;
+    for (let num of nums) {
+        total += num;
+    }
+    return total;
 }
 
-sum( 1, 2, 3, 4, 5 );						// 15
+sum( 1, 2, 3, 4, 5 );                       // 15
 
 // now with currying:
 // (5 to indicate how many we should wait for)
 var curriedSum = curry( sum, 5 );
 
-curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
+curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );        // 15
 ```
 
 The advantage of currying here is that each call to pass in an argument produces another function that's more specialized, and we can capture and use *that* new function later in the program. Partial application specifies all the partially-applied arguments up front, producing a function that's waiting for all the rest of the arguments **on the next call**.
@@ -635,15 +635,15 @@ What if we manually defined a `curriedSum(..)` instead of using `curry(..)`, how
 
 ```js
 function curriedSum(val1) {
-	return function(val2){
-		return function(val3){
-			return function(val4){
-				return function(val5){
-					return sum( val1, val2, val3, val4, val5 );
-				};
-			};
-		};
-	};
+    return function(val2){
+        return function(val3){
+            return function(val4){
+                return function(val5){
+                    return sum( val1, val2, val3, val4, val5 );
+                };
+            };
+        };
+    };
 }
 ```
 
@@ -655,12 +655,12 @@ In fact, to reinforce that point, let's consider the same code but written with 
 
 ```js
 var curriedSum =
-	val1 =>
-		val2 =>
-			val3 =>
-				val4 =>
-					val5 =>
-						sum( val1, val2, val3, val4, val5 );
+    val1 =>
+        val2 =>
+            val3 =>
+                val4 =>
+                    val5 =>
+                        sum( val1, val2, val3, val4, val5 );
 ```
 
 And now, all on one line: `curriedSum = val1 => val2 => val3 => val4 => val5 => sum(val1,val2,val3,val4,val5)`.
@@ -683,9 +683,9 @@ Consider our running `ajax(..)` example:
 
 ```js
 ajax(
-	"http://some.api/person",
-	{ user: CURRENT_USER_ID },
-	function foundUser(user){ /* .. */ }
+    "http://some.api/person",
+    { user: CURRENT_USER_ID },
+    function foundUser(user){ /* .. */ }
 );
 ```
 
@@ -695,9 +695,9 @@ Now consider:
 
 ```js
 var getCurrentUser = partial(
-	ajax,
-	"http://some.api/person",
-	{ user: CURRENT_USER_ID }
+    ajax,
+    "http://some.api/person",
+    { user: CURRENT_USER_ID }
 );
 
 // later
@@ -736,7 +736,7 @@ Specifically, JS currying utilities typically allow you to specify multiple argu
 ```js
 var curriedSum = looseCurry( sum, 5 );
 
-curriedSum( 1 )( 2, 3 )( 4, 5 );			// 15
+curriedSum( 1 )( 2, 3 )( 4, 5 );            // 15
 ```
 
 We see a slight syntax savings of fewer `( )`, and an implied performance benefit of now having three function calls instead of five. But other than that, using `looseCurry(..)` is identical in end result to the narrower `curry(..)` definition from earlier. I would guess the convenience/performance factor is probably why frameworks allow multiple arguments. This seems mostly like a matter of taste.
@@ -745,18 +745,18 @@ We can adapt our previous currying implementation to this common looser definiti
 
 ```js
 function looseCurry(fn,arity = fn.length) {
-	return (function nextCurried(prevArgs){
-		return function curried(...nextArgs){
-			var args = [ ...prevArgs, ...nextArgs ];
+    return (function nextCurried(prevArgs){
+        return function curried(...nextArgs){
+            var args = [ ...prevArgs, ...nextArgs ];
 
-			if (args.length >= arity) {
-				return fn( ...args );
-			}
-			else {
-				return nextCurried( args );
-			}
-		};
-	})( [] );
+            if (args.length >= arity) {
+                return fn( ...args );
+            }
+            else {
+                return nextCurried( args );
+            }
+        };
+    })( [] );
 }
 ```
 
@@ -770,49 +770,49 @@ The standard utility for this is (un)shockingly typically called `uncurry(..)`. 
 
 ```js
 function uncurry(fn) {
-	return function uncurried(...args){
-		var ret = fn;
+    return function uncurried(...args){
+        var ret = fn;
 
-		for (let arg of args) {
-			ret = ret( arg );
-		}
+        for (let arg of args) {
+            ret = ret( arg );
+        }
 
-		return ret;
-	};
+        return ret;
+    };
 }
 
 // or the ES6 => arrow form
 var uncurry =
-	fn =>
-		(...args) => {
-			var ret = fn;
+    fn =>
+        (...args) => {
+            var ret = fn;
 
-			for (let arg of args) {
-				ret = ret( arg );
-			}
+            for (let arg of args) {
+                ret = ret( arg );
+            }
 
-			return ret;
-		};
+            return ret;
+        };
 ```
 
 **Warning:** Don't just assume that `uncurry(curry(f))` has the same behavior as `f`. In some libs the uncurrying would result in a function like the original, but not all of them; certainly our example here does not. The uncurried function acts (mostly) the same as the original function if you pass as many arguments to it as the original function expected. However, if you pass fewer arguments, you still get back a partially curried function waiting for more arguments; this quirk is illustrated in the next snippet.
 
 ```js
 function sum(...nums) {
-	var sum = 0;
-	for (let num of nums) {
-		sum += num;
-	}
-	return sum;
+    var sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum;
 }
 
 var curriedSum = curry( sum, 5 );
 var uncurriedSum = uncurry( curriedSum );
 
-curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );		// 15
+curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );        // 15
 
-uncurriedSum( 1, 2, 3, 4, 5 );				// 15
-uncurriedSum( 1, 2, 3 )( 4 )( 5 );			// 15
+uncurriedSum( 1, 2, 3, 4, 5 );              // 15
+uncurriedSum( 1, 2, 3 )( 4 )( 5 );          // 15
 ```
 
 Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a function that comes out curried as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
@@ -831,25 +831,25 @@ Can we improve currying/partial application to free it from these ordering conce
 
 ```js
 function partialProps(fn,presetArgsObj) {
-	return function partiallyApplied(laterArgsObj){
-		return fn( Object.assign( {}, presetArgsObj, laterArgsObj ) );
-	};
+    return function partiallyApplied(laterArgsObj){
+        return fn( Object.assign( {}, presetArgsObj, laterArgsObj ) );
+    };
 }
 
 function curryProps(fn,arity = 1) {
-	return (function nextCurried(prevArgsObj){
-		return function curried(nextArgObj = {}){
-			var [key] = Object.keys( nextArgObj );
-			var allArgsObj = Object.assign( {}, prevArgsObj, { [key]: nextArgObj[key] } );
+    return (function nextCurried(prevArgsObj){
+        return function curried(nextArgObj = {}){
+            var [key] = Object.keys( nextArgObj );
+            var allArgsObj = Object.assign( {}, prevArgsObj, { [key]: nextArgObj[key] } );
 
-			if (Object.keys( allArgsObj ).length >= arity) {
-				return fn( allArgsObj );
-			}
-			else {
-				return nextCurried( allArgsObj );
-			}
-		};
-	})( {} );
+            if (Object.keys( allArgsObj ).length >= arity) {
+                return fn( allArgsObj );
+            }
+            else {
+                return nextCurried( allArgsObj );
+            }
+        };
+    })( {} );
 }
 ```
 
@@ -859,7 +859,7 @@ Here's how to use those helpers:
 
 ```js
 function foo({ x, y, z } = {}) {
-	console.log( `x:${x} y:${y} z:${z}` );
+    console.log( `x:${x} y:${y} z:${z}` );
 }
 
 var f1 = curryProps( foo, 3 );
@@ -882,7 +882,7 @@ Unfortunately, we can only take advantage of currying with named arguments if we
 
 ```js
 function bar(x,y,z) {
-	console.log( `x:${x} y:${y} z:${z}` );
+    console.log( `x:${x} y:${y} z:${z}` );
 }
 ```
 
@@ -898,17 +898,17 @@ JavaScript functions have a `.toString()` method that gives a string representat
 
 ```js
 function spreadArgProps(
-	fn,
-	propOrder =
-		fn.toString()
-		.replace( /^(?:(?:function.*\(([^]*?)\))|(?:([^\(\)]+?)
-			\s*=>)|(?:\(([^]*?)\)\s*=>))[^]+$/, "$1$2$3" )
-		.split( /\s*,\s*/ )
-		.map( v => v.replace( /[=\s].*$/, "" ) )
+    fn,
+    propOrder =
+        fn.toString()
+        .replace( /^(?:(?:function.*\(([^]*?)\))|(?:([^\(\)]+?)
+            \s*=>)|(?:\(([^]*?)\)\s*=>))[^]+$/, "$1$2$3" )
+        .split( /\s*,\s*/ )
+        .map( v => v.replace( /[=\s].*$/, "" ) )
 ) {
-	return function spreadFn(argsObj) {
-		return fn( ...propOrder.map( k => argsObj[k] ) );
-	};
+    return function spreadFn(argsObj) {
+        return fn( ...propOrder.map( k => argsObj[k] ) );
+    };
 }
 ```
 
@@ -918,7 +918,7 @@ Let's illustrate using our `spreadArgProps(..)` utility:
 
 ```js
 function bar(x,y,z) {
-	console.log( `x:${x} y:${y} z:${z}` );
+    console.log( `x:${x} y:${y} z:${z}` );
 }
 
 var f3 = curryProps( spreadArgProps( bar ), 3 );
@@ -945,11 +945,11 @@ Let's start with a simple example:
 
 ```js
 function double(x) {
-	return x * 2;
+    return x * 2;
 }
 
 [1,2,3,4,5].map( function mapper(v){
-	return double( v );
+    return double( v );
 } );
 // [2,4,6,8,10]
 ```
@@ -958,7 +958,7 @@ Can you see that `mapper(..)` and `double(..)` have the same (or compatible, any
 
 ```js
 function double(x) {
-	return x * 2;
+    return x * 2;
 }
 
 [1,2,3,4,5].map( double );
@@ -969,7 +969,7 @@ Let's revisit an example from earlier:
 
 ```js
 ["1","2","3"].map( function mapper(v){
-	return parseInt( v );
+    return parseInt( v );
 } );
 // [1,2,3]
 ```
@@ -995,23 +995,23 @@ Here's another example:
 // convenience to avoid any potential binding issue
 // with trying to use `console.log` as a function
 function output(txt) {
-	console.log( txt );
+    console.log( txt );
 }
 
 function printIf( predicate, msg ) {
-	if (predicate( msg )) {
-		output( msg );
-	}
+    if (predicate( msg )) {
+        output( msg );
+    }
 }
 
 function isShortEnough(str) {
-	return str.length <= 5;
+    return str.length <= 5;
 }
 
 var msg1 = "Hello";
 var msg2 = msg1 + " World";
 
-printIf( isShortEnough, msg1 );			// Hello
+printIf( isShortEnough, msg1 );         // Hello
 printIf( isShortEnough, msg2 );
 ```
 
@@ -1019,11 +1019,11 @@ Now let's say you want to print a message only if it's long enough; in other wor
 
 ```js
 function isLongEnough(str) {
-	return !isShortEnough( str );
+    return !isShortEnough( str );
 }
 
 printIf( isLongEnough, msg1 );
-printIf( isLongEnough, msg2 );			// Hello World
+printIf( isLongEnough, msg2 );          // Hello World
 ```
 
 Easy enough... but "points" now! See how `str` is passed through? Without re-implementing the `str.length` check, can we refactor this code to point-free style?
@@ -1032,16 +1032,16 @@ Let's define a `not(..)` negation helper (often referred to as `complement(..)` 
 
 ```js
 function not(predicate) {
-	return function negated(...args){
-		return !predicate( ...args );
-	};
+    return function negated(...args){
+        return !predicate( ...args );
+    };
 }
 
 // or the ES6 => arrow form
 var not =
-	predicate =>
-		(...args) =>
-			!predicate( ...args );
+    predicate =>
+        (...args) =>
+            !predicate( ...args );
 ```
 
 Next, let's use `not(..)` to alternately define `isLongEnough(..)` without "points":
@@ -1049,7 +1049,7 @@ Next, let's use `not(..)` to alternately define `isLongEnough(..)` without "poin
 ```js
 var isLongEnough = not( isShortEnough );
 
-printIf( isLongEnough, msg2 );			// Hello World
+printIf( isLongEnough, msg2 );          // Hello World
 ```
 
 That's pretty good, isn't it? But we *could* keep going. The definition of the `printIf(..)` function can actually be refactored to be point-free itself.
@@ -1058,18 +1058,18 @@ We can express the `if` conditional part with a `when(..)` utility:
 
 ```js
 function when(predicate,fn) {
-	return function conditional(...args){
-		if (predicate( ...args )) {
-			return fn( ...args );
-		}
-	};
+    return function conditional(...args){
+        if (predicate( ...args )) {
+            return fn( ...args );
+        }
+    };
 }
 
 // or the ES6 => form
 var when =
-	(predicate,fn) =>
-		(...args) =>
-			predicate( ...args ) ? fn( ...args ) : undefined;
+    (predicate,fn) =>
+        (...args) =>
+            predicate( ...args ) ? fn( ...args ) : undefined;
 ```
 
 Let's mix `when(..)` with a few other helper utilities we've seen earlier in this chapter, to make the point-free `printIf(..)`:
@@ -1086,11 +1086,11 @@ Here's the whole example put back together (assuming various utilities we've alr
 
 ```js
 function output(msg) {
-	console.log( msg );
+    console.log( msg );
 }
 
 function isShortEnough(str) {
-	return str.length <= 5;
+    return str.length <= 5;
 }
 
 var isLongEnough = not( isShortEnough );
@@ -1100,11 +1100,11 @@ var printIf = uncurry( partialRight( when, output ) );
 var msg1 = "Hello";
 var msg2 = msg1 + " World";
 
-printIf( isShortEnough, msg1 );			// Hello
+printIf( isShortEnough, msg1 );         // Hello
 printIf( isShortEnough, msg2 );
 
 printIf( isLongEnough, msg1 );
-printIf( isLongEnough, msg2 );			// Hello World
+printIf( isLongEnough, msg2 );          // Hello World
 ```
 
 Hopefully the FP practice of point-free style coding is starting to make a little more sense. It'll still take a lot of practice to train yourself to think this way naturally. **And you'll still have to make judgement calls** as to whether point-free coding is worth it, as well as what extent will benefit your code's readability.

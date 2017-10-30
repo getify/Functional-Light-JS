@@ -43,11 +43,11 @@ The final example of Chapter 3 -- recall defining a point-free `printIf(..)` uti
 
 ```js
 function output(msg) {
-	console.log( msg );
+    console.log( msg );
 }
 
 function isShortEnough(str) {
-	return str.length <= 5;
+    return str.length <= 5;
 }
 
 var isLongEnough = R.complement( isShortEnough );
@@ -57,11 +57,11 @@ var printIf = R.partial( R.flip( R.when ), [output] );
 var msg1 = "Hello";
 var msg2 = msg1 + " World";
 
-printIf( isShortEnough, msg1 );			// Hello
+printIf( isShortEnough, msg1 );            // Hello
 printIf( isShortEnough, msg2 );
 
 printIf( isLongEnough, msg1 );
-printIf( isLongEnough, msg2 );			// Hello World
+printIf( isLongEnough, msg2 );            // Hello World
 ```
 
 A few differences to point out compared to Chapter 3's approach:
@@ -88,11 +88,11 @@ var double = x => x * 2;
 var isOdd = x => x % 2 == 1;
 
 fp.compose( [
-	fp.reduce( sum )( 0 ),
-	fp.map( double ),
-	fp.filter( isOdd )
+    fp.reduce( sum )( 0 ),
+    fp.map( double ),
+    fp.filter( isOdd )
 ] )
-( [1,2,3,4,5] );					// 18
+( [1,2,3,4,5] );                    // 18
 ```
 
 Instead of the more familiar `_.` namespace prefix, "lodash/fp" defines its methods with `fp.` as the namespace prefix. I find that a helpful distinguisher, and also generally more easy on my eyes than `_.` anyway!
@@ -111,20 +111,20 @@ Let's instead look at another popular library: [Mori](https://github.com/swannod
 var state = mori.vector( 1, 2, 3, 4 );
 
 var newState = mori.assoc(
-	mori.into( state, Array.from( {length: 39} ) ),
-	42,
-	"meaning of life"
+    mori.into( state, Array.from( {length: 39} ) ),
+    42,
+    "meaning of life"
 );
 
-state === newState;						// false
+state === newState;                        // false
 
-mori.get( state, 2 );					// 3
-mori.get( state, 42 );					// undefined
+mori.get( state, 2 );                    // 3
+mori.get( state, 42 );                    // undefined
 
-mori.get( newState, 2 );				// 3
-mori.get( newState, 42 );				// "meaning of life"
+mori.get( newState, 2 );                // 3
+mori.get( newState, 42 );                // "meaning of life"
 
-mori.toJs( newState ).slice( 1, 3 );	// [2,3]
+mori.toJs( newState ).slice( 1, 3 );    // [2,3]
 ```
 
 Some interesting things to point out about Mori for this example:
@@ -145,19 +145,19 @@ In Chapter 2, we introduced a pattern for dealing with arguments called "named a
 
 ```js
 function foo( {x,y} = {} ) {
-	console.log( x, y );
+    console.log( x, y );
 }
 
 foo( {
-	y: 3
-} );					// undefined 3
+    y: 3
+} );                    // undefined 3
 ```
 
 Then in Chapter 3, we talked about extending our ideas of currying and partial application to work with named arguments, like this:
 
 ```js
 function foo({ x, y, z } = {}) {
-	console.log( `x:${x} y:${y} z:${z}` );
+    console.log( `x:${x} y:${y} z:${z}` );
 }
 
 var f1 = curryProps( foo, 3 );
@@ -178,15 +178,15 @@ From the documentation:
 ```js
 // Ramda's `reduce(..)`
 R.reduce(
-	(acc,v) => acc + v,
-	0,
-	[3,7,9]
+    (acc,v) => acc + v,
+    0,
+    [3,7,9]
 );  // 19
 
 // FPO named-argument method style
 FPO.reduce({
-	arr: [3,7,9],
-	fn: ({acc,v}) => acc + v
+    arr: [3,7,9],
+    fn: ({acc,v}) => acc + v
 }); // 19
 ```
 
@@ -199,16 +199,16 @@ var f = FPO.reduce({ arr: [3,7,9] });
 
 // later
 
-f({ fn: ({acc,v}) => acc + v });	// 19
+f({ fn: ({acc,v}) => acc + v });    // 19
 ```
 
 Lastly, all of FPO's API methods are also exposed using the traditional positional arguments style -- you'll find they're all very similar to Ramda and other libraries -- under the `FPO.std.*` namespace:
 
 ```js
 FPO.std.reduce(
-	(acc,v) => acc + v,
-	undefined,
-	[3,7,9]
+    (acc,v) => acc + v,
+    undefined,
+    [3,7,9]
 );  // 19
 ```
 
@@ -241,7 +241,7 @@ Of course, you could then use `Promise.all(..)` to wait for all those promises t
 ```js
 Promise.all( images )
 .then(function allImages(imgObjs){
-	// ..
+    // ..
 });
 ```
 
@@ -284,12 +284,12 @@ To illustrate **fasy**, let's consider a concurrent `map(..)` versus a serial `m
 ```js
 FA.concurrent.map( fetchImage, imageURLs )
 .then( function allImages(imgObjs){
-	// ..
+    // ..
 } );
 
 FA.serial.map( fetchImage, imageURLs )
 .then( function allImages(imgObjs){
-	// ..
+    // ..
 } );
 ```
 

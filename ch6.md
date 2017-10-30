@@ -25,8 +25,8 @@ var x = 2;
 
 x.length = 4;
 
-x;				// 2
-x.length;		// undefined
+x;              // 2
+x.length;       // undefined
 ```
 
 Numbers do not normally have a `length` property available, so the `x.length = 4` setting is trying to add a new property, and it silently fails (or is ignored/discarded, depending on your point-of-view); `x` continues to hold the simple primitive `2` number.
@@ -49,12 +49,12 @@ The immutability of simple primitives like `number`s probably seems fairly obvio
 ```js
 var s = "hello";
 
-s[1];				// "e"
+s[1];               // "e"
 
 s[1] = "E";
 s.length = 10;
 
-s;					// "hello"
+s;                  // "hello"
 ```
 
 Despite being able to access `s[1]` like it's an array, JS strings are not real arrays. Setting `s[1] = "E"` and `s.length = 10` both silently fail, just as `x.length = 4` did above. In strict mode, these assignments will fail, because both the `1` property and the `length` property are read-only on this primitive `string` value.
@@ -66,12 +66,12 @@ Interestingly, even the boxed `String` object value will act (mostly) immutable 
 
 var s = new String( "hello" );
 
-s[1] = "E";			// error
-s.length = 10;		// error
+s[1] = "E";         // error
+s.length = 10;      // error
 
-s[42] = "?";		// OK
+s[42] = "?";        // OK
 
-s;					// "hello"
+s;                  // "hello"
 ```
 
 ## Value To Value
@@ -84,11 +84,11 @@ For example:
 
 ```js
 function addValue(arr) {
-	var newArr = [ ...arr, 4 ];
-	return newArr;
+    var newArr = [ ...arr, 4 ];
+    return newArr;
 }
 
-addValue( [1,2,3] );	// [1,2,3,4]
+addValue( [1,2,3] );    // [1,2,3,4]
 ```
 
 Notice that we did not change the array that `arr` references, but rather created a new array (`newArr`) that contains the existing values plus the new `4` value.
@@ -105,13 +105,13 @@ We can use the copy-instead-of-mutate strategy for objects, too. Consider:
 
 ```js
 function updateLastLogin(user) {
-	var newUserRecord = Object.assign( {}, user );
-	newUserRecord.lastLogin = Date.now();
-	return newUserRecord;
+    var newUserRecord = Object.assign( {}, user );
+    newUserRecord.lastLogin = Date.now();
+    return newUserRecord;
 }
 
 var user = {
-	// ..
+    // ..
 };
 
 user = updateLastLogin( user );
@@ -142,9 +142,9 @@ We already saw a cheat in the previous chapter to avoid such a surprise:
 ```js
 var arr = [1,2,3];
 
-foo( arr.slice() );			// ha! a copy!
+foo( arr.slice() );         // ha! a copy!
 
-console.log( arr[0] );		// 1
+console.log( arr[0] );      // 1
 ```
 
 In a little bit, we'll see another strategy for protecting ourselves from a value being mutated out from underneath us unexpectedly.
@@ -177,7 +177,7 @@ It's true that this later line will fail with an error:
 
 ```js
 // try to change `x`, fingers crossed!
-x = 3;		// Error!
+x = 3;      // Error!
 ```
 
 But again, we're not changing anything about the value. We're attempting to reassign the variable `x`. The values involved are almost incidental.
@@ -212,9 +212,9 @@ To back up my assertion, let's take a reality check. `const` creates a block sco
 // lots of code
 
 {
-	const x = 2;
+    const x = 2;
 
-	// a few lines of code
+    // a few lines of code
 }
 
 // lots of code
@@ -230,9 +230,9 @@ My claims is: that program has basically the same magnitude of readability as th
 // lots of code
 
 {
-	let x = 2;
+    let x = 2;
 
-	// a few lines of code
+    // a few lines of code
 }
 
 // lots of code
@@ -319,7 +319,7 @@ var arr = Object.freeze( [1,2,3] );
 
 foo( arr );
 
-console.log( arr[0] );			// 1
+console.log( arr[0] );          // 1
 ```
 
 Now `arr[0]` is quite reliably `1`.
@@ -343,7 +343,7 @@ Think about a specialized data structure that's like an array, but that you want
 Internally, it might be like a linked-list tree of object references where each node in the tree represents a mutation of the original value. Actually, this is conceptually similar to how **git** version control works.
 
 <p align="center">
-	<img src="fig18.png" width="490">
+    <img src="fig18.png" width="490">
 </p>
 
 In the above conceptual illustration, an original array `[3,6,1,0]` first has the mutation of value `4` assigned to position `0` (resulting in `[4,6,1,0]`), then `1` is assigned to position `3` (now `[4,6,1,1]`), finally `2` is assigned to position `4` (result: `[4,6,1,1,2]`). The key idea is that at each mutation, only the change from the previous version is recorded, not a duplication of the entire original data structure. This approach is much more efficient in both memory and CPU performance, in general.
@@ -355,15 +355,15 @@ var state = specialArray( 4, 6, 1, 1 );
 
 var newState = state.set( 4, 2 );
 
-state === newState;					// false
+state === newState;                 // false
 
-state.get( 2 );						// 1
-state.get( 4 );						// undefined
+state.get( 2 );                     // 1
+state.get( 4 );                     // undefined
 
-newState.get( 2 );					// 1
-newState.get( 4 );					// 2
+newState.get( 2 );                  // 1
+newState.get( 4 );                  // 2
 
-newState.slice( 2, 5 );				// [1,1,2]
+newState.slice( 2, 5 );             // [1,1,2]
 ```
 
 The `specialArray(..)` data structure would internally keep track of each mutation operation (like `set(..)`) as a *diff*, so it won't have to reallocate memory for the original values (`4`, `6`, `1`, and `1`) just to add the `2` value to the end of the list. But importantly, `state` and `newState` point at different versions (or views) of the array value, so **the value immutability semantic is preserved.**
@@ -377,15 +377,15 @@ var state = Immutable.List.of( 4, 6, 1, 1 );
 
 var newState = state.set( 4, 2 );
 
-state === newState;					// false
+state === newState;                 // false
 
-state.get( 2 );						// 1
-state.get( 4 );						// undefined
+state.get( 2 );                     // 1
+state.get( 4 );                     // undefined
 
-newState.get( 2 );					// 1
-newState.get( 4 );					// 2
+newState.get( 2 );                  // 1
+newState.get( 4 );                  // 2
 
-newState.toArray().slice( 2, 5 );	// [1,1,2]
+newState.toArray().slice( 2, 5 );   // [1,1,2]
 ```
 
 A powerful library like Immutable.js employs sophisticated performance optimizations. Handling all the details and corner-cases manually without such a library would be quite difficult.
@@ -400,9 +400,9 @@ Recall this example from earlier:
 
 ```js
 function updateLastLogin(user) {
-	var newUserRecord = Object.assign( {}, user );
-	newUserRecord.lastLogin = Date.now();
-	return newUserRecord;
+    var newUserRecord = Object.assign( {}, user );
+    newUserRecord.lastLogin = Date.now();
+    return newUserRecord;
 }
 ```
 
@@ -410,8 +410,8 @@ This implementation treats `user` as a value that should not be mutated; whether
 
 ```js
 function updateLastLogin(user) {
-	user.lastLogin = Date.now();
-	return user;
+    user.lastLogin = Date.now();
+    return user;
 }
 ```
 
@@ -426,13 +426,13 @@ var arr = [1,2,3,4,5];
 
 var arr2 = arr.concat( 6 );
 
-arr;					// [1,2,3,4,5]
-arr2;					// [1,2,3,4,5,6]
+arr;                    // [1,2,3,4,5]
+arr2;                   // [1,2,3,4,5,6]
 
 var arr3 = arr2.slice( 1 );
 
-arr2;					// [1,2,3,4,5,6]
-arr3;					// [2,3,4,5,6]
+arr2;                   // [1,2,3,4,5,6]
+arr3;                   // [2,3,4,5,6]
 ```
 
 Other array prototype methods that treat the value instance as immutable and return a new array instead of mutating: `map(..)` and `filter(..)`. The `reduce(..)` / `reduceRight(..)` utilities also avoid mutating the instance, though they also don't by default return a new array.
@@ -445,18 +445,18 @@ Recall one of the implementations of `compose(..)` from Chapter 4:
 
 ```js
 function compose(...fns) {
-	return function composed(result){
-		// copy the array of functions
-		var list = fns.slice();
+    return function composed(result){
+        // copy the array of functions
+        var list = fns.slice();
 
-		while (list.length > 0) {
-			// take the last function off the end of the list
-			// and execute it
-			result = list.pop()( result );
-		}
+        while (list.length > 0) {
+            // take the last function off the end of the list
+            // and execute it
+            result = list.pop()( result );
+        }
 
-		return result;
-	};
+        return result;
+    };
 }
 ```
 
@@ -466,22 +466,22 @@ Consider this different version which doesn't make a copy:
 
 ```js
 function compose(...fns) {
-	return function composed(result){
-		while (fns.length > 0) {
-			// take the last function off the end of the list
-			// and execute it
-			result = fns.pop()( result );
-		}
+    return function composed(result){
+        while (fns.length > 0) {
+            // take the last function off the end of the list
+            // and execute it
+            result = fns.pop()( result );
+        }
 
-		return result;
-	};
+        return result;
+    };
 }
 
 var f = compose( x => x / 3, x => x + 1, x => x * 2 );
 
-f( 4 );		// 3
+f( 4 );     // 3
 
-f( 4 );		// 4 <-- uh oh!
+f( 4 );     // 4 <-- uh oh!
 ```
 
 The second usage of `f(..)` here wasn't correct, since we mutated that `fns` during the first call, which affected any subsequent uses. Depending on the circumstances, making a copy of an array like `list = fns.slice()` may or may not be necessary. But I think it's safest to assume you need it -- even if only for readability sake! -- unless you can prove you don't, rather than the other way around.

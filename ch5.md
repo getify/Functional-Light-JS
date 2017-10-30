@@ -21,7 +21,7 @@ Consider:
 
 ```js
 function foo(x) {
-	return x * 2;
+    return x * 2;
 }
 
 var y = foo( 3 );
@@ -33,7 +33,7 @@ But now:
 
 ```js
 function foo(x) {
-	y = x * 2;
+    y = x * 2;
 }
 
 var y;
@@ -48,7 +48,7 @@ This program has the exact same outcome. But there's a very big difference. The 
 What if I gave you a reference to call a function `bar(..)` that you cannot see the code for, but I told you that it had no such indirect side effects, only an explicit `return` value effect?
 
 ```js
-bar( 4 );			// 42
+bar( 4 );           // 42
 ```
 
 Because you know that the internals of `bar(..)` do not create any side effects, you can now reason about any `bar(..)` call like this one in a much more straightforward way. But if you didn't know that `bar(..)` had no side effects, to understand the outcome of calling it, you'd have to go read and dissect all of its logic. This is extra mental tax burden for the reader.
@@ -89,12 +89,12 @@ Outputs, changes in state, are the most commonly cited manifestation of side eff
 
 ```js
 function foo(x) {
-	return x + y;
+    return x + y;
 }
 
 var y = 3;
 
-foo( 1 );			// 4
+foo( 1 );           // 4
 ```
 
 `y` is not changed by `foo(..)`, so it's not the same kind of side effect as we saw before. But now, the calling of `foo(..)` actually depends on the presence and current state of a `y`. If later, we do:
@@ -104,7 +104,7 @@ y = 5;
 
 // ..
 
-foo( 1 );			// 6
+foo( 1 );           // 6
 ```
 
 Might we be surprised that the call to `foo(1)` returned different results from call to call?
@@ -121,14 +121,14 @@ Consider this code:
 
 ```js
 function foo(x) {
-	return x + bar( x );
+    return x + bar( x );
 }
 
 function bar(x) {
-	return x * 2;
+    return x * 2;
 }
 
-foo( 3 );			// 9
+foo( 3 );           // 9
 ```
 
 It's clear that for both `foo(..)` and `bar(..)`, the only direct cause is the `x` parameter. But what about the `bar(x)` call? `bar` is just an identifier, and in JS it's not even a constant (aka, non-reassignable variable) by default. The `foo(..)` function is relying on the value of `bar` -- a variable that references the second function -- as a free variable.
@@ -143,10 +143,10 @@ Consider:
 const PI = 3.141592;
 
 function foo(x) {
-	return x * PI;
+    return x * PI;
 }
 
-foo( 3 );			// 9.424776000000001
+foo( 3 );           // 9.424776000000001
 ```
 
 **Note:** JavaScript has `Math.PI` built-in, so we're only using the `PI` example in this text as a convenient illustration. In practice, always use `Math.PI` instead of defining your own!
@@ -194,43 +194,43 @@ var users = {};
 var userOrders = {};
 
 function fetchUserData(userId) {
-	ajax( "http://some.api/user/" + userId, function onUserData(userData){
-		users[userId] = userData;
-	} );
+    ajax( "http://some.api/user/" + userId, function onUserData(userData){
+        users[userId] = userData;
+    } );
 }
 
 function fetchOrders(userId) {
-	ajax( "http://some.api/orders/" + userId, function onOrders(orders){
-		for (let order of orders) {
-			// keep a reference to latest order for each user
-			users[userId].latestOrder = order;
-			userOrders[orders[i].orderId] = order;
-		}
-	} );
+    ajax( "http://some.api/orders/" + userId, function onOrders(orders){
+        for (let order of orders) {
+            // keep a reference to latest order for each user
+            users[userId].latestOrder = order;
+            userOrders[orders[i].orderId] = order;
+        }
+    } );
 }
 
 function deleteOrder(orderId) {
-	var user = users[ userOrders[orderId].userId ];
-	var isLatestOrder = (userOrders[orderId] == user.latestOrder);
+    var user = users[ userOrders[orderId].userId ];
+    var isLatestOrder = (userOrders[orderId] == user.latestOrder);
 
-	// deleting the latest order for a user?
-	if (isLatestOrder) {
-		hideLatestOrderDisplay();
-	}
+    // deleting the latest order for a user?
+    if (isLatestOrder) {
+        hideLatestOrderDisplay();
+    }
 
-	ajax( "http://some.api/delete/order/" + orderId, function onDelete(success){
-		if (success) {
-			// deleted the latest order for a user?
-			if (isLatestOrder) {
-				user.latestOrder = null;
-			}
+    ajax( "http://some.api/delete/order/" + orderId, function onDelete(success){
+        if (success) {
+            // deleted the latest order for a user?
+            if (isLatestOrder) {
+                user.latestOrder = null;
+            }
 
-			userOrders[orderId] = null;
-		}
-		else if (isLatestOrder) {
-			showLatestOrderDisplay();
-		}
-	} );
+            userOrders[orderId] = null;
+        }
+        else if (isLatestOrder) {
+            showLatestOrderDisplay();
+        }
+    } );
 }
 ```
 
@@ -286,12 +286,12 @@ First, let's give a counter example that is neither mathematically nor programmi
 
 ```js
 function updateCounter(obj) {
-	if (obj.count < 10) {
-		obj.count++;
-		return true;
-	}
+    if (obj.count < 10) {
+        obj.count++;
+        return true;
+    }
 
-	return false;
+    return false;
 }
 ```
 
@@ -307,16 +307,16 @@ Some custom mathematical operations we could define with this same characteristi
 
 ```js
 function toPower0(x) {
-	return Math.pow( x, 0 );
+    return Math.pow( x, 0 );
 }
 
 function snapUp3(x) {
-	return x - (x % 3) + (x % 3 > 0 && 3);
+    return x - (x % 3) + (x % 3 > 0 && 3);
 }
 
-toPower0( 3 ) == toPower0( toPower0( 3 ) );			// true
+toPower0( 3 ) == toPower0( toPower0( 3 ) );         // true
 
-snapUp3( 3.14 ) == snapUp3( snapUp3( 3.14 ) );		// true
+snapUp3( 3.14 ) == snapUp3( snapUp3( 3.14 ) );      // true
 ```
 
 Mathematical-style idempotence is **not** restricted to mathematic operations. Another place we can illustrate this form of idempotence is with JavaScript primitive type coercions:
@@ -324,49 +324,49 @@ Mathematical-style idempotence is **not** restricted to mathematic operations. A
 ```js
 var x = 42, y = "hello";
 
-String( x ) === String( String( x ) );				// true
+String( x ) === String( String( x ) );              // true
 
-Boolean( y ) === Boolean( Boolean( y ) );			// true
+Boolean( y ) === Boolean( Boolean( y ) );           // true
 ```
 
 Earlier in the text, we explored a common FP tool that fulfills this form of idempotence:
 
 ```js
-identity( 3 ) === identity( identity( 3 ) );	// true
+identity( 3 ) === identity( identity( 3 ) );    // true
 ```
 
 Certain string operations are also naturally idempotent, such as:
 
 ```js
 function upper(x) {
-	return x.toUpperCase();
+    return x.toUpperCase();
 }
 
 function lower(x) {
-	return x.toLowerCase();
+    return x.toLowerCase();
 }
 
 var str = "Hello World";
 
-upper( str ) == upper( upper( str ) );				// true
+upper( str ) == upper( upper( str ) );              // true
 
-lower( str ) == lower( lower( str ) );				// true
+lower( str ) == lower( lower( str ) );              // true
 ```
 
 We can even design more sophisticated string formatting operations in an idempotent way, such as:
 
 ```js
 function currency(val) {
-	var num = parseFloat(
-		String( val ).replace( /[^\d.-]+/g, "" )
-	);
-	var sign = (num < 0) ? "-" : "";
-	return `${sign}$${Math.abs( num ).toFixed( 2 )}`;
+    var num = parseFloat(
+        String( val ).replace( /[^\d.-]+/g, "" )
+    );
+    var sign = (num < 0) ? "-" : "";
+    return `${sign}$${Math.abs( num ).toFixed( 2 )}`;
 }
 
-currency( -3.1 );									// "-$3.10"
+currency( -3.1 );                                   // "-$3.10"
 
-currency( -3.1 ) == currency( currency( -3.1 ) );	// true
+currency( -3.1 ) == currency( currency( -3.1 ) );   // true
 ```
 
 `currency(..)` illustrates an important technique: in some cases the developer can take extra steps to normalize an input/output operation to ensure the operation is idempotent where it normally wouldn't be.
@@ -420,7 +420,7 @@ A function with no side causes/effects is called a pure function. A pure functio
 
 ```js
 function add(x,y) {
-	return x + y;
+    return x + y;
 }
 ```
 
@@ -430,14 +430,14 @@ However, not all pure functions are idempotent in the mathematical sense, becaus
 
 ```js
 function calculateAverage(nums) {
-	var sum = 0;
-	for (let num of nums) {
-		sum += num;
-	}
-	return sum / nums.length;
+    var sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
-calculateAverage( [1,2,4,7,11,16,22] );			// 9
+calculateAverage( [1,2,4,7,11,16,22] );         // 9
 ```
 
 The output `9` is not an array, so you cannot pass it back in: `calculateAverage(calculateAverage( .. ))`.
@@ -450,11 +450,11 @@ Some examples:
 const PI = 3.141592;
 
 function circleArea(radius) {
-	return PI * radius * radius;
+    return PI * radius * radius;
 }
 
 function cylinderVolume(radius,height) {
-	return height * circleArea( radius );
+    return height * circleArea( radius );
 }
 ```
 
@@ -464,9 +464,9 @@ Another example where a function can still be pure but reference free variables 
 
 ```js
 function unary(fn) {
-	return function onlyOneArg(arg){
-		return fn( arg );
-	};
+    return function onlyOneArg(arg){
+        return fn( arg );
+    };
 }
 ```
 
@@ -492,9 +492,9 @@ Consider:
 
 ```js
 function rememberNumbers(nums) {
-	return function caller(fn){
-		return fn( nums );
-	};
+    return function caller(fn){
+        return fn( nums );
+    };
 }
 
 var list = [1,2,3,4,5];
@@ -508,10 +508,10 @@ First, our assertion of purity is based on the array value (referenced both by `
 
 ```js
 function median(nums) {
-	return (nums[0] + nums[nums.length - 1]) / 2;
+    return (nums[0] + nums[nums.length - 1]) / 2;
 }
 
-simpleList( median );		// 3
+simpleList( median );       // 3
 
 // ..
 
@@ -519,7 +519,7 @@ list.push( 6 );
 
 // ..
 
-simpleList( median );		// 3.5
+simpleList( median );       // 3.5
 ```
 
 When we mutate the array, the `simpleList(..)` call changes its output. So, is `simpleList(..)` pure or impure? Depends on your perspective. It's pure for a given set of assumptions. It could be pure in any program that didn't have the `list.push(6)` mutation.
@@ -528,12 +528,12 @@ We could guard against this kind of impurity by altering the definition of `reme
 
 ```js
 function rememberNumbers(nums) {
-	// make a copy of the array
-	nums = nums.slice();
+    // make a copy of the array
+    nums = nums.slice();
 
-	return function caller(fn){
-		return fn( nums );
-	};
+    return function caller(fn){
+        return fn( nums );
+    };
 }
 ```
 
@@ -544,14 +544,14 @@ var list = [1,2,3,4,5];
 
 // make `list[0]` be a getter with a side effect
 Object.defineProperty(
-	list,
-	0,
-	{
-		get: function(){
-			console.log( "[0] was accessed!" );
-			return 1;
-		}
-	}
+    list,
+    0,
+    {
+        get: function(){
+            console.log( "[0] was accessed!" );
+            return 1;
+        }
+    }
 );
 
 var simpleList = rememberNumbers( list );
@@ -562,9 +562,9 @@ A perhaps more robust option is to change the signature of `rememberNumbers(..)`
 
 ```js
 function rememberNumbers(...nums) {
-	return function caller(fn){
-		return fn( nums );
-	};
+    return function caller(fn){
+        return fn( nums );
+    };
 }
 
 var simpleList = rememberNumbers( ...list );
@@ -580,18 +580,18 @@ But what if the mutation is even harder to spot? Composition of a pure function 
 ```js
 // yes, a silly contrived example :)
 function firstValue(nums) {
-	return nums[0];
+    return nums[0];
 }
 
 function lastValue(nums) {
-	return firstValue( nums.reverse() );
+    return firstValue( nums.reverse() );
 }
 
-simpleList( lastValue );	// 5
+simpleList( lastValue );    // 5
 
-list;						// [1,2,3,4,5] -- OK!
+list;                       // [1,2,3,4,5] -- OK!
 
-simpleList( lastValue );	// 1
+simpleList( lastValue );    // 1
 ```
 
 **Note:** Despite `reverse()` looking safe (like other array methods in JS) in that it returns a reversed array, it actually mutates the array rather than creating a new one.
@@ -600,10 +600,10 @@ We need a more robust definition of `rememberNumbers(..)` to guard against the `
 
 ```js
 function rememberNumbers(...nums) {
-	return function caller(fn){
-		// send in a copy!
-		return fn( nums.slice() );
-	};
+    return function caller(fn){
+        // send in a copy!
+        return fn( nums.slice() );
+    };
 }
 ```
 
@@ -613,7 +613,7 @@ We're only guarding against side effects we can control (mutating by reference).
 
 ```js
 simpleList( function impureIO(nums){
-	console.log( nums.length );
+    console.log( nums.length );
 } );
 ```
 
@@ -635,34 +635,34 @@ From the perspective of referential transparency, both of these programs have id
 
 ```js
 function calculateAverage(nums) {
-	var sum = 0;
-	for (let num of nums) {
-		sum += num;
-	}
-	return sum / nums.length;
+    var sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
 var numbers = [1,2,4,7,11,16,22];
 
 var avg = calculateAverage( numbers );
 
-console.log( "The average is:", avg );		// The average is: 9
+console.log( "The average is:", avg );      // The average is: 9
 ```
 
 ```js
 function calculateAverage(nums) {
-	var sum = 0;
-	for (let num of nums) {
-		sum += num;
-	}
-	return sum / nums.length;
+    var sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
 var numbers = [1,2,4,7,11,16,22];
 
 var avg = 9;
 
-console.log( "The average is:", avg );		// The average is: 9
+console.log( "The average is:", avg );      // The average is: 9
 ```
 
 The only difference between these two snippets is that in the latter one, we skipped the `calculateAverage(nums)` call and just inlined its ouput (`9`). Since the rest of the program behaves identically, `calculateAverage(..)` has referential transparency, and is thus a pure function.
@@ -689,11 +689,11 @@ Here's one:
 
 ```js
 function calculateAverage(nums) {
-	sum = 0;
-	for (let num of nums) {
-		sum += num;
-	}
-	return sum / nums.length;
+    sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
 var sum;
@@ -720,28 +720,28 @@ You'll generally find these kind of side-effects-that-go-unobserved being used t
 var cache = [];
 
 function specialNumber(n) {
-	// if we've already calculated this special number,
-	// skip the work and just return it from the cache
-	if (cache[n] !== undefined) {
-		return cache[n];
-	}
+    // if we've already calculated this special number,
+    // skip the work and just return it from the cache
+    if (cache[n] !== undefined) {
+        return cache[n];
+    }
 
-	var x = 1, y = 1;
+    var x = 1, y = 1;
 
-	for (let i = 1; i <= n; i++) {
-		x += i % 2;
-		y += i % 3;
-	}
+    for (let i = 1; i <= n; i++) {
+        x += i % 2;
+        y += i % 3;
+    }
 
-	cache[n] = (x * y) / (n + 1);
+    cache[n] = (x * y) / (n + 1);
 
-	return cache[n];
+    return cache[n];
 }
 
-specialNumber( 6 );				// 4
-specialNumber( 42 );			// 22
-specialNumber( 1E6 );			// 500001
-specialNumber( 987654321 );		// 493827162
+specialNumber( 6 );             // 4
+specialNumber( 42 );            // 22
+specialNumber( 1E6 );           // 500001
+specialNumber( 987654321 );     // 493827162
 ```
 
 This silly `specialNumber(..)` algorithm is deterministic and thus pure from the definition that it always gives the same output for the same input. It's also pure from the referential transparency perspective -- replace any call to `specialNumber(42)` with `22` and the end result of the program is the same.
@@ -760,26 +760,26 @@ Consider:
 
 ```js
 var specialNumber = (function memoization(){
-	var cache = [];
+    var cache = [];
 
-	return function specialNumber(n){
-		// if we've already calculated this special number,
-		// skip the work and just return it from the cache
-		if (cache[n] !== undefined) {
-			return cache[n];
-		}
+    return function specialNumber(n){
+        // if we've already calculated this special number,
+        // skip the work and just return it from the cache
+        if (cache[n] !== undefined) {
+            return cache[n];
+        }
 
-		var x = 1, y = 1;
+        var x = 1, y = 1;
 
-		for (let i = 1; i <= n; i++) {
-			x += i % 2;
-			y += i % 3;
-		}
+        for (let i = 1; i <= n; i++) {
+            x += i % 2;
+            y += i % 3;
+        }
 
-		cache[n] = (x * y) / (n + 1);
+        cache[n] = (x * y) / (n + 1);
 
-		return cache[n];
-	};
+        return cache[n];
+    };
 })();
 ```
 
@@ -807,32 +807,32 @@ Consider this trivial example:
 
 ```js
 function addMaxNum(arr) {
-	var maxNum = Math.max( ...arr );
-	arr.push( maxNum + 1 );
+    var maxNum = Math.max( ...arr );
+    arr.push( maxNum + 1 );
 }
 
 var nums = [4,2,7,3];
 
 addMaxNum( nums );
 
-nums;		// [4,2,7,3,8]
+nums;       // [4,2,7,3,8]
 ```
 
 The `nums` array needs to be modified, but we don't have to obscure that side effect by containing it in `addMaxNum(..)`. Let's move the `push(..)` mutation out, so that `addMaxNum(..)` becomes a pure function, and the side effect is now more obvious:
 
 ```js
 function addMaxNum(arr) {
-	var maxNum = Math.max( ...arr );
-	return maxNum + 1;
+    var maxNum = Math.max( ...arr );
+    return maxNum + 1;
 }
 
 var nums = [4,2,7,3];
 
 nums.push(
-	addMaxNum( nums )
+    addMaxNum( nums )
 );
 
-nums;		// [4,2,7,3,8]
+nums;       // [4,2,7,3,8]
 ```
 
 **Note:** Another technique for this kind of task could be to use an immutable data structure, which we cover in the next chapter.
@@ -851,9 +851,9 @@ Recall:
 var users = {};
 
 function fetchUserData(userId) {
-	ajax( "http://some.api/user/" + userId, function onUserData(userData){
-		users[userId] = userData;
-	} );
+    ajax( "http://some.api/user/" + userId, function onUserData(userData){
+        users[userId] = userData;
+    } );
 }
 ```
 
@@ -861,24 +861,24 @@ One option for purifying this code is to create a wrapper around both the variab
 
 ```js
 function safer_fetchUserData(userId,users) {
-	// simple, naive ES6+ shallow object copy, could also
-	// be done w/ various libs or frameworks
-	users = Object.assign( {}, users );
+    // simple, naive ES6+ shallow object copy, could also
+    // be done w/ various libs or frameworks
+    users = Object.assign( {}, users );
 
-	fetchUserData( userId );
+    fetchUserData( userId );
 
-	// return the copied state
-	return users;
+    // return the copied state
+    return users;
 
 
-	// ***********************
+    // ***********************
 
-	// original untouched impure function:
-	function fetchUserData(userId) {
-		ajax( "http://some.api/user/" + userId, function onUserData(userData){
-			users[userId] = userData;
-		} );
-	}
+    // original untouched impure function:
+    function fetchUserData(userId) {
+        ajax( "http://some.api/user/" + userId, function onUserData(userData){
+            users[userId] = userData;
+        } );
+    }
 }
 ```
 
@@ -902,18 +902,18 @@ var smallCount = 0;
 var largeCount = 0;
 
 function generateMoreRandoms(count) {
-	for (let i = 0; i < count; i++) {
-		let num = Math.random();
+    for (let i = 0; i < count; i++) {
+        let num = Math.random();
 
-		if (num >= 0.5) {
-			largeCount++;
-		}
-		else {
-			smallCount++;
-		}
+        if (num >= 0.5) {
+            largeCount++;
+        }
+        else {
+            smallCount++;
+        }
 
-		nums.push( num );
-	}
+        nums.push( num );
+    }
 }
 ```
 
@@ -928,35 +928,35 @@ The brute-force strategy to *quarantine* the side causes/effects when using this
 
 ```js
 function safer_generateMoreRandoms(count,initial) {
-	// (1) save original state
-	var orig = {
-		nums,
-		smallCount,
-		largeCount
-	};
+    // (1) save original state
+    var orig = {
+        nums,
+        smallCount,
+        largeCount
+    };
 
-	// (2) setup initial pre-side effects state
-	nums = initial.nums.slice();
-	smallCount = initial.smallCount;
-	largeCount = initial.largeCount;
+    // (2) setup initial pre-side effects state
+    nums = initial.nums.slice();
+    smallCount = initial.smallCount;
+    largeCount = initial.largeCount;
 
-	// (3) beware impurity!
-	generateMoreRandoms( count );
+    // (3) beware impurity!
+    generateMoreRandoms( count );
 
-	// (4) capture side effect state
-	var sides = {
-		nums,
-		smallCount,
-		largeCount
-	};
+    // (4) capture side effect state
+    var sides = {
+        nums,
+        smallCount,
+        largeCount
+    };
 
-	// (5) restore original state
-	nums = orig.nums;
-	smallCount = orig.smallCount;
-	largeCount = orig.largeCount;
+    // (5) restore original state
+    nums = orig.nums;
+    smallCount = orig.smallCount;
+    largeCount = orig.largeCount;
 
-	// (6) expose side effect state directly as output
-	return sides;
+    // (6) expose side effect state directly as output
+    return sides;
 }
 ```
 
@@ -964,17 +964,17 @@ And to use `safer_generateMoreRandoms(..)`:
 
 ```js
 var initialStates = {
-	nums: [0.3, 0.4, 0.5],
-	smallCount: 2,
-	largeCount: 1
+    nums: [0.3, 0.4, 0.5],
+    smallCount: 2,
+    largeCount: 1
 };
 
 safer_generateMoreRandoms( 5, initialStates );
 // { nums: [0.3,0.4,0.5,0.8510024448959794,0.04206799238...
 
-nums;			// []
-smallCount;		// 0
-largeCount;		// 0
+nums;           // []
+smallCount;     // 0
+largeCount;     // 0
 ```
 
 That's a lot of manual work to avoid a few side causes/effects; it'd be a lot easier if we just didn't have them in the first place. But if we have no choice, this extra effort is well worth it to avoid surprises in our programs.
@@ -989,16 +989,16 @@ Consider:
 
 ```js
 function handleInactiveUsers(userList,dateCutoff) {
-	for (let i = 0; i < userList.length; i++) {
-		if (userList[i].lastLogin == null) {
-			// remove the user from the list
-			userList.splice( i, 1 );
-			i--;
-		}
-		else if (userList[i].lastLogin < dateCutoff) {
-			userList[i].inactive = true;
-		}
-	}
+    for (let i = 0; i < userList.length; i++) {
+        if (userList[i].lastLogin == null) {
+            // remove the user from the list
+            userList.splice( i, 1 );
+            i--;
+        }
+        else if (userList[i].lastLogin < dateCutoff) {
+            userList[i].inactive = true;
+        }
+    }
 }
 ```
 
@@ -1006,17 +1006,17 @@ Both the `userList` array itself, plus the objects in it, are mutated. One strat
 
 ```js
 function safer_handleInactiveUsers(userList,dateCutoff) {
-	// make a copy of both the list and its user objects
-	let copiedUserList = userList.map( function mapper(user){
-		// copy a `user` object
-		return Object.assign( {}, user );
-	} );
+    // make a copy of both the list and its user objects
+    let copiedUserList = userList.map( function mapper(user){
+        // copy a `user` object
+        return Object.assign( {}, user );
+    } );
 
-	// call the original function with the copy
-	handleInactiveUsers( copiedUserList, dateCutoff );
+    // call the original function with the copy
+    handleInactiveUsers( copiedUserList, dateCutoff );
 
-	// expose the mutated list as a direct output
-	return copiedUserList;
+    // expose the mutated list as a direct output
+    return copiedUserList;
 }
 ```
 
@@ -1030,10 +1030,10 @@ Consider:
 
 ```js
 var ids = {
-	prefix: "_",
-	generate() {
-		return this.prefix + Math.random();
-	}
+    prefix: "_",
+    generate() {
+        return this.prefix + Math.random();
+    }
 };
 ```
 
@@ -1041,7 +1041,7 @@ Our strategy is similar to the previous section's discussion: create an interfac
 
 ```js
 function safer_generate(context) {
-	return ids.generate.call( context );
+    return ids.generate.call( context );
 }
 
 // *********************

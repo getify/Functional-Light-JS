@@ -63,22 +63,22 @@ y = multiplyBy3( x );
 We can naturally extend mapping from a single value transformation to a collection of values. `map(..)` is an operation that transforms all the values of a list as it projects them to a new list:
 
 <p align="center">
-	<img src="fig9.png" width="400">
+    <img src="fig9.png" width="400">
 </p>
 
 To implement `map(..)`:
 
 ```js
 function map(mapperFn,arr) {
-	var newList = [];
+    var newList = [];
 
-	for (let [idx,v] of arr.entries()) {
-		newList.push(
-			mapperFn( v, idx, arr )
-		);
-	}
+    for (let [idx,v] of arr.entries()) {
+        newList.push(
+            mapperFn( v, idx, arr )
+        );
+    }
 
-	return newList;
+    return newList;
 }
 ```
 
@@ -154,8 +154,8 @@ Some advocate using `map(..)` as a general form of `forEach(..)`-iteration, wher
 ```js
 [1,2,3,4,5]
 .map( function mapperFn(v){
-	console.log( v );			// side effect!
-	return v;
+    console.log( v );           // side effect!
+    return v;
 } )
 ..
 ```
@@ -182,19 +182,19 @@ Another example: a string functor would be a string plus a utility that executes
 
 ```js
 function uppercaseLetter(c) {
-	var code = c.charCodeAt( 0 );
+    var code = c.charCodeAt( 0 );
 
-	// lowercase letter?
-	if (code >= 97 && code <= 122) {
-		// uppercase it!
-		code = code - 32;
-	}
+    // lowercase letter?
+    if (code >= 97 && code <= 122) {
+        // uppercase it!
+        code = code - 32;
+    }
 
-	return String.fromCharCode( code );
+    return String.fromCharCode( code );
 }
 
 function stringMap(mapperFn,str) {
-	return [...str].map( mapperFn ).join( "" );
+    return [...str].map( mapperFn ).join( "" );
 }
 
 stringMap( uppercaseLetter, "Hello World!" );
@@ -232,22 +232,22 @@ The reason this semantic mismatch matters is because of how you will likely name
 Here's how to visualize a `filter(..)` operation across a list of values:
 
 <p align="center">
-	<img src="fig10.png" width="400">
+    <img src="fig10.png" width="400">
 </p>
 
 To implement `filter(..)`:
 
 ```js
 function filter(predicateFn,arr) {
-	var newList = [];
+    var newList = [];
 
-	for (let [idx,v] of arr.entries()) {
-		if (predicateFn( v, idx, arr )) {
-			newList.push( v );
-		}
-	}
+    for (let [idx,v] of arr.entries()) {
+        if (predicateFn( v, idx, arr )) {
+            newList.push( v );
+        }
+    }
 
-	return newList;
+    return newList;
 }
 ```
 
@@ -273,10 +273,10 @@ Consider how you might use `isOdd(..)` with a simple value check somewhere in yo
 var midIdx;
 
 if (isOdd( list.length )) {
-	midIdx = (list.length + 1) / 2;
+    midIdx = (list.length + 1) / 2;
 }
 else {
-	midIdx = list.length / 2;
+    midIdx = list.length / 2;
 }
 ```
 
@@ -303,7 +303,7 @@ var isEven = v => v % 2 == 1;
 Yay! But that function makes no sense with its name, in that it returns `false` when it's even:
 
 ```js
-isEven( 2 );		// false
+isEven( 2 );        // false
 ```
 
 Yuck.
@@ -313,7 +313,7 @@ Recall that in "No Points" in Chapter 3, we defined a `not(..)` operator that ne
 ```js
 var isEven = not( isOdd );
 
-isEven( 2 );		// true
+isEven( 2 );        // true
 ```
 
 But we can't use *this* `isEven(..)` with `filter(..)` the way it's currently defined, because our logic will be reversed; we'll end up with evens, not odds. We'd need to do:
@@ -333,18 +333,18 @@ To clear up all this confusion, let's define a `filterOut(..)` that actually **f
 var filterIn = filter;
 
 function filterOut(predicateFn,arr) {
-	return filterIn( not( predicateFn ), arr );
+    return filterIn( not( predicateFn ), arr );
 }
 ```
 
 Now we can use whichever filtering makes most sense at any point in our code:
 
 ```js
-isOdd( 3 );								// true
-isEven( 2 );							// true
+isOdd( 3 );                             // true
+isEven( 2 );                            // true
 
-filterIn( isOdd, [1,2,3,4,5] );			// [1,3,5]
-filterOut( isEven, [1,2,3,4,5] );		// [1,3,5]
+filterIn( isOdd, [1,2,3,4,5] );         // [1,3,5]
+filterOut( isEven, [1,2,3,4,5] );       // [1,3,5]
 ```
 
 I think using `filterIn(..)` and `filterOut(..)` (known as `reject(..)` in Ramda) will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
@@ -360,13 +360,13 @@ Just like with mapping and filtering, the manner of the combination is entirely 
 Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list, cascading down through each of the rest of the values in the list. That looks like this:
 
 <p align="center">
-	<img src="fig11.png" width="400">
+    <img src="fig11.png" width="400">
 </p>
 
 Alternately, you can omit the `initialValue` in which case the first value of the list will act in place of the `initialValue` and the combining will start with the second value in the list, like this:
 
 <p align="center">
-	<img src="fig12.png" width="400">
+    <img src="fig12.png" width="400">
 </p>
 
 **Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
@@ -390,25 +390,25 @@ But a standalone implementation of `reduce(..)` might look like this:
 
 ```js
 function reduce(reducerFn,initialValue,arr) {
-	var acc, startIdx;
+    var acc, startIdx;
 
-	if (arguments.length == 3) {
-		acc = initialValue;
-		startIdx = 0;
-	}
-	else if (arr.length > 0) {
-		acc = arr[0];
-		startIdx = 1;
-	}
-	else {
-		throw new Error( "Must provide at least one value." );
-	}
+    if (arguments.length == 3) {
+        acc = initialValue;
+        startIdx = 0;
+    }
+    else if (arr.length > 0) {
+        acc = arr[0];
+        startIdx = 1;
+    }
+    else {
+        throw new Error( "Must provide at least one value." );
+    }
 
-	for (let idx = startIdx; idx < arr.length; idx++) {
-		acc = reducerFn( acc, arr[idx], idx, arr );
-	}
+    for (let idx = startIdx; idx < arr.length; idx++) {
+        acc = reducerFn( acc, arr[idx], idx, arr );
+    }
 
-	return acc;
+    return acc;
 }
 ```
 
@@ -418,11 +418,11 @@ Recall in Chapter 4, we discussed the `compose(..)` utility and showed an implem
 
 ```js
 function compose(...fns) {
-	return function composed(result){
-		return fns.reverse().reduce( function reducer(result,fn){
-			return fn( result );
-		}, result );
-	};
+    return function composed(result){
+        return fns.reverse().reduce( function reducer(result,fn){
+            return fn( result );
+        }, result );
+    };
 }
 ```
 
@@ -432,12 +432,12 @@ To illustrate `reduce(..)`-based composition differently, consider a reducer tha
 var pipeReducer = (composedFn,fn) => pipe( composedFn, fn );
 
 var fn =
-	[3,17,6,4]
-	.map( v => n => v * n )
-	.reduce( pipeReducer );
+    [3,17,6,4]
+    .map( v => n => v * n )
+    .reduce( pipeReducer );
 
-fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
-fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
+fn( 9 );            // 11016  (9 * 3 * 17 * 6 * 4)
+fn( 10 );           // 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
 `pipeReducer(..)` is unfortunately not point-free (see "No Points" in Chapter 3), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
@@ -446,9 +446,9 @@ Earlier we talked about using `unary(..)` to limit a `mapperFn(..)` or `predicat
 
 ```js
 var binary =
-	fn =>
-		(arg1,arg2) =>
-			fn( arg1, arg2 );
+    fn =>
+        (arg1,arg2) =>
+            fn( arg1, arg2 );
 ```
 
 Using `binary(..)`, our previous example is a little cleaner:
@@ -457,12 +457,12 @@ Using `binary(..)`, our previous example is a little cleaner:
 var pipeReducer = binary( pipe );
 
 var fn =
-	[3,17,6,4]
-	.map( v => n => v * n )
-	.reduce( pipeReducer );
+    [3,17,6,4]
+    .map( v => n => v * n )
+    .reduce( pipeReducer );
 
-fn( 9 );			// 11016  (9 * 3 * 17 * 6 * 4)
-fn( 10 );			// 12240  (10 * 3 * 17 * 6 * 4)
+fn( 9 );            // 11016  (9 * 3 * 17 * 6 * 4)
+fn( 10 );           // 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
 Unlike `map(..)` and `filter(..)` whose order of passing through the array wouldn't actually matter, `reduce(..)` definitely uses left-to-right processing. If you want to reduce right-to-left, JavaScript provides a `reduceRight(..)`, with all other behaviors the same as `reduce(..)`:
@@ -481,11 +481,11 @@ Where `reduce(..)` works left-to-right and thus acts naturally like `pipe(..)` i
 
 ```js
 function compose(...fns) {
-	return function composed(result){
-		return fns.reduceRight( function reducer(result,fn){
-			return fn( result );
-		}, result );
-	};
+    return function composed(result){
+        return fns.reduceRight( function reducer(result,fn){
+            return fn( result );
+        }, result );
+    };
 }
 ```
 
@@ -502,10 +502,10 @@ var double = v => v * 2;
 // [2,4,6,8,10]
 
 [1,2,3,4,5].reduce(
-	(list,v) => (
-		list.push( double( v ) ),
-		list
-	), []
+    (list,v) => (
+        list.push( double( v ) ),
+        list
+    ), []
 );
 // [2,4,6,8,10]
 ```
@@ -525,10 +525,10 @@ var isOdd = v => v % 2 == 1;
 // [1,3,5]
 
 [1,2,3,4,5].reduce(
-	(list,v) => (
-		isOdd( v ) ? list.push( v ) : undefined,
-		list
-	), []
+    (list,v) => (
+        isOdd( v ) ? list.push( v ) : undefined,
+        list
+    ), []
 );
 // [1,3,5]
 ```
@@ -545,11 +545,11 @@ Filtering a list to include only unique values, based on `indexOf(..)` searching
 
 ```js
 var unique =
-	arr =>
-		arr.filter(
-			(v,idx) =>
-				arr.indexOf( v ) == idx
-		);
+    arr =>
+        arr.filter(
+            (v,idx) =>
+                arr.indexOf( v ) == idx
+        );
 ```
 
 This technique works by observing that we should only include the first occurrence of an item from `arr` into the new list; when running left-to-right, this will only be true if its `idx` position is the same as the `indexOf(..)` found position.
@@ -558,12 +558,12 @@ Another way to implement `unique(..)` is to run through `arr` and include an ite
 
 ```js
 var unique =
-	arr =>
-		arr.reduce(
-			(list,v) =>
-				list.indexOf( v ) == -1 ?
-					( list.push( v ), list ) : list
-		, [] );
+    arr =>
+        arr.reduce(
+            (list,v) =>
+                list.indexOf( v ) == -1 ?
+                    ( list.push( v ), list ) : list
+        , [] );
 ```
 
 **Note:** There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
@@ -593,11 +593,11 @@ The operation we're looking for is typically called `flatten(..)`, and it could 
 
 ```js
 var flatten =
-	arr =>
-		arr.reduce(
-			(list,v) =>
-				[ ...list, Array.isArray( v ) ? flatten( v ) : v ]
-		, [] );
+    arr =>
+        arr.reduce(
+            (list,v) =>
+                [ ...list, Array.isArray( v ) ? flatten( v ) : v ]
+        , [] );
 ```
 
 **Note:** This implementation choice relies on recursion as we saw in Chapter 8.
@@ -613,18 +613,18 @@ You might like to limit the recursive flattening to a certain depth. We can hand
 
 ```js
 var flatten =
-	(arr,depth = Infinity) =>
-		arr.reduce(
-			(list,v) =>
-				[ ...list,
-					depth > 0 ?
-						(depth > 1 && Array.isArray( v ) ?
-							flatten( v, depth - 1 ) :
-							v
-						) :
-						[v]
-				]
-		, [] );
+    (arr,depth = Infinity) =>
+        arr.reduce(
+            (list,v) =>
+                [ ...list,
+                    depth > 0 ?
+                        (depth > 1 && Array.isArray( v ) ?
+                            flatten( v, depth - 1 ) :
+                            v
+                        ) :
+                        [v]
+                ]
+        , [] );
 ```
 
 Illustrating the results with different flattening depths:
@@ -655,9 +655,9 @@ One of the most common usages of `flatten(..)` behavior is when you've mapped a 
 
 ```js
 var firstNames = [
-	{ name: "Jonathan", variations: [ "John", "Jon", "Jonny" ] },
-	{ name: "Stephanie", variations: [ "Steph", "Stephy" ] },
-	{ name: "Frederick", variations: [ "Fred", "Freddy" ] }
+    { name: "Jonathan", variations: [ "John", "Jon", "Jonny" ] },
+    { name: "Stephanie", variations: [ "Steph", "Stephy" ] },
+    { name: "Frederick", variations: [ "Fred", "Freddy" ] }
 ];
 
 firstNames
@@ -670,8 +670,8 @@ The return value is an array of arrays, which might be more awkward to work with
 
 ```js
 flatten(
-	firstNames
-	.map( entry => [ entry.name, ...entry.variations ] )
+    firstNames
+    .map( entry => [ entry.name, ...entry.variations ] )
 );
 // ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
 //  "Fred","Freddy"]
@@ -691,8 +691,8 @@ The naive implementation of `flatMap(..)` with both steps done separately:
 
 ```js
 var flatMap =
-	(mapperFn,arr) =>
-		flatten( arr.map( mapperFn ), 1 );
+    (mapperFn,arr) =>
+        flatten( arr.map( mapperFn ), 1 );
 ```
 
 **Note:** We use `1` for the flattening-depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
@@ -701,13 +701,13 @@ Since this approach still processes the list twice resulting in worse performanc
 
 ```js
 var flatMap =
-	(mapperFn,arr) =>
-		arr.reduce(
-			(list,v) =>
-				// note: concat(..) used here since it automatically
-				// flattens an array into the concatenation
-				list.concat( mapperFn( v ) )
-		, [] );
+    (mapperFn,arr) =>
+        arr.reduce(
+            (list,v) =>
+                // note: concat(..) used here since it automatically
+                // flattens an array into the concatenation
+                list.concat( mapperFn( v ) )
+        , [] );
 ```
 
 While there's some convenience and performance gained with a `flatMap(..)` utility, there may very well be times when you need other operations like `filter(..)`ing mixed in. If that's the case, doing the `map(..)` and `flatten(..)` separately might still be more appropriate.
@@ -727,15 +727,15 @@ An implementation of `zip(..)`:
 
 ```js
 function zip(arr1,arr2) {
-	var zipped = [];
-	arr1 = arr1.slice();
-	arr2 = arr2.slice();
+    var zipped = [];
+    arr1 = arr1.slice();
+    arr2 = arr2.slice();
 
-	while (arr1.length > 0 && arr2.length > 0) {
-		zipped.push( [ arr1.shift(), arr2.shift() ] );
-	}
+    while (arr1.length > 0 && arr2.length > 0) {
+        zipped.push( [ arr1.shift(), arr2.shift() ] );
+    }
 
-	return zipped;
+    return zipped;
 }
 ```
 
@@ -772,20 +772,20 @@ So, let's define a `mergeLists(..)` that works more like we'd expect:
 
 ```js
 function mergeLists(arr1,arr2) {
-	var merged = [];
-	arr1 = arr1.slice();
-	arr2 = arr2.slice();
+    var merged = [];
+    arr1 = arr1.slice();
+    arr2 = arr2.slice();
 
-	while (arr1.length > 0 || arr2.length > 0) {
-		if (arr1.length > 0) {
-			merged.push( arr1.shift() );
-		}
-		if (arr2.length > 0) {
-			merged.push( arr2.shift() );
-		}
-	}
+    while (arr1.length > 0 || arr2.length > 0) {
+        if (arr1.length > 0) {
+            merged.push( arr1.shift() );
+        }
+        if (arr2.length > 0) {
+            merged.push( arr2.shift() );
+        }
+    }
 
-	return merged;
+    return merged;
 }
 ```
 
@@ -796,16 +796,16 @@ Alternatively, here's a couple of options to implement the list merging as a red
 ```js
 // via @rwaldron
 var mergeReducer =
-	(merged,v,idx) =>
-		(merged.splice( idx * 2, 0, v ), merged);
+    (merged,v,idx) =>
+        (merged.splice( idx * 2, 0, v ), merged);
 
 
 // via @WebReflection
 var mergeReducer =
-	(merged,v,idx) =>
-		merged
-			.slice( 0, idx * 2 )
-			.concat( v, merged.slice( idx * 2 ) );
+    (merged,v,idx) =>
+        merged
+            .slice( 0, idx * 2 )
+            .concat( v, merged.slice( idx * 2 ) );
 ```
 
 And using a `mergeReducer(..)`:
@@ -828,18 +828,18 @@ The pain of this problem becomes more evident when you consider combining multip
 [1,2,3,4,5]
 .filter( isOdd )
 .map( double )
-.reduce( sum, 0 );					// 18
+.reduce( sum, 0 );                  // 18
 
 // vs.
 
 reduce(
-	map(
-		filter( [1,2,3,4,5], isOdd ),
-		double
-	),
-	sum,
-	0
-);									// 18
+    map(
+        filter( [1,2,3,4,5], isOdd ),
+        double
+    ),
+    sum,
+    0
+);                                  // 18
 ```
 
 Both API styles accomplish the same task, but they have very different ergonomics. Many FPers will prefer the latter to the former, but the former is unquestionably more common in JavaScript. One thing specifically that's disliked about the latter is the nesting of the calls. The preference for the method chain style -- typically called a fluent API style, as in jQuery and other tools -- is that it's compact/concise and it reads in declarative top-down order.
@@ -854,24 +854,24 @@ The array methods receive the implicit `this` argument, so despite their appeara
 
 ```js
 var partialThis =
-	(fn,...presetArgs) =>
-		// intentionally `function` to allow `this`-binding
-		function partiallyApplied(...laterArgs){
-			return fn.apply( this, [...presetArgs, ...laterArgs] );
-		};
+    (fn,...presetArgs) =>
+        // intentionally `function` to allow `this`-binding
+        function partiallyApplied(...laterArgs){
+            return fn.apply( this, [...presetArgs, ...laterArgs] );
+        };
 ```
 
 We'll also need a version of `compose(..)` that calls each of the partially applied methods in the context of the chain -- the input value it's being "passed" (via implicit `this`) from the previous step:
 
 ```js
 var composeChainedMethods =
-	(...fns) =>
-		result =>
-			fns.reduceRight(
-				(result,fn) =>
-					fn.call( result )
-				, result
-			);
+    (...fns) =>
+        result =>
+            fns.reduceRight(
+                (result,fn) =>
+                    fn.call( result )
+                , result
+            );
 ```
 
 And using these two `this`-aware utilities together:
@@ -882,7 +882,7 @@ composeChainedMethods(
    partialThis( Array.prototype.map, double ),
    partialThis( Array.prototype.filter, isOdd )
 )
-( [1,2,3,4,5] );					// 18
+( [1,2,3,4,5] );                    // 18
 ```
 
 **Note:** The three `Array.prototype.XXX`-style references are grabbing references to the built-in `Array.prototype.*` methods so that we can reuse them with our own arrays.
@@ -897,36 +897,36 @@ var filter = (arr,predicateFn) => arr.filter( predicateFn );
 var map = (arr,mapperFn) => arr.map( mapperFn );
 
 var reduce = (arr,reducerFn,initialValue) =>
-	arr.reduce( reducerFn, initialValue );
+    arr.reduce( reducerFn, initialValue );
 ```
 
 But this particular standalone approach, with the `arr` as the first parameter, suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application to compose them:
 
 ```js
 compose(
-	partialRight( reduce, sum, 0 ),
-	partialRight( map, double ),
-	partialRight( filter, isOdd )
+    partialRight( reduce, sum, 0 ),
+    partialRight( map, double ),
+    partialRight( filter, isOdd )
 )
-( [1,2,3,4,5] );					// 18
+( [1,2,3,4,5] );                    // 18
 ```
 
 That's why FP libraries typically define `filter(..)`, `map(..)`, and `reduce(..)` to instead receive the array last, not first. They also typically automatically curry the utilities:
 
 ```js
 var filter = curry(
-	(predicateFn,arr) =>
-		arr.filter( predicateFn )
+    (predicateFn,arr) =>
+        arr.filter( predicateFn )
 );
 
 var map = curry(
-	(mapperFn,arr) =>
-		arr.map( mapperFn )
+    (mapperFn,arr) =>
+        arr.map( mapperFn )
 );
 
 var reduce = curry(
-	(reducerFn,initialValue,arr) =>
-		arr.reduce( reducerFn, initialValue )
+    (reducerFn,initialValue,arr) =>
+        arr.reduce( reducerFn, initialValue )
 );
 ```
 
@@ -934,11 +934,11 @@ Working with the utilities defined in this way, the composition flow is a bit ni
 
 ```js
 compose(
-	reduce( sum )( 0 ),
-	map( double ),
-	filter( isOdd )
+    reduce( sum )( 0 ),
+    map( double ),
+    filter( isOdd )
 )
-( [1,2,3,4,5] );					// 18
+( [1,2,3,4,5] );                    // 18
 ```
 
 The cleanliness of this approach is in part why FPers prefer the standalone utility style instead of instance methods. But your mileage may vary.
@@ -949,14 +949,14 @@ In the previous definition of `filter(..)` / `map(..)` / `reduce(..)`, you might
 
 ```js
 var unboundMethod =
-	(methodName,argCount = 2) =>
-		curry(
-			(...args) => {
-				var obj = args.pop();
-				return obj[methodName]( ...args );
-			},
-			argCount
-		);
+    (methodName,argCount = 2) =>
+        curry(
+            (...args) => {
+                var obj = args.pop();
+                return obj[methodName]( ...args );
+            },
+            argCount
+        );
 ```
 
 And to use this utility:
@@ -967,11 +967,11 @@ var map = unboundMethod( "map", 2 );
 var reduce = unboundMethod( "reduce", 3 );
 
 compose(
-	reduce( sum )( 0 ),
-	map( double ),
-	filter( isOdd )
+    reduce( sum )( 0 ),
+    map( double ),
+    filter( isOdd )
 )
-( [1,2,3,4,5] );					// 18
+( [1,2,3,4,5] );                    // 18
 ```
 
 **Note:** `unboundMethod(..)` is called `invoker(..)` in Ramda.
@@ -989,13 +989,13 @@ Let's **focus on (2)** instead. To illustrate this point, we'll convert the recu
 
 ```js
 var flatten =
-	arr =>
-		arr.reduce(
-			(list,v) =>
-				// note: concat(..) used here since it automatically
-				// flattens an array into the concatenation
-				list.concat( Array.isArray( v ) ? flatten( v ) : v )
-		, [] );
+    arr =>
+        arr.reduce(
+            (list,v) =>
+                // note: concat(..) used here since it automatically
+                // flattens an array into the concatenation
+                list.concat( Array.isArray( v ) ? flatten( v ) : v )
+        , [] );
 ```
 
 Let's pull out the inner `reducer(..)` function as the standalone utility (and adapt it to work without the outer `flatten(..)`):
@@ -1003,11 +1003,11 @@ Let's pull out the inner `reducer(..)` function as the standalone utility (and a
 ```js
 // intentionally a function to allow recursion by name
 function flattenReducer(list,v) {
-	// note: concat(..) used here since it automatically
-	// flattens an array into the concatenation
-	return list.concat(
-		Array.isArray( v ) ? v.reduce( flattenReducer, [] ) : v
-	);
+    // note: concat(..) used here since it automatically
+    // flattens an array into the concatenation
+    return list.concat(
+        Array.isArray( v ) ? v.reduce( flattenReducer, [] ) : v
+    );
 }
 ```
 
@@ -1045,9 +1045,9 @@ Unfortunately, the `compose(..)` / `pipe(..)` utilties we explored in Chapter 4 
 
 ```js
 var guard =
-	fn =>
-		arg =>
-			arg != null ? fn( arg ) : arg;
+    fn =>
+        arg =>
+            arg != null ? fn( arg ) : arg;
 ```
 
 This `guard(..)` utility lets us map the five conditional-guarded functions:
@@ -1061,8 +1061,8 @@ The result of this mapping is an array of functions that are ready to compose (a
 
 ```js
 .reduce(
-	(result,nextFn) => nextFn( result )
-	, getCurrentSession()
+    (result,nextFn) => nextFn( result )
+    , getCurrentSession()
 )
 ```
 
@@ -1078,8 +1078,8 @@ To do the interleaving, we can model this as list merging. Recall `mergeReducer(
 
 ```js
 var mergeReducer =
-	(merged,v,idx) =>
-		(merged.splice( idx * 2, 0, v ), merged);
+    (merged,v,idx) =>
+        (merged.splice( idx * 2, 0, v ), merged);
 ```
 
 We can use `reduce(..)` (our swiss army knife, remember!?) to "insert" `lookupUser(..)` in the array between the generated `getSessionId(..)` and `getUserId(..)` functions, by merging two lists:
@@ -1110,8 +1110,8 @@ Finally, to put it all together, take this list of functions and tack on the gua
 .concat( lookupOrders, processOrders )
 .map( guard )
 .reduce(
-	(result,nextFn) => nextFn( result )
-	, getCurrentSession()
+    (result,nextFn) => nextFn( result )
+    , getCurrentSession()
 );
 ```
 
@@ -1152,11 +1152,11 @@ With the alternate standalone style, you might see code like this:
 
 ```js
 map(
-	fn3,
-	map(
-		fn2,
-		map( fn1, someList )
-	)
+    fn3,
+    map(
+        fn2,
+        map( fn1, someList )
+    )
 );
 ```
 
@@ -1172,12 +1172,12 @@ var removeInvalidChars = str => str.replace( /[^\w]*/g, "" );
 var upper = str => str.toUpperCase();
 
 var elide = str =>
-	str.length > 10 ?
-		str.substr( 0, 7 ) + "..." :
-		str;
+    str.length > 10 ?
+        str.substr( 0, 7 ) + "..." :
+        str;
 
 var words = "Mr. Jones isn't responsible for this disaster!"
-	.split( /\s/ );
+    .split( /\s/ );
 
 words;
 // ["Mr.","Jones","isn't","responsible","for","this","disaster!"]
@@ -1206,7 +1206,7 @@ Did you catch the point? We can express the three separate steps of the adjacent
 ```js
 words
 .map(
-	compose( elide, upper, removeInvalidChars )
+    compose( elide, upper, removeInvalidChars )
 );
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
@@ -1216,7 +1216,7 @@ This is another case where `pipe(..)` can be a more convenient form of compositi
 ```js
 words
 .map(
-	pipe( removeInvalidChars, upper, elide )
+    pipe( removeInvalidChars, upper, elide )
 );
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
@@ -1234,7 +1234,7 @@ The important part to maintain in the spirit of FP is that these operators must 
 Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has at most two references to other nodes (themselves binary trees), typically referred to as *left* and *right* child trees. Each node in the tree holds one value of the overall data structure.
 
 <p align="center">
-	<img src="fig7.png" width="250">
+    <img src="fig7.png" width="250">
 </p>
 
 For ease of illustration, we'll make our binary tree a binary search tree (BST). However, the operations we'll identify work the same for any regular non-BST binary tree.
@@ -1245,7 +1245,7 @@ To make a binary tree node object, let's use this factory function:
 
 ```js
 var BinaryTree =
-	(value,parent,left,right) => ({ value, parent, left, right });
+    (value,parent,left,right) => ({ value, parent, left, right });
 ```
 
 For convenience, we make each node store the `left` and `right` child trees as well as a reference to its own `parent` node.
@@ -1268,7 +1268,7 @@ In this particular tree structure, `banana` is the root node; this tree could ha
 Our tree looks like:
 
 <p align="center">
-	<img src="fig8.png" width="450">
+    <img src="fig8.png" width="450">
 </p>
 
 There are multiple ways to traverse a binary tree to process its values. If it's a BST (our's is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
@@ -1278,17 +1278,17 @@ Since you can't just easily `console.log(..)` a binary tree like you can with an
 ```js
 // in-order traversal
 BinaryTree.forEach = function forEach(visitFn,node){
-	if (node) {
-		if (node.left) {
-			forEach( visitFn, node.left );
-		}
+    if (node) {
+        if (node.left) {
+            forEach( visitFn, node.left );
+        }
 
-		visitFn( node );
+        visitFn( node );
 
-		if (node.right) {
-			forEach( visitFn, node.right );
-		}
-	}
+        if (node.right) {
+            forEach( visitFn, node.right );
+        }
+    }
 };
 ```
 
@@ -1311,23 +1311,23 @@ To operate on our binary tree data structure using FP patterns, let's start by d
 
 ```js
 BinaryTree.map = function map(mapperFn,node){
-	if (node) {
-		let newNode = mapperFn( node );
-		newNode.parent = node.parent;
-		newNode.left = node.left ?
-			map( mapperFn, node.left ) : undefined;
-		newNode.right = node.right ?
-			map( mapperFn, node.right ): undefined;
+    if (node) {
+        let newNode = mapperFn( node );
+        newNode.parent = node.parent;
+        newNode.left = node.left ?
+            map( mapperFn, node.left ) : undefined;
+        newNode.right = node.right ?
+            map( mapperFn, node.right ): undefined;
 
-		if (newNode.left) {
-			newNode.left.parent = newNode;
-		}
-		if (newNode.right) {
-			newNode.right.parent = newNode;
-		}
+        if (newNode.left) {
+            newNode.left.parent = newNode;
+        }
+        if (newNode.right) {
+            newNode.right.parent = newNode;
+        }
 
-		return newNode;
-	}
+        return newNode;
+    }
 };
 ```
 
@@ -1337,8 +1337,8 @@ Let's map our tree to a list of produce with all uppercase names:
 
 ```js
 var BANANA = BinaryTree.map(
-	node => BinaryTree( node.value.toUpperCase() ),
-	banana
+    node => BinaryTree( node.value.toUpperCase() ),
+    banana
 );
 
 BinaryTree.forEach( node => console.log( node.value ), BANANA );
@@ -1353,37 +1353,37 @@ We'll mimic the behavior of the array `reduce(..)`, which makes passing the `ini
 
 ```js
 BinaryTree.reduce = function reduce(reducerFn,initialValue,node){
-	if (arguments.length < 3) {
-		// shift the parameters since `initialValue` was omitted
-		node = initialValue;
-	}
+    if (arguments.length < 3) {
+        // shift the parameters since `initialValue` was omitted
+        node = initialValue;
+    }
 
-	if (node) {
-		let result;
+    if (node) {
+        let result;
 
-		if (arguments.length < 3) {
-			if (node.left) {
-				result = reduce( reducerFn, node.left );
-			}
-			else {
-				return node.right ?
-					reduce( reducerFn, node, node.right ) :
-					node;
-			}
-		}
-		else {
-			result = node.left ?
-				reduce( reducerFn, initialValue, node.left ) :
-				initialValue;
-		}
+        if (arguments.length < 3) {
+            if (node.left) {
+                result = reduce( reducerFn, node.left );
+            }
+            else {
+                return node.right ?
+                    reduce( reducerFn, node, node.right ) :
+                    node;
+            }
+        }
+        else {
+            result = node.left ?
+                reduce( reducerFn, initialValue, node.left ) :
+                initialValue;
+        }
 
-		result = reducerFn( result, node );
-		result = node.right ?
-			reduce( reducerFn, result, node.right ) : result;
-		return result;
-	}
+        result = reducerFn( result, node );
+        result = node.right ?
+            reduce( reducerFn, result, node.right ) : result;
+        return result;
+    }
 
-	return initialValue;
+    return initialValue;
 };
 ```
 
@@ -1391,9 +1391,9 @@ Let's use `reduce(..)` to make our shopping list (an array):
 
 ```js
 BinaryTree.reduce(
-	(result,node) => [ ...result, node.value ],
-	[],
-	banana
+    (result,node) => [ ...result, node.value ],
+    [],
+    banana
 );
 // ["apple","apricot","avocado","banana","cantelope"
 //   "cherry","cucumber","grape"]
@@ -1403,78 +1403,78 @@ Finally, let's consider `filter(..)` for our tree. This algorithm is trickiest s
 
 ```js
 BinaryTree.filter = function filter(predicateFn,node){
-	if (node) {
-		let newNode;
-		let newLeft = node.left ?
-			filter( predicateFn, node.left ) : undefined;
-		let newRight = node.right ?
-			filter( predicateFn, node.right ) : undefined;
+    if (node) {
+        let newNode;
+        let newLeft = node.left ?
+            filter( predicateFn, node.left ) : undefined;
+        let newRight = node.right ?
+            filter( predicateFn, node.right ) : undefined;
 
-		if (predicateFn( node )) {
-			newNode = BinaryTree(
-				node.value,
-				node.parent,
-				newLeft,
-				newRight
-			);
-			if (newLeft) {
-				newLeft.parent = newNode;
-			}
-			if (newRight) {
-				newRight.parent = newNode;
-			}
-		}
-		else {
-			if (newLeft) {
-				if (newRight) {
-					newNode = BinaryTree(
-						undefined,
-						node.parent,
-						newLeft,
-						newRight
-					);
-					newLeft.parent = newRight.parent = newNode;
+        if (predicateFn( node )) {
+            newNode = BinaryTree(
+                node.value,
+                node.parent,
+                newLeft,
+                newRight
+            );
+            if (newLeft) {
+                newLeft.parent = newNode;
+            }
+            if (newRight) {
+                newRight.parent = newNode;
+            }
+        }
+        else {
+            if (newLeft) {
+                if (newRight) {
+                    newNode = BinaryTree(
+                        undefined,
+                        node.parent,
+                        newLeft,
+                        newRight
+                    );
+                    newLeft.parent = newRight.parent = newNode;
 
-					if (newRight.left) {
-						let minRightNode = newRight;
-						while (minRightNode.left) {
-							minRightNode = minRightNode.left;
-						}
+                    if (newRight.left) {
+                        let minRightNode = newRight;
+                        while (minRightNode.left) {
+                            minRightNode = minRightNode.left;
+                        }
 
-						newNode.value = minRightNode.value;
+                        newNode.value = minRightNode.value;
 
-						if (minRightNode.right) {
-							minRightNode.parent.left =
-								minRightNode.right;
-							minRightNode.right.parent =
-								minRightNode.parent;
-						}
-						else {
-							minRightNode.parent.left = undefined;
-						}
+                        if (minRightNode.right) {
+                            minRightNode.parent.left =
+                                minRightNode.right;
+                            minRightNode.right.parent =
+                                minRightNode.parent;
+                        }
+                        else {
+                            minRightNode.parent.left = undefined;
+                        }
 
-						minRightNode.right =
-							minRightNode.parent = undefined;
-					}
-					else {
-						newNode.value = newRight.value;
-						newNode.right = newRight.right;
-						if (newRight.right) {
-							newRight.right.parent = newNode;
-						}
-					}
-				}
-				else {
-					return newLeft;
-				}
-			}
-			else {
-				return newRight;
-			}
-		}
+                        minRightNode.right =
+                            minRightNode.parent = undefined;
+                    }
+                    else {
+                        newNode.value = newRight.value;
+                        newNode.right = newRight.right;
+                        if (newRight.right) {
+                            newRight.right.parent = newNode;
+                        }
+                    }
+                }
+                else {
+                    return newLeft;
+                }
+            }
+            else {
+                return newRight;
+            }
+        }
 
-		return newNode;
-	}
+        return newNode;
+    }
 };
 ```
 The majority of this code listing is dedicated to handling the shifting of a node's parent/child references if it's "removed" (filtered out) of the duplicated tree structure.
@@ -1483,20 +1483,20 @@ As an example to illustrate using `filter(..)`, let's narrow our produce tree do
 
 ```js
 var vegetables = [ "asparagus", "avocado", "brocolli", "carrot",
-	"celery", "corn", "cucumber", "lettuce", "potato", "squash",
-	"zucchini" ];
+    "celery", "corn", "cucumber", "lettuce", "potato", "squash",
+    "zucchini" ];
 
 var whatToBuy = BinaryTree.filter(
-	// filter the produce list only for vegetables
-	node => vegetables.indexOf( node.value ) != -1,
-	banana
+    // filter the produce list only for vegetables
+    node => vegetables.indexOf( node.value ) != -1,
+    banana
 );
 
 // shopping list
 BinaryTree.reduce(
-	(result,node) => [ ...result, node.value ],
-	[],
-	whatToBuy
+    (result,node) => [ ...result, node.value ],
+    [],
+    whatToBuy
 );
 // ["avocado","cucumber"]
 ```

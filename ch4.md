@@ -32,32 +32,32 @@ functionValue <-- unary <-- adder <-- 3
 Think of this flow of data like a conveyor belt in a candy factory, where each operation is a step in the process of cooling, cutting, and wrapping a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
 
 <p align="center">
-	<img src="fig2.png">
+    <img src="fig2.png">
 </p>
 
 Let's examine composition in action one step at a time. Consider these two utilitites you might have in your program:
 
 ```js
 function words(str) {
-	return String( str )
-		.toLowerCase()
-		.split( /\s|\b/ )
-		.filter( function alpha(v){
-			return /^[\w]+$/.test( v );
-		} );
+    return String( str )
+        .toLowerCase()
+        .split( /\s|\b/ )
+        .filter( function alpha(v){
+            return /^[\w]+$/.test( v );
+        } );
 }
 
 function unique(list) {
-	var uniqList = [];
+    var uniqList = [];
 
-	for (let v of list) {
-		// value not yet in the new list?
-		if (uniqList.indexOf( v ) === -1 ) {
-			uniqList.push( v );
-		}
-	}
+    for (let v of list) {
+        // value not yet in the new list?
+        if (uniqList.indexOf( v ) === -1 ) {
+            uniqList.push( v );
+        }
+    }
 
-	return uniqList;
+    return uniqList;
 }
 ```
 
@@ -111,7 +111,7 @@ Relating back to the code: we now realize that the pairing of `words(..)` and `u
 
 ```js
 function uniqueWords(str) {
-	return unique( words( str ) );
+    return unique( words( str ) );
 }
 ```
 
@@ -132,23 +132,23 @@ But the factory engineers struggle to keep up, because each time a new kind of f
 So the factory engineers contact an industrial machine vendor for help. They're amazed to find out that this vendor offers a **machine-making** machine! As incredible as it sounds, they purchase a machine that can take a couple of the factory's smaller machines -- the chocolate cooling one and the cutting one, for example -- and wire them together automatically, even wrapping a nice clean bigger box around them. This is surely going to make the candy factory really take off!
 
 <p align="center">
-	<img src="fig5.png" width="300">
+    <img src="fig5.png" width="300">
 </p>
 
 Back to code land, let's consider a utility called `compose2(..)` that creates a composition of two functions automatically, exactly the same way we did manually:
 
 ```js
 function compose2(fn2,fn1) {
-	return function composed(origValue){
-		return fn2( fn1( origValue ) );
-	};
+    return function composed(origValue){
+        return fn2( fn1( origValue ) );
+    };
 }
 
 // or the ES6 => form
 var compose2 =
-	(fn2,fn1) =>
-		origValue =>
-			fn2( fn1( origValue ) );
+    (fn2,fn1) =>
+        origValue =>
+            fn2( fn1( origValue ) );
 ```
 
 Did you notice that we defined the parameter order as `fn2,fn1`, and furthermore that it's the second function listed (aka `fn1` parameter name) that runs first, then the first function listed (`fn2`)? In other words, the functions compose from right-to-left.
@@ -192,7 +192,7 @@ finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```
 
 <p align="center">
-	<img src="fig6.png" width="300">
+    <img src="fig6.png" width="300">
 </p>
 
 Now the candy factory owns the best machine of all: a machine that can take any number of separate smaller machines and spit out a big fancy machine that does every step in order. That's one heck of a candy operation! It's Willy Wonka's dream!
@@ -201,34 +201,34 @@ We can implement a general `compose(..)` utility like this:
 
 ```js
 function compose(...fns) {
-	return function composed(result){
-		// copy the array of functions
-		var list = fns.slice();
+    return function composed(result){
+        // copy the array of functions
+        var list = fns.slice();
 
-		while (list.length > 0) {
-			// take the last function off the end of the list
-			// and execute it
-			result = list.pop()( result );
-		}
+        while (list.length > 0) {
+            // take the last function off the end of the list
+            // and execute it
+            result = list.pop()( result );
+        }
 
-		return result;
-	};
+        return result;
+    };
 }
 
 // or the ES6 => form
 var compose =
-	(...fns) =>
-		result => {
-			var list = fns.slice();
+    (...fns) =>
+        result => {
+            var list = fns.slice();
 
-			while (list.length > 0) {
-				// take the last function off the end of the list
-				// and execute it
-				result = list.pop()( result );
-			}
+            while (list.length > 0) {
+                // take the last function off the end of the list
+                // and execute it
+                result = list.pop()( result );
+            }
 
-			return result;
-		};
+            return result;
+        };
 ```
 
 **Warning:** `...fns` is a collected array of arguments, not a passed-in array, and as such, it's local to `compose(..)`. It may be tempting to think the `fns.slice()` would thus be unnecessary. However, in this particular implementation, `.pop()` inside the inner `composed(..)` function is mutating the list, so if we didn't make a copy each time, the returned composed function could only be used reliably once. We'll revisit this hazard in Chapter 6.
@@ -237,15 +237,15 @@ Now let's look at an example of composing more than two functions. Recalling our
 
 ```js
 function skipShortWords(words) {
-	var filteredWords = [];
+    var filteredWords = [];
 
-	for (let word of words) {
-		if (word.length > 4) {
-			filteredWords.push( word );
-		}
-	}
+    for (let word of words) {
+        if (word.length > 4) {
+            filteredWords.push( word );
+        }
+    }
 
-	return filteredWords;
+    return filteredWords;
 }
 ```
 
@@ -307,21 +307,21 @@ The original version of `compose(..)` uses a loop and eagerly (aka, immediately)
 
 ```js
 function compose(...fns) {
-	return function composed(result){
-		return fns.reverse().reduce( function reducer(result,fn){
-			return fn( result );
-		}, result );
-	};
+    return function composed(result){
+        return fns.reverse().reduce( function reducer(result,fn){
+            return fn( result );
+        }, result );
+    };
 }
 
 // or the ES6 => form
 var compose = (...fns) =>
-	result =>
-		fns.reverse().reduce(
-			(result,fn) =>
-				fn( result )
-			, result
-		);
+    result =>
+        fns.reverse().reduce(
+            (result,fn) =>
+                fn( result )
+            , result
+        );
 ```
 
 Notice that the `reduce(..)` looping happens each time the final `composed(..)` function is run, and that each intermediate `result(..)` is passed along to the next iteration as the input to the next call.
@@ -334,20 +334,20 @@ To fix that first call single-argument limitation, we can still use `reduce(..)`
 
 ```js
 function compose(...fns) {
-	return fns.reverse().reduce( function reducer(fn1,fn2){
-		return function composed(...args){
-			return fn2( fn1( ...args ) );
-		};
-	} );
+    return fns.reverse().reduce( function reducer(fn1,fn2){
+        return function composed(...args){
+            return fn2( fn1( ...args ) );
+        };
+    } );
 }
 
 // or the ES6 => form
 var compose =
-	(...fns) =>
-		fns.reverse().reduce( (fn1,fn2) =>
-			(...args) =>
-				fn2( fn1( ...args ) )
-		);
+    (...fns) =>
+        fns.reverse().reduce( (fn1,fn2) =>
+            (...args) =>
+                fn2( fn1( ...args ) )
+        );
 ```
 
 Notice that we return the result of the `reduce(..)` call directly, which is itself a function, not a computed result. *That* function lets us pass in as many arguments as we want, passing them all down the line to the first function call in the composition, then bubbling up each result through each subsequent call.
@@ -368,36 +368,36 @@ compose( compose(fn1,fn2, .. fnN-1), fnN );
 
 **Note:** We will cover recursion in deep detail in Chapter 8, so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
 
-Here's how we implement	`compose(..)` with recursion:
+Here's how we implement `compose(..)` with recursion:
 
 ```js
 function compose(...fns) {
-	// pull off the last two arguments
-	var [ fn1, fn2, ...rest ] = fns.reverse();
+    // pull off the last two arguments
+    var [ fn1, fn2, ...rest ] = fns.reverse();
 
-	var composedFn = function composed(...args){
-		return fn2( fn1( ...args ) );
-	};
+    var composedFn = function composed(...args){
+        return fn2( fn1( ...args ) );
+    };
 
-	if (rest.length == 0) return composedFn;
+    if (rest.length == 0) return composedFn;
 
-	return compose( ...rest.reverse(), composedFn );
+    return compose( ...rest.reverse(), composedFn );
 }
 
 // or the ES6 => form
 var compose =
-	(...fns) => {
-		// pull off the last two arguments
-		var [ fn1, fn2, ...rest ] = fns.reverse();
+    (...fns) => {
+        // pull off the last two arguments
+        var [ fn1, fn2, ...rest ] = fns.reverse();
 
-		var composedFn =
-			(...args) =>
-				fn2( fn1( ...args ) );
+        var composedFn =
+            (...args) =>
+                fn2( fn1( ...args ) );
 
-		if (rest.length == 0) return composedFn;
+        if (rest.length == 0) return composedFn;
 
-		return compose( ...rest.reverse(), composedFn );
-	};
+        return compose( ...rest.reverse(), composedFn );
+    };
 ```
 
 I think the benefit of a recursive implementation is mostly conceptual. I personally find it much easier to think about a repetitive action in recursive terms instead of in a loop where I have to track the running result, so I prefer the code to express it that way.
@@ -416,17 +416,17 @@ The reverse ordering, composing from left-to-right, has a common name: `pipe(..)
 
 ```js
 function pipe(...fns) {
-	return function piped(result){
-		var list = fns.slice();
+    return function piped(result){
+        var list = fns.slice();
 
-		while (list.length > 0) {
-			// take the first function from the list
-			// and execute it
-			result = list.shift()( result );
-		}
+        while (list.length > 0) {
+            // take the first function from the list
+            // and execute it
+            result = list.shift()( result );
+        }
 
-		return result;
-	};
+        return result;
+    };
 }
 ```
 
@@ -478,15 +478,15 @@ For example, consider this (obviously contrived) code:
 
 ```js
 function saveComment(txt) {
-	if (txt != "") {
-		comments[comments.length] = txt;
-	}
+    if (txt != "") {
+        comments[comments.length] = txt;
+    }
 }
 
 function trackEvent(evt) {
-	if (evt.name !== undefined) {
-		events[evt.name] = evt;
-	}
+    if (evt.name !== undefined) {
+        events[evt.name] = evt;
+    }
 }
 ```
 
@@ -496,19 +496,19 @@ So let's abstract:
 
 ```js
 function storeData(store,location,value) {
-	store[location] = value;
+    store[location] = value;
 }
 
 function saveComment(txt) {
-	if (txt != "") {
-		storeData( comments, comments.length, txt );
-	}
+    if (txt != "") {
+        storeData( comments, comments.length, txt );
+    }
 }
 
 function trackEvent(evt) {
-	if (evt.name !== undefined) {
-		storeData( events, evt.name, evt );
-	}
+    if (evt.name !== undefined) {
+        storeData( events, evt.name, evt );
+    }
 }
 ```
 
@@ -522,9 +522,9 @@ Abstraction can be taken too far. Consider:
 
 ```js
 function conditionallyStoreData(store,location,value,checkFn) {
-	if (checkFn( value, store, location )) {
-		store[location] = value;
-	}
+    if (checkFn( value, store, location )) {
+        store[location] = value;
+    }
 }
 
 function notEmpty(val) { return val != ""; }
@@ -532,15 +532,15 @@ function notEmpty(val) { return val != ""; }
 function isUndefined(val) { return val === undefined; }
 
 function isPropUndefined(val,obj,prop) {
-	return isUndefined( obj[prop] );
+    return isUndefined( obj[prop] );
 }
 
 function saveComment(txt) {
-	conditionallyStoreData( comments, comments.length, txt, notEmpty );
+    conditionallyStoreData( comments, comments.length, txt, notEmpty );
 }
 
 function trackEvent(evt) {
-	conditionallyStoreData( events, evt.name, evt, isPropUndefined );
+    conditionallyStoreData( events, evt.name, evt, isPropUndefined );
 }
 ```
 
@@ -586,7 +586,7 @@ Here's an example of array destructuring:
 
 ```js
 function getData() {
-	return [1,2,3,4,5];
+    return [1,2,3,4,5];
 }
 
 // imperative
@@ -613,7 +613,7 @@ Recall the `shorterWords(..)` example from earlier. Let's compare an imperative 
 ```js
 // imperative
 function shorterWords(text) {
-	return skipLongWords( unique( words( text ) ) );
+    return skipLongWords( unique( words( text ) ) );
 }
 
 // declarative
@@ -661,9 +661,9 @@ var getPerson = partial( ajax, "http://some.api/person" );
 var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
 
 getLastOrder( function orderFound(order){
-	getPerson( { id: order.personId }, function personFound(person){
-		output( person.name );
-	} );
+    getPerson( { id: order.personId }, function personFound(person){
+        output( person.name );
+    } );
 } );
 ```
 
@@ -673,7 +673,7 @@ Let's start by trying to get the `person` "point" out of the `personFound(..)` f
 
 ```js
 function extractName(person) {
-	return person.name;
+    return person.name;
 }
 ```
 
@@ -681,13 +681,13 @@ But let's observe that this operation could instead be expressed in generic term
 
 ```js
 function prop(name,obj) {
-	return obj[name];
+    return obj[name];
 }
 
 // or the ES6 => form
 var prop =
-	(name,obj) =>
-		obj[name];
+    (name,obj) =>
+        obj[name];
 ```
 
 While we're dealing with object properties, let's also define the opposite utility: `setProp(..)` for setting a property value onto an object.
@@ -696,9 +696,9 @@ However, we want to be careful not to just mutate an existing object but rather 
 
 ```js
 function setProp(name,obj,val) {
-	var o = Object.assign( {}, obj );
-	o[name] = val;
-	return o;
+    var o = Object.assign( {}, obj );
+    o[name] = val;
+    return o;
 }
 ```
 
@@ -714,7 +714,7 @@ Next, let's narrow the focus on our example's nested lookup calls to this:
 
 ```js
 getLastOrder( function orderFound(order){
-	getPerson( { id: order.personId }, outputPersonName );
+    getPerson( { id: order.personId }, outputPersonName );
 } );
 ```
 
@@ -742,7 +742,7 @@ Let's reconstruct the nested lookups example again with our new function:
 
 ```js
 getLastOrder( function orderFound(order){
-	processPerson( { id: order.personId } );
+    processPerson( { id: order.personId } );
 } );
 ```
 
@@ -758,13 +758,13 @@ To construct the object (of the form `{ id: .. }`) that needs to be passed to `p
 
 ```js
 function makeObjProp(name,value) {
-	return setProp( name, {}, value );
+    return setProp( name, {}, value );
 }
 
 // or the ES6 => form
 var makeObjProp =
-	(name,value) =>
-		setProp( name, {}, value );
+    (name,value) =>
+        setProp( name, {}, value );
 ```
 
 **Tip:** This utility is known as `objOf(..)` in the Ramda library.
@@ -812,14 +812,14 @@ And even if you didn't like seeing/naming all those intermediate steps, you can 
 ```js
 partial( ajax, "http://some.api/order", { id: -1 } )
 (
-	compose(
-		partialRight(
-			partial( ajax, "http://some.api/person" ),
-			compose( output, partial( prop, "name" ) )
-		),
-		partial( makeObjProp, "id" ),
-		partial( prop, "personId" )
-	)
+    compose(
+        partialRight(
+            partial( ajax, "http://some.api/person" ),
+            compose( output, partial( prop, "name" ) )
+        ),
+        partial( makeObjProp, "id" ),
+        partial( prop, "personId" )
+    )
 );
 ```
 

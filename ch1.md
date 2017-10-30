@@ -24,27 +24,27 @@ var magicNumber = 0;
 
 pickFavoriteNumbers();
 calculateMagicNumber();
-outputMsg();             // The magic number is: 42
+outputMsg();                // The magic number is: 42
 
 // ***************
 
 function calculateMagicNumber() {
-	for (let fave of faves) {
-		magicNumber = magicNumber + fave;
-	}
+    for (let fave of faves) {
+        magicNumber = magicNumber + fave;
+    }
 }
 
 function pickFavoriteNumbers() {
-	for (let num of numbers) {
-		if (num >= 10 && num <= 20) {
-			faves.push( num );
-		}
-	}
+    for (let num of numbers) {
+        if (num >= 10 && num <= 20) {
+            faves.push( num );
+        }
+    }
 }
 
 function outputMsg() {
-	var msg = `The magic number is: ${magicNumber}`;
-	console.log( msg );
+    var msg = `The magic number is: ${magicNumber}`;
+    console.log( msg );
 }
 ```
 
@@ -52,19 +52,19 @@ Now consider a very different style that accomplishes exactly the same outcome:
 
 ```js
 var sumOnlyFavorites = FP.compose( [
-	FP.filterReducer( FP.gte( 10 ) ),
-	FP.filterReducer( FP.lte( 20 ) )
+    FP.filterReducer( FP.gte( 10 ) ),
+    FP.filterReducer( FP.lte( 20 ) )
 ] )( sum );
 
 var printMagicNumber = FP.pipe( [
-	FP.reduce( sumOnlyFavorites, 0 ),
-	constructMsg,
-	console.log
+    FP.reduce( sumOnlyFavorites, 0 ),
+    constructMsg,
+    console.log
 ] );
 
 var numbers = [4,10,0,27,42,17,15,-6,58];
 
-printMagicNumber( numbers );      // The magic number is: 42
+printMagicNumber( numbers );        // The magic number is: 42
 
 // ***************
 
@@ -131,7 +131,7 @@ FP (at least, without all the terminology weighing it down) is one of the most e
 Readability is not a binary characteristic. It's a largely subjective human factor describing our relationship to code. And it will naturally vary over time as our skills and understanding evolve. I have experienced effects similar to the following figure, and anecdotally many others I've talked to have as well.
 
 <p align="center">
-	<img src="fig17.png" width="600">
+    <img src="fig17.png" width="600">
 </p>
 
 You may just find yourself experiencing similar effects as you work through the book. But take heart; if you stick this out, the curve comes back up!

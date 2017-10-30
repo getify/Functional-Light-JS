@@ -55,20 +55,20 @@ Here's a simple implementation:
 
 ```js
 function Just(val) {
-	return { map, chain, ap, inspect };
+    return { map, chain, ap, inspect };
 
-	// *********************
+    // *********************
 
-	function map(fn) { return Just( fn( val ) ); }
+    function map(fn) { return Just( fn( val ) ); }
 
-	// aka: bind, flatMap
-	function chain(fn) { return fn( val ); }
+    // aka: bind, flatMap
+    function chain(fn) { return fn( val ); }
 
-	function ap(anotherMonad) { return anotherMonad.map( val ); }
+    function ap(anotherMonad) { return anotherMonad.map( val ); }
 
-	function inspect() {
-		return `Just(${ val })`;
-	}
+    function inspect() {
+        return `Just(${ val })`;
+    }
 }
 ```
 
@@ -88,7 +88,7 @@ Let's look first at the monadic `map(..)` function. Like `map(..)` on an array (
 var A = Just( 10 );
 var B = A.map( v => v * 2 );
 
-B.inspect();				// Just(20)
+B.inspect();                // Just(20)
 ```
 
 Monadic `chain(..)` kinda does the same thing as `map(..)`, but then it sort of unwraps the resulting value from its new monad. However, instead of thinking informally about "unwrapping" a monad, the more formal explanation would be that `chain(..)` flattens the monad. Consider:
@@ -97,8 +97,8 @@ Monadic `chain(..)` kinda does the same thing as `map(..)`, but then it sort of 
 var A = Just( 10 );
 var eleven = A.chain( v => v + 1 );
 
-eleven;					// 11
-typeof eleven;				// "number"
+eleven;                 // 11
+typeof eleven;              // "number"
 ```
 
 `eleven` is the actual primitive number `11`, not a monad holding that value.
@@ -108,8 +108,8 @@ To connect this `chain(..)` method conceptually to stuff we've already learned, 
 ```js
 var x = [3];
 
-map( v => [v,v+1], x );			// [[3,4]]
-flatMap( v => [v,v+1], x );		// [3,4]
+map( v => [v,v+1], x );         // [[3,4]]
+flatMap( v => [v,v+1], x );     // [3,4]
 ```
 
 See the difference? The mapper function `v => [v,v+1]` results in a `[3,4]` array, which ends up in the single first position of the outer array, so we get `[[3,4]]`. But `flatMap(..)` flattens out the inner array into the outer array, so we get just `[3,4]` instead.
@@ -121,7 +121,7 @@ One way to illustrate `chain(..)` in this manner is in combination with the `ide
 ```js
 var identity = v => v;
 
-A.chain( identity );		// 10
+A.chain( identity );        // 10
 ```
 
 `A.chain(..)` calls `identity(..)` with the value in `A`, and whatever value `identity(..)` returns (`10` in this case) just comes right out without any intervening monad. In other words, from that earlier `Just(..)` code listing, we wouldn't actually need to include that optional `inspect(..)` helper, as `chain(inspect)` accomplishes the same goal; it's purely for ease of debugging as we learn monads.
@@ -142,8 +142,8 @@ We'll define `A` as a monad that contains a value `10`, and `B` as a monad that 
 var A = Just( 10 );
 var B = Just( 3 );
 
-A.inspect();				// Just(10)
-B.inspect();				// Just(3)
+A.inspect();                // Just(10)
+B.inspect();                // Just(3)
 ```
 
 Now, how could we make a new monad where the values `10` and `3` had been added together, say via a `sum(..)` function? Turns out `ap(..)` can help.
@@ -168,7 +168,7 @@ Now, to get the second value (`3` inside `B`) passed to the waiting curried func
 ```js
 var D = C.ap( B );
 
-D.inspect();				// Just(13)
+D.inspect();                // Just(13)
 ```
 
 The value `10` came out of `C`, and `3` came out of `B`, and `sum(..)` added them together to `13` and wrapped that in the monad `D`. Let's put the two steps together so you can see their connection more clearly:
@@ -176,7 +176,7 @@ The value `10` came out of `C`, and `3` came out of `B`, and `sum(..)` added the
 ```js
 var D = A.map( curry( sum ) ).ap( B );
 
-D.inspect();				// Just(13)
+D.inspect();                // Just(13)
 ```
 
 To illustrate what `ap(..)` is helping us with, we could have achieved the same result this way:
@@ -184,7 +184,7 @@ To illustrate what `ap(..)` is helping us with, we could have achieved the same 
 ```js
 var D = B.map( A.chain( curry( sum ) ) );
 
-D.inspect();				// Just(13);
+D.inspect();                // Just(13);
 ```
 
 And that of course is just a composition (see Chapter 4):
@@ -192,7 +192,7 @@ And that of course is just a composition (see Chapter 4):
 ```js
 var D = compose( B.map, A.chain, curry )( sum );
 
-D.inspect();				// Just(13)
+D.inspect();                // Just(13)
 ```
 
 Cool, huh!?
@@ -213,13 +213,13 @@ var Maybe = { Just, Nothing, of/* aka: unit, pure */: Just };
 function Just(val) { /* .. */ }
 
 function Nothing() {
-	return { map: Nothing, chain: Nothing, ap: Nothing, inspect };
+    return { map: Nothing, chain: Nothing, ap: Nothing, inspect };
 
-	// *********************
+    // *********************
 
-	function inspect() {
-		return "Nothing";
-	}
+    function inspect() {
+        return "Nothing";
+    }
 }
 ```
 
@@ -263,12 +263,12 @@ Never fear! We can simply provide the empty-check externally, and the rest of th
 
 ```js
 function isEmpty(val) {
-	return val === null || val === undefined;
+    return val === null || val === undefined;
 }
 
 var safeProp = curry( function safeProp(prop,obj){
-	if (isEmpty( obj[prop] )) return Maybe.Nothing();
-	return Maybe.of( obj[prop] );
+    if (isEmpty( obj[prop] )) return Maybe.Nothing();
+    return Maybe.of( obj[prop] );
 } );
 
 Maybe.of( someObj )
@@ -294,10 +294,10 @@ Here's the factory function for our Maybe+Humble monad:
 
 ```js
 function MaybeHumble(egoLevel) {
-	// accept anything other than a number that's 42 or higher
-	return !(Number( egoLevel ) >= 42) ?
-		Maybe.of( egoLevel ) :
-		Maybe.Nothing();
+    // accept anything other than a number that's 42 or higher
+    return !(Number( egoLevel ) >= 42) ?
+        Maybe.of( egoLevel ) :
+        Maybe.Nothing();
 }
 ```
 
@@ -309,19 +309,19 @@ Let's illustrate some basic usage:
 var bob = MaybeHumble( 45 );
 var alice = MaybeHumble( 39 );
 
-bob.inspect();				// Nothing
-alice.inspect();			// Just(39)
+bob.inspect();              // Nothing
+alice.inspect();            // Just(39)
 ```
 
 What if Alice wins a big award and is now a bit more proud of herself?
 
 ```js
 function winAward(ego) {
-	return MaybeHumble( ego + 3 );
+    return MaybeHumble( ego + 3 );
 }
 
 alice = alice.chain( winAward );
-alice.inspect();			// Nothing
+alice.inspect();            // Nothing
 ```
 
 The `MaybeHumble( 39 + 3 )` call creates a `Nothing()` monad instance to return back from the `chain(..)` call, so now Alice doesn't qualify as humble anymore.
@@ -333,7 +333,7 @@ var bob = MaybeHumble( 41 );
 var alice = MaybeHumble( 39 );
 
 var teamMembers = curry( function teamMembers(ego1,ego2){
-	console.log( `Our humble team's egos: ${ego1} ${ego2}` );
+    console.log( `Our humble team's egos: ${ego1} ${ego2}` );
 } );
 
 bob.map( teamMembers ).ap( alice );
@@ -364,12 +364,12 @@ One more example to illustrate the behaviors of our Maybe+Humble data structure:
 
 ```js
 function introduction() {
-	console.log( "I'm just a learner like you! :)" );
+    console.log( "I'm just a learner like you! :)" );
 }
 
 var egoChange = curry( function egoChange(amount,concept,egoLevel) {
-	console.log( `${amount > 0 ? "Learned" : "Shared"} ${concept}.` );
-	return MaybeHumble( egoLevel + amount );
+    console.log( `${amount > 0 ? "Learned" : "Shared"} ${concept}.` );
+    return MaybeHumble( egoLevel + amount );
 } );
 
 var learn = egoChange( 3 );

@@ -57,7 +57,7 @@ You sometimes hear people refer to these inputs as "arguments" and sometimes as 
 
 ```js
 function foo(x,y) {
-	// ..
+    // ..
 }
 
 var a = 3;
@@ -77,13 +77,13 @@ Consider:
 
 ```js
 function foo(x = 3) {
-	console.log( x );
+    console.log( x );
 }
 
-foo();					// 3
-foo( undefined );		// 3
-foo( null );			// null
-foo( 0 );				// 0
+foo();                  // 3
+foo( undefined );       // 3
+foo( null );            // null
+foo( 0 );               // 0
 ```
 
 It's always a good practice to think about any default cases that can aide the usability of your functions. However, defaulting parameters can lead to more complexity in terms of reading and understanding the variations of how a function is called. Be judicious in how much you rely on this feature.
@@ -94,7 +94,7 @@ The number of arguments a function "expects" -- how many arguments you'll likely
 
 ```js
 function foo(x,y,z) {
-	// ..
+    // ..
 }
 ```
 
@@ -106,10 +106,10 @@ You may wish to inspect a function reference during the runtime of a program to 
 
 ```js
 function foo(x,y,z) {
-	// ..
+    // ..
 }
 
-foo.length;				// 3
+foo.length;             // 3
 ```
 
 One reason for determining the arity during execution would be if a piece of code received a function reference from multiple sources, and sent different values depending on the arity of each.
@@ -121,13 +121,13 @@ For example, imagine a case where an `fn` function reference could expect one, t
 // `x` exists with some value
 
 if (fn.length == 1) {
-	fn( x );
+    fn( x );
 }
 else if (fn.length == 2) {
-	fn( undefined, x );
+    fn( undefined, x );
 }
 else if (fn.length == 3) {
-	fn( undefined, undefined, x );
+    fn( undefined, undefined, x );
 }
 ```
 
@@ -137,27 +137,27 @@ One gotcha to be aware of is that certain kinds of parameter list variations can
 
 ```js
 function foo(x,y = 2) {
-	// ..
+    // ..
 }
 
 function bar(x,...args) {
-	// ..
+    // ..
 }
 
 function baz( {a,b} ) {
-	// ..
+    // ..
 }
 
-foo.length;				// 1
-bar.length;				// 1
-baz.length;				// 1
+foo.length;             // 1
+bar.length;             // 1
+baz.length;             // 1
 ```
 
 What about counting the number of arguments the current function call received? This used to be trivial, but now the situation is slightly more complicated. Each function has an `arguments` object (array-like) available that holds a reference to each of the arguments passed in. You can then inspect the `length` property of `arguments` to figure out how many were actually passed:
 
 ```js
 function foo(x,y,z) {
-	console.log( arguments.length );	// 2
+    console.log( arguments.length );    // 2
 }
 
 foo( 3, 4 );
@@ -183,7 +183,7 @@ ES6 to the rescue! Let's declare our function with the `...` operator -- various
 
 ```js
 function foo(x,y,z,...args) {
-	// ..
+    // ..
 }
 ```
 
@@ -191,13 +191,13 @@ See the `...args` in the parameter list? That's an ES6 declarative form that tel
 
 ```js
 function foo(x,y,z,...args) {
-	console.log( x, y, z, args );
+    console.log( x, y, z, args );
 }
 
-foo();					// undefined undefined undefined []
-foo( 1, 2, 3 );			// 1 2 3 []
-foo( 1, 2, 3, 4 );		// 1 2 3 [ 4 ]
-foo( 1, 2, 3, 4, 5 );	// 1 2 3 [ 4, 5 ]
+foo();                  // undefined undefined undefined []
+foo( 1, 2, 3 );         // 1 2 3 []
+foo( 1, 2, 3, 4 );      // 1 2 3 [ 4 ]
+foo( 1, 2, 3, 4, 5 );   // 1 2 3 [ 4, 5 ]
 ```
 
 So, if you *really* want to design a function that can account for an arbitrary number of arguments to be passed in, use `...args` (or whatever name you like) on the end. Now, you'll have a real, non-deprecated, non-yucky array to access those argument values from.
@@ -208,7 +208,7 @@ You *can* even use the `...` operator in the parameter list even if there's no o
 
 ```js
 function foo(...args) {
-	// ..
+    // ..
 }
 ```
 
@@ -220,12 +220,12 @@ What if you wanted to pass along an array of values as the arguments to a functi
 
 ```js
 function foo(...args) {
-	console.log( args[3] );
+    console.log( args[3] );
 }
 
 var arr = [ 1, 2, 3, 4, 5 ];
 
-foo( ...arr );						// 4
+foo( ...arr );                      // 4
 ```
 
 Our new friend `...` is used, but now not just in the parameter list; it's also used in the argument list at the call-site. It has the opposite behavior in this context. In a parameter list, we said it *gathered* arguments together. In an argument list, it *spreads* them out. So the contents of `arr` are actually spread out as individual arguments to the `foo(..)` call. Do you see how that's different from just passing in a reference to the whole `arr` array?
@@ -235,7 +235,7 @@ By the way, multiple values and `...` spreadings can be interleaved, as you see 
 ```js
 var arr = [ 2 ];
 
-foo( 1, ...arr, 3, ...[4,5] );		// 4
+foo( 1, ...arr, 3, ...[4,5] );      // 4
 ```
 
 Think of `...` in this symmetric sense: in a value-list position, it *spreads*. In an assignment position -- like a parameter list, because arguments get *assigned to* parameters -- it *gathers*.
@@ -250,7 +250,7 @@ Consider the variadic `foo(..)` from the previous section:
 
 ```js
 function foo(...args) {
-	// ..
+    // ..
 }
 
 foo( ...[1,2,3] );
@@ -260,7 +260,7 @@ What if we wanted to change that interaction so the caller of our function passe
 
 ```js
 function foo(args) {
-	// ..
+    // ..
 }
 
 foo( [1,2,3] );
@@ -274,7 +274,7 @@ Consider:
 
 ```js
 function foo( [x,y,...args] = [] ) {
-	// ..
+    // ..
 }
 
 foo( [1,2,3] );
@@ -290,11 +290,11 @@ Considering the destructured `foo(..)` we just looked at, we could instead have 
 
 ```js
 function foo(params) {
-	var x = params[0];
-	var y = params[1];
-	var args = params.slice( 2 );
+    var x = params[0];
+    var y = params[1];
+    var args = params.slice( 2 );
 
-	// ..
+    // ..
 }
 ```
 
@@ -314,12 +314,12 @@ Just as we can destructure array parameters, we can destructure object parameter
 
 ```js
 function foo( {x,y} = {} ) {
-	console.log( x, y );
+    console.log( x, y );
 }
 
 foo( {
-	y: 3
-} );					// undefined 3
+    y: 3
+} );                    // undefined 3
 ```
 
 We pass in an object as the single argument, and it's destructured into two separate parameter variables `x` and `y`, which are assigned the values of those corresponding property names from the object passed in. It didn't matter that the `x` property wasn't on the object; it just ended up as a variable with `undefined` like you'd expect.
@@ -340,12 +340,12 @@ Another key benefit is that named arguments, by virtue of being specified as obj
 
 ```js
 function foo( {x,y} = {} ) {
-	console.log( x, y );
+    console.log( x, y );
 }
 
 foo( {
-	y: 3
-} );					// undefined 3
+    y: 3
+} );                    // undefined 3
 ```
 
 We're skipping the `x` parameter by simply omitting it. Or we could specify an `x` argument if we cared to, even if we listed it after `y` in the object literal. The call-site is no longer cluttered by ordered-placeholders like `undefined` to skip a parameter.
@@ -364,11 +364,11 @@ In JavaScript, functions always return a value. These three functions all have i
 function foo() {}
 
 function bar() {
-	return;
+    return;
 }
 
 function baz() {
-	return undefined;
+    return undefined;
 }
 ```
 
@@ -380,9 +380,9 @@ A `return` statement can only return a single value. So if your function needs t
 
 ```js
 function foo() {
-	var retValue1 = 11;
-	var retValue2 = 31;
-	return [ retValue1, retValue2 ];
+    var retValue1 = 11;
+    var retValue2 = 31;
+    return [ retValue1, retValue2 ];
 }
 ```
 
@@ -390,7 +390,7 @@ Then, we'll assign `x` and `y` from two respective items in the array that comes
 
 ```js
 var [ x, y ] = foo();
-console.log( x + y );			// 42
+console.log( x + y );           // 42
 ```
 
 Collecting multiple values into an array (or object) to return, and subsequently destructuring those values back into distinct assignments, is a way to transparently express multiple outputs for a function.
@@ -405,17 +405,17 @@ Consider:
 
 ```js
 function foo(x) {
-	if (x > 10) return x + 1;
+    if (x > 10) return x + 1;
 
-	var y = x / 2;
+    var y = x / 2;
 
-	if (y > 3) {
-		if (x % 2 == 0) return x;
-	}
+    if (y > 3) {
+        if (x % 2 == 0) return x;
+    }
 
-	if (y > 1) return y;
+    if (y > 1) return y;
 
-	return x;
+    return x;
 }
 ```
 
@@ -431,29 +431,29 @@ Consider this version of the code:
 
 ```js
 function foo(x) {
-	var retValue;
+    var retValue;
 
-	if (retValue == undefined && x > 10) {
-		retValue = x + 1;
-	}
+    if (retValue == undefined && x > 10) {
+        retValue = x + 1;
+    }
 
-	var y = x / 2;
+    var y = x / 2;
 
-	if (y > 3) {
-		if (retValue == undefined && x % 2 == 0) {
-			retValue = x;
-		}
-	}
+    if (y > 3) {
+        if (retValue == undefined && x % 2 == 0) {
+            retValue = x;
+        }
+    }
 
-	if (retValue == undefined && y > 1) {
-		retValue = y;
-	}
+    if (retValue == undefined && y > 1) {
+        retValue = y;
+    }
 
-	if (retValue == undefined) {
-		retValue = x;
-	}
+    if (retValue == undefined) {
+        retValue = x;
+    }
 
-	return retValue;
+    return retValue;
 }
 ```
 
@@ -473,24 +473,24 @@ Remember our <code>f(x) = 2x<sup>2</sup> + 3</code> function from earlier in the
 var y;
 
 function foo(x) {
-	y = (2 * Math.pow( x, 2 )) + 3;
+    y = (2 * Math.pow( x, 2 )) + 3;
 }
 
 foo( 2 );
 
-y;						// 11
+y;                      // 11
 ```
 
 I know this is a silly example; we could just as easily have `return`d the value instead of setting it into `y` from within the function:
 
 ```js
 function foo(x) {
-	return (2 * Math.pow( x, 2 )) + 3;
+    return (2 * Math.pow( x, 2 )) + 3;
 }
 
 var y = foo( 2 );
 
-y;						// 11
+y;                      // 11
 ```
 
 Both functions accomplish the same task. Is there any reason we should pick one over the other? **Yes, absolutely.**
@@ -503,19 +503,19 @@ Consider:
 
 ```js
 function sum(list) {
-	var total = 0;
-	for (let i = 0; i < list.length; i++) {
-		if (!list[i]) list[i] = 0;
+    var total = 0;
+    for (let i = 0; i < list.length; i++) {
+        if (!list[i]) list[i] = 0;
 
-		total = total + list[i];
-	}
+        total = total + list[i];
+    }
 
-	return total;
+    return total;
 }
 
 var nums = [ 1, 3, 9, 27, , 84 ];
 
-sum( nums );			// 124
+sum( nums );            // 124
 ```
 
 The most obvious output from this function is the sum `124`, which we explicitly `return`ed. But do you spot the other output? Try that code and then inspect the `nums` array. Now do you spot the difference?
@@ -534,13 +534,13 @@ Consider:
 
 ```js
 function forEach(list,fn) {
-	for (let v of list) {
-		fn( v );
-	}
+    for (let v of list) {
+        fn( v );
+    }
 }
 
 forEach( [1,2,3,4,5], function each(val){
-	console.log( val );
+    console.log( val );
 } );
 // 1 2 3 4 5
 ```
@@ -551,30 +551,30 @@ A higher-order function can also output another function, like:
 
 ```js
 function foo() {
-	return function inner(msg){
-		return msg.toUpperCase();
-	};
+    return function inner(msg){
+        return msg.toUpperCase();
+    };
 }
 
 var f = foo();
 
-f( "Hello!" );			// HELLO!
+f( "Hello!" );          // HELLO!
 ```
 
 `return` is not the only way to "output" an inner function:
 
 ```js
 function foo() {
-	bar( function inner(msg){
-		return msg.toUpperCase();
-	} );
+    bar( function inner(msg){
+        return msg.toUpperCase();
+    } );
 }
 
 function bar(func) {
-	func( "Hello!" );
+    func( "Hello!" );
 }
 
-foo();					// HELLO!
+foo();                  // HELLO!
 ```
 
 Functions that treat other functions as values are higher-order functions by definition. FPers write these all the time!
@@ -591,16 +591,16 @@ Consider:
 
 ```js
 function foo(msg) {
-	var fn = function inner(){
-		return msg.toUpperCase();
-	};
+    var fn = function inner(){
+        return msg.toUpperCase();
+    };
 
-	return fn;
+    return fn;
 }
 
 var helloFn = foo( "Hello!" );
 
-helloFn();				// HELLO!
+helloFn();              // HELLO!
 ```
 
 The `msg` parameter variable in the scope of `foo(..)` is referenced inside the inner function. When `foo(..)` is executed and the inner function is created, it captures the access to the `msg` variable, and retains that access even after being `return`d.
@@ -611,16 +611,16 @@ Let's look at a few more examples of closure in action:
 
 ```js
 function person(name) {
-	return function identify(){
-		console.log( `I am ${name}` );
-	};
+    return function identify(){
+        console.log( `I am ${name}` );
+    };
 }
 
 var fred = person( "Fred" );
 var susan = person( "Susan" );
 
-fred();					// I am Fred
-susan();				// I am Susan
+fred();                 // I am Fred
+susan();                // I am Susan
 ```
 
 The inner function `identify()` has closure over the parameter `id`.
@@ -629,19 +629,19 @@ The access that closure enables is not restricted to merely reading the variable
 
 ```js
 function runningCounter(start) {
-	var val = start;
+    var val = start;
 
-	return function current(increment = 1){
-		val = val + increment;
-		return val;
-	};
+    return function current(increment = 1){
+        val = val + increment;
+        return val;
+    };
 }
 
 var score = runningCounter( 0 );
 
-score();				// 1
-score();				// 2
-score( 13 );			// 15
+score();                // 1
+score();                // 2
+score( 13 );            // 15
 ```
 
 **Warning:** For reasons that we'll cover more later in the book, this example of using closure to remember a state that changes (`val`) is probably something you'll want to avoid where possible.
@@ -650,9 +650,9 @@ If you have an operation that needs two inputs, one of which you know now but th
 
 ```js
 function makeAdder(x) {
-	return function sum(y){
-		return x + y;
-	};
+    return function sum(y){
+        return x + y;
+    };
 }
 
 // we already know `10` and `37` as first inputs, respectively
@@ -660,10 +660,10 @@ var addTo10 = makeAdder( 10 );
 var addTo37 = makeAdder( 37 );
 
 // later, we specify the second inputs
-addTo10( 3 );			// 13
-addTo10( 90 );			// 100
+addTo10( 3 );           // 13
+addTo10( 90 );          // 100
 
-addTo37( 13 );			// 50
+addTo37( 13 );          // 50
 ```
 
 Normally, a `sum(..)` function would take both an `x` and `y` input to add them together. But in this example we receive and remember (via closure) the `x` value(s) first, while the `y` value(s) are separately specified later.
@@ -674,21 +674,21 @@ Of course, since functions are just values in JS, we can remember function value
 
 ```js
 function formatter(formatFn) {
-	return function inner(str){
-		return formatFn( str );
-	};
+    return function inner(str){
+        return formatFn( str );
+    };
 }
 
 var lower = formatter( function formatting(v){
-	return v.toLowerCase();
+    return v.toLowerCase();
 } );
 
 var upperFirst = formatter( function formatting(v){
-	return v[0].toUpperCase() + v.substr( 1 ).toLowerCase();
+    return v[0].toUpperCase() + v.substr( 1 ).toLowerCase();
 } );
 
-lower( "WOW" );				// wow
-upperFirst( "hello" );		// Hello
+lower( "WOW" );             // wow
+upperFirst( "hello" );      // Hello
 ```
 
 Instead of distributing/repeating the `toUpperCase()` and `toLowerCase()` logic all over our code, FP encourages us to create simple functions that encapsulate -- a fancy way of saying wrapping up -- that behavior.
@@ -713,7 +713,7 @@ Syntatically speaking, function declarations require the inclusion of a name:
 
 ```js
 function helloMyNameIs() {
-	// ..
+    // ..
 }
 ```
 
@@ -721,11 +721,11 @@ But function expressions can come in both named and anonymous forms:
 
 ```js
 foo( function namedFunctionExpr(){
-	// ..
+    // ..
 } );
 
-bar( function(){	// <-- look, no name!
-	// ..
+bar( function(){    // <-- look, no name!
+    // ..
 } );
 ```
 
@@ -742,7 +742,7 @@ As of ES6, anonymous function expressions are in certain cases aided by *name in
 ```js
 var x = function(){};
 
-x.name;			// x
+x.name;         // x
 ```
 
 If the engine is able to guess what name you *probably* want the function to take, it will go ahead and do so.
@@ -751,13 +751,13 @@ But beware, not all syntactic forms benefit from name inferencing. Probably the 
 
 ```js
 function foo(fn) {
-	console.log( fn.name );
+    console.log( fn.name );
 }
 
 var x = function(){};
 
-foo( x );				// x
-foo( function(){} );	//
+foo( x );               // x
+foo( function(){} );    //
 ```
 
 When the name can't be inferred from the immediate surrounding syntax, it remains an empty string. Such a function will be reported as `(anonymous function)` in a stack trace should one occur.
@@ -769,42 +769,42 @@ Consider these different scenarios:
 ```js
 // sync recursion:
 function findPropIn(propName,obj) {
-	if (obj == undefined || typeof obj != "object") return;
+    if (obj == undefined || typeof obj != "object") return;
 
-	if (propName in obj) {
-		return obj[propName];
-	}
-	else {
-		for (let prop of Object.keys( obj )) {
-			let ret = findPropIn( propName, obj[prop] );
-			if (ret !== undefined) {
-				return ret;
-			}
-		}
-	}
+    if (propName in obj) {
+        return obj[propName];
+    }
+    else {
+        for (let prop of Object.keys( obj )) {
+            let ret = findPropIn( propName, obj[prop] );
+            if (ret !== undefined) {
+                return ret;
+            }
+        }
+    }
 }
 ```
 
 ```js
 // async recursion:
 setTimeout( function waitForIt(){
-	// does `it` exist yet?
-	if (!o.it) {
-		// try again later
-		setTimeout( waitForIt, 100 );
-	}
+    // does `it` exist yet?
+    if (!o.it) {
+        // try again later
+        setTimeout( waitForIt, 100 );
+    }
 }, 100 );
 ```
 
 ```js
 // event handler unbinding
 document.getElementById( "onceBtn" )
-	.addEventListener( "click", function handleClick(evt){
-		// unbind event
-		evt.target.removeEventListener( "click", handleClick, false );
+    .addEventListener( "click", function handleClick(evt){
+        // unbind event
+        evt.target.removeEventListener( "click", handleClick, false );
 
-		// ..
-	}, false );
+        // ..
+    }, false );
 ```
 
 In all these cases, the named function's lexical name was a useful and reliable self-reference from inside itself.
@@ -813,7 +813,7 @@ Moreover, even in simple cases with one-liner functions, naming them tends to ma
 
 ```js
 people.map( function getPreferredName(person){
-	return person.nicknames[0] || person.firstName;
+    return person.nicknames[0] || person.firstName;
 } )
 // ..
 ```
@@ -825,7 +825,7 @@ Another place where anonymous function expressions are common is with IIFEs (imm
 ```js
 (function(){
 
-	// look, I'm an IIFE!
+    // look, I'm an IIFE!
 
 })();
 ```
@@ -835,7 +835,7 @@ You virtually never see IIFEs using names for their function expressions, but th
 ```js
 (function IIFE(){
 
-	// You already knew I was an IIFE!
+    // You already knew I was an IIFE!
 
 })();
 ```
@@ -864,7 +864,7 @@ Compare:
 
 ```js
 people.map( function getPreferredName(person){
-	return person.nicknames[0] || person.firstName;
+    return person.nicknames[0] || person.firstName;
 } );
 
 // vs.
@@ -900,7 +900,7 @@ people.map( (person = {}) => person.nicknames[0] || person.firstName );
 
 // returning an object? need ( )
 people.map( person =>
-	({ preferredName: person.nicknames[0] || person.firstName })
+    ({ preferredName: person.nicknames[0] || person.firstName })
 );
 ```
 
@@ -926,33 +926,33 @@ Consider:
 
 ```js
 function sum() {
-	return this.x + this.y;
+    return this.x + this.y;
 }
 
 var context = {
-	x: 1,
-	y: 2
+    x: 1,
+    y: 2
 };
 
-sum.call( context );		// 3
+sum.call( context );        // 3
 
 context.sum = sum;
-context.sum();				// 3
+context.sum();              // 3
 
 var s = sum.bind( context );
-s();						// 3
+s();                        // 3
 ```
 
 Of course, if `this` can be input into a function implicitly, the same object context could be sent in as an explicit argument:
 
 ```js
 function sum(ctx) {
-	return ctx.x + ctx.y;
+    return ctx.x + ctx.y;
 }
 
 var context = {
-	x: 1,
-	y: 2
+    x: 1,
+    y: 2
 };
 
 sum( context );
@@ -964,30 +964,30 @@ There are other tricks we can leverage in a `this`-based system, like for exampl
 
 ```js
 var Auth = {
-	authorize() {
-		var credentials = this.username + ":" + this.password;
-		this.send( credentials, resp => {
-			if (resp.error) this.displayError( resp.error );
-			else this.displaySuccess();
-		} );
-	},
-	send(/* .. */) {
-		// ..
-	}
+    authorize() {
+        var credentials = this.username + ":" + this.password;
+        this.send( credentials, resp => {
+            if (resp.error) this.displayError( resp.error );
+            else this.displaySuccess();
+        } );
+    },
+    send(/* .. */) {
+        // ..
+    }
 };
 
 var Login = Object.assign( Object.create( Auth ), {
-	doLogin(user,pw) {
-		this.username = user;
-		this.password = pw;
-		this.authorize();
-	},
-	displayError(err) {
-		// ..
-	},
-	displaySuccess() {
-		// ..
-	}
+    doLogin(user,pw) {
+        this.username = user;
+        this.password = pw;
+        this.authorize();
+    },
+    displayError(err) {
+        // ..
+    },
+    displaySuccess() {
+        // ..
+    }
 } );
 
 Login.doLogin( "fred", "123456" );
@@ -1003,20 +1003,20 @@ In case you're having trouble parsing what this code does: we have two separate 
 // ..
 
 authorize(ctx) {
-	var credentials = ctx.username + ":" + ctx.password;
-	Auth.send( credentials, function onResp(resp){
-		if (resp.error) ctx.displayError( resp.error );
-		else ctx.displaySuccess();
-	} );
+    var credentials = ctx.username + ":" + ctx.password;
+    Auth.send( credentials, function onResp(resp){
+        if (resp.error) ctx.displayError( resp.error );
+        else ctx.displaySuccess();
+    } );
 }
 
 // ..
 
 doLogin(user,pw) {
-	Auth.authorize( {
-		username: user,
-		password: pw
-	} );
+    Auth.authorize( {
+        username: user,
+        password: pw
+    } );
 }
 
 // ..
