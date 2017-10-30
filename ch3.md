@@ -284,7 +284,7 @@ function partial(fn,...presetArgs) {
 
 // or the ES6 => arrow form
 var partial =
-	(fn, ...presetArgs) =>
+	(fn,...presetArgs) =>
 		(...laterArgs) =>
 			fn( ...presetArgs, ...laterArgs );
 ```
@@ -547,7 +547,7 @@ function curry(fn,arity = fn.length) {
 
 // or the ES6 => arrow form
 var curry =
-	(fn, arity = fn.length, nextCurried) =>
+	(fn,arity = fn.length,nextCurried) =>
 		(nextCurried = prevArgs =>
 			nextArg => {
 				var args = [ ...prevArgs, nextArg ];
@@ -601,13 +601,13 @@ var adder = curry( add );
 // [4,5,6,7,8]
 ```
 
-How about another numbers example, this time adding a list of them together:
+Let's look at another numbers example, this time adding a list of them together:
 
 ```js
-function sum(...args) {
+function sum(...nums) {
 	var total = 0;
-	for (let i = 0; i < args.length; i++) {
-		total += args[i];
+	for (let num of nums) {
+		total += num;
 	}
 	return total;
 }
@@ -773,8 +773,8 @@ function uncurry(fn) {
 	return function uncurried(...args){
 		var ret = fn;
 
-		for (let i = 0; i < args.length; i++) {
-			ret = ret( args[i] );
+		for (let arg of args) {
+			ret = ret( arg );
 		}
 
 		return ret;
@@ -787,8 +787,8 @@ var uncurry =
 		(...args) => {
 			var ret = fn;
 
-			for (let i = 0; i < args.length; i++) {
-				ret = ret( args[i] );
+			for (let arg of args) {
+				ret = ret( arg );
 			}
 
 			return ret;
@@ -798,10 +798,10 @@ var uncurry =
 **Warning:** Don't just assume that `uncurry(curry(f))` has the same behavior as `f`. In some libs the uncurrying would result in a function like the original, but not all of them; certainly our example here does not. The uncurried function acts (mostly) the same as the original function if you pass as many arguments to it as the original function expected. However, if you pass fewer arguments, you still get back a partially curried function waiting for more arguments; this quirk is illustrated in the next snippet.
 
 ```js
-function sum(...args) {
+function sum(...nums) {
 	var sum = 0;
-	for (let i = 0; i < args.length; i++) {
-		sum += args[i];
+	for (let num of nums) {
+		sum += num;
 	}
 	return sum;
 }

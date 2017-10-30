@@ -72,9 +72,9 @@ To implement `map(..)`:
 function map(mapperFn,arr) {
 	var newList = [];
 
-	for (let idx = 0; idx < arr.length; idx++) {
+	for (let [idx,v] of arr.entries()) {
 		newList.push(
-			mapperFn( arr[idx], idx, arr )
+			mapperFn( v, idx, arr )
 		);
 	}
 
@@ -241,9 +241,9 @@ To implement `filter(..)`:
 function filter(predicateFn,arr) {
 	var newList = [];
 
-	for (let idx = 0; idx < arr.length; idx++) {
-		if (predicateFn( arr[idx], idx, arr )) {
-			newList.push( arr[idx] );
+	for (let [idx,v] of arr.entries()) {
+		if (predicateFn( v, idx, arr )) {
+			newList.push( v );
 		}
 	}
 

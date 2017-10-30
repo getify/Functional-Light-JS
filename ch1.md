@@ -29,15 +29,15 @@ outputMsg();             // The magic number is: 42
 // ***************
 
 function calculateMagicNumber() {
-	for (var i = 0; i < faves.length; i++) {
-		magicNumber = magicNumber + faves[i];
+	for (let fave of faves) {
+		magicNumber = magicNumber + fave;
 	}
 }
 
 function pickFavoriteNumbers() {
-	for (var i = 0; i < numbers.length; i++) {
-		if (numbers[i] >= 10 && numbers[i] <= 20) {
-			faves.push( numbers[i] );
+	for (let num of numbers) {
+		if (num >= 10 && num <= 20) {
+			faves.push( num );
 		}
 	}
 }

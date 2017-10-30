@@ -201,10 +201,10 @@ function fetchUserData(userId) {
 
 function fetchOrders(userId) {
 	ajax( "http://some.api/orders/" + userId, function onOrders(orders){
-		for (let i = 0; i < orders.length; i++) {
+		for (let order of orders) {
 			// keep a reference to latest order for each user
-			users[userId].latestOrder = orders[i];
-			userOrders[orders[i].orderId] = orders[i];
+			users[userId].latestOrder = order;
+			userOrders[orders[i].orderId] = order;
 		}
 	} );
 }
@@ -429,12 +429,12 @@ All the inputs (`x` and `y`) and outputs (`return ..`) are direct; there are no 
 However, not all pure functions are idempotent in the mathematical sense, because they don't have to return a value that would be suitable for feeding back in as their own input. Consider:
 
 ```js
-function calculateAverage(list) {
+function calculateAverage(nums) {
 	var sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
+	for (let num of nums) {
+		sum += num;
 	}
-	return sum / list.length;
+	return sum / nums.length;
 }
 
 calculateAverage( [1,2,4,7,11,16,22] );			// 9
@@ -634,31 +634,31 @@ Referential transparency is the assertion that a function call could be replaced
 From the perspective of referential transparency, both of these programs have identical behavior as they are built with pure functions:
 
 ```js
-function calculateAverage(list) {
+function calculateAverage(nums) {
 	var sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
+	for (let num of nums) {
+		sum += num;
 	}
-	return sum / list.length;
+	return sum / nums.length;
 }
 
-var nums = [1,2,4,7,11,16,22];
+var numbers = [1,2,4,7,11,16,22];
 
-var avg = calculateAverage( nums );
+var avg = calculateAverage( numbers );
 
 console.log( "The average is:", avg );		// The average is: 9
 ```
 
 ```js
-function calculateAverage(list) {
+function calculateAverage(nums) {
 	var sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
+	for (let num of nums) {
+		sum += num;
 	}
-	return sum / list.length;
+	return sum / nums.length;
 }
 
-var nums = [1,2,4,7,11,16,22];
+var numbers = [1,2,4,7,11,16,22];
 
 var avg = 9;
 
@@ -688,17 +688,18 @@ What about a function that has a side effect, but this side effect isn't ever ob
 Here's one:
 
 ```js
-function calculateAverage(list) {
+function calculateAverage(nums) {
 	sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
+	for (let num of nums) {
+		sum += num;
 	}
-	return sum / list.length;
+	return sum / nums.length;
 }
 
-var sum, nums = [1,2,4,7,11,16,22];
+var sum;
+var numbers = [1,2,4,7,11,16,22];
 
-var avg = calculateAverage( nums );
+var avg = calculateAverage( numbers );
 ```
 
 Did you spot it?

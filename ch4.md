@@ -50,10 +50,10 @@ function words(str) {
 function unique(list) {
 	var uniqList = [];
 
-	for (let i = 0; i < list.length; i++) {
+	for (let v of list) {
 		// value not yet in the new list?
-		if (uniqList.indexOf( list[i] ) === -1 ) {
-			uniqList.push( list[i] );
+		if (uniqList.indexOf( v ) === -1 ) {
+			uniqList.push( v );
 		}
 	}
 
@@ -236,16 +236,16 @@ var compose =
 Now let's look at an example of composing more than two functions. Recalling our `uniqueWords(..)` composition example, let's add a `skipShortWords(..)` to the mix:
 
 ```js
-function skipShortWords(list) {
-	var filteredList = [];
+function skipShortWords(words) {
+	var filteredWords = [];
 
-	for (let i = 0; i < list.length; i++) {
-		if (list[i].length > 4) {
-			filteredList.push( list[i] );
+	for (let word of words) {
+		if (word.length > 4) {
+			filteredWords.push( word );
 		}
 	}
 
-	return filteredList;
+	return filteredWords;
 }
 ```
 

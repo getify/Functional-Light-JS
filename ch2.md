@@ -534,8 +534,8 @@ Consider:
 
 ```js
 function forEach(list,fn) {
-	for (let i = 0; i < list.length; i++) {
-		fn( list[i] );
+	for (let v of list) {
+		fn( v );
 	}
 }
 
@@ -775,9 +775,8 @@ function findPropIn(propName,obj) {
 		return obj[propName];
 	}
 	else {
-		let props = Object.keys( obj );
-		for (let i = 0; i < props.length; i++) {
-			let ret = findPropIn( propName, obj[props[i]] );
+		for (let prop of Object.keys( obj )) {
+			let ret = findPropIn( propName, obj[prop] );
 			if (ret !== undefined) {
 				return ret;
 			}

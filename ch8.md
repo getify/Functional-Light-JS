@@ -165,8 +165,8 @@ Simple iterative algorithms can trivially be expressed as recursion:
 
 ```js
 function sum(total,...nums) {
-	for (let i = 0; i < nums.length; i++) {
-		total = total + nums[i];
+	for (let num of nums) {
+		total = total + num;
 	}
 
 	return total;
@@ -192,16 +192,16 @@ Recursion is declarative for algorithms in the same sense that **Σ** is declara
 
 ```js
 function maxEven(...nums) {
-	var num = -Infinity;
+	var maxNum = -Infinity;
 
-	for (let i = 0; i < nums.length; i++) {
-		if (nums[i] % 2 == 0 && nums[i] > num) {
-			num = nums[i];
+	for (let num of nums) {
+		if (num % 2 == 0 && num > maxNum) {
+			maxNum = num;
 		}
 	}
 
 	if (num !== -Infinity) {
-		return num;
+		return maxNum;
 	}
 }
 ```
