@@ -3,17 +3,17 @@
 
 Chapter 2 explored the core nature of JS `function`s, and layed the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions -- to bend them to our will.
 
-Specifically, our attention for this chapter will be on the parameter inputs of functions. As you bring functions of all different shapes together in your programs, you'll quickly face incompatibilities in the number/order/type of inputs, as well the need to specify some inputs at different times than others.
+Specifically, our attention for this chapter will be on the parameter inputs of functions. As you bring functions of all different shapes together in your programs, you'll quickly face incompatibilities in the number/order/type of inputs, as well as the need to specify some inputs at different times than others.
 
 As a matter of fact, for stylistic purposes of readability, sometimes you'll want to define functions in a way that hides their inputs entirely!
 
-These kinds of techniques are absolutely essential to making functions truly *function*al.
+These kinds of techniques are absolutely essential to making functions truly *function*-al.
 
 ## All For One
 
-Imagine you're passing a function to a utility, where it will send multiple arguments to that function. But you may only want it to receive a single argument.
+Imagine you're passing a function to a utility, where the utility will send multiple arguments to that function. But you may only want the function to receive a single argument.
 
-We can design a simple utility that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
+We can design a simple helper that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
 
 ```js
 function unary(fn) {
@@ -32,7 +32,7 @@ var unary =
             fn( arg );
 ```
 
-**Note:** No question this is more terse, sparse even. But I personally feel that whatever it may gain in symmetry with the mathematical notation, it loses more in overall readability with the functions all being anonymous, and by obscuring the scope boundaries making deciphering closure a little more cryptic.
+**Note:** No question this is more terse, sparse even. But I personally feel that whatever it may gain in symmetry with the mathematical notation, it loses more in overall readability with the functions all being anonymous, and by obscuring the scope boundaries, making deciphering closure a little more cryptic.
 
 A commonly cited example for using `unary(..)` is with the `map(..)` utility (see Chapter 9) and `parseInt(..)`. `map(..)` calls a mapper function for each item in a list, and each time it invokes the mapper function, it passes in 3 arguments: `value`, `idx`, `arr`.
 
@@ -45,7 +45,7 @@ That's usually not a big deal, unless you're trying to use something as a mapper
 
 For the signature `parseInt(str,radix)`, it's clear that when `map(..)` passes `index` in the second argument position, it's interpreted by `parseInt(..)` as the `radix`, which we don't want.
 
-`unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is never received by `parseInt(..)` to be mistaken as the `radix`:
+`unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed in `index` is never received by `parseInt(..)` and mistaken as the `radix`:
 
 ```js
 ["1","2","3"].map( unary( parseInt ) );
@@ -54,7 +54,7 @@ For the signature `parseInt(str,radix)`, it's clear that when `map(..)` passes `
 
 ### One On One
 
-Speaking of functions with only one argument, another common base operation in the FP toolbelt is a function that takes one argument and does nothing but return the value untouched:
+Speaking of functions with only one argument, another common base utility in the FP toolbelt is a function that takes one argument and does nothing but return the value untouched:
 
 ```js
 function identity(v) {
@@ -69,7 +69,7 @@ var identity =
 
 This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
 
-For example, imagine you'd like split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (covered in detail later in the text) with `identity(..)` as the predicate:
+For example, imagine you'd like to split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (see Chapter 9) with `identity(..)` as the predicate:
 
 ```js
 var words = "   Now is the time for all...  ".split( /\s|\b/ );
@@ -80,9 +80,9 @@ words.filter( identity );
 // ["Now","is","the","time","for","all","..."]
 ```
 
-Since `identity(..)` simply returns the value passed to it, JS coerces each value into either `true` or `false`, and that decides to keep or exclude each value in the final array.
+Since `identity(..)` simply returns the value passed to it, JS coerces each value into either `true` or `false`, and that determines whether to keep or exclude each value in the final array.
 
-**Tip:** Another unary function that can be used as the predicate in the previous example is JS's own `Boolean(..)` function, which explicitly coerces the values to `true` or `false`.
+**Tip:** Another unary function that can be used as the predicate in the previous example is JS's built-in `Boolean(..)` function, which explicitly coerces a value to `true` or `false`.
 
 Another example of using `identity(..)` is as a default function in place of a transformation:
 
@@ -100,21 +100,27 @@ output( "Hello World", upper );     // HELLO WORLD
 output( "Hello World" );            // Hello World
 ```
 
-If `output(..)` didn't have a default for `formatFn`, we could bring our earlier friend `partialRight(..)`:
-
-```js
-var specialOutput = partialRight( output, upper );
-var simpleOutput = partialRight( output, identity );
-
-specialOutput( "Hello World" );     // HELLO WORLD
-simpleOutput( "Hello World" );      // Hello World
-```
-
 You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in Chapter 9.
 
 ### Unchanging One
 
-Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function just returns the value. One such API is the `then(..)` method on JS Promises. Many claim that ES6 `=>` arrow functions are the best "solution". But there's an FP utility that's more well suited for the task:
+Certain APIs don't let you pass a value directly into a method, but require you to pass in a function, even if that function literally just returns the value. One such API is the `then(..)` method on JS Promises:
+
+```js
+// doesn't work:
+p1.then( foo ).then( p2 ).then( bar );
+
+// instead:
+p1.then( foo ).then( function(){ return p2; } ).then( bar );
+```
+
+Many claim that ES6 `=>` arrow functions are the best "solution":
+
+```js
+p1.then( foo ).then( () => p2 ).then( bar );
+```
+
+But there's an FP utility that's more well suited for the task:
 
 ```js
 function constant(v) {
@@ -130,13 +136,9 @@ var constant =
             v;
 ```
 
-With this tidy little utility, we can solve our `then(..)` annoyance:
+With this tidy little FP utility, we can solve our `then(..)` annoyance properly:
 
 ```js
-p1.then( foo ).then( () => p2 ).then( bar );
-
-// vs
-
 p1.then( foo ).then( constant( p2 ) ).then( bar );
 ```
 
