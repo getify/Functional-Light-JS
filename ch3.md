@@ -747,7 +747,7 @@ We can adapt our previous currying implementation to this common looser definiti
 function looseCurry(fn,arity = fn.length) {
 	return (function nextCurried(prevArgs){
 		return function curried(...nextArgs){
-			var args = [ ...prevArgs, nextArgs ];
+			var args = [ ...prevArgs, ...nextArgs ];
 
 			if (args.length >= arity) {
 				return fn( ...args );
