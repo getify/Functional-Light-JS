@@ -218,7 +218,7 @@ function person(name,age) {
     return happyBirthday(){
         age++;
         console.log(
-            "Happy " + age + "th Birthday, " + name + "!"
+            `Happy ${age}th Birthday, ${name}!`
         );
     }
 }
@@ -239,7 +239,7 @@ var birthdayBoy = {
     happyBirthday() {
         this.age++;
         console.log(
-            "Happy " + this.age + "th Birthday, " + this.name + "!"
+            `Happy ${this.age}th Birthday, ${this.name}!`
         );
     }
 };
