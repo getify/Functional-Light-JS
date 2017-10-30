@@ -157,10 +157,10 @@ What about counting the number of arguments the current function call received? 
 
 ```js
 function foo(x,y,z) {
-    console.log( arguments.length );    // 2
+    console.log( arguments.length );
 }
 
-foo( 3, 4 );
+foo( 3, 4 );    // 2
 ```
 
 As of ES5 (and strict mode, specifically), `arguments` is considered by some to be sort-of-deprecated; many avoid using it if possible. In JS, we "never" break backwards-compatibility no matter how helpful that may be for future progress, so `arguments` will never be removed. But it's now commonly suggested that you avoid using it whenever possible.
@@ -284,7 +284,7 @@ Do you spot the `[ .. ]` brackets around the parameter list now? This is called 
 
 In this example, destructuring tells the engine that an array is expected in this assignment position (aka parameter). The pattern says to take the first value of that array and assign to a local parameter variable called `x`, the second to `y`, and whatever is left is *gathered* into `args`.
 
-## The Importance Of Declarative Style
+### The Importance Of Declarative Style
 
 Considering the destructured `foo(..)` we just looked at, we could instead have processed the parameters manually:
 
@@ -298,9 +298,9 @@ function foo(params) {
 }
 ```
 
-But now we can dig into a principle we only glanced at in Chapter 1: declarative code communicates more effectively than imperative code.
+But here we highlight a principle we only briefly introduced in Chapter 1: declarative code communicates more effectively than imperative code.
 
-Declarative code -- for example, the destructuring in the earlier `foo(..)` snippet, or the `...` operator usages -- focuses on what the outcome of a piece of code should be.
+Declarative code -- for example, the destructuring in the former `foo(..)` snippet, or the `...` operator usages -- focuses on what the outcome of a piece of code should be.
 
 Imperative code -- such as the manual assignments in the latter snippet -- focuses more on how to get the outcome. If you later read such imperative code, you have to mentally execute all of it to understand the desired outcome. The outcome is *coded* there, but it's not as clear because it's clouded by the details of *how* we get there.
 
@@ -308,7 +308,7 @@ The earlier `foo(..)` is regarded as more readable, because the destructuring hi
 
 Wherever possible, and to whatever degrees our language and our libraries/frameworks will let us, **we should be striving for declarative, self-explanatory code.**
 
-### Named Arguments
+## Named Arguments
 
 Just as we can destructure array parameters, we can destructure object parameters:
 
@@ -334,7 +334,7 @@ Some languages have an explicit feature for this: named arguments. In other word
 
 Another FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that in Chapter 4.
 
-#### Unordered Parameters
+### Unordered Parameters
 
 Another key benefit is that named arguments, by virtue of being specified as object properties, are not fundamentally ordered. That means we can specify inputs in whatever order we want:
 
@@ -858,7 +858,7 @@ This time investment is well worth it.
 
 ### Functions Without `function`
 
-So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz around the new ES6 `=>` arrow function syntax.
+So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz around the ES6 `=>` arrow function syntax.
 
 Compare:
 
@@ -1036,4 +1036,4 @@ Be careful of anonymous functions, especially `=>` arrow functions. They're conv
 
 Don't use `this`-aware functions. Just don't.
 
-You should now be developing a clear and colorful perspective in your mind of what *function* means in Functional Programming. It's time to start wrangling functions to get them to interoperate, and the next chapter teaches you a variety of critical techniques you'll need on this journey.
+You should now be developing a clear and colorful perspective in your mind of what *function* means in Functional Programming. It's time to start wrangling functions to get them to interoperate, and the next chapter teaches you a variety of critical techniques you'll need along the way.

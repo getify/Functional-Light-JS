@@ -181,7 +181,7 @@ I call the less formal practice herein "Functional-Light Programming" because I 
 
 I know many FPers who believe that the formalism itself helps learning. But I think there's clearly a cliff where that only becomes true once you reach a certain comfort with the formalism. If you happen to already have a math background or even some flavors of CS experience, this may come more naturally to you. But some of us don't, and no matter how hard we try, the formalism keeps getting in the way.
 
-So this book introduces the concepts that I believe FP is built on, but comes at it by giving you a boost from below to climb up the cliff wall, rather than shouting down at you from the top to urge you to figure out how to climb as you go.
+So this book introduces the concepts that I believe FP is built on, but comes at it by giving you a boost from below to climb up the cliff wall, rather than condescendingly shouting down at you from the top, proding you to just figure out how to climb as you go.
 
 ## How To Find Balance
 
