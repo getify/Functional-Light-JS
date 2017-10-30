@@ -194,13 +194,13 @@ var users = {};
 var userOrders = {};
 
 function fetchUserData(userId) {
-    ajax( "http://some.api/user/" + userId, function onUserData(userData){
+    ajax( `http://some.api/user/${userId}`, function onUserData(userData){
         users[userId] = userData;
     } );
 }
 
 function fetchOrders(userId) {
-    ajax( "http://some.api/orders/" + userId, function onOrders(orders){
+    ajax( `http://some.api/orders/${userId}`, function onOrders(orders){
         for (let order of orders) {
             // keep a reference to latest order for each user
             users[userId].latestOrder = order;
@@ -218,7 +218,7 @@ function deleteOrder(orderId) {
         hideLatestOrderDisplay();
     }
 
-    ajax( "http://some.api/delete/order/" + orderId, function onDelete(success){
+    ajax( `http://some.api/delete/order/${orderId}`, function onDelete(success){
         if (success) {
             // deleted the latest order for a user?
             if (isLatestOrder) {
@@ -851,7 +851,7 @@ Recall:
 var users = {};
 
 function fetchUserData(userId) {
-    ajax( "http://some.api/user/" + userId, function onUserData(userData){
+    ajax( `http://some.api/user/${userId}`, function onUserData(userData){
         users[userId] = userData;
     } );
 }
@@ -875,7 +875,7 @@ function safer_fetchUserData(userId,users) {
 
     // original untouched impure function:
     function fetchUserData(userId) {
-        ajax( "http://some.api/user/" + userId, function onUserData(userData){
+        ajax( `http://some.api/user/${userId}`, function onUserData(userData){
             users[userId] = userData;
         } );
     }

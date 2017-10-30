@@ -965,7 +965,7 @@ There are other tricks we can leverage in a `this`-based system, like for exampl
 ```js
 var Auth = {
     authorize() {
-        var credentials = this.username + ":" + this.password;
+        var credentials = `${this.username}:${this.password}`;
         this.send( credentials, resp => {
             if (resp.error) this.displayError( resp.error );
             else this.displaySuccess();
@@ -1003,7 +1003,7 @@ In case you're having trouble parsing what this code does: we have two separate 
 // ..
 
 authorize(ctx) {
-    var credentials = ctx.username + ":" + ctx.password;
+    var credentials = `${ctx.username}:${ctx.password}`;
     Auth.send( credentials, function onResp(resp){
         if (resp.error) ctx.displayError( resp.error );
         else ctx.displaySuccess();
