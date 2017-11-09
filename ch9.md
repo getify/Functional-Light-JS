@@ -596,7 +596,7 @@ var flatten =
     arr =>
         arr.reduce(
             (list,v) =>
-                [ ...list, Array.isArray( v ) ? flatten( v ) : v ]
+                [ ...list, ...Array.isArray( v ) ? flatten( v ) : [v] ]
         , [] );
 ```
 
@@ -617,12 +617,10 @@ var flatten =
         arr.reduce(
             (list,v) =>
                 [ ...list,
-                    depth > 0 ?
-                        (depth > 1 && Array.isArray( v ) ?
+                    ...
+                        depth >= 1 && Array.isArray( v ) ?
                             flatten( v, depth - 1 ) :
-                            v
-                        ) :
-                        [v]
+                            [v]
                 ]
         , [] );
 ```
