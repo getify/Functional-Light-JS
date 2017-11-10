@@ -389,7 +389,7 @@ Expressed in JavaScript using the built-in `reduce(..)` method on arrays:
 But a standalone implementation of `reduce(..)` might look like this:
 
 ```js
-function reduce(reducerFn,initialValue,arr) {
+function reduce(reducerFn,arr,initialValue) {
     var acc, startIdx;
 
     if (arguments.length == 3) {
