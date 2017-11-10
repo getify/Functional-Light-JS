@@ -623,7 +623,7 @@ fred();                 // I am Fred
 susan();                // I am Susan
 ```
 
-The inner function `identify()` has closure over the parameter `id`.
+The inner function `identify()` has closure over the parameter `name`.
 
 The access that closure enables is not restricted to merely reading the variable's original value -- it's not just a snapshot but rather a live link. You can update the value, and that new current state remains remembered until the next access.
 
