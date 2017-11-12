@@ -194,7 +194,7 @@ function maxEven(...nums) {
         }
     }
 
-    if (num !== -Infinity) {
+    if (maxNum !== -Infinity) {
         return maxNum;
     }
 }
