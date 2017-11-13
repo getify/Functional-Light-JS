@@ -3,16 +3,16 @@
 
 If you've been reading this book from start to finish, take a minute to stop and look back how far you've come since Chapter 1. It's been quite a journey. I hope you've learned a lot and gained insight into thinking functionally for your own programs.
 
-I want to close this book leaving you with some quick pointers of working with official FP libraries. This is not an exhaustive documentation on each, but a quick glance at the things you should be aware of as you venture beyond "functional-light" into true FP.
+I want to close this book leaving you with some quick pointers of working with common/popular FP libraries. This is not an exhaustive documentation on each, but a quick glance at the things you should be aware of as you venture beyond "Functional-Light" into broader FP.
 
 Wherever possible, I recommend you *not* reinvent any wheels. If you find an FP library that suits your needs, use it. Only use the ad hoc helper utilities from this book -- or invent ones of your own! -- if you can't find a suitable library method for your circumstance.
 
-## Stuff To Investigate
+## Stuff to Investigate
 
 Let's expand the list of FP libraries to be aware of, from Chapter 1. We won't cover all of these (as there's a lot of overlap), but here are the ones that should probably be on your radar screen:
 
 * [Ramda](http://ramdajs.com): General FP Utilities
-* [Sanctuary](https://github.com/sanctuary-js/sanctuary): Ramda Companion For FP Types
+* [Sanctuary](https://github.com/sanctuary-js/sanctuary): Ramda Companion for FP Types
 * [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide): General FP Utilities
 * [functional.js](http://functionaljs.com/): General FP Utilities
 * [Immutable](https://github.com/facebook/immutable-js): Immutable Data Structures
@@ -27,7 +27,7 @@ One resource that's extremely important to the FP world -- it's not a library bu
 
 This is definitely not light reading for the faint of heart. It's a complete detailed roadmap of all of FP as it's interpreted in JavaScript. FL has become a de facto standard for JavaScript FP libraries to adhere to, to ensure maximum interoperability.
 
-Fantasy Land is pretty much the exact opposite of "functional-light". It's the full-on no holds barred approach to FP in JavaScript. That said, as you venture beyond this book, it's undeniable that FL will be down that road for you. I'd recommend you bookmark it, and go back to it after you've had at least 6 months of real world practice with this book's concepts.
+Fantasy Land is pretty much the exact opposite of "Functional-Light". It's the full-on no-holds-barred approach to FP in JavaScript. That said, as you venture beyond this book, it's likely that FL will be on that road for you. I'd recommend you bookmark it, and go back to it after you've had at least six months of real-world practice with this book's concepts.
 
 ## Ramda (0.23.0)
 
@@ -72,13 +72,13 @@ A few differences to point out compared to Chapter 3's approach:
 
 * `R.partial(..)` takes all of its subsequent arguments (beyond the function) as a single array.
 
-* Because Ramda is using loose currying, we don't need to use `R.uncurryN(..)` to get a `printIf(..)` that takes both its arguments. If we did, it would look like `R.uncurryN( 2, .. )` wrapped around the `R.partial(..)` call; but, that's not necessary.
+* Because Ramda is using loose currying, we don't need to use `R.uncurryN(..)` to get a `printIf(..)` that takes both its arguments. If we did, it would look like `R.uncurryN( 2, .. )` wrapped around the `R.partial(..)` call; but that's not necessary.
 
 Ramda is a very popular and powerful library. It's a really good place to start if you're practicing adding FP to your code base.
 
 ## Lodash/fp (4.17.4)
 
-Lodash is one of the most popular libraries in the entire JS ecosystem. They publish an "FP friendly" version of their API as ["lodash/fp"](https://github.com/lodash/lodash/wiki/FP-Guide).
+Lodash is one of the most popular libraries in the entire JS ecosystem. They publish an "FP-friendly" version of their API as ["lodash/fp"](https://github.com/lodash/lodash/wiki/FP-Guide).
 
 In Chapter 9, we looked at composing standalone list operations (`map(..)`, `filter(..)`, and `reduce(..)`). Here's how we could do it with "lodash/fp":
 
@@ -216,7 +216,7 @@ If FPO's named argument form of FP appeals to you, perhaps check out the library
 
 ## Bonus #2: fasy
 
-FP iterations (`map(..)`, `filter(..)`, etc) are almost always modeled as synchronous operations, meaning we eagerly run through all the steps of the iteration immediately. As a matter of fact, other FP patterns like composition and even transducing are also iterations, and are also modeled exactly this way.
+FP iterations (`map(..)`, `filter(..)`, etc.) are almost always modeled as synchronous operations, meaning we eagerly run through all the steps of the iteration immediately. As a matter of fact, other FP patterns like composition and even transducing are also iterations, and are also modeled exactly this way.
 
 But what happens if one or more of the steps in an iteration needs to complete asynchronously? You might jump to thinking that Observables (see Chapter 10) is the natural answer, but they're not what we need.
 
@@ -249,7 +249,7 @@ Unfortunately, this "trick" only works if you're going to do all the asynchronou
 
 And some operations naturally require serial asynchrony, like for example an asynchronous `reduce(..)`, which clearly needs to work left-to-right one at a time; those steps can't be run concurrently and have that operation make any sense.
 
-As I said, Observables (see Chapter 10) aren't the answer to these kinds of tasks. The reason is, an Observable's coordination of asynchrony is between separate operations, not between steps/iterations in at a single level of operation.
+As I said, Observables (see Chapter 10) aren't the answer to these kinds of tasks. The reason is, an Observable's coordination of asynchrony is between separate operations, not between steps/iterations at a single level of operation.
 
 Another way to visualize this distinction is that Observables support "vertical asynchrony", whereas what I'm talking about would be "horizontal asynchrony".
 
@@ -271,7 +271,7 @@ obsv
 // 11
 ```
 
-If for some reason I wanted to ensure that there was a delay of 100ms between when `1` was processed by the first `map(..)` and when `2` was processed, that would be the "horizontal asynchrony" I'm referring to. There's not really a clean way to model that.
+If for some reason I wanted to ensure that there was a delay of 100 ms between when `1` was processed by the first `map(..)` and when `2` was processed, that would be the "horizontal asynchrony" I'm referring to. There's not really a clean way to model that.
 
 And of course, I'm using an arbitrary delay in that description, but in practice that would more likely be serial-asynchrony like an asynchronous reduce, where each step in that reduction iteration could take some time before it completes and lets the next step be processed.
 
@@ -297,16 +297,16 @@ In both cases, the `then(..)` handler will only be invoked once all the fetches 
 
 Your instinct might be that concurrent would always be preferable, and while that may be common, it's not always the case.
 
-For example, what if `fetchImage(..)` maintains a cache of fetched images, and it checks the cache before making the actual network request? What if also, the list of `imageURLs` could have duplicates in it? You'd certainly want the first fetch of an image URL to complete (and populate the cache) before doing the check on the duplicate image URL later in the list.
+For example, what if `fetchImage(..)` maintains a cache of fetched images, and it checks the cache before making the actual network request? What if, in addition to that, the list of `imageURLs` could have duplicates in it? You'd certainly want the first fetch of an image URL to complete (and populate the cache) before doing the check on the duplicate image URL later in the list.
 
-Again, there will inevitably be cases where whether concurrent or serial asynchrony will be called for. Asynchronous reductions will always be serial, whereas asynchronous mappings may likely tend to be more concurrent but can also need to be serial in some cases. That's why **fasy** supports all these options.
+Again, there will inevitably be cases where concurrent or serial asynchrony will be called for. Asynchronous reductions will always be serial, whereas asynchronous mappings may likely tend to be more concurrent but can also need to be serial in some cases. That's why **fasy** supports all these options.
 
 Along with Observables, **fasy** will help you extend more FP patterns and principles to your asynchronous operations.
 
 ## Summary
 
-JavaScript is not particularly designed as an FP language. However, it does have enough of the basics (like function values, closures, etc) for us to make it FP-friendly. And the libraries we've examined here will help you do that.
+JavaScript is not particularly designed as an FP language. However, it does have enough of the basics (like function values, closures, etc.) for us to make it FP-friendly. And the libraries we've examined here will help you do that.
 
-Armed with the concepts from this book, you're ready to start tackling real world code. Find a good, comfortable FP library and jump in. Practice, practice, practice!
+Armed with the concepts from this book, you're ready to start tackling real-world code. Find a good, comfortable FP library and jump in. Practice, practice, practice!
 
-So... that's it. I've shared what I have for you, for now. I hereby officially certify you as a "Functional-Light JavaScript" programmer! It's time to close out this "chapter" of our story of learning FP together. But my learning journey still continues; I hope your's does, too!
+So... that's it. I've shared what I have for you, for now. I hereby officially certify you as a "Functional-Light JavaScript" programmer! It's time to close out this "chapter" of our story of learning FP together. But my learning journey still continues; I hope yours does, too!

@@ -1,13 +1,13 @@
 # Functional-Light JavaScript
 # Appendix B: The Humble Monad
 
-Let me just start off this appendix by admitting: I did not know much about what a monad was before starting to write the following. And it took a lot of mistakes to get something sensible. If you don't believe me, go look at the commit history of this appendix in the Git repo for this book (https://github.com/getify/Functional-Light-JS)!
+Let me just start off this appendix by admitting: I did not know much about what a monad was before starting to write this appendix. And it took a lot of mistakes to get something sensible. If you don't believe me, go look at the commit history of this appendix in the Git repo for this book (https://github.com/getify/Functional-Light-JS)!
 
 I am including the topic of monads in the book because it's part of the journey that every developer will encounter while learning FP, just as I have in this book writing.
 
-We're basically ending this book with a brief glimpse at monads, whereas most other FP literature kinda almost starts with monads! I do not encounter in my "functional light" programming much of a need to think explicitly in terms of monads, so that's why this material is more bonus than main core. But that's not to say monads aren't useful or prevalent -- they very much are.
+We're basically ending this book with a brief glimpse at monads, whereas most other FP literature kinda almost starts with monads! I do not encounter in my "Functional-Light" programming much of a need to think explicitly in terms of monads, so that's why this material is more bonus than main core. But that's not to say monads aren't useful or prevalent -- they very much are.
 
-There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite-of-passage. Over the years, monads have variously been depicted as burritos, onions, and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here!
+There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite of passage. Over the years, monads have variously been depicted as burritos, onions, and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here!
 
 > A monad is just a monoid in the category of endofunctors.
 
@@ -23,7 +23,7 @@ But what I will say is that a monad is basically a value type.
 
 The number `42` has a value type (number!) that brings with it certain characteristics and capabilities that we rely on. The string `"42"` may look very similar, but it has a different purpose in our program.
 
-In object oriented programming, when you have a set of data (even a single discrete value) and you have some behavior you want to bundle with it, you create an object/class to represent that "type". Instances are then members of that type. This practice generally goes by the name "Data Structures".
+In object-oriented programming, when you have a set of data (even a single discrete value) and you have some behavior you want to bundle with it, you create an object/class to represent that "type". Instances are then members of that type. This practice generally goes by the name "data structures".
 
 I'm going to use the notion of data structures very loosely here, and assert that we may find it useful in a program to define a set of behaviors and constraints for a certain value, and bundle them together with that value into a single abstraction. That way, as we work with one or more of those kinds of values in our program, their behaviors come along for free and will make working with them more convenient. And by convenient, I mean more declarative and approachable for the reader of your code!
 
@@ -39,19 +39,19 @@ For example, you may read about the "Identity Monad", the "IO Monad", the "Maybe
 
 It's a little more than an interface though, because it's not just the presence of certain API methods that makes an object a monad. There's a certain set of guarantees about the interactions of these methods that is necessary, to be monadic. These well-known invariants are critical to usage of monads improving readability by familiarity; otherwise, it's just an ad hoc data structure that must be fully read to be understood by the reader.
 
-As a matter of fact, there's not even just one single unified agreement on the names of these monadic methods, the way a true interface would mandate; a monad is more like a loose interface. Some people call a certain method `bind(..)`, some call it `chain(..)`, some call it `flatMap(..)`, etc.
+As a matter of fact, there's not even just one single unified agreement on the names of these monadic methods, the way a true interface would mandate; a monad is more like a loose interface. Some people call a certain method `bind(..)`, some call it `chain(..)`, some call it `flatMap(..)`, and so on.
 
 So a monad is an object data structure with sufficient methods (of practically any name or sort) that at a minimum satisfy the main behavioral requirements of the monad definition. Each kind of monad has a different kind of extension above the minimum. But, because they all have an overlap in behavior, using two different kinds of monads together is still straightforward and predictable.
 
 It's in that sense that monads are sort of like an interface.
 
-## Just A Monad
+## Just a Monad
 
 A basic primitive monad underlying many other monads you will run across is called Just. It's *just* a simple monadic wrapper for any regular (aka, non-empty) value.
 
-Since a monad is a type, you might think we'd define `Just` as a class to be instantiated. That's a valid way of doing it, but it introduces `this`-binding issues in the methods that I don't want to juggle; instead I'm going to stick with just a simple function approach.
+Since a monad is a type, you might think we'd define `Just` as a class to be instantiated. That's a valid way of doing it, but it introduces `this`-binding issues in the methods that I don't want to juggle; instead, I'm going to stick with just a simple function approach.
 
-Here's a simple implementation:
+Here's a basic implementation:
 
 ```js
 function Just(val) {
@@ -76,9 +76,9 @@ function Just(val) {
 
 You'll notice that whatever `val` value a `Just(..)` instance holds, it's never changed. All monad methods create new monad instances instead of mutating the monad's value itself.
 
-Don't worry if most of this doesn't make sense right now. We're not gonna obsess too much over the details or the math/theory behind the design of the Monad. Instead, we'll focus more on illustrating what we can do with them.
+Don't worry if most of this doesn't make sense right now. We're not gonna obsess too much over the details or the math/theory behind the design of the monad. Instead, we'll focus more on illustrating what we can do with them.
 
-### Working With Monad Methods
+### Working with Monad Methods
 
 All monad instances will have `map(..)`, `chain(..)` (also called `bind(..)` or `flatMap(..)`), and `ap(..)` methods. The purpose of these methods and their behavior is to provide a standardized way of multiple monad instances interacting with each other.
 
@@ -134,7 +134,7 @@ By contrast, a monad's `ap(..)` method will likely be much less intuitive at fir
 
 However, `map(..)` always expects a function. So that means the monad you call `ap(..)` on has to actually contain a function as its value, to pass to that other monad's `map(..)`.
 
-Confused? Yeah, not what you might have expected. We'll try to briefly illuminate, but just expect that these things will be fuzzy for awhile until you've had a lot more exposure and practice with monads.
+Confused? Yeah, not what you might have expected. We'll try to briefly illuminate, but just expect that these things will be fuzzy for a while until you've had a lot more exposure and practice with monads.
 
 We'll define `A` as a monad that contains a value `10`, and `B` as a monad that contains the value `3`:
 
@@ -235,7 +235,7 @@ The power of the Maybe abstraction is to encapsulate that behavior/no-op duality
 
 ### Different Maybes
 
-Many implementations of a JavaScript Maybe monad include a check (usually in `map(..)`) to see if the value is `null` / `undefined`, and skipping the behavior if so. In fact, Maybe is trumpeted as being valuable precisely because it sort of automatically short-circuits its behavior with the encapsulated empty-value check.
+Many implementations of a JavaScript Maybe monad include a check (usually in `map(..)`) to see if the value is `null`/`undefined`, and skipping the behavior if so. In fact, Maybe is trumpeted as being valuable precisely because it sort of automatically short-circuits its behavior with the encapsulated empty-value check.
 
 Here's how Maybe is usually illustrated:
 
@@ -249,13 +249,13 @@ Maybe.of( someObj )
 .map( console.log );
 ```
 
-In other words, if at any point in the chain we get a `null` / `undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
+In other words, if at any point in the chain we get a `null`/`undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
 
 But... that approach to Maybe is not a pure monad.
 
 The core spirit of a Monad says that it must be valid for all values and cannot do any inspection of the value, at all -- not even a null check. So those other implementations are cutting corners for the sake of convenience. It's not a huge deal, but when it comes to learning something, you should probably learn it in its purest form first before you go bending the rules.
 
-The earlier implementation of the Maybe monad I provided differs from other Maybes primarily in that it does not have the empty-check in it. Also, we present `Maybe` merely as a loose pairing of `Just(..)` / `Nothing()`.
+The earlier implementation of the Maybe monad I provided differs from other Maybes primarily in that it does not have the empty-check in it. Also, we present `Maybe` merely as a loose pairing of `Just(..)`/`Nothing()`.
 
 So wait. If we don't get the automatic short-circuting, why is Maybe useful at all?!? That seems like its whole point.
 
@@ -288,7 +288,7 @@ The benefit of the monad, and Maybe specifically, is that our `map(..)` and `cha
 
 Now that we have a little more understanding of Maybe and what it does, I'm going to put a little twist on it -- and add some self-deferential humor to our discussion -- by inventing the Maybe+Humble monad. Technically, `MaybeHumble(..)` is not a monad itself, but a factory function that produces a Maybe monad instance.
 
-Humble is an admittedly contrived data structure wrapper that uses Maybe to track the status of an `egoLevel` number. Specifically, `MaybeHumble(..)`-produced monad instances only operate affirmatively if their ego level value is low enough (less than `42`!) to be considered humble; otherwise it's a `Nothing()` no-op. That should sound a lot like Maybe; it's pretty similar!
+Humble is an admittedly contrived data structure wrapper that uses Maybe to track the status of an `egoLevel` number. Specifically, `MaybeHumble(..)`-produced monad instances only operate affirmatively if their ego-level value is low enough (less than `42`!) to be considered humble; otherwise it's a `Nothing()` no-op. That should sound a lot like Maybe; it's pretty similar!
 
 Here's the factory function for our Maybe+Humble monad:
 
@@ -342,7 +342,7 @@ bob.map( teamMembers ).ap( alice );
 
 Recalling the usage of `ap(..)` from earlier, we can now explain how this code works.
 
-Since `teamMembers(..)` is curried, the `bob.map(..)` call passes in the `bob` ego level (`41`), and creates a monad instance with the remaining function wrapped up. Calling `ap(alice)` on *that* monad calls `alice.map(..)` and passes to it the function from the monad. The effect is that both the `bob` and `alice` monad's numeric values have been provided to `teamMembers(..)` function, printing out the message as shown.
+Because `teamMembers(..)` is curried, the `bob.map(..)` call passes in the `bob` ego level (`41`), and creates a monad instance with the remaining function wrapped up. Calling `ap(alice)` on *that* monad calls `alice.map(..)` and passes to it the function from the monad. The effect is that both the `bob` and `alice` monad's numeric values have been provided to `teamMembers(..)` function, printing out the message as shown.
 
 However, if either or both monads are actually `Nothing()` instances (because their ego level was too high):
 
@@ -388,7 +388,7 @@ learner
 // ..nothing else..
 ```
 
-Unfortunately, the learning process seems to have been cut short. You see, I've found that learning a bunch of stuff without sharing with others: inflates your ego too much and is not good for your skills.
+Unfortunately, the learning process seems to have been cut short. You see, I've found that learning a bunch of stuff without sharing with others inflates your ego too much and is not good for your skills.
 
 Let's try a better approach to learning:
 

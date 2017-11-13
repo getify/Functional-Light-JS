@@ -5,18 +5,18 @@ In Chapter 5, we talked about the importance of reducing side causes/effects: th
 
 If programming-style idempotence is about defining a value change operation so that it can only affect state once, we now turn our attention to the goal of reducing the number of change occurrences from one to zero.
 
-Let's now explore value immutability, the notion that we use only values in our programs that cannot be changed.
+Let's now explore value immutability, the notion that in our programs we use only values that cannot be changed.
 
 ## Primitive Immutability
 
-Values of the primitive types (`number`, `string`, `boolean`, `null`, and `undefined`) are already immutable; there's nothing you can do to change them.
+Values of the primitive types (`number`, `string`, `boolean`, `null`, and `undefined`) are already immutable; there's nothing you can do to change them:
 
 ```js
 // invalid, and also makes no sense
 2 = 2.5;
 ```
 
-However, JS does have an peculiar behavior which seems like it allows mutating such primitive type values: "boxing". When you access a property on certain primitive type values -- specifically `number`, `string`, and `boolean` -- under the covers JS automatically wraps (aka "boxes") the value in its object counterpart (`Number`, `String`, and `Boolean`, respectively).
+However, JS does have a peculiar behavior which seems like it allows mutating such primitive type values: "boxing". When you access a property on certain primitive type values -- specifically `number`, `string`, and `boolean` -- under the covers JS automatically wraps (aka "boxes") the value in its object counterpart (`Number`, `String`, and `Boolean`, respectively).
 
 Consider:
 
@@ -33,7 +33,7 @@ Numbers do not normally have a `length` property available, so the `x.length = 4
 
 But the fact that JS allows the `x.length = 4` statement to run at all can seem troubling, if for no other reason than its potential confusion to readers. The good news is, if you use strict mode (`"use strict";`), such a statement will throw an error.
 
-What if you try to mutate the explicitly-boxed object representation of such a value?
+What if you try to mutate the explicitly boxed object representation of such a value?
 
 ```js
 var x = new Number( 2 );
@@ -44,7 +44,7 @@ x.length = 4;
 
 `x` in this snippet is holding a reference to an object, so custom properties can be added and changed without issue.
 
-The immutability of simple primitives like `number`s probably seems fairly obvious. But what about `string` values? JS developers have a very common misconception that strings are like arrays and can thus be changed. JS syntax even hints at them being "array like" with the `[ ]` access operator. However, strings are also immutable.
+The immutability of simple primitives like `number`s probably seems fairly obvious. But what about `string` values? JS developers have a very common misconception that strings are like arrays and can thus be changed. JS syntax even hints at them being "array like" with the `[ ]` access operator. However, strings are also immutable:
 
 ```js
 var s = "hello";
@@ -57,7 +57,7 @@ s.length = 10;
 s;                  // "hello"
 ```
 
-Despite being able to access `s[1]` like it's an array, JS strings are not real arrays. Setting `s[1] = "E"` and `s.length = 10` both silently fail, just as `x.length = 4` did above. In strict mode, these assignments will fail, because both the `1` property and the `length` property are read-only on this primitive `string` value.
+Despite being able to access `s[1]` like it's an array, JS strings are not real arrays. Setting `s[1] = "E"` and `s.length = 10` both silently fail, just as `x.length = 4` did before. In strict mode, these assignments will fail, because both the `1` property and the `length` property are read-only on this primitive `string` value.
 
 Interestingly, even the boxed `String` object value will act (mostly) immutable as it will throw errors in strict mode if you change existing properties:
 
@@ -74,7 +74,7 @@ s[42] = "?";        // OK
 s;                  // "hello"
 ```
 
-## Value To Value
+## Value to Value
 
 We'll unpack this idea more throughout the chapter, but just to start with a clear understanding in mind: value immutability does not mean we can't have values change over the course of our program. A program without changing state is not a very interesting one! It also doesn't mean that our variables can't hold different values. These are all common misconceptions about value immutability.
 
@@ -151,11 +151,11 @@ In a little bit, we'll see another strategy for protecting ourselves from a valu
 
 ## Reassignment
 
-How would you describe what a "constant" is? Think about that for a moment before you move onto the next paragraph.
+How would you describe what a "constant" is? Think about that for a moment before you move on to the next paragraph.
 
 ...
 
-Some of you may have conjured descriptions like, "a value that can't change", "a variable that can't be changed", etc. These are all approximately in the neighborhood, but not quite at the right house. The precise definition we should use for a constant is: a variable that cannot be reassigned.
+Some of you may have conjured descriptions like, "a value that can't change", "a variable that can't be changed", or something similar. These are all approximately in the neighborhood, but not quite at the right house. The precise definition we should use for a constant is: a variable that cannot be reassigned.
 
 This nitpicking is really important, because it clarifies that a constant actually has nothing to do with the value, except to say that whatever value a constant holds, that variable cannot be reassigned any other value. But it says nothing about the nature of the value itself.
 
@@ -220,11 +220,11 @@ To back up my assertion, let's take a reality check. `const` creates a block sco
 // lots of code
 ```
 
-Typically, blocks are considered best designed to be only a few lines long. If you have blocks of more than say 10 lines, most developers will advise you to refactor. So `const x = 2` only applies to those next 9 lines of code at most.
+Typically, blocks are considered best designed to be only a few lines long. If you have blocks of more than say 10 lines, most developers will advise you to refactor. So `const x = 2` only applies to those next nine lines of code at most.
 
 No other part of the program can ever affect the assignment of `x`. **Period.**
 
-My claims is: that program has basically the same magnitude of readability as this one:
+My claims is that program has basically the same magnitude of readability as this one:
 
 ```js
 // lots of code
@@ -268,7 +268,7 @@ I've written and seen a lot of JavaScript, and I just think it's an imagined pro
 
 One of the reasons FPers so highly favor `const` and avoid reassignment is because of equational reasoning. Though this topic is more related to other languages than JS and goes beyond what we'll get into here, it is a valid point. However, I prefer the pragmatic view over the more academic one.
 
-For example, I've found measured use of variable reassignment can be useful in simplifying the description of intermediate states of computation. When a value is goes through multiple type coercions or other transformations, I don't generally want to come up with new variable names for each representation:
+For example, I've found measured use of variable reassignment can be useful in simplifying the description of intermediate states of computation. When a value goes through multiple type coercions or other transformations, I don't generally want to come up with new variable names for each representation:
 
 ```js
 var a = "420";
@@ -284,9 +284,9 @@ a = [ a ];
 
 If after changing from `"420"` to `420`, the original `"420"` value is no longer needed, then I think it's more readable to reassign `a` rather than come up with a new variable name like `aNum`.
 
-The thing we really should worry more about is not whether our variables get reassigned, but **whether our values get mutated**. Why? Because values are portable; lexical assignments are not. You can pass an array to a function, and it can be changed without you realizing it. But you cannot have a reassignment happen unexpectedly caused by some other part of your program.
+The thing we really should worry more about is not whether our variables get reassigned, but **whether our values get mutated**. Why? Because values are portable; lexical assignments are not. You can pass an array to a function, and it can be changed without you realizing it. But a reassignment will never be unexpectedly caused by some other part of your program.
 
-### It's Freezing In Here
+### It's Freezing in Here
 
 There's a cheap and simple way to turn a mutable object/array/function into an "immutable value" (of sorts):
 
@@ -328,9 +328,9 @@ This is so important because it makes reasoning about our code much easier when 
 
 ## Performance
 
-Whenever we start creating new values (arrays, objects, etc) instead of mutating existing ones, the obvious next question is: what does that mean for performance?
+Whenever we start creating new values (arrays, objects, etc.) instead of mutating existing ones, the obvious next question is: what does that mean for performance?
 
-If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory, the old values (if no longer referenced) are being garbage collected; That's even more CPU burn.
+If we have to reallocate a new array each time we need to add to it, that's not only churning CPU time and consuming extra memory; the old values (if no longer referenced) are also being garbage collected. That's even more CPU burn.
 
 Is that an acceptable trade-off? It depends. No discussion or optimization of code performance should happen **without context.**
 
@@ -340,13 +340,13 @@ Then again, if such an operation is going to occur frequently, or specifically h
 
 Think about a specialized data structure that's like an array, but that you want to be able to make changes to and have each change behave implicitly as if the result was a new array. How could you accomplish this without actually creating a new array each time? Such a special array data structure could store the original value and then track each change made as a delta from the previous version.
 
-Internally, it might be like a linked-list tree of object references where each node in the tree represents a mutation of the original value. Actually, this is conceptually similar to how **git** version control works.
+Internally, it might be like a linked-list tree of object references where each node in the tree represents a mutation of the original value. Actually, this is conceptually similar to how **Git** version control works.
 
 <p align="center">
     <img src="fig18.png" width="490">
 </p>
 
-In the above conceptual illustration, an original array `[3,6,1,0]` first has the mutation of value `4` assigned to position `0` (resulting in `[4,6,1,0]`), then `1` is assigned to position `3` (now `[4,6,1,1]`), finally `2` is assigned to position `4` (result: `[4,6,1,1,2]`). The key idea is that at each mutation, only the change from the previous version is recorded, not a duplication of the entire original data structure. This approach is much more efficient in both memory and CPU performance, in general.
+In this conceptual illustration, an original array `[3,6,1,0]` first has the mutation of value `4` assigned to position `0` (resulting in `[4,6,1,0]`), then `1` is assigned to position `3` (now `[4,6,1,1]`), finally `2` is assigned to position `4` (result: `[4,6,1,1,2]`). The key idea is that at each mutation, only the change from the previous version is recorded, not a duplication of the entire original data structure. This approach is much more efficient in both memory and CPU performance, in general.
 
 Imagine using this hypothetical specialized array data structure like this:
 
@@ -370,7 +370,7 @@ The `specialArray(..)` data structure would internally keep track of each mutati
 
 Inventing your own performance-optimized data structures is an interesting challenge. But pragmatically, you should probably use a library that already does this well. One great option is **Immutable.js** (http://facebook.github.io/immutable-js), which provides a variety of data structures, including `List` (like array) and `Map` (like object).
 
-Consider the above `specialArray` example but using `Immutable.List`:
+Consider the previous `specialArray` example but using `Immutable.List`:
 
 ```js
 var state = Immutable.List.of( 4, 6, 1, 1 );
@@ -435,11 +435,11 @@ arr2;                   // [1,2,3,4,5,6]
 arr3;                   // [2,3,4,5,6]
 ```
 
-Other array prototype methods that treat the value instance as immutable and return a new array instead of mutating: `map(..)` and `filter(..)`. The `reduce(..)` / `reduceRight(..)` utilities also avoid mutating the instance, though they also don't by default return a new array.
+Other array prototype methods that treat the value instance as immutable and return a new array instead of mutating: `map(..)` and `filter(..)`. The `reduce(..)`/`reduceRight(..)` utilities also avoid mutating the instance, though they don't by default return a new array.
 
 Unfortunately, for historical reasons, quite a few other array methods are impure mutators of their instance: `splice(..)`, `pop(..)`, `push(..)`, `shift(..)`, `unshift(..)`, `reverse(..)`, `sort(..)`, and `fill(..)`.
 
-It should not be seen as *forbidden* to use these kinds utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
+It should not be seen as *forbidden* to use these kinds of utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
 
 Recall one of the implementations of `compose(..)` from Chapter 4:
 
@@ -460,7 +460,7 @@ function compose(...fns) {
 }
 ```
 
-The `...fns` gather parameter is making a new local array from the passed in arguments, so it's not an array that we could create an outside side effect on. It would be reasonable then to assume that it's safe for us to mutate it locally. But the subtle gotcha here is that the inner `composed(..)` which closes over `fns` is not "local" in this sense.
+The `...fns` gather parameter is making a new local array from the passed-in arguments, so it's not an array that we could create an outside side effect on. It would be reasonable then to assume that it's safe for us to mutate it locally. But the subtle gotcha here is that the inner `composed(..)` which closes over `fns` is not "local" in this sense.
 
 Consider this different version which doesn't make a copy:
 
@@ -494,6 +494,6 @@ Value immutability is not about unchanging values. It's about creating and track
 
 `const` declarations (constants) are commonly mistaken for their ability to signal intent and enforce immutability. In reality, `const` has basically nothing to do with value immutability, and its usage will likely create more confusion than it solves. Instead, `Object.freeze(..)` provides a nice built-in way of setting shallow value immutability on an array or object. In many cases, this will be sufficient.
 
-For performance sensitive parts of the program, or in cases where changes happen frequently, creating a new array or object (especially if it contains lots of data) is undesirable, for both processing and memory concerns. In these cases, using immutable data structures from a library like **Immutable.js** is probably the best idea.
+For performance-sensitive parts of the program, or in cases where changes happen frequently, creating a new array or object (especially if it contains lots of data) is undesirable, for both processing and memory concerns. In these cases, using immutable data structures from a library like **Immutable.js** is probably the best idea.
 
 The importance of value immutability on code readability is less in the inability to change a value, and more in the discipline to treat a value as immutable.
