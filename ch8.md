@@ -226,13 +226,12 @@ To implement this recursive definition in JS, one approach is:
 
 ```js
 function maxEven(num1,...restNums) {
-    var maxRest = restNums.length > 0 ?
-            maxEven( ...restNums ) :
-            undefined;
-
-    return (num1 % 2 != 0 || num1 < maxRest) ?
-        maxRest :
-        num1;
+    var maxRest;
+    if (restNums.length > 0) {
+        maxRest = maxEven( ...restNums );
+    }
+    if (num1 % 2 != 0 || num1 < maxRest) return maxRest;
+    else return num1;
 }
 ```
 
@@ -261,7 +260,7 @@ Next, we turn our attention to checking `num1` against `maxRest` -- the main log
 
 The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` approach.
 
-**Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations like we discussed in Chapter 7. The list of numbers could first be `filter(..)`ed to include only evens, and then finding the max is a `reduce(..)` that simply compares two numbers and returns the bigger of the two. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
+**Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations like we discussed in Chapter 9. The list of numbers could first be `filter(..)`ed to include only evens, and then finding the max is a `reduce(..)` that simply compares two numbers and returns the bigger of the two. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
 
 ### Binary Tree Recursion
 
@@ -581,15 +580,15 @@ Our code can follow these steps almost exactly:
 ```js
 "use strict";
 
-function maxEven(num1,num2,...nums) {
-    num1 =
-        (num1 % 2 == 0 && !(maxEven( num2 ) > num1)) ?
-            num1 :
-            (num2 % 2 == 0 ? num2 : undefined);
-
-    return nums.length == 0 ?
-        num1 :
-        maxEven( num1, ...nums )
+function maxEven(num1,num2,...restNums) {
+  let maxNum;
+  if (num1 % 2 == 0 && !(maxEven( num2 ) > num1)) {
+    maxNum = num1;
+  } else if (num2 % 2 == 0) {
+    maxNum = num2;
+  }
+  if (restNums.length === 0) return maxNum;
+  else return maxEven( maxNum, ...restNums );
 }
 ```
 
