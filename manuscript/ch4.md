@@ -2,7 +2,7 @@
 
 By now, I hope you're feeling much more comfortable with what it means to use functions for functional programming.
 
-A functional programmer sees every function in their program like a little simple lego piece. They recognize the blue 2x2 brick at a glance, and know exactly how it works and what they can do with it. As they go about building a bigger complex lego model, as they need each next piece, they already have an instinct for which of their many spare pieces to grab.
+A functional programmer sees every function in their program like a simple little Lego piece. They recognize the blue 2x2 brick at a glance, and know exactly how it works and what they can do with it. When they begin building a bigger, more complex Lego model, as they need each next piece, they already have an instinct for which of their many spare pieces to grab.
 
 But sometimes you take the blue 2x2 brick and the gray 4x1 brick and put them together in a certain way, and you realize, "that's a useful piece that I need often".
 
@@ -12,9 +12,9 @@ Functions come in a variety of shapes and sizes. And we can define a certain com
 
 Composition is how an FPer models the flow of data through the program. In some senses, it's the most foundational concept in all of FP, because without it, you can't declaratively model data and state changes. In other words, everything else in FP would collapse without composition.
 
-## Output To Input
+## Output to Input
 
-We've already seen a few examples of composition. For example, in Chapter 3 our discussion of `unary(..)` included this expression: `unary(adder(3))`. Think about what's happening there.
+We've already seen a few examples of composition. For example, our discussion of `unary(..)` in Chapter 3 included this expression: `unary(adder(3))`. Think about what's happening there.
 
 To compose two functions together, pass the output of the first function call as the input of the second function call. In `unary(adder(3))`, the `adder(3)` call returns a value (a function); that value is directly passed as an argument to `unary(..)`, which also returns a value (another function).
 
@@ -58,7 +58,7 @@ function unique(list) {
 }
 ```
 
-`words(..)` splits of a string into an array of words. `unique(..)` takes a list of words and filters it to not have any repeat words in it.
+`words(..)` splits a string into an array of words. `unique(..)` takes a list of words and filters it to not have any repeat words in it.
 
 To use these two utilities to analyze a string of text:
 
@@ -78,13 +78,13 @@ wordsUsed;
 
 We name the array output of `words(..)` as `wordsFound`. The input of `unique(..)` is also an array, so we can pass the `wordsFound` into it.
 
-Back to the candy factory assembly line: the first machine takes as "input" the melted chocolate, and its "output" is a chunk of formed and cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut-up of piece of chocolate candy. Next, a machine on the line takes small pieces of chocolate candy from the conveyor belt and outputs wrapped candies ready to bag and ship.
+Back to the candy factory assembly line: the first machine takes as "input" the melted chocolate, and its "output" is a chunk of formed and cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut-up piece of chocolate candy. Next, a machine on the line takes small pieces of chocolate candy from the conveyor belt and outputs wrapped candies ready to bag and ship.
 
 ![](images/fig3.png)
 
 The candy factory is fairly successful with this process, but as with all businesses, management keeps searching for ways to grow.
 
-To keep up with demand for more candy production, they decide to take out the conveyor belt contraption and just stack all three machines on top of each other, so that the output valve of one is connected directly to the input valve of the one below it. There's no longer sprawling wasted space where a chunk of chocolate slowly and noisly rumbles down a conveyor belt from the first machine to the second.
+To keep up with demand for more candy production, they decide to take out the conveyor belt contraption and just stack all three machines on top of one another, so that the output valve of one is connected directly to the input valve of the one below it. There's no longer sprawling wasted space where a chunk of chocolate slowly and noisly rumbles down a conveyor belt from the first machine to the second.
 
 This innovation saves a lot of room on the factory floor, so management is happy they'll get to make more candy each day!
 
@@ -104,7 +104,7 @@ One morning, an engineer at the candy factory has a great idea. She figures that
 
 This single compound machine is much easier to move around and install wherever the factory needs it. The workers on the factory floor are even happier because they don't need to fidget with buttons and dials on three individual machines anymore; they quickly prefer using the single fancy machine.
 
-Relating back to the code: we now realize that the pairing of `words(..)` and `unique(..)` in that specific order of execution -- think: compound lego -- is something we could use in several other parts of our application. So, let's define a compound function that combines them:
+Relating back to the code: we now realize that the pairing of `words(..)` and `unique(..)` in that specific order of execution (think: compound Lego) is something we could use in several other parts of our application. So, let's define a compound function that combines them:
 
 ```js
 function uniqueWords(str) {
@@ -258,7 +258,7 @@ wordsUsed;
 // "function","input","second"]
 ```
 
-Now, let's recall `partialRight(..)` from Chapter 3 to do something more interesting with composition. We can build a right-partial application of `compose(..)` itself, pre-specifying the second and third arguments (`unique(..)` and `words(..)`, respectively); we'll call it `filterWords(..)` (see below).
+To do something more interesting with composition, let's use `partialRight(..)`, which we first looked at in Chapter 3. We can build a right-partial application of `compose(..)` itself, pre-specifying the second and third arguments (`unique(..)` and `words(..)`, respectively); we'll call it `filterWords(..)`.
 
 Then, we can complete the composition multiple times by calling `filterWords(..)`, but with different first-arguments respectively:
 
@@ -284,15 +284,15 @@ Take a moment to consider what the right-partial application on `compose(..)` gi
 
 You can also `curry(..)` a composition instead of partial application, though because of right-to-left ordering, you might more often want to `curry( reverseArgs(compose), ..)` rather than just `curry( compose, ..)` itself.
 
-**Note:** Since `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity like `curry(.. , 3)`.
+**Note:** Because `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity like `curry(.. , 3)`.
 
-### Alternate Implementations
+### Alternative Implementations
 
 While you may very well never implement your own `compose(..)` to use in production, and rather just use a library's implementation as provided, I've found that understanding how it works under the covers actually helps solidify general FP concepts very well.
 
 So let's examine some different implementation options for `compose(..)`. We'll also see there are some pros/cons to each implementation, especially performance.
 
-We'll be looking at the `reduce(..)` utility in detail later in the text, but for now, just know that it reduces a list (array) to a single finite value. It's like a fancy loop.
+We'll be looking at the `reduce(..)` utility in detail in Chapter 9, but for now, just know that it reduces a list (array) to a single finite value. It's like a fancy loop.
 
 For example, if you did an addition-reduction across the list of numbers `[1,2,3,4,5,6]`, you'd be looping over them adding them together as you go. The reduction would add `1` to `2`, and add that result to `3`, and then add that result to `4`, and so on, resulting in the final summation: `21`.
 
@@ -359,7 +359,7 @@ We could also define `compose(..)` using recursion. The recursive definition for
 compose( compose(fn1,fn2, .. fnN-1), fnN );
 ```
 
-**Note:** We will cover recursion in deep detail in Chapter 8, so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
+**Note:** We will cover recursion more fully in Chapter 8, so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
 
 Here's how we implement `compose(..)` with recursion:
 
@@ -459,7 +459,7 @@ var filterWords = partial( pipe, words, unique );
 
 As you may recall from our first implementation of `partialRight(..)` in Chapter 3, it uses `reverseArgs(..)` under the covers, just as our `pipe(..)` now does. So we get the same result either way.
 
-*In this specific case*, the slight performance advantage to using `pipe(..)` is, since we're not trying to preserve the right-to-left argument order of `compose(..)`, we don't need to reverse the argument order back, like we do inside `partialRight(..)`. So `partial(pipe, ..)` is a little more efficient here than `partialRight(compose, ..)`.
+*In this specific case*, the slight performance advantage to using `pipe(..)` is, because we're not trying to preserve the right-to-left argument order of `compose(..)`, we don't need to reverse the argument order back, like we do inside `partialRight(..)`. So `partial(pipe, ..)` is a little more efficient here than `partialRight(compose, ..)`.
 
 ## Abstraction
 
@@ -507,9 +507,9 @@ function trackEvent(evt) {
 
 The general task of referencing a property on an object (or array, thanks to JS's convenient operator overloading of `[ ]`) and setting its value is abstracted into its own function `storeData(..)`. While this utility only has a single line of code right now, one could envision other general behavior that was common across both tasks, such as generating a unique numeric ID or storing a timestamp with the value.
 
-If we repeat the common general behavior in multiple places, we run the maintenance risk of changing some instances but forgetting to change others. There's a principle at play in this kind of abstraction, often referred to as DRY (don't repeat yourself).
+If we repeat the common general behavior in multiple places, we run the maintenance risk of changing some instances but forgetting to change others. There's a principle at play in this kind of abstraction, often referred to as "don't repeat yourself" (DRY).
 
-DRY strives to have only one definition in a program for any given task. An alternate aphorism to motivate DRY coding is that programmers are just generally lazy and don't want to do unnecessary work.
+DRY strives to have only one definition in a program for any given task. An alternative aphorism to motivate DRY coding is that programmers are just generally lazy and don't want to do unnecessary work.
 
 Abstraction can be taken too far. Consider:
 
@@ -547,13 +547,13 @@ Moreover, **composition is helpful even if there's only one occurrence of someth
 
 ### Separation Enables Focus
 
-Aside from generalization vs specialization, I think there's another more useful definition for abstraction, as revealed by this quote:
+Aside from generalization vs. specialization, I think there's another more useful definition for abstraction, as revealed by this quote:
 
 > ... abstraction is a process by which the programmer associates a name with a potentially complicated program fragment, which can then be thought of in terms of its purpose of function, rather than in terms of how that function is achieved. By hiding irrelevant details, abstraction reduces conceptual complexity, making it possible for the programmer to focus on a manageable subset of the program text at any particular time.
 >
 > Scott, Michael L. “Chapter 3: Names, Scopes, and Bindings.” Programming Language Pragmatics, 4th ed., Morgan Kaufmann, 2015, pp. 115.
 
-The point this quote makes is that abstraction -- generally, pulling out some piece of code into its own function -- serves the primary purpose of separating apart two pieces of functionality so that each piece can be focused on independent of the other.
+The point this quote makes is that abstraction -- generally, pulling out some piece of code into its own function -- serves the primary purpose of separating apart two pieces of functionality so that it's possible to focus on each piece independently of the other.
 
 Note that abstraction in this sense is not really intended to *hide* details, as if to treat things as black boxes we *never* examine.
 
@@ -561,7 +561,7 @@ In this quote, "irrelevant", in terms of what is hidden, shouldn't be thought of
 
 **We're not abstracting to hide, but to separate to improve focus**.
 
-Recall that at the outset of this text I described the goal of FP as creating more readable, understandable code. One effective way of doing that is untangling complected -- read: tightly braided, as in strands of rope -- code into separate, simpler -- read: loosely bound -- pieces of code. In that way, the reader isn't distracted by the details of one part while looking for the details of the other part.
+Recall that at the outset of this book I stated that FP's goal is to create code that is more readable and understandable. One effective way of doing that is untangling complected (read: tightly braided, as in strands of rope) code into separate, simpler (read: loosely bound) pieces of code. In that way, the reader isn't distracted by the details of one part while looking for the details of the other part.
 
 Our higher goal is not to implement something only once, as it is with the DRY mindset. As a matter of fact, sometimes we'll actually repeat ourselves in code.
 
@@ -569,9 +569,9 @@ As we asserted in Chapter 3, the main goal with abstraction is to implement sepa
 
 By separating two ideas, we insert a semantic boundary between them, which affords us the ability to focus on each side independent of the other. In many cases, that semantic boundary is something like the name of a function. The function's implementation is focused on *how* to compute something, and the call-site using that function by name is focused on *what* to do with its output. We abstract the *how* from the *what* so they are separate and separately reason'able.
 
-Another way of describing this goal is with imperative vs declarative programming style. Imperative code is primarily concerned with explicitly stating *how* to accomplish a task. Declarative code states *what* the outcome should be, and leaves the implementation to some other responsibility.
+Another way of describing this goal is with imperative vs. declarative programming style. Imperative code is primarily concerned with explicitly stating *how* to accomplish a task. Declarative code states *what* the outcome should be, and leaves the implementation to some other responsibility.
 
-Declarative code abstracts the *what* from the *how*. Typically declarative coding is favored in readability over imperative, though no program (except of course machine code 1's and 0's) is ever entirely one or the other. The programmer must seek balance between them.
+Declarative code abstracts the *what* from the *how*. Typically declarative coding is favored in readability over imperative, though no program (except of course machine code 1s and 0s) is ever entirely one or the other. The programmer must seek balance between them.
 
 ES6 added many syntactic affordances that transform old imperative operations into newer declarative forms. Perhaps one of the clearest is destructuring. Destructuring is a pattern for assignment that describes how a compound value (object, array) is taken apart into its constituent values.
 
@@ -597,7 +597,7 @@ Does the array destructuring *hide* the assignment? Depends on your perspective.
 
 Instead, you read `[ a ,,, b ] = ..` and can see the assignment pattern merely telling you *what* will happen. Array destructuring is an example of declarative abstraction.
 
-### Composition As Abstraction
+### Composition as Abstraction
 
 What's all this have to do with function composition? Function composition is also declarative abstraction.
 
@@ -613,7 +613,7 @@ function shorterWords(text) {
 var shorterWords = compose( skipLongWords, unique, words );
 ```
 
-The declarative form focuses on the *what* -- these 3 functions pipe data from a string to a list of shorter words -- and leaves the *how* to the internals of `compose(..)`.
+The declarative form focuses on the *what* -- these three functions pipe data from a string to a list of shorter words -- and leaves the *how* to the internals of `compose(..)`.
 
 In a bigger sense, the `shorterWords = compose(..)` line explains the *how* for defining a `shorterWords(..)` utility, leaving this declarative line somewhere else in the code to focus only on the *what*:
 
@@ -645,7 +645,7 @@ Composition is a powerful tool for abstraction that transforms imperative code i
 
 ## Revisiting Points
 
-Now that we've thoroughly covered composition -- a trick that will be immensely helpful in many areas of FP -- let's watch it in action by revisiting point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
+Now that we've thoroughly covered composition (a trick that will be immensely helpful in many areas of FP), let's watch it in action by revisiting point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
 
 ```js
 // given: ajax( url, data, cb )
@@ -662,7 +662,7 @@ getLastOrder( function orderFound(order){
 
 The "points" we'd like to remove are the `order` and `person` parameter references.
 
-Let's start by trying to get the `person` "point" out of the `personFound(..)` function. To do so, let's first to define:
+Let's start by trying to get the `person` "point" out of the `personFound(..)` function. To do so, let's first define:
 
 ```js
 function extractName(person) {
@@ -670,7 +670,7 @@ function extractName(person) {
 }
 ```
 
-But let's observe that this operation could instead be expressed in generic terms: extracting any property by name off of any object. Let's call such a utility `prop(..)`:
+Consider that this operation could instead be expressed in generic terms: extracting any property by name off of any object. Let's call such a utility `prop(..)`:
 
 ```js
 function prop(name,obj) {
@@ -685,7 +685,7 @@ var prop =
 
 While we're dealing with object properties, let's also define the opposite utility: `setProp(..)` for setting a property value onto an object.
 
-However, we want to be careful not to just mutate an existing object but rather create a clone of the object to make the change to, and then return it. The reasons for such care will be discussed in detail in Chapter 5.
+However, we want to be careful not to just mutate an existing object but rather create a clone of the object to make the change to, and then return it. The reasons for such care will be discussed at length in Chapter 5.
 
 ```js
 function setProp(name,obj,val) {
@@ -828,4 +828,4 @@ Instead of listing out each step as a discrete call in our code, function compos
 
 Composition is declarative data flow, meaning our code describes the flow of data in an explicit, obvious, and readable way.
 
-Composition is the most important foundational pattern in all of FP, in large part because it's the only way to route data through our programs aside from using side effects; the next chapter explores why such should be avoided wherever possible.
+In many ways, composition is the most important foundational pattern, in large part because it's the only way to route data through our programs aside from using side effects; the next chapter explores why such should be avoided wherever possible.

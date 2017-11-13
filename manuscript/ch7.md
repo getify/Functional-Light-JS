@@ -1,4 +1,4 @@
-# Chapter 7: Closure vs Object
+# Chapter 7: Closure vs. Object
 
 A number of years ago, Anton van Straaten crafted what has become a rather famous and oft-cited [koan](https://www.merriam-webster.com/dictionary/koan) to illustrate and provoke an important tension between closure and objects:
 
@@ -26,11 +26,11 @@ object." At that moment, Anton became enlightened.
 
 The original posting, while brief, has more context to the origin and motivations, and I strongly suggest you read that post to properly set your mindset for approaching this chapter.
 
-Many people I've observed read this koan smirk at its clever wit but then move on without it changing much about their thinking. However, the purpose of a koan (from the Bhuddist Zen perspective) is to prod the reader into wrestling with the contradictory truths therein. So, go back and read it again. Now read it again.
+Many people I've observed read this koan smirk at its clever wit but then move on without it changing much about their thinking. However, the purpose of a koan (from the Zen Buddhist perspective) is to prod the reader into wrestling with the contradictory truths therein. So, go back and read it again. Now read it again.
 
 Which is it? Is a closure a poor man's object, or is an object a poor man's closure? Or neither? Or both? Is merely the take-away that closures and objects are in some way equivalent?
 
-And what does any of this have to do with functional programming? Pull up a chair and ponder for awhile. This chapter will be an interesting detour, an excursion if you will.
+And what does any of this have to do with functional programming? Pull up a chair and ponder for a while. This chapter will be an interesting detour, an excursion if you will.
 
 ## The Same Page
 
@@ -68,7 +68,7 @@ function three(outer) {
 three( obj );       // 3
 ```
 
-Many people conjur lots of extra things when you mention "closure", such as the asynchronous callbacks or even the module pattern with encapsulation and information hiding. Similarly, "object" brings to mind classes, `this`, prototypes, and a whole slew of other utilities and patterns.
+Many people conjure lots of extra things when you mention "closure", such as the asynchronous callbacks or even the module pattern with encapsulation and information hiding. Similarly, "object" brings to mind classes, `this`, prototypes, and a whole slew of other utilities and patterns.
 
 As we go along, we'll carefully address the parts of this external context that matter, but for now, try to just stick to the simplest interpretations of "closure" and "object" as illustrated here; it'll make our exploration less confusing.
 
@@ -85,7 +85,7 @@ In other words, we can think of closures and objects as two different representa
 
 ### State
 
-Consider this code from above:
+Consider this code from before:
 
 ```js
 function outer() {
@@ -309,7 +309,7 @@ While these programs look and feel a bit different ergonomically, they're actual
 
 Many people will initially think that closures and objects behave differently with respect to mutability; closures protect from external mutation while objects do not. But, it turns out, both forms have identical mutation behavior.
 
-That's because what we care about, as discussed in Chapter 6, is **value** mutability, and this is a characteristic of the value itself, regardless of where or how it's assigned.
+That's because what we care about, as discussed in Chapter 6, is **value** mutability, and this is a characteristic of the value itself, regardless of where or how it's assigned:
 
 ```js
 function outer() {
@@ -363,7 +363,7 @@ Whether you represent this state with nested objects, or with nested closures, t
 
 ### Isomorphic
 
-The term "isomorphic" gets thrown around a lot in JavaScript these days, and it's usually used to refer to code that can be used/shared in both the server and the browser. I wrote a blog post awhile back that calls bogus on that usage of this word "isomorphic", which actually has an explicit and important meaning that's being clouded.
+The term "isomorphic" gets thrown around a lot in JavaScript these days, and it's usually used to refer to code that can be used/shared in both the server and the browser. I wrote a blog post a while back that calls bogus on that usage of this word "isomorphic", which actually has an explicit and important meaning that's being clouded.
 
 Here's some selections from a part of that post:
 
@@ -385,7 +385,7 @@ Put simply, closures and objects are isomorphic representations of state (and it
 
 The next time you hear someone say "X is isomorphic to Y", what they mean is, "X and Y can be converted from either one to the other in either direction, and not lose information."
 
-### Under The Hood
+### Under the Hood
 
 So, we can think of objects as an isomorphic representation of closures from the perspective of code we could write. But we can also observe that a closure system could actually be implemented -- and likely is -- with objects!
 
@@ -430,7 +430,7 @@ Now, this is all conceptual. I'm not literally saying the JS engine uses objects
 
 Many languages do in fact implement closures via objects. And other languages implement objects in terms of closures. But we'll let the reader use their imagination on how that would work.
 
-## Two Roads Diverged In A Wood...
+## Two Roads Diverged in a Wood...
 
 So closures and objects are equivalent, right? Not quite. I bet they're more similar than you thought before you started this chapter, but they still have important differences.
 
@@ -460,7 +460,7 @@ var keypresses = trackEvent( newEvent1 );
 keypresses = trackEvent( newEvent2, keypresses );
 ```
 
-**Note:** Did you spot why I didn't `push(..)` directly to `keypresses`? Because in FP, we typically want to treat arrays as immutable data structures that can be recreated and added to, but not directly changed. We trade out the evil of side-effects for an explicit reassignment (more on that later).
+**Note:** Did you spot why I didn't `push(..)` directly to `keypresses`? Because in FP, we typically want to treat arrays as immutable data structures that can be re-created and added to, but not directly changed. We trade out the evil of side-effects for an explicit reassignment (more on that later).
 
 Though we're not changing the structure of the array, we could if we wanted to. More on this in a moment.
 
@@ -490,7 +490,7 @@ Creating a new array for each addition to the array is treating the array as str
 
 ### Privacy
 
-Probably one of the first differences you think of when analyzing closure vs object is that closure offers "privacy" of state through nested lexical scoping, whereas objects expose everything as public properties. Such privacy has a fancy name: information hiding.
+Probably one of the first differences you think of when analyzing closure vs. object is that closure offers "privacy" of state through nested lexical scoping, whereas objects expose everything as public properties. Such privacy has a fancy name: information hiding.
 
 Consider lexical closure hiding:
 
@@ -518,7 +518,7 @@ var xPublic = {
 xPublic.x;          // 1
 ```
 
-There's some obvious differences around general software engineering principles -- consider abstraction, the module pattern with public and private APIs, etc -- but let's try to constrain our discussion to the perspective of FP; this is, after all, a book about functional programming!
+There are some obvious differences around general software engineering principles -- consider abstraction, the module pattern with public and private APIs, etc. -- but let's try to constrain our discussion to the perspective of FP; this is, after all, a book about functional programming!
 
 #### Visibility
 
@@ -533,15 +533,15 @@ function recordKeypress(keypressEvt) {
 }
 ```
 
-If you already have an array -- just an object with public numerically-named properties -- this is very straightforward using a built-in JS array utility `forEach(..)`:
+If you already have an array -- just an object with public numerically named properties -- this is very straightforward using a built-in JS array utility `forEach(..)`:
 
 ```js
 keypresses.forEach( recordKeypress );
 ```
 
-But, if the list of keypresses is hidden inside closure, you'll have to expose a utility on the public API of the closure with privileged access to the hidden data.
+But if the list of keypresses is hidden inside closure, you'll have to expose a utility on the public API of the closure with privileged access to the hidden data.
 
-For example, we can give our closure-`keypresses` example its own `forEach`,  like built-in arrays have:
+For example, we can give our closure-`keypresses` example its own `forEach`, like built-in arrays have:
 
 ```js
 function trackEvent(
@@ -591,11 +591,11 @@ With closure, you have some code with the privilege to change, and the rest of t
 
 In places where I want to allow reassignment but restrict its surface area, closures are a more convenient and flexible form than objects. In places where I want no reassignment, a frozen object is a lot more convenient than repeating `const` declarations all over my function.
 
-Many FPers take a hard-line stance on reassignment: it shouldn't be used. They will tend to use `const` to make all closure variables read-only, and they'll use `Object.freeze(..)` or full immutable data structures to prevent property reassignment. Moreover, they'll try to reduce the amount of explicitly declared/tracked variables and properties wherever possible, perferring value transfer -- function chains, `return` value passed as argument, etc -- instead of intermediate value storage.
+Many FPers take a hard-line stance on reassignment: it shouldn't be used. They will tend to use `const` to make all closure variables read-only, and they'll use `Object.freeze(..)` or full immutable data structures to prevent property reassignment. Moreover, they'll try to reduce the amount of explicitly declared/tracked variables and properties wherever possible, preferring value transfer -- function chains, `return` value passed as argument, etc. -- instead of intermediate value storage.
 
-This book is about "functional light" programming in JavaScript, and this is one of those cases where I diverge from the core FP crowd.
+This book is about "Functional-Light" programming in JavaScript, and this is one of those cases where I diverge from the core FP crowd.
 
-I think variable reassignment can be quite useful and, when used approriately, quite readable in its explicitness. It's certainly been my experience that debugging is a lot easier when you can insert a `debugger` or breakpoint, or track a watch expression.
+I think variable reassignment can be quite useful, and when used appropriately, quite readable in its explicitness. It's certainly been my experience that debugging is a lot easier when you can insert a `debugger` or breakpoint, or track a watch expression.
 
 ### Cloning State
 
@@ -603,7 +603,7 @@ As we learned in Chapter 6, one of the best ways we prevent side effects from er
 
 If you're not using a purpose-built library to provide sophisticated immutable data structures, the simplest approach will suffice: duplicate your objects/arrays each time before making a change.
 
-Arrays are easy to clone shallowly: just use the `slice()` method:
+Arrays are easy to clone shallowly -- just use the `slice()` method:
 
 ```js
 var a = [ 1, 2, 3 ];
@@ -686,11 +686,11 @@ student();
 // Kyle Simpson, Major: CS, GPA: 4.0
 ```
 
-The `student()` function -- technically referred to as a "bound function" -- has a hard-bound `this` reference to the object literal we passed in, such that any later call to `student()` will use that object for it `this`, and thus be able to access its encapsulated state.
+The `student()` function -- technically referred to as a "bound function" -- has a hard-bound `this` reference to the object literal we passed in, such that any later call to `student()` will use that object for its `this`, and thus be able to access its encapsulated state.
 
-Both implemenations have the same outcome: a function with preserved state. But what about the performance; what differences will there be?
+Both implementations have the same outcome: a function with preserved state. But what about the performance; what differences will there be?
 
-**Note:** Accurately and actionably judging performance of a snippet of JS code is a very dodgy affair. We won't get into all the details here, but I urge you to read the "You Don't Know JS: Async & Performance" book, specifically Chapter 6 "Benchmarking & Tuning", for more details.
+**Note:** Accurately and actionably judging performance of a snippet of JS code is a very dodgy affair. We won't get into all the details here, but I urge you to read *You Don't Know JS: Async & Performance*, specifically Chapter 6, "Benchmarking & Tuning", for more details.
 
 If you were writing a library that created a pairing of state with its function -- either the call to `StudentRecord(..)` in the first snippet or the call to `StudentRecord.bind(..)` in the second snippet -- you're likely to care most about how those two perform. Inspecting the code, we can see that the former has to create a new function expression each time. The second one uses `bind(..)`, which is not as obvious in its implications.
 
@@ -728,9 +728,9 @@ The truth of this chapter cannot be written out. One must read this chapter to f
 
 ----
 
-Coining some Zen wisdom here was my attempt at being clever. But, you deserve a proper summary of this chapter's message.
+Coining some Zen wisdom here was my attempt at being clever. But you deserve a proper summary of this chapter's message.
 
-Objects and closures are isomorphic to each other, which means that can be used somewhat interchangably to represent state and behavior in your program.
+Objects and closures are isomorphic to each other, which means that they can be used somewhat interchangeably to represent state and behavior in your program.
 
 Representation as a closure has certain benefits, like granular change control and automatic privacy. Representation as an object has other benefits, like easier cloning of state.
 
