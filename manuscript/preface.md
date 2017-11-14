@@ -1,4 +1,3 @@
-# Functional-Light JavaScript
 # Preface
 
 > A monad is just a monoid in the category of endofunctors.

@@ -1,4 +1,3 @@
-# Functional-Light JavaScript
 # Appendix A: Transducing
 
 Transducing is a more advanced technique than we've covered in this book. It extends many of the concepts from Chapter 9 on list operations.
@@ -597,7 +596,7 @@ Not bad, huh!? See the `listCombination(..)` and `strConcat(..)` functions used 
 
 ### Transducers.js
 
-Finally, let's illustrate our running example using the `transducers-js` library (https://github.com/cognitect-labs/transducers-js):
+Finally, let's illustrate our running example using the [`transducers-js` library](https://github.com/cognitect-labs/transducers-js):
 
 ```js
 var transformer = transducers.comp(

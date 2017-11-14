@@ -1,4 +1,3 @@
-toc.md
 foreword.md
 preface.md
 ch1.md

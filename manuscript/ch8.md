@@ -1,27 +1,14 @@
-# Functional-Light JavaScript
 # Chapter 8: Recursion
 
 Did you have fun down our little closures/objects rabbit hole in the previous chapter? Welcome back!
 
 On the next page, we're going to jump into the topic of recursion.
 
-<hr>
+----
 
 *(rest of the page intentionally left blank)*
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-
-<div style="page-break-after: always;"></div>
+{pagebreak}
 
 Let's talk about recursion. Before we dive in, consult the previous page for the formal definition.
 
@@ -145,7 +132,7 @@ function fib(n) {
 }
 ```
 
-**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in "Fibonacci Numbers Using Mutual Recursion" (https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
+**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in ["Fibonacci Numbers Using Mutual Recursion"](https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
 
 While these mutual recursion examples shown are rather contrived, there are more complex use cases where mutual recursion can be very helpful. Counting the number of leaves in a tree data structure is one example, and recursive descent parsing (of source code, by a compiler) is another.
 

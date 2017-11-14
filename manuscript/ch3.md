@@ -1,4 +1,3 @@
-# Functional-Light JavaScript
 # Chapter 3: Managing Function Inputs
 
 Chapter 2 explored the core nature of JS `function`s, and layed the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions -- to bend them to our will.
@@ -23,7 +22,7 @@ function unary(fn) {
 }
 ```
 
-Many FPers tend to prefer the shorter `=>` arrow function syntax for such code (see Chapter 1 "Syntax"), such as:
+Many FPers tend to prefer the shorter `=>` arrow function syntax for such code (see Chapter 2 "Syntax"), such as:
 
 ```js
 var unary =

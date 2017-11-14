@@ -1,4 +1,3 @@
-# Functional-Light JavaScript
 # Appendix C: FP Libraries
 
 If you've been reading this book from start to finish, take a minute to stop and look back how far you've come since Chapter 1. It's been quite a journey. I hope you've learned a lot and gained insight into thinking functionally for your own programs.
@@ -277,7 +276,7 @@ And of course, I'm using an arbitrary delay in that description, but in practice
 
 So, how do we support both serial and concurrent iteration across asynchronous operations?
 
-**fasy** (pronounced like "Tracy" but with an "f") is a little utility library I built for supporting exactly those kinds of tasks. You can find more information about it here: https://github.com/getify/fasy
+**fasy** (pronounced like "Tracy" but with an "f") is a little utility library I built for supporting exactly those kinds of tasks. You can find more information about it [here](https://github.com/getify/fasy).
 
 To illustrate **fasy**, let's consider a concurrent `map(..)` versus a serial `map(..)`:
 

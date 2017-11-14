@@ -1,4 +1,3 @@
-# Functional-Light JavaScript
 # Chapter 4: Composing Functions
 
 By now, I hope you're feeling much more comfortable with what it means to use functions for functional programming.

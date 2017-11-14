@@ -1,4 +1,3 @@
-# Functional-Light JavaScript
 # Chapter 7: Closure vs Object
 
 A number of years ago, Anton van Straaten crafted what has become a rather famous and oft-cited [koan](https://www.merriam-webster.com/dictionary/koan) to illustrate and provoke an important tension between closure and objects:
