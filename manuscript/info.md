@@ -1,4 +1,5 @@
 Editors: Brian MacDonald and Brian Lonsdorf
+
 Copyeditor: Jasmine Kwityn
 
 November 2017: First Edition

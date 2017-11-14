@@ -115,7 +115,7 @@ You probably know by experience that an awful lot of your time spent "coding" is
 
 It's widely estimated that developers spend 70% of code maintenance time on reading to understand it? That is eye-opening. 70%. No wonder the global average for a programmer's lines of code written per day is about 10. We spend about 7 hours of our day just reading the code to figure out where those 10 lines should go!
 
-I think we should focus a lot more on the readability of our code. And by the way, readability is not just about fewer characters. Readability is actually most impacted by familiarity. [1]
+I think we should focus a lot more on the readability of our code. And by the way, readability is not just about fewer characters. Readability is actually most impacted by familiarity. [^readability]
 
 If we are going to spend our time concerned with making code that will be more readable and understandable, FP is central in that effort. The principles of FP are well established, deeply studied and vetted, and provably verifiable. Taking the time to learn and employ these FP principles will ultimately lead to more readily and recognizably familiar code for you and others. The increase in code familiarity, and the expediency of that recognition, will increase code readability.
 
@@ -255,6 +255,4 @@ This is the heart of Functional-Light JavaScript. The goal is to learn to effect
 
 The journey to learning functional programming starts with deeply understanding the nature of what a function is. That's what we tackle in the next chapter.
 
-----
-
-[1] Buse, Raymond P. L., and Westley R. Weimer. “Learning a Metric for Code Readability.” IEEE Transactions on Software Engineering, IEEE Press, July 2010, dl.acm.org/citation.cfm?id=1850615.
+[^readability] Buse, Raymond P. L., and Westley R. Weimer. “Learning a Metric for Code Readability.” IEEE Transactions on Software Engineering, IEEE Press, July 2010, dl.acm.org/citation.cfm?id=1850615.
