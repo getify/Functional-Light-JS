@@ -3,8 +3,6 @@
 
 > Functional programmer: (noun) One who names variables "x", names functions "f", and names code patterns "zygohistomorphic prepromorphism"
 >
-> James Iry ‏(jamesiry) 5/13/15
->
 > https://twitter.com/jamesiry/status/598547781515485184
 
 Functional Programming (FP) is not a new concept by any means. It's been around almost the entire history of programming. However -- and I'm not sure it's fair to say, but! -- it sure hasn't seemed like as mainstream of a concept in the overall developer world until perhaps the last few years. I think FP has more been the realm of academics.
