@@ -12,6 +12,8 @@ On the next page, we're going to jump into the topic of recursion.
 
 Let's talk about recursion. Before we dive in, consult the previous page for the formal definition.
 
+| |
+
 Weak joke, I know. :)
 
 Recursion is one of those programming techniques that most developers admit can be very powerful, but also most of them don't like to use it. I'd put it in the same category as regular expressions, in that sense. Powerful, but confusing, and thus seen as *not worth the effort*.
