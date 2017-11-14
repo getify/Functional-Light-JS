@@ -267,7 +267,8 @@ The sequencing dependency between `fetchUserData(..)` and `fetchOrders(..)` is f
 
 Yes, you can recompute the `isLatestOrder` flag once `deleteOrder(..)` fires. But now you have a different problem: your UI state can be out of sync.
 
-If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call `showLatestOrderDisplay()`, but only if a new `latestOrder` has in fact been set. So you'll need to track at least three states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
+If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call
+`showLatestOrderDisplay()`, but only if a new `latestOrder` has in fact been set. So you'll need to track at least three states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
 
 All of these hassles are because we decided to structure our code with side causes/effects on a shared set of state.
 

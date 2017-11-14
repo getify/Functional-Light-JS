@@ -664,7 +664,11 @@ var curriedSum =
                         sum( val1, val2, val3, val4, val5 );
 ```
 
-And now, all on one line: `curriedSum = val1 => val2 => val3 => val4 => val5 => sum(val1,val2,val3,val4,val5)`.
+And now, all on one line:
+
+```js
+curriedSum = val1 => val2 => val3 => val4 => val5 => sum( val1, val2, val3, val4, val5 );
+```
 
 Depending on your perspective, that form of visualizing the curried function may be more or less helpful to you. For me, it's a fair bit more obscured.
 
@@ -841,7 +845,9 @@ function curryProps(fn,arity = 1) {
     return (function nextCurried(prevArgsObj){
         return function curried(nextArgObj = {}){
             var [key] = Object.keys( nextArgObj );
-            var allArgsObj = Object.assign( {}, prevArgsObj, { [key]: nextArgObj[key] } );
+            var allArgsObj = Object.assign(
+                {}, prevArgsObj, { [key]: nextArgObj[key] }
+            );
 
             if (Object.keys( allArgsObj ).length >= arity) {
                 return fn( allArgsObj );

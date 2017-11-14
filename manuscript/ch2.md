@@ -20,9 +20,9 @@ I know I've promised we'd stay away from math as much as possible, but bear with
 
 Do you remember learning anything about `f(x)` back in school? What about the equation `y = f(x)`?
 
-Let's say an equation is defined like this: `f(x) = 2x^2 + 3`. What does that mean? What does it mean to graph that equation? Here's the graph:
+Let's say an equation is defined like this: {$$}f(x) = 2x^2 + 3{/$$}. What does that mean? What does it mean to graph that equation? Here's the graph:
 
-![f(x) = 2x^2 + 3](images/fig1.png)
+![{$$}f(x) = 2x^2 + 3{/$$}](images/fig1.png)
 
 What you can notice is that for any value of `x`, say `2`, if you plug it into the equation, you get `11`. What is `11`, though? It's the *return value* of the `f(x)` function, which earlier we said represents a `y` value.
 
@@ -466,7 +466,7 @@ I'm not unconditionally saying that you should always have a single `return`, or
 
 One technique that you've probably used in most code you've written, and maybe didn't even think about it much, is to have a function output some or all of its values by simply changing variables outside itself.
 
-Remember our `f(x) = 2x^2 + 3` function from earlier in the chapter? We could have defined it like this in JS:
+Remember our {$$}f(x) = 2x^2 + 3{/$$} function from earlier in the chapter? We could have defined it like this in JS:
 
 ```js
 var y;

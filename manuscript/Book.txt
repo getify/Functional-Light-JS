@@ -1,5 +1,7 @@
+frontmatter.txt
 foreword.md
 preface.md
+mainmatter.txt
 ch1.md
 ch2.md
 ch3.md
@@ -11,6 +13,7 @@ ch8.md
 ch9.md
 ch10.md
 ch11.md
+backmatter.txt
 apA.md
 apB.md
 apC.md
