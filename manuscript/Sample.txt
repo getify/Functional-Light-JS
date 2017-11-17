@@ -1,5 +1,4 @@
 frontmatter.txt
-info.md
 preface.md
 mainmatter.txt
 ch4.md
