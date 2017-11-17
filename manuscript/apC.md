@@ -170,7 +170,7 @@ In my journey learning FP, I've regularly been frustrated by both of those irrit
 
 One day, I was musing about with this style of FP coding, and wondered what it would be like if a whole FP library had all its API methods exposed in this style. I started experimenting, showed those experiments to a few FP folks, and got some positive feedback.
 
-From those experiments, eventually the FPO (pronounced "eff-poh") library (https://github.com/getify/fpo) was born; FPO stands for FP-with-Objects, in case you were wondering.
+From those experiments, eventually the [FPO](https://github.com/getify/fpo) (pronounced "eff-poh") library was born; FPO stands for FP-with-Objects, in case you were wondering.
 
 From the documentation:
 
