@@ -2,8 +2,9 @@
 
 > Functional programmer: (noun) One who names variables "x", names functions "f", and names code patterns "zygohistomorphic prepromorphism"
 >
+> ----
 >
-> -- James Iry @jamesiry 5/13/2015
+> James Iry @jamesiry 5/13/2015
 >
 > https://twitter.com/jamesiry/status/598547781515485184
 
@@ -196,6 +197,8 @@ This is where I will differ from many formal FPers: just because you *can* apply
 Generally, I'd recommend seeking balance in what you code, and to be conservative in your application of FP concepts as you get the hang of things. Default to the YAGNI principle in deciding if a certain pattern or abstraction will help that part of the code be more readable or if it's just introducing clever sophistication that isn't (yet) warranted.
 
 > Reminder, any extensibility point that’s never used isn’t just wasted effort, it’s likely to also get in your way as well
+>
+> ----
 >
 > Jeremy D. Miller @jeremydmiller 2/20/15
 >

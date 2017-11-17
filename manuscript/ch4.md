@@ -561,8 +561,9 @@ Aside from generalization vs. specialization, I think there's another more usefu
 
 > ... abstraction is a process by which the programmer associates a name with a potentially complicated program fragment, which can then be thought of in terms of its purpose of function, rather than in terms of how that function is achieved. By hiding irrelevant details, abstraction reduces conceptual complexity, making it possible for the programmer to focus on a manageable subset of the program text at any particular time.
 >
+> ----
 >
-> -- Michael L. Scott, Programming Language Pragmatics[^proglangprag]
+> Michael L. Scott, Programming Language Pragmatics[^proglangprag]
 
 The point this quote makes is that abstraction -- generally, pulling out some piece of code into its own function -- serves the primary purpose of separating apart two pieces of functionality so that it's possible to focus on each piece independently of the other.
 
