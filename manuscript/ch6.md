@@ -152,7 +152,7 @@ In a little bit, we'll see another strategy for protecting ourselves from a valu
 
 How would you describe what a "constant" is? Think about that for a moment before you move on to the next paragraph.
 
-...
+C> __* * * *__
 
 Some of you may have conjured descriptions like, "a value that can't change", "a variable that can't be changed", or something similar. These are all approximately in the neighborhood, but not quite at the right house. The precise definition we should use for a constant is: a variable that cannot be reassigned.
 

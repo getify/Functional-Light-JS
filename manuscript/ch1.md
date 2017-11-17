@@ -2,7 +2,8 @@
 
 > Functional programmer: (noun) One who names variables "x", names functions "f", and names code patterns "zygohistomorphic prepromorphism"
 >
-> James Iry @jamesiry 5/13/2015
+>
+> -- James Iry @jamesiry 5/13/2015
 >
 > https://twitter.com/jamesiry/status/598547781515485184
 

@@ -20,7 +20,8 @@ that objects are truly a poor man's closures." Qc Na responded by hitting
 Anton with his stick, saying "When will you learn? Closures are a poor man's
 object." At that moment, Anton became enlightened.
 >
-> Anton van Straaten 6/4/2003
+>
+> -- Anton van Straaten 6/4/2003
 >
 > http://people.csail.mit.edu/gregs/ll1-discuss-archive-html/msg03277.html
 
