@@ -1,1 +1,2 @@
-ch2.md
+ch1.md
+ch6.md
