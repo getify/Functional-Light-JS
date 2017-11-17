@@ -16,7 +16,9 @@ But there's something **even more important to grasp**. With imperative code, ea
 
 By chaining and/or composing list operations together, the intermediate results are tracked implicitly and largely protected from these hazards.
 
-**Note:** More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my advice on `=>` from Chapter 2 still applies for general coding.
+I> ## Note
+I>
+I> More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my advice on `=>` from Chapter 2 still applies for general coding.
 
 ## Non-FP List Processing
 
@@ -79,7 +81,9 @@ function map(mapperFn,arr) {
 }
 ```
 
-**Note:** The parameter order `mapperFn, arr` may feel backwards at first, but this convention is much more common in FP libraries because it makes these utilities easier to compose (with currying).
+I> ## Note
+I>
+I> The parameter order `mapperFn, arr` may feel backwards at first, but this convention is much more common in FP libraries because it makes these utilities easier to compose (with currying).
 
 The `mapperFn(..)` is naturally passed the list item to map/transform, but also an `idx` and `arr`. We're doing that to keep consistency with the built-in array `map(..)`. These extra pieces of information can be very useful in some cases.
 
@@ -94,7 +98,9 @@ map( ["1","2","3"], unary( parseInt ) );
 
 JavaScript provides the `map(..)` utility built-in on arrays, making it very convenient to use as part of a chain of operations on a list.
 
-**Note:** The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in "What's This?" in Chapter 2, `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support such a `this`-binding feature.
+I> ## Note
+I>
+I> The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in "What's This?" in Chapter 2, `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support such a `this`-binding feature.
 
 Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here are some other examples of mapping operations. We can use `map(..)` to transform a list of functions into a list of their return values:
 
@@ -360,7 +366,9 @@ Alternatively, you can omit the `initialValue` in which case the first value of 
 
 ![`reduce(..)` with no initial value specified](images/fig12.png)
 
-**Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
+W> ## Warning
+W>
+W> In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
 
 The function you pass to `reduce(..)` to perform the reduction is typically called a reducer. A reducer has a different signature from the mapper and predicate functions we looked at earlier. Reducers primarily receive the current reduction result as well as the next value to reduce it with. The current result at each step of the reduction is often referred to as the accumulator.
 
@@ -501,7 +509,9 @@ var double = v => v * 2;
 // [2,4,6,8,10]
 ```
 
-**Note:** We're cheating with this reducer: using a side effect by allowing `list.push(..)` to mutate the list that was passed in. In general, that's not a good idea, obviously, but since we know the `[]` list is being created and passed in, it's less dangerous. You could be more formal -- yet less performant! -- by creating a new list with the val `concat(..)`d onto the end. We'll come back to this cheat in Appendix A.
+I> ## Note
+I>
+I> We're cheating with this reducer: using a side effect by allowing `list.push(..)` to mutate the list that was passed in. In general, that's not a good idea, obviously, but since we know the `[]` list is being created and passed in, it's less dangerous. You could be more formal -- yet less performant! -- by creating a new list with the val `concat(..)`d onto the end. We'll come back to this cheat in Appendix A.
 
 Implementing `map(..)` with `reduce(..)` is not on its surface an obvious step or even an improvement. However, this ability will be a crucial recognition for more advanced techniques like those we'll cover in Appendix A, "Transducing".
 
@@ -524,7 +534,9 @@ var isOdd = v => v % 2 == 1;
 // [1,3,5]
 ```
 
-**Note:** More impure reducer cheating here. Instead of `list.push(..)`, we could have done `list.concat(..)` and returned the new list. We'll come back to this cheat in Appendix A.
+I> ## Note
+I>
+I> More impure reducer cheating here. Instead of `list.push(..)`, we could have done `list.concat(..)` and returned the new list. We'll come back to this cheat in Appendix A.
 
 ## Advanced List Operations
 
@@ -557,7 +569,9 @@ var unique =
         , [] );
 ```
 
-**Note:** There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
+I> ## Note
+I>
+I> There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
 
 `unique(..)` nicely produces a new list with no duplicates:
 
@@ -591,7 +605,9 @@ var flatten =
         , [] );
 ```
 
-**Note:** This implementation choice relies on recursion as we saw in Chapter 8.
+I> ## Note
+I>
+I> This implementation choice relies on recursion as we saw in Chapter 8.
 
 To use `flatten(..)` with an array of arrays (of any nested depth):
 
@@ -686,7 +702,9 @@ var flatMap =
         flatten( arr.map( mapperFn ), 1 );
 ```
 
-**Note:** We use `1` for the flattening-depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
+I> ## Note
+I>
+I> We use `1` for the flattening-depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
 
 Since this approach still processes the list twice resulting in worse performance, we can combine the operations manually, using `reduce(..)`:
 
@@ -732,7 +750,9 @@ function zip(arr1,arr2) {
 
 The `arr1.slice()` and `arr2.slice()` calls ensure `zip(..)` is pure by not causing side effects on the received array references.
 
-**Note:** There are some decidedly un-FP things going on in this implementation. There's an imperative `while`-loop and mutations of lists with both `shift()` and `push(..)`. Earlier in the book, I asserted that it's reasonable for pure functions to use impure behavior inside them (usually for performance), as long as the effects are fully self-contained. This implementation is safely pure.
+I> ## Note
+I>
+I> There are some decidedly un-FP things going on in this implementation. There's an imperative `while`-loop and mutations of lists with both `shift()` and `push(..)`. Earlier in the book, I asserted that it's reasonable for pure functions to use impure behavior inside them (usually for performance), as long as the effects are fully self-contained. This implementation is safely pure.
 
 ### Merge
 
@@ -780,7 +800,9 @@ function mergeLists(arr1,arr2) {
 }
 ```
 
-**Note:** Various FP libraries don't define a `mergeLists(..)` but instead define a `merge(..)` that merges properties of two objects; the results of such a `merge(..)` will differ from our `mergeLists(..)`.
+I> ## Note
+I>
+I> Various FP libraries don't define a `mergeLists(..)` but instead define a `merge(..)` that merges properties of two objects; the results of such a `merge(..)` will differ from our `mergeLists(..)`.
 
 Alternatively, here are a couple of options to implement the list merging as a reducer:
 
@@ -807,7 +829,9 @@ And using a `mergeReducer(..)`:
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-**Tip:** We'll use the `mergeReducer(..)` trick later in the chapter.
+T> ## Tip
+T>
+T> We'll use the `mergeReducer(..)` trick later in the chapter.
 
 ## Method vs. Standalone
 
@@ -876,7 +900,9 @@ composeChainedMethods(
 ( [1,2,3,4,5] );                    // 18
 ```
 
-**Note:** The three `Array.prototype.XXX`-style references are grabbing references to the built-in `Array.prototype.*` methods so that we can reuse them with our own arrays.
+I> ## Note
+I>
+I> The three `Array.prototype.XXX`-style references are grabbing references to the built-in `Array.prototype.*` methods so that we can reuse them with our own arrays.
 
 ### Composing Standalone Utilities
 
@@ -965,7 +991,9 @@ compose(
 ( [1,2,3,4,5] );                    // 18
 ```
 
-**Note:** `unboundMethod(..)` is called `invoker(..)` in Ramda.
+I> ## Note
+I>
+I> `unboundMethod(..)` is called `invoker(..)` in Ramda.
 
 ### Adapting Standalones to Methods
 
@@ -1228,7 +1256,9 @@ Let's illustrate with a well-known data structure: the binary tree. A binary tre
 
 For ease of illustration, we'll make our binary tree a binary search tree (BST). However, the operations we'll identify work the same for any regular non-BST binary tree.
 
-**Note:** A binary search tree is a general binary tree with a special constraint on the relationship of values in the tree to each other. Each value of nodes on the left side of a tree is less than the value of the node at the root of that tree, which in turn is less than each value of nodes in the right side of the tree. The notion of "less than" is relative to the kind of data stored; it can be numerical for numbers, lexicographic for strings, and so on. BSTs by definition must remain balanced, which makes searching for a value in the tree more efficient, using a recursive binary search algorithm.
+I> ## Note
+I>
+I> A binary search tree is a general binary tree with a special constraint on the relationship of values in the tree to each other. Each value of nodes on the left side of a tree is less than the value of the node at the root of that tree, which in turn is less than each value of nodes in the right side of the tree. The notion of "less than" is relative to the kind of data stored; it can be numerical for numbers, lexicographic for strings, and so on. BSTs by definition must remain balanced, which makes searching for a value in the tree more efficient, using a recursive binary search algorithm.
 
 To make a binary tree node object, let's use this factory function:
 
@@ -1279,7 +1309,9 @@ BinaryTree.forEach = function forEach(visitFn,node){
 };
 ```
 
-**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We already discussed recursion in Chapter 8, where we covered recursion in the chapter on recursion.
+I> ## Note
+I>
+I> Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We already discussed recursion in Chapter 8, where we covered recursion in the chapter on recursion.
 
 Recall `forEach(..)` was described at the beginning of this chapter as only being useful for side effects, which is not very typically desired in FP. In this case, we'll use `forEach(..)` only for the side effect of I/O, so it's perfectly reasonable as a helper.
 
@@ -1488,7 +1520,9 @@ BinaryTree.reduce(
 // ["avocado","cucumber"]
 ```
 
-**Note:** We aren't making any effort to rebalance a tree after any of the `map`/`reduce`/`filter` operations on BSTs. Technically, this means the results are not themselves binary *search* trees. Most JS values have a reasonable less-than operation (`<`) by which we could rebalance such a tree, but some values (like promises) wouldn't have any such definition. For the sake of keeping this chapter practical in length, we'll punt on handling this complication.
+I> ## Note
+I>
+I> We aren't making any effort to rebalance a tree after any of the `map`/`reduce`/`filter` operations on BSTs. Technically, this means the results are not themselves binary *search* trees. Most JS values have a reasonable less-than operation (`<`) by which we could rebalance such a tree, but some values (like promises) wouldn't have any such definition. For the sake of keeping this chapter practical in length, we'll punt on handling this complication.
 
 You will likely use most of the list operations from this chapter in the context of simple arrays. But now we've seen that the concepts apply to whatever data structures and operations you might need. That's a powerful expression of how FP can be widely applied to many different application scenarios!
 

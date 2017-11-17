@@ -28,7 +28,9 @@ Sadly, recursion gets far less attention, especially in JS, than it should, in l
 
 Recursion is when a function calls itself, and that call does the same, and this cycle continues until a base condition is satisfied and the call loop unwinds.
 
-**Warning:** If you don't ensure that a base condition is *eventually* met, recursion will run forever, and crash or lock up your program; the base condition is pretty important to get right!
+W> ## Warning
+W>
+W> If you don't ensure that a base condition is *eventually* met, recursion will run forever, and crash or lock up your program; the base condition is pretty important to get right!
 
 But... that definition is too confusing in its written form. We can do better. Consider this recursive function:
 
@@ -83,7 +85,9 @@ fib( n ):
     fib( n - 2 ) + fib( n - 1 )
 ```
 
-**Note:** The first several numbers of this sequence are: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... Each number is the addition of the previous two numbers in the sequence.
+I> ## Note
+I>
+I> The first several numbers of this sequence are: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... Each number is the addition of the previous two numbers in the sequence.
 
 The definition of Fibonacci expressed directly in code:
 
@@ -134,7 +138,9 @@ function fib(n) {
 }
 ```
 
-**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in ["Fibonacci Numbers Using Mutual Recursion"](https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
+I> ## Note
+I>
+I> This mutually recursive `fib(..)` implementation is adapted from research presented in ["Fibonacci Numbers Using Mutual Recursion"](https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
 
 While these mutual recursion examples shown are rather contrived, there are more complex use cases where mutual recursion can be very helpful. Counting the number of leaves in a tree data structure is one example, and recursive descent parsing (of source code, by a compiler) is another.
 
@@ -244,7 +250,9 @@ Next, we turn our attention to checking `num1` against `maxRest` -- the main log
 
 The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` approach.
 
-**Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see Chapter 9), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
+T> ## Tip
+T>
+T> We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see Chapter 9), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
 
 ### Binary Tree Recursion
 
@@ -327,7 +335,9 @@ Visualizing this program's stack frame step by step:
 
 ![Recursive function call stack frames](images/fig15.png)
 
-**Note:** If these functions didn't call each other, but were just called sequentially -- like `baz(); bar(); foo();`, where each one finishes before the next one starts -- the  frames won't stack up; each function call finishes and removes its frame from the stack before the next one is added.
+I> ## Note
+I>
+I> If these functions didn't call each other, but were just called sequentially -- like `baz(); bar(); foo();`, where each one finishes before the next one starts -- the  frames won't stack up; each function call finishes and removes its frame from the stack before the next one is added.
 
 OK, so a little bit of memory is needed for each function call. No big deal under most normal program conditions, right? But it quickly becomes a big deal once you introduce recursion. While you'd almost certainly never manually stack thousands (or even hundreds!) of calls of different functions together in one call stack, you'll easily see tens of thousands or more recursive calls stack up.
 
@@ -383,7 +393,9 @@ return x;
 return 1 + foo( .. );
 ```
 
-**Note:** A JS engine, or a smart transpiler, *could* do some code reorganization to realize that `var x = foo(); return x;` is effectively the same as `return foo();`, which would then make it eligible as PTC. But that is not required by the specification.
+I> ## Note
+I>
+I> A JS engine, or a smart transpiler, *could* do some code reorganization to realize that `var x = foo(); return x;` is effectively the same as `return foo();`, which would then make it eligible as PTC. But that is not required by the specification.
 
 The `1 +` part is definitely processed *after* `foo(..)` finishes, so the stack frame has to be kept around.
 
@@ -572,7 +584,9 @@ function maxEven(num1,num2,...nums) {
 }
 ```
 
-**Note:** The first `maxEven(..)` call is not in PTC position, but because it only passes in `num2`, it only recurses just that one level then returns right back out; this is only a trick to avoid repeating the `%` logic. As such, this call won't increase the growth of the recursive stack, any more than if that call was to an entirely different function. The second `maxEven(..)` call is the legitimate recursive call, and it is in fact in PTC position, meaning our stack won't grow as the recursion proceeds.
+I> ## Note
+I>
+I> The first `maxEven(..)` call is not in PTC position, but because it only passes in `num2`, it only recurses just that one level then returns right back out; this is only a trick to avoid repeating the `%` logic. As such, this call won't increase the growth of the recursive stack, any more than if that call was to an entirely different function. The second `maxEven(..)` call is the legitimate recursive call, and it is in fact in PTC position, meaning our stack won't grow as the recursion proceeds.
 
 It should be repeated that this example is only to illustrate the approach to moving recursion to the PTC form to optimize the stack (memory) usage. The more direct way to express a max-even algorithm might indeed be a filtering of the `nums` list for evens first, followed then by a max bubbling or even a sort.
 
@@ -613,7 +627,9 @@ In static languages, CPS is often an opportunity for tail calls the compiler can
 
 In JavaScript, you'd likely need to write the CPS form yourself. It's clunkier, for sure; the declarative notation-like form has certainly been obscured. But overall, this form is still more declarative than the `for`-loop imperative implementation.
 
-**Warning:** One major caveat that should be noted is that in CPS, creating the extra inner continuation functions still consumes memory, but of a different sort. Instead of piling up stack frames, the closures just consume free memory (typically, from the heap). Engines don't seem to apply the `RangeError` limits in these cases, but that doesn't mean your memory usage is fixed in scale.
+W> ## Warning
+W>
+W> One major caveat that should be noted is that in CPS, creating the extra inner continuation functions still consumes memory, but of a different sort. Instead of piling up stack frames, the closures just consume free memory (typically, from the heap). Engines don't seem to apply the `RangeError` limits in these cases, but that doesn't mean your memory usage is fixed in scale.
 
 ### Trampolines
 

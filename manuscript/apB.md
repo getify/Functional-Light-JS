@@ -71,7 +71,9 @@ function Just(val) {
 }
 ```
 
-**Note:** The `inspect(..)` method is included here only for our demonstration purposes. It serves no direct role in the monadic sense.
+I> ## Note
+I>
+I> The `inspect(..)` method is included here only for our demonstration purposes. It serves no direct role in the monadic sense.
 
 You'll notice that whatever `val` value a `Just(..)` instance holds, it's never changed. All monad methods create new monad instances instead of mutating the monad's value itself.
 
@@ -222,7 +224,9 @@ function Nothing() {
 }
 ```
 
-**Note:** `Maybe.of(..)` (sometimes referred to as `unit(..)` or `pure(..)`) is a convenience alias for `Just(..)`.
+I> ## Note
+I>
+I> `Maybe.of(..)` (sometimes referred to as `unit(..)` or `pure(..)`) is a convenience alias for `Just(..)`.
 
 In contrast to `Just()` instances, `Nothing()` instances have no-op definitions for all monadic methods. So if such a monad instance shows up in any monadic operations, it has the effect of basically short-circuiting to have no behavior happen. Notice there's no imposition here of what "empty" means -- your code gets to decide that. More on that later.
 
