@@ -1,4 +1,4 @@
-# Chapter 1: Why Functional Programming?
+# Chapter 1: Why Functional Programming? {#ch1}
 
 > Functional programmer: (noun) One who names variables "x", names functions "f", and names code patterns "zygohistomorphic prepromorphism"
 >
@@ -127,7 +127,7 @@ By having more code that's recognizable at a glance, and thus spending less time
 
 FP (at least, without all the terminology weighing it down) is one of the most effective tools for crafting readable code. *That* is why it's so important.
 
-## Readability
+## Readability {#ch1readability}
 
 Readability is not a binary characteristic. It's a largely subjective human factor describing our relationship to code. And it will naturally vary over time as our skills and understanding evolve. I have experienced effects similar to the following figure, and anecdotally many others I've talked to have as well.
 
@@ -234,7 +234,7 @@ Some other authors and content you should check out:
 * [Functional Programming Jargon](https://github.com/hemanth/functional-programming-jargon#functional-programming-jargon)
 * [Functional Programming Exercises](https://github.com/InceptionCode/Functional-Programming-Exercises)
 
-### Libraries
+### Libraries {#ch1libraries}
 
 The code snippets in this book largely do not rely on libraries. Each operation that we discover, we'll derive how to implement it in standalone, plain ol' JavaScript. However, as you begin to build more of your real code with FP, you'll soon want a library to provide optimized and highly reliable versions of these commonly accepted utilities.
 

@@ -1,6 +1,6 @@
-# Chapter 5: Reducing Side Effects
+# Chapter 5: Reducing Side Effects {#ch5}
 
-In Chapter 2, we discussed how a function can have outputs besides its `return` value. By now you should be very comfortable with the FP definition of a function, so the idea of such side outputs -- side effects! -- should smell.
+In [Chapter 2](#ch2), we discussed how a function can have outputs besides its `return` value. By now you should be very comfortable with the FP definition of a function, so the idea of such side outputs -- side effects! -- should smell.
 
 We're going to examine the various different forms of side effects and see why they are harmful to our code's quality and readability.
 
@@ -168,7 +168,7 @@ In both cases, `PI` and `bar` are not part of the state of the program. They're 
 
 I> ## Note
 I>
-I> The use of `const` here does not, in my opinion, make the case that `PI` is absolved as a side cause; `var PI` would lead to the same conclusion. The lack of reassigning `PI` is what matters, not the inability to do so. We'll discuss `const` in Chapter 6.
+I> The use of `const` here does not, in my opinion, make the case that `PI` is absolved as a side cause; `var PI` would lead to the same conclusion. The lack of reassigning `PI` is what matters, not the inability to do so. We'll [discuss `const` in Chapter 6](#ch6reassignment).
 
 #### Randomness
 
@@ -726,7 +726,7 @@ Is a side cause/effect that's unobserved like this tree:
 
 By the narrowest definition of referential transparency, I think you'd have to say `calculateAverage(..)` is still a pure function. However, because we're trying to avoid a strictly academic approach in favor of balancing it with pragmatism, I also think this conclusion needs more perspective. Let's explore.
 
-#### Performance Effects
+#### Performance Effects {#ch5performance}
 
 You'll generally find these kind of side-effects-that-go-unobserved being used to optimize the performance of an operation. For example:
 
@@ -1044,7 +1044,7 @@ The success of this technique will be dependent on the thoroughness of the *copy
 
 ### `this` Revisited
 
-Another variation of the via-reference side cause/effect is with `this`-aware functions having `this` as an implicit input. See "What's This" in Chapter 2 for more info on why the `this` keyword is problematic for FPers.
+Another variation of the via-reference side cause/effect is with `this`-aware functions having `this` as an implicit input. See [Chapter 2, "What's This"](#ch2this) for more info on why the `this` keyword is problematic for FPers.
 
 Consider:
 

@@ -1,6 +1,6 @@
-# Chapter 3: Managing Function Inputs
+# Chapter 3: Managing Function Inputs {#ch3}
 
-Chapter 2 explored the core nature of JS `function`s, and layed the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions -- to bend them to our will.
+[Chapter 2](#ch2) explored the core nature of JS `function`s, and layed the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions -- to bend them to our will.
 
 Specifically, our attention for this chapter will be on the parameter inputs of functions. As you bring functions of all different shapes together in your programs, you'll quickly face incompatibilities in the number/order/type of inputs, as well as the need to specify some inputs at different times than others.
 
@@ -8,12 +8,13 @@ As a matter of fact, for stylistic purposes of readability, sometimes you'll wan
 
 These kinds of techniques are absolutely essential to making functions truly *function*-al.
 
-## All for One
+## All for One {#ch3allforone}
 
 Imagine you're passing a function to a utility, where the utility will send multiple arguments to that function. But you may only want the function to receive a single argument.
 
 We can design a simple helper that wraps a function call to ensure only one argument will pass through. Since this is effectively enforcing that a function is treated as unary, let's name it as such:
 
+{id="ch3unary"}
 ```js
 function unary(fn) {
     return function onlyOneArg(arg){
@@ -22,7 +23,7 @@ function unary(fn) {
 }
 ```
 
-Many FPers tend to prefer the shorter `=>` arrow function syntax for such code (see Chapter 2, "Syntax"), such as:
+Many FPers tend to prefer the shorter `=>` arrow function syntax for such code (see [Chapter 2, "Functions without `function`"](#ch2arrowfuncs)), such as:
 
 ```js
 var unary =
@@ -35,7 +36,7 @@ I> ## Note
 I>
 I> No question this is more terse, sparse even. But I personally feel that whatever it may gain in symmetry with the mathematical notation, it loses more in overall readability with the functions all being anonymous, and by obscuring the scope boundaries, making deciphering closure a little more cryptic.
 
-A commonly cited example for using `unary(..)` is with the `map(..)` utility (see Chapter 9) and `parseInt(..)`. `map(..)` calls a mapper function for each item in a list, and each time it invokes the mapper function, it passes in three arguments: `value`, `idx`, `arr`.
+A commonly cited example for using `unary(..)` is with the `map(..)` utility (see [Chapter 9, "Map"](#ch9map)) and `parseInt(..)`. `map(..)` calls a mapper function for each item in a list, and each time it invokes the mapper function, it passes in three arguments: `value`, `idx`, `arr`.
 
 That's usually not a big deal, unless you're trying to use something as a mapper function that will behave incorrectly if it's passed too many arguments. Consider:
 
@@ -48,12 +49,13 @@ For the signature `parseInt(str,radix)`, it's clear that when `map(..)` passes `
 
 `unary(..)` creates a function that will ignore all but the first argument passed to it, meaning the passed-in `index` is never received by `parseInt(..)` and mistaken as the `radix`:
 
+{id="ch3mapunary"}
 ```js
 ["1","2","3"].map( unary( parseInt ) );
 // [1,2,3]
 ```
 
-### One on One
+### One on One {#ch3oneonone}
 
 Speaking of functions with only one argument, another common base utility in the FP toolbelt is a function that takes one argument and does nothing but return the value untouched:
 
@@ -70,7 +72,7 @@ var identity =
 
 This utility looks so simple as to hardly be useful. But even simple functions can be helpful in the world of FP. Like they say in acting: there are no small parts, only small actors.
 
-For example, imagine you'd like to split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (see Chapter 9) with `identity(..)` as the predicate:
+For example, imagine you'd like to split up a string using a regular expression, but the resulting array may have some empty values in it. To discard those, we can use JS's `filter(..)` array operation (see [Chapter 9, "Filter"](#ch9filter)) with `identity(..)` as the predicate:
 
 ```js
 var words = "   Now is the time for all...  ".split( /\s|\b/ );
@@ -103,7 +105,7 @@ output( "Hello World", upper );     // HELLO WORLD
 output( "Hello World" );            // Hello World
 ```
 
-You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in Chapter 9.
+You also may see `identity(..)` used as a default transformation function for `map(..)` calls or as the initial value in a `reduce(..)` of a list of functions; both of these utilities will be covered in [Chapter 9](#ch9).
 
 ### Unchanging One
 
@@ -147,13 +149,13 @@ p1.then( foo ).then( constant( p2 ) ).then( bar );
 
 W> ## Warning
 W>
-W> Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the book (see Chapter 5, "Reducing Side Effects").
+W> Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the book (see [Chapter 5](#ch5)).
 
 ## Adapting Arguments to Parameters
 
 There are a variety of patterns and tricks we can use to adapt a function's signature to match the kinds of arguments we want to provide to it.
 
-Recall this function signature from Chapter 2 which highlights using array parameter destructuring:
+Recall [this function signature from Chapter 2](#ch2funcparamdestr) which highlights using array parameter destructuring:
 
 ```js
 function foo( [x,y,...args] = [] ) {
@@ -183,6 +185,7 @@ There will be occasions when you have two functions that are imcompatible in thi
 
 We can define a helper to adapt a function so that it spreads out a single received array as its individual arguments:
 
+{id="ch3spreadargs"}
 ```js
 function spreadArgs(fn) {
     return function spreadFn(argsArr) {
@@ -229,7 +232,7 @@ I> ## Note
 I>
 I> In Ramda, this utility is referred to as `unapply(..)`, being that it's the opposite of `apply(..)`. I think the "spread"/"gather" terminology is a little more descriptive for what's going on.
 
-We can use this utility to gather individual arguments into a single array, perhaps because we want to adapt a function with array parameter destructuring to another utility that passes arguments separately. We will cover `reduce(..)` more fully in Chapter 9; in short, it repeatedly calls its reducer function with two individual parameters, which we can now *gather* together:
+We can use this utility to gather individual arguments into a single array, perhaps because we want to adapt a function with array parameter destructuring to another utility that passes arguments separately. We will [cover `reduce(..)` more fully in Chapter 9](#ch9reduce); in short, it repeatedly calls its reducer function with two individual parameters, which we can now *gather* together:
 
 ```js
 function combineFirstTwo([ v1, v2 ]) {
@@ -240,7 +243,7 @@ function combineFirstTwo([ v1, v2 ]) {
 // 15
 ```
 
-## Some Now, Some Later
+## Some Now, Some Later {#ch3somenowsomelater}
 
 If a function takes multiple arguments, you may want to specify some of those up front and leave the rest to be specified later.
 
@@ -384,7 +387,7 @@ function add(x,y) {
 }
 ```
 
-Now imagine we'd like take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility (see Chapter 9) built into JS arrays:
+Now imagine we'd like take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility (see [Chapter 9, "Map"](#ch9map)) built into JS arrays:
 
 ```js
 [1,2,3,4,5].map( function adder(val){
@@ -455,6 +458,7 @@ cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 
 Instead of manually using `reverseArgs(..)` (twice!) for this purpose, we could define a `partialRight(..)` which partially applies from the right. Under the covers, it could use the same double-reverse trick:
 
+{id="ch3partialright"}
 ```js
 function partialRight(fn,...presetArgs) {
     return reverseArgs(
@@ -508,7 +512,7 @@ f( 1, 2, 3, 4 );    // 1 2 3 [4,"z:last"]
 
 The value `"z:last"` is only applied to the `z` parameter in the case where `f(..)` is called with exactly two arguments (matching `x` and `y` parameters). In all other cases, the `"z:last"` will just be the rightmost argument, however many arguments precede it.
 
-## One at a Time
+## One at a Time {#ch3oneatatime}
 
 Let's examine a technique similar to partial application, where a function that expects multiple arguments is broken down into successive chained functions that each take a single argument (arity: 1) and return another function to accept the next argument.
 
@@ -544,6 +548,7 @@ So currying unwinds a single higher-arity function into a series of chained unar
 
 How might we define a utility to do this currying? Consider:
 
+{id="ch3curry"}
 ```js
 function curry(fn,arity = fn.length) {
     return (function nextCurried(prevArgs){
@@ -583,7 +588,7 @@ By default, this implementation relies on being able to inspect the `length` pro
 
 I> ## Note
 I>
-I> If you use this implementation of `curry(..)` with a function that doesn't have an accurate `length` property, you'll need to pass the `arity` (the second parameter of `curry(..)`) to ensure `curry(..)` works correctly. `length` will be inaccurate if the function's parameter signature includes default parameter values, parameter destructuring, or is variadic with `...args` (see Chapter 2).
+I> If you use this implementation of `curry(..)` with a function that doesn't have an accurate `length` property, you'll need to pass the `arity` (the second parameter of `curry(..)`) to ensure `curry(..)` works correctly. `length` will be inaccurate if the function's parameter signature includes default parameter values, parameter destructuring, or is variadic with `...args` (see [Chapter 2](#ch2)).
 
 Here's how we would use `curry(..)` for our earlier `ajax(..)` example:
 
@@ -690,13 +695,13 @@ Depending on your perspective, that form of visualizing the curried function may
 
 But the reason I show it that way is that it happens to look almost identical to the mathematical notation (and Haskell syntax) for a curried function! That's one reason why those who like mathematical notation (and/or Haskell) like the ES6 arrow function form.
 
-### Why Currying and Partial Application?
+### Why Currying and Partial Application? {#ch3whyspecialization}
 
 With either style -- currying (`sum(1)(2)(3)`) or partial application (`partial(sum,1,2)(3)`) -- the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we ever go this direction** when adopting FP? There are multiple layers to answering that question.
 
 The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your codebase) when and where separate arguments are specified, whereas traditional function calls require all the arguments to be present at the same time. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
 
-Another layer to this answer, specifically for currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs three arguments, if curried, becomes a function that needs just one, three times over. That kind of unary function will be a lot easier to work with when we start composing them. We'll tackle this topic later in Chapter 4.
+Another layer to this answer, specifically for currying, is that composition of functions is much easier when there's only one argument. So a function that ultimately needs three arguments, if curried, becomes a function that needs just one, three times over. That kind of unary function will be a lot easier to work with when we start composing them. We'll tackle this topic later in [Chapter 4](#ch4).
 
 But the most important layer is specialization of generalized functions, and how such abstraction improves readability of code.
 
@@ -766,6 +771,7 @@ We see a slight syntax savings of fewer `( )`, and an implied performance benefi
 
 We can adapt our previous currying implementation to this common looser definition:
 
+{id="ch3loosecurry"}
 ```js
 function looseCurry(fn,arity = fn.length) {
     return (function nextCurried(prevArgs){
@@ -785,7 +791,7 @@ function looseCurry(fn,arity = fn.length) {
 
 Now each curried-call accepts one or more arguments (as `nextArgs`). We'll leave it as an exercise for the interested reader to define the ES6 `=>` version of `looseCurry(..)` similar to how we did it for `curry(..)` earlier.
 
-### No Curry for Me, Please
+### No Curry for Me, Please {#ch3nocurry}
 
 It may also be the case that you have a curried function that you'd like to essentially un-curry -- basically, to turn a function like `f(1)(2)(3)` back into a function like `g(1,2,3)`.
 
@@ -842,9 +848,9 @@ uncurriedSum( 1, 2, 3 )( 4 )( 5 );          // 15
 
 Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a function that comes out curried as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
 
-## Order Matters
+## Order Matters {#ch3ordermatters}
 
-In Chapter 2, we explored the named arguments pattern. One primary advantage of named arguments is not needing to juggle argument ordering, thereby improving readability.
+In Chapter 2, we explored the [named arguments pattern](#ch2namedargs). One primary advantage of named arguments is not needing to juggle argument ordering, thereby improving readability.
 
 We've looked at the advantages of using currying/partial application to provide individual arguments to a function separately. But the downside is that these techniques are traditionally based on positional arguments; argument ordering is thus an inevitable headache.
 
@@ -968,7 +974,7 @@ While order is no longer a concern, usage of functions defined in this style req
 
 Weigh these trade-offs carefully.
 
-## No Points
+## No Points {#ch3nopoints}
 
 A popular style of coding in the FP world aims to reduce some of the visual clutter by removing unnecessary parameter-argument mapping. This style is formally called tacit programming, or more commonly: point-free style. The term "point" here is referring to a function's parameter input.
 
@@ -1026,6 +1032,7 @@ W> ## Warning
 W>
 W> You might have been tempted, as I was, to try `map(partialRight(parseInt,10))` to right-partially apply the `10` value as the `radix`. However, as we saw earlier, `partialRight(..)` only guarantees that `10` will be the last argument passed in, not that it will be specifically the second argument. Since `map(..)` itself passes three arguments (`value`, `index`, `arr`) to its mapping function, the `10` value would just be the fourth argument to `parseInt(..)`; it only pays attention to the first two.
 
+{id="ch3shortlongenough"}
 Here's another example:
 
 ```js
@@ -1121,6 +1128,7 @@ A chain of multiple (two) function calls like that looks an awful lot like a cur
 
 Here's the whole example put back together (assuming various utilities we've already detailed in this chapter are present):
 
+{id="ch3finalshortlong"}
 ```js
 function output(msg) {
     console.log( msg );
@@ -1150,7 +1158,7 @@ What do you think? Points or no points for you?
 
 I> ## Note
 I>
-I> Want more practice with point-free style coding? We'll revisit this technique in "Revisiting Points" in Chapter 4, based on newfound knowledge of function composition.
+I> Want more practice with point-free style coding? We'll revisit this technique in [Chapter 4, "Revisiting Points"](#ch4revisitingpoints), based on newfound knowledge of function composition.
 
 ## Summary
 

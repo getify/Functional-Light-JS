@@ -1,4 +1,4 @@
-# Chapter 9: List Operations
+# Chapter 9: List Operations {#ch9}
 
 C> *If you can do something awesome, keep doing it repeatedly.*
 
@@ -18,7 +18,7 @@ By chaining and/or composing list operations together, the intermediate results 
 
 I> ## Note
 I>
-I> More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my advice on `=>` from Chapter 2 still applies for general coding.
+I> More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my [advice on `=>` from Chapter 2](#ch2arrowfuncs) still applies for general coding.
 
 ## Non-FP List Processing
 
@@ -32,7 +32,7 @@ As a quick preamble to our discussion in this chapter, I want to call out a few 
 
 `some(..)` and `every(..)` do encourage the use of pure functions (specifically, predicate functions like `filter(..)` expects), but they inevitably reduce a list to a `true`/`false` result, essentially like a search or matching. These two utilities don't really fit the mold of how we want to model our code with FP, so we're going to skip covering them here.
 
-## Map
+## Map {#ch9map}
 
 We'll start our exploration of FP list operations with one of the most basic and fundamental: `map(..)`.
 
@@ -87,20 +87,18 @@ I> The parameter order `mapperFn, arr` may feel backwards at first, but this con
 
 The `mapperFn(..)` is naturally passed the list item to map/transform, but also an `idx` and `arr`. We're doing that to keep consistency with the built-in array `map(..)`. These extra pieces of information can be very useful in some cases.
 
-But in other cases, you may want to use a `mapperFn(..)` that only the list item should be passed to, because the extra arguments might change its behavior. In "All For One" in Chapter 3, we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed).
+But in other cases, you may want to use a `mapperFn(..)` that only the list item should be passed to, because the extra arguments might change its behavior. In [Chapter 3, "All For One"](#ch3allforone), we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed).
 
-Recall the example from Chapter 3 about limiting `parseInt(..)` to a single argument to be used safely as a `mapperFn(..)`:
+Recall [the example from Chapter 3](#ch3mapunary) about limiting `parseInt(..)` to a single argument to be used safely as a `mapperFn(..)`, which we can also utilize with the standalone `map(..)`:
 
 ```js
 map( ["1","2","3"], unary( parseInt ) );
 // [1,2,3]
 ```
 
-JavaScript provides the `map(..)` utility built-in on arrays, making it very convenient to use as part of a chain of operations on a list.
-
 I> ## Note
 I>
-I> The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in "What's This?" in Chapter 2, `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support such a `this`-binding feature.
+I> The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in [Chapter 2, "What's This?"](#ch2this), `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support such a `this`-binding feature.
 
 Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here are some other examples of mapping operations. We can use `map(..)` to transform a list of functions into a list of their return values:
 
@@ -148,9 +146,9 @@ arr.addEventListener( "value", multiplyBy3 );
 
 Now, any time a value is added to `arr`, the `multiplyBy3(..)` event handler -- mapper function -- is called with the value, and its transformation is added to `newArr`.
 
-What we're hinting at is that arrays, and the array operations we perform on them, are the eager synchronous versions, whereas these same operations can also be modeled on a "lazy list" (aka, stream) that receives its values over time. We'll dive into this topic in Chapter 10.
+What we're hinting at is that arrays, and the array operations we perform on them, are the eager synchronous versions, whereas these same operations can also be modeled on a "lazy list" (aka, stream) that receives its values over time. We'll dive into this topic in [Chapter 10](#ch10).
 
-### Mapping vs. Eaching
+### Mapping vs. Eaching {#ch9mappingeaching}
 
 Some advocate using `map(..)` as a general form of `forEach(..)`-iteration, where essentially the value received is passed through untouched, but then some side effect can be performed:
 
@@ -169,7 +167,7 @@ You've heard the old adage about using the right tool for the right job, right? 
 
 A hammer is meant to be held in your hand; if you instead hold it in your mouth and try to hammer the nail, you're not gonna be very effective. `map(..)` is intended to map values, not create side effects.
 
-### A Word: Functors
+### A Word: Functors {#ch9functors}
 
 We've mostly tried to stay away from invented terminology in FP as much as possible in this book. We have used official terms at times, but mostly when we can derive some sense of meaning from them in regular everyday conversation.
 
@@ -206,7 +204,7 @@ stringMap( uppercaseLetter, "Hello World!" );
 
 `stringMap(..)` allows a string to be a functor. You can define a mapping function for any data structure; as long as the utility follows these rules, the data structure is a functor.
 
-## Filter
+## Filter {#ch9filter}
 
 Imagine I bring an empty basket with me to the grocery store to visit the fruit section; there's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one by one, and I walk away with a basket full of just the apples and oranges.
 
@@ -309,7 +307,7 @@ isEven( 2 );        // false
 
 Yuck.
 
-Recall that in "No Points" in Chapter 3, we defined a `not(..)` operator that negates a predicate function. Consider:
+Recall that in [Chapter 3, "No Points"](#ch3nopoints), we defined a `not(..)` operator that negates a predicate function. Consider:
 
 ```js
 var isEven = not( isOdd );
@@ -350,7 +348,7 @@ filterOut( isEven, [1,2,3,4,5] );       // [1,3,5]
 
 I think using `filterIn(..)` and `filterOut(..)` (known as `reject(..)` in Ramda) will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
 
-## Reduce
+## Reduce {#ch9reduce}
 
 While `map(..)` and `filter(..)` produce new lists, typically this third operator (`reduce(..)`) combines (aka "reduces") the values of a list down to a single finite (non-list) value, like a number or string. However, later in this chapter, we'll look at how you can push `reduce(..)` to use it in more advanced ways. `reduce(..)` is one of the most important FP tools; it's like a Swiss Army all-in-one knife with all its usefulness.
 
@@ -413,7 +411,7 @@ function reduce(reducerFn,initialValue,arr) {
 
 Just as with `map(..)` and `filter(..)`, the reducer function is also passed the lesser-common `idx` and `arr` arguments in case that's useful to the reduction. I would say I don't typically use these, but I guess it's nice to have them available.
 
-Recall in Chapter 4, we discussed the `compose(..)` utility and showed an implementation with `reduce(..)`:
+Recall in [Chapter 4, we discussed the `compose(..)` utility](#ch4composereduce) and showed an implementation with `reduce(..)`:
 
 ```js
 function compose(...fns) {
@@ -439,7 +437,7 @@ fn( 9 );            // 11016  (9 * 3 * 17 * 6 * 4)
 fn( 10 );           // 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
-`pipeReducer(..)` is unfortunately not point-free (see "No Points" in Chapter 3), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
+`pipeReducer(..)` is unfortunately not point-free (see [Chapter 3, "No Points"](#ch3nopoints)), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
 
 Earlier we talked about using `unary(..)` to limit a `mapperFn(..)` or `predicateFn(..)` to just a single argument. It might be handy to have a `binary(..)` that does something similar but limits to two arguments, for a `reducerFn(..)` function:
 
@@ -490,7 +488,7 @@ function compose(...fns) {
 
 Now, we don't need to do `fns.reverse()`; we just reduce from the other direction!
 
-### Map as Reduce
+### Map as Reduce {#ch9mapasreduce}
 
 The `map(..)` operation is iterative in its nature, so it can also be represented as a reduction (`reduce(..)`). The trick is to realize that the `initialValue` of `reduce(..)` can be itself an (empty) array, in which case the result of a reduction can be another list!
 
@@ -509,6 +507,7 @@ var double = v => v * 2;
 // [2,4,6,8,10]
 ```
 
+{id="ch9reducecheating"}
 I> ## Note
 I>
 I> We're cheating with this reducer: using a side effect by allowing `list.push(..)` to mutate the list that was passed in. In general, that's not a good idea, obviously, but since we know the `[]` list is being created and passed in, it's less dangerous. You could be more formal -- yet less performant! -- by creating a new list with the val `concat(..)`d onto the end. We'll come back to this cheat in Appendix A.
@@ -607,7 +606,7 @@ var flatten =
 
 I> ## Note
 I>
-I> This implementation choice relies on recursion as we saw in Chapter 8.
+I> This implementation choice relies on recursion as we saw in [Chapter 8](#ch8).
 
 To use `flatten(..)` with an array of arrays (of any nested depth):
 
@@ -696,6 +695,7 @@ flatMap( entry => [ entry.name, ...entry.variations ], firstNames );
 
 The naive implementation of `flatMap(..)` with both steps done separately:
 
+{id="ch9flatmap"}
 ```js
 var flatMap =
     (mapperFn,arr) =>
@@ -721,7 +721,7 @@ var flatMap =
 
 While there's some convenience and performance gained with a `flatMap(..)` utility, there may very well be times when you need other operations like `filter(..)`ing mixed in. If that's the case, doing the `map(..)` and `flatten(..)` separately might still be more appropriate.
 
-### Zip
+### Zip {#ch9zip}
 
 So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of two input lists into sub-lists, called `zip(..)`:
 
@@ -904,7 +904,7 @@ I> ## Note
 I>
 I> The three `Array.prototype.XXX`-style references are grabbing references to the built-in `Array.prototype.*` methods so that we can reuse them with our own arrays.
 
-### Composing Standalone Utilities
+### Composing Standalone Utilities {#ch9composingiterations}
 
 Standalone `compose(..)`-style composition of these utilities doesn't need all the `this` contortions, which is its most favorable argument. For example, we could define standalones as:
 
@@ -960,7 +960,7 @@ compose(
 
 The cleanliness of this approach is in part why FPers prefer the standalone utility style instead of instance methods. But your mileage may vary.
 
-### Adapting Methods to Standalones
+### Adapting Methods to Standalones {#ch9adaptingmethods}
 
 In the previous definition of `filter(..)`/`map(..)`/`reduce(..)`, you might have spotted the common pattern across all three: they all dispatch to the corresponding native array method. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unboundMethod(..)` to do just that:
 
@@ -1060,7 +1060,7 @@ if (orders != null) processOrders( orders );
 
 First, let's observe that the five variable declarations and the running series of `if` conditionals guarding the function calls are effectively one big composition of these six calls `getCurrentSession()`, `getSessionId(..)`, `lookupUser(..)`, `getUserId(..)`, `lookupOrders(..)`, and `processOrders(..)`. Ideally, we'd like to get rid of all these variable declarations and imperative conditionals.
 
-Unfortunately, the `compose(..)`/`pipe(..)` utilities we explored in Chapter 4 don't by themselves offer a convenient way to express the `!= null` conditionals in the composition. Let's define a utility to help:
+Unfortunately, the `compose(..)`/`pipe(..)` utilities we explored in [Chapter 4](#ch4) don't by themselves offer a convenient way to express the `!= null` conditionals in the composition. Let's define a utility to help:
 
 ```js
 var guard =
@@ -1142,7 +1142,7 @@ Part of your evolution to become a functional programmer is to develop a recogni
 
 Before we move on from this topic, let's take a reality check: the example here is heavily contrived. Not all code segments will be straightforwardly modeled as list operations. The pragmatic take-away is to develop the instinct to look for these opportunities, but not get too hung up on code acrobatics; some improvement is better than none. Always step back and ask if you're **improving or harming** code readability.
 
-## Fusion
+## Fusion {#ch9fusion}
 
 As FP list operations permeate the way you think about code, you'll very likely start recognizing chains of combined behavior, like:
 
@@ -1311,7 +1311,7 @@ BinaryTree.forEach = function forEach(visitFn,node){
 
 I> ## Note
 I>
-I> Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We already discussed recursion in Chapter 8, where we covered recursion in the chapter on recursion.
+I> Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We already discussed recursion in [Chapter 8](#ch8), where we covered recursion in the chapter on recursion.
 
 Recall `forEach(..)` was described at the beginning of this chapter as only being useful for side effects, which is not very typically desired in FP. In this case, we'll use `forEach(..)` only for the side effect of I/O, so it's perfectly reasonable as a helper.
 

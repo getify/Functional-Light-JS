@@ -1,4 +1,4 @@
-# Chapter 7: Closure vs. Object
+# Chapter 7: Closure vs. Object {#ch7}
 
 A number of years ago, Anton van Straaten crafted what has become a rather famous and oft-cited [koan](https://www.merriam-webster.com/dictionary/koan) to illustrate and provoke an important tension between closure and objects:
 
@@ -35,7 +35,7 @@ And what does any of this have to do with functional programming? Pull up a chai
 
 ## The Same Page
 
-First, let's make sure we're all on the same page when we refer to closures and objects. We're obviously in the context of how JavaScript deals with these two mechanisms, and specifically talking about simple function closure (see "Keeping Scope" in Chapter 2) and simple objects (collections of key-value pairs).
+First, let's make sure we're all on the same page when we refer to closures and objects. We're obviously in the context of how JavaScript deals with these two mechanisms, and specifically talking about simple function closure (see [Chapter 2, "Keeping Scope"](#ch2keepingscope)) and simple objects (collections of key-value pairs).
 
 For the record, here's an illustration of a simple function closure:
 
@@ -312,7 +312,7 @@ While these programs look and feel a bit different ergonomically, they're actual
 
 Many people will initially think that closures and objects behave differently with respect to mutability; closures protect from external mutation while objects do not. But, it turns out, both forms have identical mutation behavior.
 
-That's because what we care about, as discussed in Chapter 6, is **value** mutability, and this is a characteristic of the value itself, regardless of where or how it's assigned:
+That's because what we care about, as discussed in [Chapter 6](#ch6), is **value** mutability, and this is a characteristic of the value itself, regardless of where or how it's assigned:
 
 ```js
 function outer() {
@@ -376,7 +376,7 @@ Here's some selections from a part of that post:
 >
 > In other words, two things A and B would be isomorphic if you could map (convert) from A to B and then go back to A with the inverse mapping.
 
-Recall in "Brief Math Review" in Chapter 2, we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case of bijective (aka, 2-way) morphism that requires not only that the mapping must be able to go in either direction, but also that the behavior is identical in either form.
+Recall in [Chapter 2, "Brief Math Review"](#ch2mathreview), we discussed the mathematical definition of a function as being a mapping between inputs and outputs. We pointed out this is technically called a morphism. An isomorphism is a special case of bijective (aka, 2-way) morphism that requires not only that the mapping must be able to go in either direction, but also that the behavior is identical in either form.
 
 But instead of thinking about numbers, let's relate isomorphism to code. Again quoting my blog post:
 
@@ -582,7 +582,7 @@ The visibility of an object's state data makes using it more straightforward, wh
 
 If the lexical variable `x` is hidden inside a closure, the only code that has the freedom to reassign it is also inside that closure; it's impossible to modify `x` from the outside.
 
-As we saw in Chapter 6, that fact alone improves the readability of code by reducing the surface area that the reader must consider to predict the behavior of any given variable.
+As we saw in [Chapter 6](#ch6), that fact alone improves the readability of code by reducing the surface area that the reader must consider to predict the behavior of any given variable.
 
 The local proximity of lexical reassignment is a big reason why I don't find `const` as a feature that helpful. Scopes (and thus closures) should in general be pretty small, and that means there will only be a few lines of code that can affect reassignment. In `outer()` above, we can quickly inspect to see that no line of code reassigns `x`, so for all intents and purposes it's acting as a constant.
 
@@ -590,7 +590,7 @@ This kind of guarantee is a powerful contributor to our confidence in the purity
 
 On the other hand, `xPublic.x` is a public property, and any part of the program that gets a reference to `xPublic` has the ability, by default, to reassign `xPublic.x` to some other value. That's a lot more lines of code to consider!
 
-That's why in Chapter 6, we looked at `Object.freeze(..)` as a quick-n-dirty means of making all of an object's properties read-only (`writable: false`), so that they can't be reassigned unpredictably.
+That's why in [Chapter 6, we looked at `Object.freeze(..)`](#ch6freezing) as a quick-n-dirty means of making all of an object's properties read-only (`writable: false`), so that they can't be reassigned unpredictably.
 
 Unfortunately, `Object.freeze(..)` is both all-or-nothing and irreversible.
 
@@ -606,7 +606,7 @@ I think variable reassignment can be quite useful, and when used appropriately, 
 
 ### Cloning State
 
-As we learned in Chapter 6, one of the best ways we prevent side effects from eroding the predictability of our code is to make sure we treat all state values as immutable, regardless of whether they are actually immutable (frozen) or not.
+As we learned in [Chapter 6](#ch6), one of the best ways we prevent side effects from eroding the predictability of our code is to make sure we treat all state values as immutable, regardless of whether they are actually immutable (frozen) or not.
 
 If you're not using a purpose-built library to provide sophisticated immutable data structures, the simplest approach will suffice: duplicate your objects/arrays each time before making a change.
 

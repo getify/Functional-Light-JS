@@ -1,6 +1,6 @@
-# Chapter 6: Value Immutability
+# Chapter 6: Value Immutability {#ch6}
 
-In Chapter 5, we talked about the importance of reducing side causes/effects: the ways that your application's state can change unexpectedly and cause surprises (bugs). The fewer places we have with such landmines, the more confidence we have over our code, and the more readable it will be. Our topic for this chapter follows directly from that same effort.
+In [Chapter 5](#ch5), we talked about the importance of reducing side causes/effects: the ways that your application's state can change unexpectedly and cause surprises (bugs). The fewer places we have with such landmines, the more confidence we have over our code, and the more readable it will be. Our topic for this chapter follows directly from that same effort.
 
 If programming-style idempotence is about defining a value change operation so that it can only affect state once, we now turn our attention to the goal of reducing the number of change occurrences from one to zero.
 
@@ -92,7 +92,7 @@ addValue( [1,2,3] );    // [1,2,3,4]
 
 Notice that we did not change the array that `arr` references, but rather created a new array (`newArr`) that contains the existing values plus the new `4` value.
 
-Analyze `addValue(..)` based on what we discussed in Chapter 5 about side causes/effects. Is it pure? Does it have referential transparency? Given the same array, will it always produce the same output? Is it free of both side causes and side effects? **Yes.**
+Analyze `addValue(..)` based on what we discussed in [Chapter 5](#ch5) about side causes/effects. Is it pure? Does it have referential transparency? Given the same array, will it always produce the same output? Is it free of both side causes and side effects? **Yes.**
 
 Imagine the `[1,2,3]` array represents a sequence of data from some previous operations and we stored in some variable. It is our current state. If we want to compute what the next state of our application is, we call `addValue(..)`. But we want that act of next-state computation to be direct and explicit. So the `addValue(..)` operation takes a direct input, returns a direct output, and avoids creating a side effect by mutating the original array that `arr` references.
 
@@ -148,7 +148,7 @@ console.log( arr[0] );      // 1
 
 In a little bit, we'll see another strategy for protecting ourselves from a value being mutated out from underneath us unexpectedly.
 
-## Reassignment
+## Reassignment {#ch6reassignment}
 
 How would you describe what a "constant" is? Think about that for a moment before you move on to the next paragraph.
 
@@ -285,7 +285,7 @@ If after changing from `"420"` to `420`, the original `"420"` value is no longer
 
 The thing we really should worry more about is not whether our variables get reassigned, but **whether our values get mutated**. Why? Because values are portable; lexical assignments are not. You can pass an array to a function, and it can be changed without you realizing it. But a reassignment will never be unexpectedly caused by some other part of your program.
 
-### It's Freezing in Here
+### It's Freezing in Here {#ch6freezing}
 
 There's a cheap and simple way to turn a mutable object/array/function into an "immutable value" (of sorts):
 
@@ -389,7 +389,7 @@ A powerful library like Immutable.js employs sophisticated performance optimizat
 
 When changes to a value are few or infrequent and performance is less of a concern, I'd recommend the lighter-weight solution, sticking with built-in `Object.freeze(..)` as discussed earlier.
 
-## Treatment
+## Treatment {#ch6treatment}
 
 What if we receive a value to our function and we're not sure if it's mutable or immutable? Is it ever OK to just go ahead and try to mutate it? **No.** As we asserted at the beginning of this chapter, we should treat all received values as immutable -- to avoid side effects and remain pure -- regardless of whether they are or not.
 
@@ -438,7 +438,7 @@ Unfortunately, for historical reasons, quite a few other array methods are impur
 
 It should not be seen as *forbidden* to use these kinds of utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
 
-Recall one of the implementations of `compose(..)` from Chapter 4:
+Recall one of the implementations of [`compose(..)` from Chapter 4](#ch4generalcompose):
 
 ```js
 function compose(...fns) {

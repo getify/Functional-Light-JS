@@ -1,4 +1,4 @@
-# Chapter 8: Recursion
+# Chapter 8: Recursion {#ch8}
 
 Did you have fun down our little closures/objects rabbit hole in the previous chapter? Welcome back!
 
@@ -102,7 +102,7 @@ function fib(n) {
 
 We'll use `fib(..)` variously throughout this chapter to illustrate ideas around recursion, but one downside to this particular form is that there's an awful lot of duplicated work. `fib(n-1)` and `fib(n-2)` don't share any of their work with each other, but overlap with each other almost entirely, over the entire integer space down to `0`.
 
-We briefly touched on memoization in the "Performance Effects" section of Chapter 5. Here, memoization would allow the `fib(..)` of any given number to be computed only once, instead of being recomputed many times. We won't go further into that topic here, but that performance caveat is important to keep in mind with any algorithm, recursive or not.
+We briefly touched on memoization in the [Chapter 5, "Performance Effects"](#ch5performance). Here, memoization would allow the `fib(..)` of any given number to be computed only once, instead of being recomputed many times. We won't go further into that topic here, but that performance caveat is important to keep in mind with any algorithm, recursive or not.
 
 ### Mutual Recursion
 
@@ -252,7 +252,7 @@ The case I'm making is that this reasoning while reading an implementation is mo
 
 T> ## Tip
 T>
-T> We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see Chapter 9), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
+T> We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see [Chapter 9](#ch9)), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
 
 ### Binary Tree Recursion
 
@@ -617,7 +617,7 @@ function fib(n,cont = identity) {
 }
 ```
 
-Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our `identity(..)` utility from Chapter 3; remember, it simply returns whatever is passed to it.
+Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our [`identity(..)` utility from Chapter 3](#ch3oneonone); remember, it simply returns whatever is passed to it.
 
 Morever, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
 

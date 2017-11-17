@@ -1,4 +1,4 @@
-# Chapter 2: The Nature Of Functions
+# Chapter 2: The Nature Of Functions {#ch2}
 
 Functional Programming is **not just programming with the `function` keyword.** Oh, if only it was that easy -- I could end the book right here! Nevertheless, functions really *are* at the center of FP. And it's how we use functions that makes our code *functional*.
 
@@ -14,7 +14,7 @@ The question "What is a function?" superficially seems to have an obvious answer
 
 While this definition is reasonable, it's missing some very important essence that is the core of a *function* as it applies to FP. So let's dig below the surface to understand functions more completely.
 
-### Brief Math Review
+### Brief Math Review {#ch2mathreview}
 
 I know I've promised we'd stay away from math as much as possible, but bear with me for a moment as we quickly observe some fundamental things about functions and graphs from algebra before we proceed.
 
@@ -249,7 +249,7 @@ T> ## Tip
 T>
 T> Actually, these methods are not entirely useless. There will be a few places we rely on them throughout the code in this book. But certainly in most places, `...` will be much more declaratively readable, and preferable as a result.
 
-### Parameter Destructuring
+### Parameter Destructuring {#ch2paramdestr}
 
 Consider the variadic `foo(..)` from the previous section:
 
@@ -277,6 +277,7 @@ Thankfully, ES6 destructuring is the answer. Destructuring is a way to declare a
 
 Consider:
 
+{id="ch2funcparamdestr"}
 ```js
 function foo( [x,y,...args] = [] ) {
     // ..
@@ -303,7 +304,7 @@ function foo(params) {
 }
 ```
 
-But here we highlight a principle we only briefly introduced in Chapter 1: declarative code communicates more effectively than imperative code.
+But here we highlight a principle we only briefly introduced in [Chapter 1](#ch1): declarative code communicates more effectively than imperative code.
 
 Declarative code (for example, the destructuring in the former `foo(..)` snippet, or the `...` operator usages) focuses on what the outcome of a piece of code should be.
 
@@ -313,7 +314,7 @@ The earlier `foo(..)` is regarded as more readable, because the destructuring hi
 
 Wherever possible, and to whatever degrees our language and our libraries/frameworks will let us, **we should be striving for declarative, self-explanatory code.**
 
-## Named Arguments
+## Named Arguments {#ch2namedargs}
 
 Just as we can destructure array parameters, we can destructure object parameters:
 
@@ -337,7 +338,7 @@ We didn't have to account for `x` in *that* call-site because in effect we didn'
 
 Some languages have an explicit feature for this: named arguments. In other words, at the call-site, labeling an input value to indicate which parameter it maps to. JavaScript doesn't have named arguments, but parameter object destructuring is the next best thing.
 
-Another FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that in Chapter 4.
+Another FP-related benefit of using an object destructuring to pass in potentially multiple arguments is that a function that only takes one parameter (the object) is much easier to compose with another function's single output. Much more on that in [Chapter 4](#ch4).
 
 ### Unordered Parameters
 
@@ -535,7 +536,7 @@ Instead of an `undefined` empty slot value in position `4`, now there's a `0`. T
 
 Why? Because `list` holds a reference-copy of the `nums` reference, not a value-copy of the `[1,3,9,..]` array value. JavaScript uses references and reference-copies for arrays, objects, and functions, so we may create an accidental output from our function all too easily.
 
-This implicit function output has a special name in the FP world: side effects. And a function that has *no side effects* also has a special name: pure function. We'll talk a lot more about these in Chapter 5, but the punchline is that we'll want to prefer pure functions and avoid side effects wherever possible.
+This implicit function output has a special name in the FP world: side effects. And a function that has *no side effects* also has a special name: pure function. We'll talk a lot more about these in [Chapter 5](#ch5), but the punchline is that we'll want to prefer pure functions and avoid side effects wherever possible.
 
 ## Functions of Functions
 
@@ -590,7 +591,7 @@ foo();                  // HELLO!
 
 Functions that treat other functions as values are higher-order functions by definition. FPers write these all the time!
 
-### Keeping Scope
+### Keeping Scope {#ch2keepingscope}
 
 One of the most powerful things in all of programming, and especially in FP, is how a function behaves when it's inside another function's scope. When the inner function makes reference to a variable from the outer function, this is called closure.
 
@@ -716,7 +717,7 @@ T> Did you spot how `upperFirst(..)` could have used `lower(..)`?
 
 We'll use closure heavily throughout the rest of the text. It may just be the most important foundational practice in all of FP, if not programming as a whole. Make sure you're really comfortable with it!
 
-## Syntax
+## Syntax {#ch2syntax}
 
 Before we move on from this primer on functions, let's take a moment to discuss their syntax.
 
@@ -873,7 +874,7 @@ I can testify from my own experience that in the struggle to name something well
 
 This time investment is well worth it.
 
-### Functions Without `function`
+### Functions Without `function` {#ch2arrowfuncs}
 
 So far we've been using the full canonical syntax for functions. But you've no doubt also heard all the buzz around the ES6 `=>` arrow function syntax.
 
@@ -931,13 +932,13 @@ I> ## Note
 I>
 I> Though I do not prefer to use `=>` in practice in my production code, they are useful in quick code explorations. Moreover, we will use arrow functions in many places throughout the rest of this book -- especially when we present typical FP utilities -- where conciseness is preferred to optimize for the limited physical space in code snippets. Make your own determinations whether this approach will make your own production-ready code more or less readable.
 
-## What's This?
+## What's This? {#ch2this}
 
 If you're not familiar with the `this` binding rules in JavaScript, I recommend checking out my book *You Don't Know JS: this & Object Prototypes*. For the purposes of this section, I'll assume you know how `this` gets determined for a function call (one of the four rules). But even if you're still fuzzy on *this*, the good news is we're going to conclude that you shouldn't be using `this` if you're trying to do FP.
 
 I> ## Note
 I>
-I> We're tackling a topic that we'll ultimately conclude we shouldn't use. Why!? Because the topic of `this` has implications for other topics covered later in this book. For example, our notions of function purity are impacted by `this` being essentially an implicit input to a function (see Chapter 5). Additionally, our perspective on `this` affects whether we choose array methods (`arr.map(..)`) versus standalone utilities (`map(..,arr)`) (see Chapter 9). Understanding `this` is essential to understanding why `this` really should *not* be part of your FP!
+I> We're tackling a topic that we'll ultimately conclude we shouldn't use. Why!? Because the topic of `this` has implications for other topics covered later in this book. For example, our notions of function purity are impacted by `this` being essentially an implicit input to a function (see [Chapter 5](#ch5)). Additionally, our perspective on `this` affects whether we choose array methods (`arr.map(..)`) versus standalone utilities (`map(..,arr)`) (see [Chapter 9](#ch9)). Understanding `this` is essential to understanding why `this` really should *not* be part of your FP!
 
 JavaScript `function`s have a `this` keyword that's automatically bound per function call. The `this` keyword can be described in many different ways, but I prefer to say it provides an object context for the function to run against.
 

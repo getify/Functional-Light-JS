@@ -1,6 +1,6 @@
-# Appendix C: FP Libraries
+# Appendix C: FP Libraries {#apC}
 
-If you've been reading this book from start to finish, take a minute to stop and look back how far you've come since Chapter 1. It's been quite a journey. I hope you've learned a lot and gained insight into thinking functionally for your own programs.
+If you've been reading this book from start to finish, take a minute to stop and look back how far you've come since [Chapter 1](#ch1). It's been quite a journey. I hope you've learned a lot and gained insight into thinking functionally for your own programs.
 
 I want to close this book leaving you with some quick pointers of working with common/popular FP libraries. This is not an exhaustive documentation on each, but a quick glance at the things you should be aware of as you venture beyond "Functional-Light" into broader FP.
 
@@ -8,7 +8,7 @@ Wherever possible, I recommend you *not* reinvent any wheels. If you find an FP 
 
 ## Stuff to Investigate
 
-Let's expand the list of FP libraries to be aware of, from Chapter 1. We won't cover all of these (as there's a lot of overlap), but here are the ones that should probably be on your radar screen:
+Let's expand the [list of FP libraries to be aware of, from Chapter 1](#ch1libraries). We won't cover all of these (as there's a lot of overlap), but here are the ones that should probably be on your radar screen:
 
 * [Ramda](http://ramdajs.com): General FP Utilities
 * [Sanctuary](https://github.com/sanctuary-js/sanctuary): Ramda Companion for FP Types
@@ -36,9 +36,9 @@ From the [Ramda documentation](http://ramdajs.com/):
 >
 > The parameters to Ramda functions are arranged to make it convenient for currying. The data to be operated on is generally supplied last.
 
-I find that design decision to be one of Ramda's strengths. It's also important to note that Ramda's form of currying (as with most libraries, it seems) is the "loose currying" we talked about in Chapter 3.
+I find that design decision to be one of Ramda's strengths. It's also important to note that Ramda's form of currying (as with most libraries, it seems) is the ["loose currying" we talked about in Chapter 3](#ch3loosecurry).
 
-The final example of Chapter 3 -- recall defining a point-free `printIf(..)` utility -- can be done with Ramda like this:
+The [final example of Chapter 3](#ch3finalshortlong) -- recall defining a point-free `printIf(..)` utility -- can be done with Ramda like this:
 
 ```js
 function output(msg) {
@@ -63,7 +63,7 @@ printIf( isLongEnough, msg1 );
 printIf( isLongEnough, msg2 );            // Hello World
 ```
 
-A few differences to point out compared to Chapter 3's approach:
+A few differences to point out compared to [Chapter 3's approach](#ch3finalshortlong):
 
 * We use `R.complement(..)` instead of `not(..)` to create a negating function `isLongEnough(..)` around `isShortEnough(..)`.
 
@@ -79,7 +79,7 @@ Ramda is a very popular and powerful library. It's a really good place to start 
 
 Lodash is one of the most popular libraries in the entire JS ecosystem. They publish an "FP-friendly" version of their API as ["lodash/fp"](https://github.com/lodash/lodash/wiki/FP-Guide).
 
-In Chapter 9, we looked at composing standalone list operations (`map(..)`, `filter(..)`, and `reduce(..)`). Here's how we could do it with "lodash/fp":
+In [Chapter 9, we looked at composing standalone list operations](#ch9composingiterations) (`map(..)`, `filter(..)`, and `reduce(..)`). Here's how we could do it with "lodash/fp":
 
 ```js
 var sum = (x,y) => x + y;
@@ -102,7 +102,7 @@ You cannot beat the stability, widespread community support, and performance of 
 
 ## Mori (0.3.2)
 
-In Chapter 6, we already briefly glanced at the Immutable.js library, probably the most well-known for immutable data structures.
+In [Chapter 6](#ch6), we already briefly glanced at the Immutable.js library, probably the most well-known for immutable data structures.
 
 Let's instead look at another popular library: [Mori](https://github.com/swannodette/mori). Mori is designed with a different (ostensibly more FP-like) take on API: it uses standalone functions instead of methods directly on the values.
 
@@ -140,7 +140,7 @@ But I really like the standalone function design instead of methods on values. M
 
 ## Bonus: FPO
 
-In Chapter 2, we introduced a pattern for dealing with arguments called "named arguments", which in JS means using an object at the call-site to map properties to destructured function parameters:
+In [Chapter 2, we introduced a pattern](#ch2namedargs) for dealing with arguments called "named arguments", which in JS means using an object at the call-site to map properties to destructured function parameters:
 
 ```js
 function foo( {x,y} = {} ) {
@@ -152,7 +152,7 @@ foo( {
 } );                    // undefined 3
 ```
 
-Then in Chapter 3, we talked about extending our ideas of currying and partial application to work with named arguments, like this:
+Then in [Chapter 3, we talked about extending](#ch3ordermatters) our ideas of currying and partial application to work with named arguments, like this:
 
 ```js
 function foo({ x, y, z } = {}) {
@@ -217,7 +217,7 @@ If FPO's named argument form of FP appeals to you, perhaps check out the library
 
 FP iterations (`map(..)`, `filter(..)`, etc.) are almost always modeled as synchronous operations, meaning we eagerly run through all the steps of the iteration immediately. As a matter of fact, other FP patterns like composition and even transducing are also iterations, and are also modeled exactly this way.
 
-But what happens if one or more of the steps in an iteration needs to complete asynchronously? You might jump to thinking that Observables (see Chapter 10) is the natural answer, but they're not what we need.
+But what happens if one or more of the steps in an iteration needs to complete asynchronously? You might jump to thinking that Observables (see [Chapter 10](#ch10observables)) is the natural answer, but they're not what we need.
 
 Let me quickly illustrate.
 
@@ -248,7 +248,7 @@ Unfortunately, this "trick" only works if you're going to do all the asynchronou
 
 And some operations naturally require serial asynchrony, like for example an asynchronous `reduce(..)`, which clearly needs to work left-to-right one at a time; those steps can't be run concurrently and have that operation make any sense.
 
-As I said, Observables (see Chapter 10) aren't the answer to these kinds of tasks. The reason is, an Observable's coordination of asynchrony is between separate operations, not between steps/iterations at a single level of operation.
+As I said, Observables (see [Chapter 10](#ch10observables)) aren't the answer to these kinds of tasks. The reason is, an Observable's coordination of asynchrony is between separate operations, not between steps/iterations at a single level of operation.
 
 Another way to visualize this distinction is that Observables support "vertical asynchrony", whereas what I'm talking about would be "horizontal asynchrony".
 

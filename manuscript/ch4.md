@@ -1,4 +1,4 @@
-# Chapter 4: Composing Functions
+# Chapter 4: Composing Functions {#ch4}
 
 By now, I hope you're feeling much more comfortable with what it means to use functions for functional programming.
 
@@ -14,17 +14,17 @@ Composition is how an FPer models the flow of data through the program. In some 
 
 ## Output to Input
 
-We've already seen a few examples of composition. For example, our discussion of `unary(..)` in Chapter 3 included this expression: `unary(adder(3))`. Think about what's happening there.
+We've already seen a few examples of composition. For example, our discussion of [`unary(..)` in Chapter 3](#ch3unary) included [this expression: `[ .. ].map(unary(parseInt))`](#ch3mapunary). Think about what's happening there.
 
-To compose two functions together, pass the output of the first function call as the input of the second function call. In `unary(adder(3))`, the `adder(3)` call returns a value (a function); that value is directly passed as an argument to `unary(..)`, which also returns a value (another function).
+To compose two functions together, pass the output of the first function call as the input of the second function call. In `map(unary(parseInt))`, the `unary(parseInt)` call returns a value (a function); that value is directly passed as an argument to `map(..)`, which returns an array.
 
 To take a step back and visualize the conceptual flow of data, consider:
 
 ```
-functionValue <-- unary <-- adder <-- 3
+arrayValue <-- map <-- unary <-- parseInt
 ```
 
-`3` is the input to `adder(..)`. The output of `adder(..)` is the input to `unary(..)`. The output of `unary(..)` is `functionValue`. This is the composition of `unary(..)` and `adder(..)`.
+`parseInt` is the input to `unary(..)`. The output of `unary(..)` is the input to `map(..)`. The output of `map(..)` is `arrayValue`. This is the composition of `map(..)` and `unary(..)`.
 
 I> ## Note
 I>
@@ -196,6 +196,7 @@ Now the candy factory owns the best machine of all: a machine that can take any 
 
 We can implement a general `compose(..)` utility like this:
 
+{id="ch4generalcompose"}
 ```js
 function compose(...fns) {
     return function composed(result){
@@ -230,7 +231,7 @@ var compose =
 
 W> ## Warning
 W>
-W> `...fns` is a collected array of arguments, not a passed-in array, and as such, it's local to `compose(..)`. It may be tempting to think the `fns.slice()` would thus be unnecessary. However, in this particular implementation, `.pop()` inside the inner `composed(..)` function is mutating the list, so if we didn't make a copy each time, the returned composed function could only be used reliably once. We'll revisit this hazard in Chapter 6.
+W> `...fns` is a collected array of arguments, not a passed-in array, and as such, it's local to `compose(..)`. It may be tempting to think the `fns.slice()` would thus be unnecessary. However, in this particular implementation, `.pop()` inside the inner `composed(..)` function is mutating the list, so if we didn't make a copy each time, the returned composed function could only be used reliably once. We'll revisit this hazard in [Chapter 6](#ch6).
 
 Now let's look at an example of composing more than two functions. Recalling our `uniqueWords(..)` composition example, let's add a `skipShortWords(..)` to the mix:
 
@@ -264,7 +265,7 @@ wordsUsed;
 // "function","input","second"]
 ```
 
-To do something more interesting with composition, let's use `partialRight(..)`, which we first looked at in Chapter 3. We can build a right-partial application of `compose(..)` itself, pre-specifying the second and third arguments (`unique(..)` and `words(..)`, respectively); we'll call it `filterWords(..)`.
+To do something more interesting with composition, let's use [`partialRight(..)`, which we first looked at in Chapter 3](#ch3partialright). We can build a right-partial application of `compose(..)` itself, pre-specifying the second and third arguments (`unique(..)` and `words(..)`, respectively); we'll call it `filterWords(..)`.
 
 Then, we can complete the composition multiple times by calling `filterWords(..)`, but with different first-arguments respectively:
 
@@ -292,7 +293,7 @@ You can also `curry(..)` a composition instead of partial application, though be
 
 I> ## Note
 I>
-I> Because `curry(..)` (at least the way we implemented it in Chapter 3) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity like `curry(.. , 3)`.
+I> Because `curry(..)` (at least [the way we implemented it in Chapter 3](#ch3curry)) relies on either detecting the arity (`length`) or having it manually specified, and `compose(..)` is a variadic function, you'll need to manually specify the intended arity like `curry(.. , 3)`.
 
 ### Alternative Implementations
 
@@ -300,7 +301,7 @@ While you may very well never implement your own `compose(..)` to use in product
 
 So let's examine some different implementation options for `compose(..)`. We'll also see there are some pros/cons to each implementation, especially performance.
 
-We'll be looking at the `reduce(..)` utility in detail in Chapter 9, but for now, just know that it reduces a list (array) to a single finite value. It's like a fancy loop.
+We'll be looking at the [`reduce(..)` utility in detail in Chapter 9](#ch9reduce), but for now, just know that it reduces a list (array) to a single finite value. It's like a fancy loop.
 
 For example, if you did an addition-reduction across the list of numbers `[1,2,3,4,5,6]`, you'd be looping over them adding them together as you go. The reduction would add `1` to `2`, and add that result to `3`, and then add that result to `4`, and so on, resulting in the final summation: `21`.
 
@@ -333,6 +334,7 @@ However, this implementation is limited in that the outer composed function (aka
 
 To fix that first call single-argument limitation, we can still use `reduce(..)` but produce a lazy-evaluation function wrapping:
 
+{id="ch4composereduce"}
 ```js
 function compose(...fns) {
     return fns.reverse().reduce( function reducer(fn1,fn2){
@@ -369,7 +371,7 @@ compose( compose(fn1,fn2, .. fnN-1), fnN );
 
 I> ## Note
 I>
-I> We will cover recursion more fully in Chapter 8, so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
+I> We will cover recursion more fully in [Chapter 8](#ch8), so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
 
 Here's how we implement `compose(..)` with recursion:
 
@@ -467,7 +469,7 @@ var filterWords = partialRight( compose, unique, words );
 var filterWords = partial( pipe, words, unique );
 ```
 
-As you may recall from our first implementation of `partialRight(..)` in Chapter 3, it uses `reverseArgs(..)` under the covers, just as our `pipe(..)` now does. So we get the same result either way.
+As you may recall from our first implementation of [`partialRight(..)` in Chapter 3](#ch3partialright), it uses `reverseArgs(..)` under the covers, just as our `pipe(..)` now does. So we get the same result either way.
 
 *In this specific case*, the slight performance advantage to using `pipe(..)` is, because we're not trying to preserve the right-to-left argument order of `compose(..)`, we don't need to reverse the argument order back, like we do inside `partialRight(..)`. So `partial(pipe, ..)` is a little more efficient here than `partialRight(compose, ..)`.
 
@@ -475,7 +477,7 @@ As you may recall from our first implementation of `partialRight(..)` in Chapter
 
 Abstraction plays heavily into our reasoning about composition, so let's examine it in more detail.
 
-Similar to how partial application and currying (see Chapter 3) allow a progression from generalized to specialized functions, we can abstract by pulling out the generality between two or more tasks. The general part is defined once, so as to avoid repetition. To perform each task's specialization, the general part is parameterized.
+Similar to how partial application and currying (see [Chapter 3](#ch3somenowsomelater)) allow a progression from generalized to specialized functions, we can abstract by pulling out the generality between two or more tasks. The general part is defined once, so as to avoid repetition. To perform each task's specialization, the general part is parameterized.
 
 For example, consider this (obviously contrived) code:
 
@@ -577,7 +579,7 @@ Recall that at the outset of this book I stated that FP's goal is to create code
 
 Our higher goal is not to implement something only once, as it is with the DRY mindset. As a matter of fact, sometimes we'll actually repeat ourselves in code.
 
-As we asserted in Chapter 3, the main goal with abstraction is to implement separate things, separately. We're trying to improve focus, because that improves readability.
+As we [asserted in Chapter 3](#ch3whyspecialization), the main goal with abstraction is to implement separate things, separately. We're trying to improve focus, because that improves readability.
 
 By separating two ideas, we insert a semantic boundary between them, which affords us the ability to focus on each side independent of the other. In many cases, that semantic boundary is something like the name of a function. The function's implementation is focused on *how* to compute something, and the call-site using that function by name is focused on *what* to do with its output. We abstract the *how* from the *what* so they are separate and separately reason'able.
 
@@ -655,9 +657,9 @@ Function composition isn't just about saving code with DRY. Even if the usage of
 
 Composition is a powerful tool for abstraction that transforms imperative code into more readable declarative code.
 
-## Revisiting Points
+## Revisiting Points {#ch4revisitingpoints}
 
-Now that we've thoroughly covered composition (a trick that will be immensely helpful in many areas of FP), let's watch it in action by revisiting point-free style from "No Points" in Chapter 3 with a scenario that's a fair bit more complex to refactor:
+Now that we've thoroughly covered composition (a trick that will be immensely helpful in many areas of FP), let's watch it in action by revisiting point-free style from [Chapter 3, "No Points"](#ch3nopoints) with a scenario that's a fair bit more complex to refactor:
 
 ```js
 // given: ajax( url, data, cb )
@@ -697,8 +699,9 @@ var prop =
 
 While we're dealing with object properties, let's also define the opposite utility: `setProp(..)` for setting a property value onto an object.
 
-However, we want to be careful not to just mutate an existing object but rather create a clone of the object to make the change to, and then return it. The reasons for such care will be discussed at length in Chapter 5.
+However, we want to be careful not to just mutate an existing object but rather create a clone of the object to make the change to, and then return it. The reasons for such care will be discussed at length in [Chapter 5](#ch5).
 
+{id="ch4setprop"}
 ```js
 function setProp(name,obj,val) {
     var o = Object.assign( {}, obj );
