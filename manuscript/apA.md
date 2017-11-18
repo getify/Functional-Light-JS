@@ -138,6 +138,8 @@ words
 
 That's a decent improvement. We now have four adjacent `reduce(..)` calls instead of a mixture of three different methods all with different shapes. We still can't just `compose(..)` those four reducers, however, because they accept two arguments instead of one.
 
+{#apAcheat}
+
 In [Chapter 9, we sort of cheated](#ch9reducecheating) and used `list.push(..)` to mutate as a side effect rather than creating a whole new array to concatenate onto. Let's step back and be a bit more formal for now:
 
 ```js

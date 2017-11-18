@@ -6,7 +6,7 @@ I want to close this book leaving you with some quick pointers of working with c
 
 Wherever possible, I recommend you *not* reinvent any wheels. If you find an FP library that suits your needs, use it. Only use the ad hoc helper utilities from this book -- or invent ones of your own! -- if you can't find a suitable library method for your circumstance.
 
-## Stuff to Investigate
+## Stuff to Investigate {#apCstuff}
 
 Let's expand the [list of FP libraries to be aware of, from Chapter 1](#ch1libraries). We won't cover all of these (as there's a lot of overlap), but here are the ones that should probably be on your radar screen:
 
@@ -138,7 +138,7 @@ Mori is heavily inspired by ClojureScript. Its API will be very familiar if you 
 
 But I really like the standalone function design instead of methods on values. Mori also has some functions that automatically return regular JS arrays, which is a nice convenience.
 
-## Bonus: FPO
+## Bonus: FPO {#apCfpo}
 
 In [Chapter 2, we introduced a pattern](#ch2namedargs) for dealing with arguments called "named arguments", which in JS means using an object at the call-site to map properties to destructured function parameters:
 
@@ -213,7 +213,7 @@ FPO.std.reduce(
 
 If FPO's named argument form of FP appeals to you, perhaps check out the library and see what you think. It has a full test suite and most of the major FP functionality you'd expect, including everything we covered in this text to get you up and going with Functional-Light JavaScript!
 
-## Bonus #2: fasy
+## Bonus #2: fasy {#apCfasy}
 
 FP iterations (`map(..)`, `filter(..)`, etc.) are almost always modeled as synchronous operations, meaning we eagerly run through all the steps of the iteration immediately. As a matter of fact, other FP patterns like composition and even transducing are also iterations, and are also modeled exactly this way.
 

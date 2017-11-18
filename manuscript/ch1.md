@@ -248,7 +248,7 @@ Here are a few popular FP libraries for JavaScript that are a great place to sta
 * [functional.js](http://functionaljs.com/)
 * [Immutable.js](https://github.com/facebook/immutable-js)
 
-Appendix C takes a deeper look at these libraries and others.
+[Appendix C takes a deeper look at these libraries](#apCstuff) and others.
 
 ## Summary
 

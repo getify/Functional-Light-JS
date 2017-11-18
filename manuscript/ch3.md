@@ -911,7 +911,7 @@ Even with currying or partial application, order doesn't matter anymore! We can 
 
 T> ## Tip
 T>
-T> If this style of function arguments seems useful or interesting to you, check out coverage of my "FPO" library in Appendix C.
+T> If this style of function arguments seems useful or interesting to you, check out coverage of the [FPO library in Appendix C](#apCfpo).
 
 ### Spreading Properties
 
