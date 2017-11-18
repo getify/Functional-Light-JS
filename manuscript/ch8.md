@@ -55,6 +55,7 @@ Once the base condition is satisified, the returned value cascades back through 
 
 Another way to visualize this recursion is by considering the function calls in the order they happen (commonly referred to as the call stack):
 
+{width=20%}
 ![Recursive function call stack](images/fig19.png)
 
 More on the call stack later in this chapter.
@@ -333,6 +334,7 @@ baz();
 
 Visualizing this program's stack frame step by step:
 
+{width=80%}
 ![Recursive function call stack frames](images/fig15.png)
 
 I> ## Note
@@ -355,6 +357,7 @@ Fortunately, a powerful observation was made in those early days that still offe
 
 The idea is that if a call from function `baz()` to function `bar()` happens at the very end of function `baz()`'s execution -- referred to as a tail call -- the stack frame for `baz()` isn't needed anymore. That means that either the memory can be reclaimed, or even better, simply reused to handle function `bar()`'s execution. Visualizing:
 
+{width=80%}
 ![Recursive function call stack frames; tail calls](images/fig16.png)
 
 Tail calls are not really directly related to recursion, per se; this notion holds for any function call. But your manual non-recursion call stacks are unlikely to go beyond maybe 10 levels deep in most cases, so the chances of tail calls impacting your program's memory footprint are pretty low.
