@@ -136,7 +136,7 @@ console.log( arr[0] );
 
 Ostensibly, you're expecting `arr[0]` to still be the value `1`. But is it? You don't know, because `foo(..)` *might* mutate the array using the reference copy you pass to it.
 
-We already saw a cheat in the previous chapter to avoid such a surprise:
+We already saw a trick in the previous chapter to avoid such a surprise:
 
 ```js
 var arr = [1,2,3];
