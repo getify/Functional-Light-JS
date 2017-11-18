@@ -55,7 +55,7 @@ Once the base condition is satisified, the returned value cascades back through 
 
 Another way to visualize this recursion is by considering the function calls in the order they happen (commonly referred to as the call stack):
 
-{width=20%}
+{width=30%}
 ![Recursive function call stack](images/fig19.png)
 
 More on the call stack later in this chapter.

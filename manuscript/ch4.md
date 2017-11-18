@@ -82,7 +82,7 @@ We name the array output of `words(..)` as `wordsFound`. The input of `unique(..
 
 Back to the candy factory assembly line: the first machine takes as "input" the melted chocolate, and its "output" is a chunk of formed and cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut-up piece of chocolate candy. Next, a machine on the line takes small pieces of chocolate candy from the conveyor belt and outputs wrapped candies ready to bag and ship.
 
-{width=15%, float=right}
+{width=9%, float=right}
 ![](images/fig3.png)
 
 The candy factory is fairly successful with this process, but as with all businesses, management keeps searching for ways to grow.
