@@ -747,7 +747,7 @@ Specifically, if we look briefly at how currying works in Haskell, we can observ
 
 For example, in Haskell:
 
-```js
+```haskell
 foo 1 2 3
 ```
 
