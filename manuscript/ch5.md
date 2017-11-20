@@ -199,8 +199,8 @@ var users = {};
 var userOrders = {};
 
 function fetchUserData(userId) {
-    ajax( `http://some.api/user/${userId}`, function onUserData(userData){
-        users[userId] = userData;
+    ajax( `http://some.api/user/${userId}`, function onUserData(user){
+        users[userId] = user;
     } );
 }
 
@@ -223,7 +223,7 @@ function deleteOrder(orderId) {
         hideLatestOrderDisplay();
     }
 
-    ajax( `http://some.api/delete/order/${orderId}`, function onDelete(success){
+    ajax( `http://some.api/delete/${orderId}`, function onDelete(success){
         if (success) {
             // deleted the latest order for a user?
             if (isLatestOrder) {
@@ -239,7 +239,7 @@ function deleteOrder(orderId) {
 }
 ```
 
-I bet for some readers one of the potential bugs here is fairly obvious. If the callback `onOrders(..)` runs before the `onUserData(..)` callback, it will attempt to add a `latestOrder` property to a value (the `userData` object at `users[userId]`) that's not yet been set.
+I bet for some readers one of the potential bugs here is fairly obvious. If the callback `onOrders(..)` runs before the `onUserData(..)` callback, it will attempt to add a `latestOrder` property to a value (the `user` object at `users[userId]`) that's not yet been set.
 
 So one form of "bug" that can occur with logic that relies on side causes/effects is the race condition of two different operations (async or not!) that we expect to run in a certain order but under some cases may run in a different order. There are strategies for ensuring the order of operations, and it's fairly obvious that order is critical in that case.
 
@@ -866,8 +866,8 @@ Recall:
 var users = {};
 
 function fetchUserData(userId) {
-    ajax( `http://some.api/user/${userId}`, function onUserData(userData){
-        users[userId] = userData;
+    ajax( `http://some.api/user/${userId}`, function onUserData(user){
+        users[userId] = user;
     } );
 }
 ```
@@ -890,8 +890,8 @@ function safer_fetchUserData(userId,users) {
 
     // original untouched impure function:
     function fetchUserData(userId) {
-        ajax( `http://some.api/user/${userId}`, function onUserData(userData){
-            users[userId] = userData;
+        ajax( `http://some.api/user/${userId}`, function onUserData(user){
+            users[userId] = user;
         } );
     }
 }
