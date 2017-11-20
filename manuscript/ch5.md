@@ -261,7 +261,7 @@ onOrders(..);
 onDelete(..);
 ```
 
-Do you see the interleaving of `fetchOrders(..)`/`onOrders(..)` with the `deleteOrder(..)`/`onDelete(..)` pair? That potential sequencing exposes a weird condition with our side causes/effects of state management.
+Do you see the interleaving of `fetchOrders(..)` and `onOrders(..)` with the `deleteOrder(..)` and `onDelete(..)` pair? That potential sequencing exposes a weird condition with our side causes/effects of state management.
 
 There's a delay in time (because of the callback) between when we set the `isLatestOrder` flag and when we use it to decide if we should empty the `latestOrder` property of the user data object in `users`. During that delay, if `onOrders(..)` callback fires, it can potentially change which order value that user's `latestOrder` references. When `onDelete(..)` then fires, it will assume it still needs to unset the `latestOrder` reference.
 
@@ -273,8 +273,7 @@ The sequencing dependency between `fetchUserData(..)` and `fetchOrders(..)` is f
 
 Yes, you can recompute the `isLatestOrder` flag once `deleteOrder(..)` fires. But now you have a different problem: your UI state can be out of sync.
 
-If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call
-`showLatestOrderDisplay()`, but only if a new `latestOrder` has in fact been set. So you'll need to track at least three states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
+If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call the function `showLatestOrderDisplay()`, but only if a new `latestOrder` has in fact been set. So you'll need to track at least three states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
 
 All of these hassles are because we decided to structure our code with side causes/effects on a shared set of state.
 
