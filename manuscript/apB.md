@@ -262,7 +262,7 @@ The earlier implementation of the Maybe monad I provided differs from other Mayb
 
 So wait. If we don't get the automatic short-circuting, why is Maybe useful at all?!? That seems like its whole point.
 
-Never fear! We can simply provide the empty-check externally, and the rest of the short-circuting behavior of the Maybe monad will work just fine. Here's how you could do the `someObj.something.else.entirely` nested-property access from before, but more "correctly":
+Never fear! We can simply provide the empty-check externally, and the rest of the short-circuting behavior of the Maybe monad will work just fine. Here's how you could do the nested-property access (`someObj.something.else.entirely`) from before, but more "correctly":
 
 ```js
 function isEmpty(val) {

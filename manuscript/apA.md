@@ -281,12 +281,13 @@ var curriedMapReducer = curry( function mapReducer(mapperFn,combinationFn){
     };
 } );
 
-var curriedFilterReducer = curry( function filterReducer(predicateFn,combinationFn){
-    return function reducer(list,val){
-        if (predicateFn( val )) return combinationFn( list, val );
-        return list;
-    };
-} );
+var curriedFilterReducer = curry(
+    function filterReducer(predicateFn,combinationFn){
+        return function reducer(list,val){
+            if (predicateFn( val )) return combinationFn( list, val );
+            return list;
+        };
+    } );
 
 var strToUppercaseReducer =
     curriedMapReducer( strUppercase )( listCombination );
@@ -550,12 +551,13 @@ var transduceMap = curry( function mapReducer(mapperFn,combinationFn){
     };
 } );
 
-var transduceFilter = curry( function filterReducer(predicateFn,combinationFn){
-    return function reducer(list,v){
-        if (predicateFn( v )) return combinationFn( list, v );
-        return list;
-    };
-} );
+var transduceFilter = curry(
+    function filterReducer(predicateFn,combinationFn){
+        return function reducer(list,v){
+            if (predicateFn( v )) return combinationFn( list, v );
+            return list;
+        };
+    } );
 ```
 
 Also recall that we use them like this:
