@@ -131,7 +131,7 @@ function isShortEnoughReducer(list,str) {
 words
 .reduce( strUppercaseReducer, [] )
 .reduce( isLongEnoughReducer, [] )
-.reduce( isShortEnough, [] )
+.reduce( isShortEnoughReducer, [] )
 .reduce( strConcat, "" );
 // "WRITTENSOMETHING"
 ```
@@ -193,7 +193,7 @@ Our chain still looks the same:
 words
 .reduce( strUppercaseReducer, [] )
 .reduce( isLongEnoughReducer, [] )
-.reduce( isShortEnough, [] )
+.reduce( isShortEnoughReducer, [] )
 .reduce( strConcat, "" );
 ```
 
