@@ -676,7 +676,7 @@ When trying to decipher curried functions, I've found it helps me tremendously i
 In fact, to reinforce that point, let's consider the same code but written with ES6 arrow functions:
 
 ```js
-var curriedSum =
+curriedSum =
     val1 =>
         val2 =>
             val3 =>
