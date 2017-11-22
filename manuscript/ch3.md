@@ -846,7 +846,7 @@ uncurriedSum( 1, 2, 3, 4, 5 );              // 15
 uncurriedSum( 1, 2, 3 )( 4 )( 5 );          // 15
 ```
 
-Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a function that comes out curried as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the "No Points" discussion.
+Probably the more common case of using `uncurry(..)` is not with a manually curried function as just shown, but with a function that comes out curried as a result of some other set of operations. We'll illustrate that scenario later in this chapter in the ["No Points" discussion](#ch3nopoints).
 
 ## Order Matters {#ch3ordermatters}
 
