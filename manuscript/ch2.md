@@ -305,7 +305,7 @@ function foo(params) {
 }
 ```
 
-But here we highlight a principle we only briefly introduced in [Chapter 1](#ch1): declarative code communicates more effectively than imperative code.
+But here we highlight a principle we only briefly introduced in [Chapter 1](#ch1readability): declarative code communicates more effectively than imperative code.
 
 Declarative code (for example, the destructuring in the former `foo(..)` snippet, or the `...` operator usages) focuses on what the outcome of a piece of code should be.
 
