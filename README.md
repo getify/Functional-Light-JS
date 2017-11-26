@@ -14,7 +14,7 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 
 ## Book
 
-[Table of Contents](manuscript/toc.md/#table-of-contents)
+[Table of Contents](manuscript/README.md/#table-of-contents)
 
 * [Foreword](manuscript/foreword.md/#foreword) (by [Brian Lonsdorf, aka "Prof Frisby"](https://twitter.com/DrBoolean))
 * [Preface](manuscript/preface.md/#preface)
