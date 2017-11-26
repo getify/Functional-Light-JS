@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Chapter 6: Value Immutability
 
-In Chapter 5, we talked about the importance of reducing side causes/effects: the ways that your application's state can change unexpectedly and cause surprises (bugs). The fewer places we have with such landmines, the more confidence we have over our code, and the more readable it will be. Our topic for this chapter follows directly from that same effort.
+In [Chapter 5](ch5.md), we talked about the importance of reducing side causes/effects: the ways that your application's state can change unexpectedly and cause surprises (bugs). The fewer places we have with such landmines, the more confidence we have over our code, and the more readable it will be. Our topic for this chapter follows directly from that same effort.
 
 If programming-style idempotence is about defining a value change operation so that it can only affect state once, we now turn our attention to the goal of reducing the number of change occurrences from one to zero.
 
@@ -93,7 +93,7 @@ addValue( [1,2,3] );    // [1,2,3,4]
 
 Notice that we did not change the array that `arr` references, but rather created a new array (`newArr`) that contains the existing values plus the new `4` value.
 
-Analyze `addValue(..)` based on what we discussed in Chapter 5 about side causes/effects. Is it pure? Does it have referential transparency? Given the same array, will it always produce the same output? Is it free of both side causes and side effects? **Yes.**
+Analyze `addValue(..)` based on what we discussed in [Chapter 5](ch5.md) about side causes/effects. Is it pure? Does it have referential transparency? Given the same array, will it always produce the same output? Is it free of both side causes and side effects? **Yes.**
 
 Imagine the `[1,2,3]` array represents a sequence of data from some previous operations and we stored in some variable. It is our current state. If we want to compute what the next state of our application is, we call `addValue(..)`. But we want that act of next-state computation to be direct and explicit. So the `addValue(..)` operation takes a direct input, returns a direct output, and avoids creating a side effect by mutating the original array that `arr` references.
 
@@ -137,7 +137,7 @@ console.log( arr[0] );
 
 Ostensibly, you're expecting `arr[0]` to still be the value `1`. But is it? You don't know, because `foo(..)` *might* mutate the array using the reference copy you pass to it.
 
-We already saw a cheat in the previous chapter to avoid such a surprise:
+We already saw a trick in the previous chapter to avoid such a surprise:
 
 ```js
 var arr = [1,2,3];
@@ -153,7 +153,9 @@ In a little bit, we'll see another strategy for protecting ourselves from a valu
 
 How would you describe what a "constant" is? Think about that for a moment before you move on to the next paragraph.
 
-...
+<p align="center">
+    * * * *
+</p>
 
 Some of you may have conjured descriptions like, "a value that can't change", "a variable that can't be changed", or something similar. These are all approximately in the neighborhood, but not quite at the right house. The precise definition we should use for a constant is: a variable that cannot be reassigned.
 
@@ -343,7 +345,7 @@ Think about a specialized data structure that's like an array, but that you want
 Internally, it might be like a linked-list tree of object references where each node in the tree represents a mutation of the original value. Actually, this is conceptually similar to how **Git** version control works.
 
 <p align="center">
-    <img src="fig18.png" width="490">
+    <img src="fig18.png" width="33%">
 </p>
 
 In this conceptual illustration, an original array `[3,6,1,0]` first has the mutation of value `4` assigned to position `0` (resulting in `[4,6,1,0]`), then `1` is assigned to position `3` (now `[4,6,1,1]`), finally `2` is assigned to position `4` (result: `[4,6,1,1,2]`). The key idea is that at each mutation, only the change from the previous version is recorded, not a duplication of the entire original data structure. This approach is much more efficient in both memory and CPU performance, in general.
@@ -368,7 +370,7 @@ newState.slice( 2, 5 );             // [1,1,2]
 
 The `specialArray(..)` data structure would internally keep track of each mutation operation (like `set(..)`) as a *diff*, so it won't have to reallocate memory for the original values (`4`, `6`, `1`, and `1`) just to add the `2` value to the end of the list. But importantly, `state` and `newState` point at different versions (or views) of the array value, so **the value immutability semantic is preserved.**
 
-Inventing your own performance-optimized data structures is an interesting challenge. But pragmatically, you should probably use a library that already does this well. One great option is **Immutable.js** (http://facebook.github.io/immutable-js), which provides a variety of data structures, including `List` (like array) and `Map` (like object).
+Inventing your own performance-optimized data structures is an interesting challenge. But pragmatically, you should probably use a library that already does this well. One great option is [Immutable.js](http://facebook.github.io/immutable-js), which provides a variety of data structures, including `List` (like array) and `Map` (like object).
 
 Consider the previous `specialArray` example but using `Immutable.List`:
 
@@ -441,7 +443,7 @@ Unfortunately, for historical reasons, quite a few other array methods are impur
 
 It should not be seen as *forbidden* to use these kinds of utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
 
-Recall one of the implementations of `compose(..)` from Chapter 4:
+Recall one of the implementations of [`compose(..)` from Chapter 4](ch4.md/#user-content-generalcompose):
 
 ```js
 function compose(...fns) {

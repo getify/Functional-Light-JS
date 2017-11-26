@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Chapter 5: Reducing Side Effects
 
-In Chapter 2, we discussed how a function can have outputs besides its `return` value. By now you should be very comfortable with the FP definition of a function, so the idea of such side outputs -- side effects! -- should smell.
+In [Chapter 2](ch2.md), we discussed how a function can have outputs besides its `return` value. By now you should be very comfortable with the FP definition of a function, so the idea of such side outputs -- side effects! -- should smell.
 
 We're going to examine the various different forms of side effects and see why they are harmful to our code's quality and readability.
 
@@ -194,8 +194,8 @@ var users = {};
 var userOrders = {};
 
 function fetchUserData(userId) {
-    ajax( `http://some.api/user/${userId}`, function onUserData(userData){
-        users[userId] = userData;
+    ajax( `http://some.api/user/${userId}`, function onUserData(user){
+        users[userId] = user;
     } );
 }
 
@@ -218,7 +218,7 @@ function deleteOrder(orderId) {
         hideLatestOrderDisplay();
     }
 
-    ajax( `http://some.api/delete/order/${orderId}`, function onDelete(success){
+    ajax( `http://some.api/delete/${orderId}`, function onDelete(success){
         if (success) {
             // deleted the latest order for a user?
             if (isLatestOrder) {
@@ -234,7 +234,7 @@ function deleteOrder(orderId) {
 }
 ```
 
-I bet for some readers one of the potential bugs here is fairly obvious. If the callback `onOrders(..)` runs before the `onUserData(..)` callback, it will attempt to add a `latestOrder` property to a value (the `userData` object at `users[userId]`) that's not yet been set.
+I bet for some readers one of the potential bugs here is fairly obvious. If the callback `onOrders(..)` runs before the `onUserData(..)` callback, it will attempt to add a `latestOrder` property to a value (the `user` object at `users[userId]`) that's not yet been set.
 
 So one form of "bug" that can occur with logic that relies on side causes/effects is the race condition of two different operations (async or not!) that we expect to run in a certain order but under some cases may run in a different order. There are strategies for ensuring the order of operations, and it's fairly obvious that order is critical in that case.
 
@@ -256,7 +256,7 @@ onOrders(..);
 onDelete(..);
 ```
 
-Do you see the interleaving of `fetchOrders(..)`/`onOrders(..)` with the `deleteOrder(..)`/`onDelete(..)` pair? That potential sequencing exposes a weird condition with our side causes/effects of state management.
+Do you see the interleaving of `fetchOrders(..)` and `onOrders(..)` with the `deleteOrder(..)` and `onDelete(..)` pair? That potential sequencing exposes a weird condition with our side causes/effects of state management.
 
 There's a delay in time (because of the callback) between when we set the `isLatestOrder` flag and when we use it to decide if we should empty the `latestOrder` property of the user data object in `users`. During that delay, if `onOrders(..)` callback fires, it can potentially change which order value that user's `latestOrder` references. When `onDelete(..)` then fires, it will assume it still needs to unset the `latestOrder` reference.
 
@@ -268,7 +268,7 @@ The sequencing dependency between `fetchUserData(..)` and `fetchOrders(..)` is f
 
 Yes, you can recompute the `isLatestOrder` flag once `deleteOrder(..)` fires. But now you have a different problem: your UI state can be out of sync.
 
-If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call `showLatestOrderDisplay()`, but only if a new `latestOrder` has in fact been set. So you'll need to track at least three states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
+If you had called the `hideLatestOrderDisplay()` previously, you'll now need to call the function `showLatestOrderDisplay()`, but only if a new `latestOrder` has in fact been set. So you'll need to track at least three states: was the deleted order the "latest" originally, and is the "latest" set, and are those two orders different? These are solvable problems, of course. But they're not obvious by any means.
 
 All of these hassles are because we decided to structure our code with side causes/effects on a shared set of state.
 
@@ -851,8 +851,8 @@ Recall:
 var users = {};
 
 function fetchUserData(userId) {
-    ajax( `http://some.api/user/${userId}`, function onUserData(userData){
-        users[userId] = userData;
+    ajax( `http://some.api/user/${userId}`, function onUserData(user){
+        users[userId] = user;
     } );
 }
 ```
@@ -875,8 +875,8 @@ function safer_fetchUserData(userId,users) {
 
     // original untouched impure function:
     function fetchUserData(userId) {
-        ajax( `http://some.api/user/${userId}`, function onUserData(userData){
-            users[userId] = userData;
+        ajax( `http://some.api/user/${userId}`, function onUserData(user){
+            users[userId] = user;
         } );
     }
 }
@@ -1024,7 +1024,7 @@ The success of this technique will be dependent on the thoroughness of the *copy
 
 ### `this` Revisited
 
-Another variation of the via-reference side cause/effect is with `this`-aware functions having `this` as an implicit input. See "What's This" in Chapter 2 for more info on why the `this` keyword is problematic for FPers.
+Another variation of the via-reference side cause/effect is with `this`-aware functions having `this` as an implicit input. See [Chapter 2, "What's This"](ch2.md/#whats-this) for more info on why the `this` keyword is problematic for FPers.
 
 Consider:
 

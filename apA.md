@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Appendix A: Transducing
 
-Transducing is a more advanced technique than we've covered in this book. It extends many of the concepts from Chapter 9 on list operations.
+Transducing is a more advanced technique than we've covered in this book. It extends many of the concepts from [Chapter 9](ch9.md) on list operations.
 
 I wouldn't necessarily call this topic strictly "Functional-Light", but more like a bonus on top. I've presented this as an appendix because you might very well need to skip the discussion for now and come back to it once you feel fairly comfortable with -- and make sure you've practiced! -- the main book concepts.
 
@@ -15,7 +15,7 @@ As with the rest of this book, my approach is to first explain *why*, then *how*
 
 ## Why, First
 
-Let's start by extending a scenario we covered back in Chapter 3, testing words to see if they're short enough and/or long enough:
+Let's start by extending a [scenario we covered back in Chapter 3](ch3.md/#user-content-shortlongenough), testing words to see if they're short enough and/or long enough:
 
 ```js
 function isLongEnough(str) {
@@ -40,7 +40,7 @@ words
 
 It may not be obvious, but this pattern of separate adjacent list operations has some non-ideal characteristics. When we're dealing with only a single array of a small number of values, everything is fine. But if there were lots of values in the array, each `filter(..)` processing the list separately can slow down a bit more than we'd like.
 
-A similar performance problem arises when our arrays are async/lazy (aka Observables), processing values over time in response to events (see Chapter 10). In this scenario, only a single value comes down the event stream at a time, so processing that discrete value with two separate `filter(..)`s function calls isn't really such a big deal.
+A similar performance problem arises when our arrays are async/lazy (aka Observables), processing values over time in response to events (see [Chapter 10](ch10.md)). In this scenario, only a single value comes down the event stream at a time, so processing that discrete value with two separate `filter(..)`s function calls isn't really such a big deal.
 
 But what's not obvious is that each `filter(..)` method produces a separate observable. The overhead of pumping a value out of one observable into another can really add up. That's especially true since in these cases, it's not uncommon for thousands or millions of values to be processed; even such small overhead costs add up quickly.
 
@@ -66,7 +66,7 @@ function isCorrectLength(str) {
 
 But that's not the FP way!
 
-In Chapter 9, we talked about fusion -- composing adjacent mapping functions. Recall:
+In [Chapter 9, we talked about fusion](ch9.md/#fusion) -- composing adjacent mapping functions. Recall:
 
 ```js
 words
@@ -108,7 +108,7 @@ Let's jump in.
 
 ### Expressing Map/Filter as Reduce
 
-The first trick we need to perform is expressing our `filter(..)` and `map(..)` calls as `reduce(..)` calls. Recall how we did that in Chapter 9:
+The first trick we need to perform is expressing our `filter(..)` and `map(..)` calls as `reduce(..)` calls. Recall [how we did that in Chapter 9](ch9.md/#map-as-reduce):
 
 ```js
 function strUppercase(str) { return str.toUpperCase(); }
@@ -139,7 +139,9 @@ words
 
 That's a decent improvement. We now have four adjacent `reduce(..)` calls instead of a mixture of three different methods all with different shapes. We still can't just `compose(..)` those four reducers, however, because they accept two arguments instead of one.
 
-In Chapter 9, we sort of cheated and used `list.push(..)` to mutate as a side effect rather than creating a whole new array to concatenate onto. Let's step back and be a bit more formal for now:
+<a name="cheating"></a>
+
+In [Chapter 9, we sort of cheated](ch9.md/#user-content-reducecheating) and used `list.push(..)` to mutate as a side effect rather than creating a whole new array to concatenate onto. Let's step back and be a bit more formal for now:
 
 ```js
 function strUppercaseReducer(list,str) {
@@ -281,12 +283,13 @@ var curriedMapReducer = curry( function mapReducer(mapperFn,combinationFn){
     };
 } );
 
-var curriedFilterReducer = curry( function filterReducer(predicateFn,combinationFn){
-    return function reducer(list,val){
-        if (predicateFn( val )) return combinationFn( list, val );
-        return list;
-    };
-} );
+var curriedFilterReducer = curry(
+    function filterReducer(predicateFn,combinationFn){
+        return function reducer(list,val){
+            if (predicateFn( val )) return combinationFn( list, val );
+            return list;
+        };
+    } );
 
 var strToUppercaseReducer =
     curriedMapReducer( strUppercase )( listCombination );
@@ -464,7 +467,7 @@ words
 // ["WRITTEN","SOMETHING"]
 ```
 
-**Note:** We should make an observation about the `compose(..)` order in the previous two snippets, which may be confusing. Recall that in our original example chain, we `map(strUppercase)` and then `filter(isLongEnough)` and finally `filter(isShortEnough)`; those operations indeed happen in that order. But in Chapter 4, we learned that `compose(..)` typically has the effect of running its functions in reverse order of listing. So why don't we need to reverse the order *here* to get the same desired outcome? The abstraction of the `combinationFn(..)` from each reducer reverses the effective applied order of operations under the hood. So counter-intuitively, when composing a tranducer, you actually want to list them in desired order of execution!
+**Note:** We should make an observation about the `compose(..)` order in the previous two snippets, which may be confusing. Recall that in our original example chain, we `map(strUppercase)` and then `filter(isLongEnough)` and finally `filter(isShortEnough)`; those operations indeed happen in that order. But in [Chapter 4](ch4.md/#user-content-generalcompose), we learned that `compose(..)` typically has the effect of running its functions in reverse order of listing. So why don't we need to reverse the order *here* to get the same desired outcome? The abstraction of the `combinationFn(..)` from each reducer reverses the effective applied order of operations under the hood. So counter-intuitively, when composing a tranducer, you actually want to list them in desired order of execution!
 
 #### List Combination: Pure vs. Impure
 
@@ -491,7 +494,7 @@ Thinking about `listCombination(..)` in isolation, there's no question it's impu
 
 `listCombination(..)` is not a function we interact with at all. We don't directly use it anywhere in the program; instead, we let the transducing process use it.
 
-Back in Chapter 5, we asserted that our goal with reducing side effects and defining pure functions was only that we expose pure functions to the API level of functions we'll use throughout our program. We observed that under the covers, inside a pure function, it can cheat for performance sake all it wants, as long as it doesn't violate the external contract of purity.
+Back in [Chapter 5](ch5.md), we asserted that our goal with reducing side effects and defining pure functions was only that we expose pure functions to the API level of functions we'll use throughout our program. We observed that under the covers, inside a pure function, it can cheat for performance sake all it wants, as long as it doesn't violate the external contract of purity.
 
 `listCombination(..)` is more an internal implementation detail of the transducing -- in fact, it'll often be provided by the transducing library for you! -- rather than a top-level method you'd interact with on a normal basis throughout your program.
 
@@ -548,12 +551,13 @@ var transduceMap = curry( function mapReducer(mapperFn,combinationFn){
     };
 } );
 
-var transduceFilter = curry( function filterReducer(predicateFn,combinationFn){
-    return function reducer(list,v){
-        if (predicateFn( v )) return combinationFn( list, v );
-        return list;
-    };
-} );
+var transduceFilter = curry(
+    function filterReducer(predicateFn,combinationFn){
+        return function reducer(list,v){
+            if (predicateFn( v )) return combinationFn( list, v );
+            return list;
+        };
+    } );
 ```
 
 Also recall that we use them like this:
@@ -597,7 +601,7 @@ Not bad, huh!? See the `listCombination(..)` and `strConcat(..)` functions used 
 
 ### Transducers.js
 
-Finally, let's illustrate our running example using the `transducers-js` library (https://github.com/cognitect-labs/transducers-js):
+Finally, let's illustrate our running example using the [`transducers-js` library](https://github.com/cognitect-labs/transducers-js):
 
 ```js
 var transformer = transducers.comp(
@@ -615,7 +619,7 @@ transducers.transduce( transformer, strConcat, "", words );
 
 Looks almost identical to above.
 
-**Note:** The preceding snippet uses `transformers.comp(..)` because the library provides it, but in this case our `compose(..)` from Chapter 4 would produce the same outcome. In other words, composition itself isn't a transducing-sensitive operation.
+**Note:** The preceding snippet uses `transformers.comp(..)` because the library provides it, but in this case our [`compose(..)` from Chapter 4](ch4.md/#user-content-generalcompose) would produce the same outcome. In other words, composition itself isn't a transducing-sensitive operation.
 
 The composed function in this snippet is named `transformer` instead of `transducer`. That's because if we call `transformer(listCombination)` (or `transformer(strConcat)`), we won't get a straight-up transduce-reducer function as earlier.
 

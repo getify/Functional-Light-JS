@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Appendix B: The Humble Monad
 
-Let me just start off this appendix by admitting: I did not know much about what a monad was before starting to write this appendix. And it took a lot of mistakes to get something sensible. If you don't believe me, go look at the commit history of this appendix in the Git repo for this book (https://github.com/getify/Functional-Light-JS)!
+Let me just start off this appendix by admitting: I did not know much about what a monad was before starting to write this appendix. And it took a lot of mistakes to get something sensible. If you don't believe me, go look at the commit history of this appendix in the [Github repository for this book](https://github.com/getify/Functional-Light-JS)!
 
 I am including the topic of monads in the book because it's part of the journey that every developer will encounter while learning FP, just as I have in this book writing.
 
@@ -29,7 +29,7 @@ I'm going to use the notion of data structures very loosely here, and assert tha
 
 A monad is a data structure. It's a type. It's a set of behaviors that are specifically designed to make working with a value predictable.
 
-Recall in Chapter 9 that we talked about functors: a value along with a map-like utility to perform an operation on all its constitute data members. A monad is a functor that includes some additional behavior.
+Recall in [Chapter 9 that we talked about functors](ch9.md/#a-word-functors): a value along with a map-like utility to perform an operation on all its constitute data members. A monad is a functor that includes some additional behavior.
 
 ## Loose Interface
 
@@ -82,7 +82,7 @@ Don't worry if most of this doesn't make sense right now. We're not gonna obsess
 
 All monad instances will have `map(..)`, `chain(..)` (also called `bind(..)` or `flatMap(..)`), and `ap(..)` methods. The purpose of these methods and their behavior is to provide a standardized way of multiple monad instances interacting with each other.
 
-Let's look first at the monadic `map(..)` function. Like `map(..)` on an array (see Chapter 9) that calls a mapper function with its value(s) and produces a new array, a monad's `map(..)` calls a mapper function with the monad's value, and whatever is returned is wrapped in a new Just monad instance:
+Let's look first at the monadic `map(..)` function. Like `map(..)` on an array (see [Chapter 9](ch9.md/#map)) that calls a mapper function with its value(s) and produces a new array, a monad's `map(..)` calls a mapper function with the monad's value, and whatever is returned is wrapped in a new Just monad instance:
 
 ```js
 var A = Just( 10 );
@@ -103,7 +103,7 @@ typeof eleven;              // "number"
 
 `eleven` is the actual primitive number `11`, not a monad holding that value.
 
-To connect this `chain(..)` method conceptually to stuff we've already learned, we'll point out that many monad implementations name this method `flatMap(..)`. Now, recall from Chapter 9 what `flatMap(..)` does (as compared to `map(..)`) with an array:
+To connect this `chain(..)` method conceptually to stuff we've already learned, we'll point out that many monad implementations name this method `flatMap(..)`. Now, recall from [Chapter 9 what `flatMap(..)`](ch9.md/#user-content-flatmap) does (as compared to `map(..)`) with an array:
 
 ```js
 var x = [3];
@@ -116,7 +116,7 @@ See the difference? The mapper function `v => [v,v+1]` results in a `[3,4]` arra
 
 That's the same kind of thing going on with a monad's `chain(..)` (aka `flatMap(..)`). Instead of getting a monad holding the value as `map(..)` does, `chain(..)` additionally flattens the monad into the underlying value. Actually, instead of creating that intermediate monad only to immediately flatten it, `chain(..)` is generally implemented more performantly to just take a shortcut and not create the monad in the first place. Either way, the end result is the same.
 
-One way to illustrate `chain(..)` in this manner is in combination with the `identity(..)` utility (see Chapter 3), to effectively extract a value from a monad:
+One way to illustrate `chain(..)` in this manner is in combination with the `identity(..)` utility (see [Chapter 3](ch3.md/#one-on-one)), to effectively extract a value from a monad:
 
 ```js
 var identity = v => v;
@@ -150,7 +150,7 @@ Now, how could we make a new monad where the values `10` and `3` had been added 
 
 To use `ap(..)`, we said we first need to construct a monad that holds a function. Specifically, we need one that holds a function that itself holds (remembers via closure) the value in `A`. Let that sink in for a moment.
 
-To make a monad from `A` that holds a value-containing function, we'll call `A.map(..)`, giving it a curried function that "remembers" that extracted value (see Chapter 3) as its first argument. We'll call this new function-containing monad `C`:
+To make a monad from `A` that holds a value-containing function, we'll call `A.map(..)`, giving it a curried function that "remembers" that extracted value (see [Chapter 3](ch3.md/#one-at-a-time)) as its first argument. We'll call this new function-containing monad `C`:
 
 ```js
 function sum(x,y) { return x + y; }
@@ -187,7 +187,7 @@ var D = B.map( A.chain( curry( sum ) ) );
 D.inspect();                // Just(13);
 ```
 
-And that of course is just a composition (see Chapter 4):
+And that of course is just a composition (see [Chapter 4](ch4.md)):
 
 ```js
 var D = compose( B.map, A.chain, curry )( sum );
@@ -249,7 +249,7 @@ Maybe.of( someObj )
 .map( console.log );
 ```
 
-In other words, if at any point in the chain we get a `null`/`undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
+In other words, if at any point in the chain we get a `null`/`undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested-property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
 
 But... that approach to Maybe is not a pure monad.
 
@@ -259,7 +259,7 @@ The earlier implementation of the Maybe monad I provided differs from other Mayb
 
 So wait. If we don't get the automatic short-circuting, why is Maybe useful at all?!? That seems like its whole point.
 
-Never fear! We can simply provide the empty-check externally, and the rest of the short-circuting behavior of the Maybe monad will work just fine. Here's how you could do the `someObj.something.else.entirely` nested-property access from before, but more "correctly":
+Never fear! We can simply provide the empty-check externally, and the rest of the short-circuting behavior of the Maybe monad will work just fine. Here's how you could do the nested-property access (`someObj.something.else.entirely`) from before, but more "correctly":
 
 ```js
 function isEmpty(val) {

@@ -1,7 +1,7 @@
 # Functional-Light JavaScript
 # Preface
 
-> A monad is just a monoid in the category of endofunctors.
+> *A monad is just a monoid in the category of endofunctors.*
 
 Did I just lose you? Don't worry, I'd be lost, too! All those terms that only mean something to the already-initiated in Functional Programming&trade; (FP) are just jumbled nonsense to many of the rest of us.
 

@@ -3,7 +3,7 @@
 
 > Functional programmer: (noun) One who names variables "x", names functions "f", and names code patterns "zygohistomorphic prepromorphism"
 >
-> James Iry ‏@jamesiry 5/13/15
+> James Iry @jamesiry 5/13/15
 >
 > https://twitter.com/jamesiry/status/598547781515485184
 
@@ -116,7 +116,7 @@ You probably know by experience that an awful lot of your time spent "coding" is
 
 It's widely estimated that developers spend 70% of code maintenance time on reading to understand it. That is eye-opening. 70%. No wonder the global average for a programmer's lines of code written per day is about 10. We spend up to 7 hours of our day just reading the code to figure out where those 10 lines should go!
 
-We need to focus a lot more on the readability of our code. And by the way, readability is not just about fewer characters. Readability is actually most impacted by familiarity. [1]
+We need to focus a lot more on the readability of our code. And by the way, readability is not just about fewer characters. Readability is actually most impacted by familiarity.<a href="#user-content-footnote-1"><sup>1</sup></a>
 
 If we are going to spend our time concerned with making code that will be more readable and understandable, FP is central in that effort. The principles of FP are well established, deeply studied and vetted, and provably verifiable. Taking the time to learn and employ these FP principles will ultimately lead to more readily and recognizably familiar code for you and others. The increase in code familiarity, and the expediency of that recognition, will improve code readability.
 
@@ -131,7 +131,7 @@ FP (at least, without all the terminology weighing it down) is one of the most e
 Readability is not a binary characteristic. It's a largely subjective human factor describing our relationship to code. And it will naturally vary over time as our skills and understanding evolve. I have experienced effects similar to the following figure, and anecdotally many others I've talked to have as well.
 
 <p align="center">
-    <img src="fig17.png" width="600">
+    <img src="fig17.png" width="50%">
 </p>
 
 You may just find yourself experiencing similar effects as you work through the book. But take heart; if you stick this out, the curve comes back up!
@@ -246,7 +246,7 @@ Here are a few popular FP libraries for JavaScript that are a great place to sta
 * [functional.js](http://functionaljs.com/)
 * [Immutable.js](https://github.com/facebook/immutable-js)
 
-Appendix C takes a deeper look at these libraries and others.
+[Appendix C takes a deeper look at these libraries](apC.md/#stuff-to-investigate) and others.
 
 ## Summary
 
@@ -260,4 +260,4 @@ The journey to learning functional programming starts with deeply understanding 
 
 ----
 
-[1] Buse, Raymond P. L., and Westley R. Weimer. “Learning a Metric for Code Readability.” IEEE Transactions on Software Engineering, IEEE Press, July 2010, dl.acm.org/citation.cfm?id=1850615.
+<a name="footnote-1"><sup>1</sup></a>Buse, Raymond P. L., and Westley R. Weimer. “Learning a Metric for Code Readability.” IEEE Transactions on Software Engineering, IEEE Press, July 2010, dl.acm.org/citation.cfm?id=1850615.

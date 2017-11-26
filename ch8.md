@@ -53,7 +53,7 @@ function foo(x) {
 Let's visualize what happens with this function when we call `foo( 16 )`:
 
 <p align="center">
-    <img src="fig13.png" width="850">
+    <img src="fig13.png">
 </p>
 
 In step 2, `x / 2` produces `8`, and that's passed in as the argument to a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
@@ -61,7 +61,7 @@ In step 2, `x / 2` produces `8`, and that's passed in as the argument to a recur
 But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
 
 <p align="center">
-    <img src="fig14.png" width="850">
+    <img src="fig14.png">
 </p>
 
 Once the base condition is satisified, the returned value cascades back through all of the current function calls (and thus `return`s), eventually `return`ing the final result out.
@@ -69,7 +69,7 @@ Once the base condition is satisified, the returned value cascades back through 
 Another way to visualize this recursion is by considering the function calls in the order they happen (commonly referred to as the call stack):
 
 <p align="center">
-    <img src="fig19.png" width="188">
+    <img src="fig19.png" width="30%">
 </p>
 
 More on the call stack later in this chapter.
@@ -115,7 +115,7 @@ function fib(n) {
 
 We'll use `fib(..)` variously throughout this chapter to illustrate ideas around recursion, but one downside to this particular form is that there's an awful lot of duplicated work. `fib(n-1)` and `fib(n-2)` don't share any of their work with each other, but overlap with each other almost entirely, over the entire integer space down to `0`.
 
-We briefly touched on memoization in the "Performance Effects" section of Chapter 5. Here, memoization would allow the `fib(..)` of any given number to be computed only once, instead of being recomputed many times. We won't go further into that topic here, but that performance caveat is important to keep in mind with any algorithm, recursive or not.
+We briefly touched on memoization in [Chapter 5, "Performance Effects"](ch5.md/#performance-effects). Here, memoization would allow the `fib(..)` of any given number to be computed only once, instead of being recomputed many times. We won't go further into that topic here, but that performance caveat is important to keep in mind with any algorithm, recursive or not.
 
 ### Mutual Recursion
 
@@ -151,7 +151,7 @@ function fib(n) {
 }
 ```
 
-**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in "Fibonacci Numbers Using Mutual Recursion" (https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
+**Note:** This mutually recursive `fib(..)` implementation is adapted from research presented in ["Fibonacci Numbers Using Mutual Recursion"](https://www.researchgate.net/publication/246180510_Fibonacci_Numbers_Using_Mutual_Recursion).
 
 While these mutual recursion examples shown are rather contrived, there are more complex use cases where mutual recursion can be very helpful. Counting the number of leaves in a tree data structure is one example, and recursive descent parsing (of source code, by a compiler) is another.
 
@@ -261,7 +261,7 @@ Next, we turn our attention to checking `num1` against `maxRest` -- the main log
 
 The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` approach.
 
-**Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see Chapter 9), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
+**Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see [Chapter 9](ch9.md)), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
 
 ### Binary Tree Recursion
 
@@ -343,7 +343,7 @@ baz();
 Visualizing this program's stack frame step by step:
 
 <p align="center">
-    <img src="fig15.png" width="600">
+    <img src="fig15.png" width="80%">
 </p>
 
 **Note:** If these functions didn't call each other, but were just called sequentially -- like `baz(); bar(); foo();`, where each one finishes before the next one starts -- the  frames won't stack up; each function call finishes and removes its frame from the stack before the next one is added.
@@ -365,7 +365,7 @@ Fortunately, a powerful observation was made in those early days that still offe
 The idea is that if a call from function `baz()` to function `bar()` happens at the very end of function `baz()`'s execution -- referred to as a tail call -- the stack frame for `baz()` isn't needed anymore. That means that either the memory can be reclaimed, or even better, simply reused to handle function `bar()`'s execution. Visualizing:
 
 <p align="center">
-    <img src="fig16.png" width="600">
+    <img src="fig16.png" width="80%">
 </p>
 
 Tail calls are not really directly related to recursion, per se; this notion holds for any function call. But your manual non-recursion call stacks are unlikely to go beyond maybe 10 levels deep in most cases, so the chances of tail calls impacting your program's memory footprint are pretty low.
@@ -624,7 +624,7 @@ function fib(n,cont = identity) {
 }
 ```
 
-Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our `identity(..)` utility from Chapter 3; remember, it simply returns whatever is passed to it.
+Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our [`identity(..)` utility from Chapter 3](ch3.md/#one-on-one); remember, it simply returns whatever is passed to it.
 
 Morever, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
 
