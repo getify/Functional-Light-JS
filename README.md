@@ -1,6 +1,10 @@
-# Functional-Light JavaScript (book)
+# Functional-Light JavaScript
 
-This book explores the core principles of functional programming (FP) as they are applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
+<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-sd.png" width="25%" align="right" hspace="20"></a>
+
+This book is a balanced, pragramtic look at FP in JavaScript. The first edition is now complete.
+
+"Functional-Light JavaScript" explores the core principles of functional programming (FP) as they are applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
 
 **Note:** Despite the word "Light" in the title, I do not consider or recommend this book as a "beginner", "easy", or "intro" book on the topic. This book is rigorous and full of gritty detail; it expects a solid foundation of JS knowledge before diving in. "Light" means limited in scope; instead of being more broad, this book goes much deeper into each topic than you typically find in other FP-JavaScript books.
 
@@ -10,7 +14,7 @@ That's not to say the terms are meaning*less* or that FPrs are bad for using the
 
 But I want you to be able to apply some of the fundamentals of FP to your JavaScript *now*, because I believe it will help you write better, more *reason*able code.
 
-**To read more about the motivations and perspective behind this book, check out the [Preface](preface.md).**
+**To read more about the motivations and perspective behind this book, check out the [Preface](manuscript/preface.md).**
 
 ## Book
 
@@ -35,9 +39,9 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 
 ## Publishing
 
-I'm self-publishing this book, most likely digitally [on Leanpub](https://leanpub.com/fljs/). I'll also be trying to work out an option to sell print book copies, but that part is still uncertain.
+This book has been published [and is now available for purchase on Leanpub](https://leanpub.com/fljs/). I'll also be trying to work out an option to sell print book copies, but that part is still uncertain.
 
-If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the books, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
+If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the book, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
 
 <a href="https://www.patreon.com/getify">[![patreon.png](https://s11.postimg.org/axpzguh77/patreon.png)](https://www.patreon.com/getify)</a>
 
@@ -45,13 +49,11 @@ If you'd like to contribute financially towards the effort (or any of my other O
 
 The content for this book derives heavily from a training workshop I teach professionally (in both public and private-corporate workshop format) of the same name.
 
-If you like this content and would like to contact me regarding conducting training on this, or other various JS/HTML5/Node.js topics, please reach out to me through any of these channels listed here:
-
-[http://getify.me](http://getify.me)
+If you like this content and would like to contact me regarding conducting training on this, or other various JS/HTML5/Node.js topics, please reach out to me through email: getify @ gmail
 
 ## Online Video Training
 
-I also have several JS training courses available in on-demand video format. I teach courses through [Frontend Masters](https://FrontendMasters.com), like my [Functional-Lite JS](https://frontendmasters.com/courses/functional-js-lite/) workshop. Some of those courses are also available on [PluralSight](https://www.pluralsight.com/search?q=kyle%20simpson&categories=all).
+I also have several JS training courses available in on-demand video format. I [teach courses](https://FrontendMasters.com/teachers/kyle-simpson) through [Frontend Masters](https://FrontendMasters.com), like my [Functional-Light JavaScript v2](https://frontendmasters.com/courses/functional-javascript-v2/) workshop. Some of my courses are also available on [PluralSight](https://www.pluralsight.com/search?q=kyle%20simpson&categories=all).
 
 ## Contributions
 
