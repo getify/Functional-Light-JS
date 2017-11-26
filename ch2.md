@@ -24,7 +24,7 @@ Do you remember learning anything about `f(x)` back in school? What about the eq
 Let's say an equation is defined like this: <code>f(x) = 2x<sup>2</sup> + 3</code>. What does that mean? What does it mean to graph that equation? Here's the graph:
 
 <p align="center">
-    <img src="fig1.png" width="40%">
+    <img src="images/fig1.png" width="40%">
 </p>
 
 What you can notice is that for any value of `x`, say `2`, if you plug it into the equation, you get `11`. What is `11`, though? It's the *return value* of the `f(x)` function, which earlier we said represents a `y` value.

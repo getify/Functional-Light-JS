@@ -32,7 +32,7 @@ arrayValue <-- map <-- unary <-- parseInt
 Think of this flow of data like a conveyor belt in a candy factory, where each operation is a step in the process of cooling, cutting, and wrapping a piece of candy. We'll use the candy factory metaphor throughout this chapter to explain what composition is.
 
 <p align="center">
-    <img src="fig2.png">
+    <img src="images/fig2.png">
 </p>
 
 Let's examine composition in action one step at a time. Consider these two utilitites you might have in your program:
@@ -83,7 +83,7 @@ We name the array output of `words(..)` as `wordsFound`. The input of `unique(..
 
 Back to the candy factory assembly line: the first machine takes as "input" the melted chocolate, and its "output" is a chunk of formed and cooled chocolate. The next machine a little down the assembly line takes as its "input" the chunk of chocolate, and its "output" is a cut-up piece of chocolate candy. Next, a machine on the line takes small pieces of chocolate candy from the conveyor belt and outputs wrapped candies ready to bag and ship.
 
-<img src="fig3.png" align="right" width="9%" hspace="20">
+<img src="images/fig3.png" align="right" width="9%" hspace="20">
 
 The candy factory is fairly successful with this process, but as with all businesses, management keeps searching for ways to grow.
 
@@ -101,7 +101,7 @@ var wordsUsed = unique( words( text ) );
 
 The stacked machines are working fine, but it's kind of clunky to have the wires hanging out all over the place. The more of these machine-stacks they create, the more cluttered the factory floor gets. And the effort to assemble and maintain all these machine stacks is awfully time intensive.
 
-<img src="fig4.png" align="left" width="15%" hspace="20">
+<img src="images/fig4.png" align="left" width="15%" hspace="20">
 
 One morning, an engineer at the candy factory has a great idea. She figures that it'd be much more efficient if she made an outer box to hide all the wires; on the inside, all three of the machines are hooked up together, and on the outside everything is now neat and tidy. On the top of this fancy new machine is a valve to pour in melted chocolate and on the bottom is a valve that spits out wrapped chocolate candies. Brilliant!
 
@@ -132,7 +132,7 @@ But the factory engineers struggle to keep up, because each time a new kind of f
 So the factory engineers contact an industrial machine vendor for help. They're amazed to find out that this vendor offers a **machine-making** machine! As incredible as it sounds, they purchase a machine that can take a couple of the factory's smaller machines -- the chocolate cooling one and the cutting one, for example -- and wire them together automatically, even wrapping a nice clean bigger box around them. This is surely going to make the candy factory really take off!
 
 <p align="center">
-    <img src="fig5.png" width="50%">
+    <img src="images/fig5.png" width="50%">
 </p>
 
 Back to code land, let's consider a utility called `compose2(..)` that creates a composition of two functions automatically, exactly the same way we did manually:
@@ -192,7 +192,7 @@ finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```
 
 <p align="center">
-    <img src="fig6.png" width="50%">
+    <img src="images/fig6.png" width="50%">
 </p>
 
 Now the candy factory owns the best machine of all: a machine that can take any number of separate smaller machines and spit out a big fancy machine that does every step in order. That's one heck of a candy operation! It's Willy Wonka's dream!

@@ -63,7 +63,7 @@ y = multiplyBy3( x );
 We can naturally extend mapping from a single value transformation to a collection of values. `map(..)` is an operation that transforms all the values of a list as it projects them to a new list:
 
 <p align="center">
-    <img src="fig9.png" width="50%">
+    <img src="images/fig9.png" width="50%">
 </p>
 
 To implement `map(..)`:
@@ -230,7 +230,7 @@ The reason this semantic mismatch matters is because of how you will likely name
 Here's how to visualize a `filter(..)` operation across a list of values:
 
 <p align="center">
-    <img src="fig10.png" width="50%">
+    <img src="images/fig10.png" width="50%">
 </p>
 
 To implement `filter(..)`:
@@ -358,13 +358,13 @@ Just like with mapping and filtering, the manner of the combination is entirely 
 Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list, cascading down through each of the rest of the values in the list. That looks like this:
 
 <p align="center">
-    <img src="fig11.png" width="50%">
+    <img src="images/fig11.png" width="50%">
 </p>
 
 Alternatively, you can omit the `initialValue` in which case the first value of the list will act in place of the `initialValue` and the combining will start with the second value in the list, like this:
 
 <p align="center">
-    <img src="fig12.png" width="50%">
+    <img src="images/fig12.png" width="50%">
 </p>
 
 **Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
@@ -1233,7 +1233,7 @@ Just as we said earlier that array's `map(..)` adapts a single-value operation t
 
 The important part to maintain in the spirit of FP is that these operators must behave according to value immutability, meaning that they must return a new data structure rather than mutating the existing one.
 
-<img src="fig7.png" align="left" width="20%" hspace="20" vspace="20">
+<img src="images/fig7.png" align="left" width="20%" hspace="20" vspace="20">
 
 Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has at most two references to other nodes (themselves binary trees), typically referred to as *left* and *right* child trees. Each node in the tree holds one value of the overall data structure:
 
@@ -1268,7 +1268,7 @@ In this particular tree structure, `banana` is the root node; this tree could ha
 Our tree looks like:
 
 <p align="center">
-    <img src="fig8.png" width="60%">
+    <img src="images/fig8.png" width="60%">
 </p>
 
 There are multiple ways to traverse a binary tree to process its values. If it's a BST (ours is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.

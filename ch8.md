@@ -53,7 +53,7 @@ function foo(x) {
 Let's visualize what happens with this function when we call `foo( 16 )`:
 
 <p align="center">
-    <img src="fig13.png">
+    <img src="images/fig13.png">
 </p>
 
 In step 2, `x / 2` produces `8`, and that's passed in as the argument to a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
@@ -61,7 +61,7 @@ In step 2, `x / 2` produces `8`, and that's passed in as the argument to a recur
 But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
 
 <p align="center">
-    <img src="fig14.png">
+    <img src="images/fig14.png">
 </p>
 
 Once the base condition is satisified, the returned value cascades back through all of the current function calls (and thus `return`s), eventually `return`ing the final result out.
@@ -69,7 +69,7 @@ Once the base condition is satisified, the returned value cascades back through 
 Another way to visualize this recursion is by considering the function calls in the order they happen (commonly referred to as the call stack):
 
 <p align="center">
-    <img src="fig19.png" width="30%">
+    <img src="images/fig19.png" width="30%">
 </p>
 
 More on the call stack later in this chapter.
@@ -343,7 +343,7 @@ baz();
 Visualizing this program's stack frame step by step:
 
 <p align="center">
-    <img src="fig15.png" width="80%">
+    <img src="images/fig15.png" width="80%">
 </p>
 
 **Note:** If these functions didn't call each other, but were just called sequentially -- like `baz(); bar(); foo();`, where each one finishes before the next one starts -- the  frames won't stack up; each function call finishes and removes its frame from the stack before the next one is added.
@@ -365,7 +365,7 @@ Fortunately, a powerful observation was made in those early days that still offe
 The idea is that if a call from function `baz()` to function `bar()` happens at the very end of function `baz()`'s execution -- referred to as a tail call -- the stack frame for `baz()` isn't needed anymore. That means that either the memory can be reclaimed, or even better, simply reused to handle function `bar()`'s execution. Visualizing:
 
 <p align="center">
-    <img src="fig16.png" width="80%">
+    <img src="images/fig16.png" width="80%">
 </p>
 
 Tail calls are not really directly related to recursion, per se; this notion holds for any function call. But your manual non-recursion call stacks are unlikely to go beyond maybe 10 levels deep in most cases, so the chances of tail calls impacting your program's memory footprint are pretty low.

@@ -131,7 +131,7 @@ FP (at least, without all the terminology weighing it down) is one of the most e
 Readability is not a binary characteristic. It's a largely subjective human factor describing our relationship to code. And it will naturally vary over time as our skills and understanding evolve. I have experienced effects similar to the following figure, and anecdotally many others I've talked to have as well.
 
 <p align="center">
-    <img src="fig17.png" width="50%">
+    <img src="images/fig17.png" width="50%">
 </p>
 
 You may just find yourself experiencing similar effects as you work through the book. But take heart; if you stick this out, the curve comes back up!
