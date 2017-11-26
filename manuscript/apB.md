@@ -252,7 +252,7 @@ Maybe.of( someObj )
 .map( console.log );
 ```
 
-In other words, if at any point in the chain we get a `null`/`undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
+In other words, if at any point in the chain we get a `null`/`undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested-property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
 
 But... that approach to Maybe is not a pure monad.
 

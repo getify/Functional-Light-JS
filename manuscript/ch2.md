@@ -305,7 +305,7 @@ function foo(params) {
 }
 ```
 
-But here we highlight a principle we only briefly introduced in [Chapter 1](#ch1): declarative code communicates more effectively than imperative code.
+But here we highlight a principle we only briefly introduced in [Chapter 1](#ch1readability): declarative code communicates more effectively than imperative code.
 
 Declarative code (for example, the destructuring in the former `foo(..)` snippet, or the `...` operator usages) focuses on what the outcome of a piece of code should be.
 
@@ -689,7 +689,7 @@ Normally, a `sum(..)` function would take both an `x` and `y` input to add them 
 
 I> ## Note
 I>
-I> This technique of specifying inputs in successive function calls is very common in FP, and comes in two forms: partial application and currying. We'll dive into them more thoroughly later in the text.
+I> This technique of specifying inputs in successive function calls is very common in FP, and comes in two forms: partial application and currying. We'll dive into them more thoroughly in [Chapter 3](#ch3somenowsomelater).
 
 Of course, since functions are just values in JS, we can remember function values via closure:
 

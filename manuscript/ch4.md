@@ -375,7 +375,7 @@ compose( compose(fn1,fn2, .. fnN-1), fnN );
 
 I> ## Note
 I>
-I> We will cover recursion more fully in [Chapter 8](#ch8), so if this approach seems confusing, feel free to skip it for now and come back later after reading that chapter.
+I> We will cover recursion more fully in [Chapter 8](#ch8), so if this approach seems confusing, don't worry for now. Or, go read that chapter then come back and re-read this note. :)
 
 Here's how we implement `compose(..)` with recursion:
 
