@@ -689,7 +689,7 @@ Normally, a `sum(..)` function would take both an `x` and `y` input to add them 
 
 I> ## Note
 I>
-I> This technique of specifying inputs in successive function calls is very common in FP, and comes in two forms: partial application and currying. We'll dive into them more thoroughly later in the text.
+I> This technique of specifying inputs in successive function calls is very common in FP, and comes in two forms: partial application and currying. We'll dive into them more thoroughly in [Chapter 3](#ch3somenowsomelater).
 
 Of course, since functions are just values in JS, we can remember function values via closure:
 
