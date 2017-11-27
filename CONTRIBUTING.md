@@ -12,7 +12,7 @@ If you have any questions or concerns, please make sure to search the issues (bo
 
 This book has already been edited. Most typos have already been caught and fixed, but there might still be some mistakes here and there.
 
-If you're going to submit a PR for typo fixes, please be measured in doing, perhaps by collecting several small changes into a single PR (in separate commits).
+If you're going to submit a PR for typo fixes, please be measured in doing so, perhaps by collecting several small changes into a single PR (in separate commits).
 
 ## Reading Experience (Chapter/Section links, etc)
 
