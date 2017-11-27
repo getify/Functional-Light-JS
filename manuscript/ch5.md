@@ -297,11 +297,11 @@ function updateCounter(obj) {
 
 This function mutates an object via reference by incrementing `obj.count`, so it produces a side effect on that object. If `updateCounter(o)` is called multiple times -- while `o.count` is less than `10`, that is -- the program state changes each time. Also, the output of `updateCounter(..)` is a Boolean, which is not suitable to feed back into a subsequent call of `updateCounter(..)`.
 
-### Mathematic Idempotence
+### Mathematical Idempotence
 
 From the mathematical point of view, idempotence means an operation whose output won't ever change after the first call, if you feed that output back into the operation over and over again. In other words, `foo(x)` would produce the same output as `foo(foo(x))` and `foo(foo(foo(x)))`.
 
-A typical mathematic example is `Math.abs(..)` (absolute value). `Math.abs(-2)` is `2`, which is the same result as `Math.abs(Math.abs(Math.abs(Math.abs(-2))))`. Utilities like `Math.min(..)`, `Math.max(..)`, `Math.round(..)`, `Math.floor(..)`, and `Math.ceil(..)` are all idempotent.
+A typical mathematical example is `Math.abs(..)` (absolute value). `Math.abs(-2)` is `2`, which is the same result as `Math.abs(Math.abs(Math.abs(Math.abs(-2))))`. Utilities like `Math.min(..)`, `Math.max(..)`, `Math.round(..)`, `Math.floor(..)`, and `Math.ceil(..)` are all idempotent.
 
 Some custom mathematical operations we could define with this same characteristic:
 
@@ -319,7 +319,7 @@ toPower0( 3 ) == toPower0( toPower0( 3 ) );         // true
 snapUp3( 3.14 ) == snapUp3( snapUp3( 3.14 ) );      // true
 ```
 
-Mathematical-style idempotence is **not** restricted to mathematic operations. Another place we can illustrate this form of idempotence is with JavaScript primitive type coercions:
+Mathematical-style idempotence is **not** restricted to mathematical operations. Another place we can illustrate this form of idempotence is with JavaScript primitive type coercions:
 
 ```js
 var x = 42, y = "hello";
@@ -665,7 +665,7 @@ var avg = 9;
 console.log( "The average is:", avg );      // The average is: 9
 ```
 
-The only difference between these two snippets is that in the latter one, we skipped the `calculateAverage(nums)` call and just inlined its ouput (`9`). Since the rest of the program behaves identically, `calculateAverage(..)` has referential transparency, and is thus a pure function.
+The only difference between these two snippets is that in the latter one, we skipped the `calculateAverage(nums)` call and just inlined its output (`9`). Since the rest of the program behaves identically, `calculateAverage(..)` has referential transparency, and is thus a pure function.
 
 ### Mentally Transparent
 
