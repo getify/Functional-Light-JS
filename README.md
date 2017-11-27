@@ -1,6 +1,6 @@
 # Functional-Light JavaScript
 
-<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-sd.png" width="25%" align="right" hspace="20" vspace="20"></a>
+<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-small.png" width="25%" align="right" hspace="20" vspace="20"></a>
 
 This book is a balanced, pragramtic look at FP in JavaScript. The first edition is now complete.
 
