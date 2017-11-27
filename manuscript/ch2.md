@@ -732,7 +732,7 @@ Ultimately, you get to decide.
 
 ### What's in a Name?
 
-Syntatically speaking, function declarations require the inclusion of a name:
+Syntactically speaking, function declarations require the inclusion of a name:
 
 ```js
 function helloMyNameIs() {
@@ -901,7 +901,7 @@ The keyword `function` is gone, so is `return`, the parentheses (`( )`), the cur
 
 But there's another thing we omitted. Did you spot it? The `getPreferredName` function name.
 
-That's right; `=>` arrow functions are lexically anonymous; there's no way to syntatically provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values passed as arguments won't get any assistance in that way. Bummer.
+That's right; `=>` arrow functions are lexically anonymous; there's no way to syntactically provide it a name. Their names can be inferred like regular functions, but again, the most common case of function expression values passed as arguments won't get any assistance in that way. Bummer.
 
 If `person.nicknames` isn't defined for some reason, an exception will be thrown, meaning this `(anonymous function)` will be at the top of the stack trace. Ugh.
 

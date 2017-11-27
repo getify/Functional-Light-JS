@@ -47,11 +47,11 @@ Let's visualize what happens with this function when we call `foo( 16 )`:
 
 In step 2, `x / 2` produces `8`, and that's passed in as the argument to a recursive `foo(..)` call. In step 3, same thing, `x / 2` produces `4`, and that's passed in as the argument to yet another `foo(..)` call. That part is hopefully fairly straightforward.
 
-But where someone may often get tripped up is what happens in step 4. Once we've satisifed the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
+But where someone may often get tripped up is what happens in step 4. Once we've satisfied the base condition where `x` (value `4`) is `< 5`, we no longer make any more recursive calls, and just (effectively) do `return 4`. Specifically the dotted line return of `4` in this figure simplifies what's happening there, so let's dig into that last step and visualize it as these three sub-steps:
 
 ![Steps of recursive return](images/fig14.png)
 
-Once the base condition is satisified, the returned value cascades back through all of the current function calls (and thus `return`s), eventually `return`ing the final result out.
+Once the base condition is satisfied, the returned value cascades back through all of the current function calls (and thus `return`s), eventually `return`ing the final result out.
 
 Another way to visualize this recursion is by considering the function calls in the order they happen (commonly referred to as the call stack):
 
@@ -196,7 +196,7 @@ function maxEven(...nums) {
 }
 ```
 
-This implementation is not particulary intractable, but it's also not readily apparent what its nuances are. How obvious is it that `maxEven()`, `maxEven(1)`, and `maxEven(1,13)` all return `undefined`? Is it quickly clear why the final `if` statement is necessary?
+This implementation is not particularly intractable, but it's also not readily apparent what its nuances are. How obvious is it that `maxEven()`, `maxEven(1)`, and `maxEven(1,13)` all return `undefined`? Is it quickly clear why the final `if` statement is necessary?
 
 Let's instead consider a recursive approach, to compare. We could notate the recursion this way:
 
@@ -622,7 +622,7 @@ function fib(n,cont = identity) {
 
 Pay close attention to what's happening here. First, we default the `cont(..)` continuation function as our [`identity(..)` utility from Chapter 3](#ch3oneonone); remember, it simply returns whatever is passed to it.
 
-Morever, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
+Moreover, not just one but two continuation functions are added to the mix. The first one receives the `n2` argument, which eventually receives the computation of the `fib(n-2)` value. The next inner continuation receives the `n1` argument, which eventually is the `fib(n-1)` value. Once both `n2` and `n1` values are known, they can be added together (`n2 + n1`), and that value is passed along to the next `cont(..)` continuation step.
 
 Perhaps this will help mentally sort out what's going on: just like in the previous discussion when we passed partial results along instead of returning them back after the recursive stack, we're doing the same here, but each step gets wrapped in a continuation, which defers its computation. That trick allows us to perform multiple steps where each is in PTC form.
 
@@ -687,7 +687,7 @@ Beyond execution and memory performance, the advantage of trampolines over CPS i
 
 Recursion is when a function recursively calls itself. Heh. A recursive definition for recursion. Get it!?
 
-Direct recursion is a function that makes at least one call to itself, and it keeps dispatching to itself until it satisifies a base condition. Multiple recursion (like binary recursion) is when a function calls itself multiple times. Mutual recursion is when two or more functions recursively loop by *mutually* calling each other.
+Direct recursion is a function that makes at least one call to itself, and it keeps dispatching to itself until it satisfies a base condition. Multiple recursion (like binary recursion) is when a function calls itself multiple times. Mutual recursion is when two or more functions recursively loop by *mutually* calling each other.
 
 The upside of recursion is that it's more declarative and thus typically more readable. The downside is usually performance, but more memory constraints even than execution speed.
 

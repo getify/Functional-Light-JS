@@ -1,6 +1,6 @@
 # Chapter 3: Managing Function Inputs {#ch3}
 
-[Chapter 2](#ch2) explored the core nature of JS `function`s, and layed the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions -- to bend them to our will.
+[Chapter 2](#ch2) explored the core nature of JS `function`s, and laid the foundation for what makes a `function` an FP *function*. But to leverage the full power of FP, we also need patterns and practices for manipulating functions to shift and adjust their interactions -- to bend them to our will.
 
 Specifically, our attention for this chapter will be on the parameter inputs of functions. As you bring functions of all different shapes together in your programs, you'll quickly face incompatibilities in the number/order/type of inputs, as well as the need to specify some inputs at different times than others.
 
@@ -210,7 +210,7 @@ Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input t
 bar( spreadArgs( foo ) );           // 12
 ```
 
-It won't seem clear yet why these occassions arise, but you will see them often. Essentially, `spreadArgs(..)` allows us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
+It won't seem clear yet why these occasions arise, but you will see them often. Essentially, `spreadArgs(..)` allows us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
 
 While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
 
@@ -915,7 +915,7 @@ T> If this style of function arguments seems useful or interesting to you, check
 
 ### Spreading Properties
 
-Unfortunately, we can only take advantage of currying with named arguments if we have control over the signature of `foo(..)` and define it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters indivdually listed (no parameter destructuring!), and we couldn't change that function signature? For example:
+Unfortunately, we can only take advantage of currying with named arguments if we have control over the signature of `foo(..)` and define it to destructure its first parameter. What if we wanted to use this technique with a function that had its parameters individually listed (no parameter destructuring!), and we couldn't change that function signature? For example:
 
 ```js
 function bar(x,y,z) {

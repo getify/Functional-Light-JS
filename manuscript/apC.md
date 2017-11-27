@@ -17,7 +17,7 @@ Let's expand the [list of FP libraries to be aware of, from Chapter 1](#ch1libra
 * [Immutable](https://github.com/facebook/immutable-js): Immutable Data Structures
 * [Mori](https://github.com/swannodette/mori): (ClojureScript Inspired) Immutable Data Structures
 * [Seamless-Immutable](https://github.com/rtfeldman/seamless-immutable): Immutable Data Helpers
-* [tranducers-js](https://github.com/cognitect-labs/transducers-js): Transducers
+* [transducers-js](https://github.com/cognitect-labs/transducers-js): Transducers
 * [monet.js](https://github.com/monet/monet.js): Monadic Types
 
 There are dozens of other fine libraries not on this list. Just because it's not on my list here doesn't mean it's not good, nor is this list a particular endorsement. It's just a quick glance at the landscape of FP-in-JavaScript. A much longer list of FP resources can be [found here](https://github.com/stoeffel/awesome-fp-js).
