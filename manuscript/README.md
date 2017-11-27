@@ -1,5 +1,7 @@
 # Functional-Light JavaScript
 
+<a href="https://leanpub.com/fljs"><img src="images/marketing/book-cover-sd.png" width="20%"></a>
+
 ## Table of Contents
 
 * [Foreword](foreword.md/#foreword)

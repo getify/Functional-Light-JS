@@ -1,8 +1,12 @@
 # Functional-Light JavaScript
 
-<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-sd.png" width="25%" align="right" hspace="20"></a>
+<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-sd.png" width="25%" align="right" hspace="20" vspace="20"></a>
 
 This book is a balanced, pragramtic look at FP in JavaScript. The first edition is now complete.
+
+<p align="center">
+    <a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/leanpub-buynow.png" width="7%"></a>
+</p>
 
 "Functional-Light JavaScript" explores the core principles of functional programming (FP) as they are applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
 
@@ -40,6 +44,10 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 ## Publishing
 
 This book has been published [and is now available for purchase on Leanpub](https://leanpub.com/fljs/). I'll also be trying to work out an option to sell print book copies, but that part is still uncertain.
+
+<p align="center">
+    <a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/leanpub-buynow.png" width="7%"></a>
+</p>
 
 If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the book, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
 
