@@ -1,11 +1,13 @@
 # Functional-Light JavaScript
 
-<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-small.png" width="25%" align="right" hspace="20" vspace="20"></a>
+[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
+
+<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-small.png" width="25%" align="right" hspace="20" vspace="20" title="Functional-Light JavaScript" alt="Book Cover"></a>
 
 This book is a balanced, pragramtic look at FP in JavaScript. The first edition is now complete.
 
 <p align="center">
-    <a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/leanpub-buynow.png" width="7%"></a>
+    <a href="https://leanpub.com/fljs"><img src="https://img.shields.io/badge/Buy-Leanpub-yellow.svg" title="Buy on Leanpub" alt="Buy on Leanpub"></a>
 </p>
 
 "Functional-Light JavaScript" explores the core principles of functional programming (FP) as they are applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
@@ -45,9 +47,7 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 
 This book has been published [and is now available for purchase on Leanpub](https://leanpub.com/fljs/). I'll also be trying to work out an option to sell print book copies, but that part is still uncertain.
 
-<p align="center">
-    <a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/leanpub-buynow.png" width="7%"></a>
-</p>
+[![Buy on Leanpub](https://img.shields.io/badge/Buy-Leanpub-yellow.svg)](https://leanpub.com/fljs)
 
 If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the book, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
 
