@@ -4,7 +4,7 @@
 
 <a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-small.png" width="25%" align="right" hspace="20" vspace="20" title="Functional-Light JavaScript" alt="Book Cover"></a>
 
-This book is a balanced, pragramtic look at FP in JavaScript. The first edition is now complete.
+This book is a balanced, pragmatic look at FP in JavaScript. The first edition is now complete.
 
 <p align="center">
     <a href="https://leanpub.com/fljs"><img src="https://img.shields.io/badge/Buy-Leanpub-yellow.svg" title="Buy on Leanpub" alt="Buy on Leanpub"></a>
