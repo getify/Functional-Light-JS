@@ -1,65 +1,75 @@
-# 轻量函数式 JavaScript（书籍）
+# Functional-Light JavaScript
 
-这本书在将函数式编程（FP）应用于 JavaScript 的同时探索它的核心原理。但是这本书与众不同的是，我们讲解这些原理的方式不会沉浸在所有那些专门术语中。我们将关注于一个我称之为 “轻量函数式编程” 的 FP 基础概念子集，并将它应用在 JavaScript 上。
+[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-**注意：** 尽管在标题中出现了 “轻量” 一词，但我不认为或推荐将这本书看做一本在这个话题上的 “入门”、“简易”、或者 “介绍” 书籍。这本书十分缜密而且充满了细节；它希望读者在深入之前有坚实的 JS 知识基础。“轻量” 意味着在范围上的限制；取代更加广泛讨论的是，这本书与你经常能够看到的其他 FP-JavaScript 书籍相比在每一个话题上都要深入得多。
+<a href="https://leanpub.com/fljs"><img src="manuscript/images/marketing/book-cover-small.png" width="25%" align="right" hspace="20" vspace="20" title="Functional-Light JavaScript" alt="Book Cover"></a>
 
-让我们直面这个问题：除非你已经是 FP 酷小子俱乐部的一员（我不是！），那么像 “单子只是自函子范畴中的幺半群” 这样的话对我们不意味着任何有用的东西。
+This book is a balanced, pragmatic look at FP in JavaScript. The first edition is now complete.
 
-这不是说这些名词 *没有* 意义，或者 FP 程序员使用它们很不好。一旦你从轻量函数式中毕业，你就可能/希望去更正规的学习 FP，而且你无疑会有很多机会搞清楚它们意味着什么和为什么。
+<p align="center">
+    <a href="https://leanpub.com/fljs"><img src="https://img.shields.io/badge/Buy-Leanpub-yellow.svg" title="Buy on Leanpub" alt="Buy on Leanpub"></a>
+</p>
 
-但我想让你 *现在* 就能够将 FP 基础中的一些应用到你的 JavaScript 中去，因为我相信它能帮你写出更好，更 *合理* 的代码。
+"Functional-Light JavaScript" explores the core principles of functional programming (FP) as they are applied to JavaScript. But what makes this book different is that we approach these principles without drowning in all the heavy terminology. We look at a subset of FP foundational concepts that I call "Functional-Light Programming" (FLP) and apply it to JavaScript.
 
-**要了解更多本书背后的动机与视角，请参阅[前言](preface.md)。**
+**Note:** Despite the word "Light" in the title, I do not consider or recommend this book as a "beginner", "easy", or "intro" book on the topic. This book is rigorous and full of gritty detail; it expects a solid foundation of JS knowledge before diving in. "Light" means limited in scope; instead of being more broad, this book goes much deeper into each topic than you typically find in other FP-JavaScript books.
 
-## 书籍
+Let's face it: unless you're already a member of the FP cool kids club (I'm not!), a statement like, "a monad is just a monoid in the category of endofunctors", just doesn't mean anything useful to us.
 
-[目录](toc.md)
+That's not to say the terms are meaning*less* or that FPrs are bad for using them. Once you graduate from Functional-Light, you'll maybe/hopefully want to study FP more formally, and you'll certainly have plenty of exposure to what they mean and why.
 
-* 序 (TBA)
-* [前言](preface.md)
-* [第一章：为什么要进行函数式编程？](ch1.md)
-* [第二章：函数式函数的基础](ch2.md)
-* [第三章：管理函数输入](ch3.md)
-* [第四章：组合函数](ch4.md)
-* [第五章：降低副作用](ch5.md)
-* [第六章：值不可变性](ch6.md)
-* [第七章：闭包 vs 对象](ch7.md)
-* [第八章：列表操作](ch8.md)
-* [第九章：递归](ch9.md)
-* [第十章：函数式异步](ch10.md)
-* [第十一章：综合应用](ch11.md)
-* [附录A：转导](apA.md)
-* [附录B：谦逊的单子（Monad）](apB.md)
-* [附录C：FP 库](apC.md)
+But I want you to be able to apply some of the fundamentals of FP to your JavaScript *now*, because I believe it will help you write better, more *reason*able code.
 
-## 出版
+**To read more about the motivations and perspective behind this book, check out the [Preface](manuscript/preface.md).**
 
-这本书由我自出版，最有可能是在 [Leanpub](https://leanpub.com/fljs/) 上出版数字版本。我也在为贩卖此书的印刷版想办法，但这部分还不确定。
+## Book
 
-除了购买这本书以外，如果你想要对本作品（或者我的其他在线开源内容）做出经济上的贡献，我有一个 [patreon](https://www.patreon.com/getify)。我将永远感激你的慷慨。
+[Table of Contents](manuscript/README.md/#table-of-contents)
+
+* [Foreword](manuscript/foreword.md/#foreword) (by [Brian Lonsdorf, aka "Prof Frisby"](https://twitter.com/DrBoolean))
+* [Preface](manuscript/preface.md/#preface)
+* [Chapter 1: Why Functional Programming?](manuscript/ch1.md/#chapter-1-why-functional-programming)
+* [Chapter 2: The Nature Of Functions](manuscript/ch2.md/#chapter-2-the-nature-of-functions)
+* [Chapter 3: Managing Function Inputs](manuscript/ch3.md/#chapter-3-managing-function-inputs)
+* [Chapter 4: Composing Functions](manuscript/ch4.md/#chapter-4-composing-functions)
+* [Chapter 5: Reducing Side Effects](manuscript/ch5.md/#chapter-5-reducing-side-effects)
+* [Chapter 6: Value Immutability](manuscript/ch6.md/#chapter-6-value-immutability)
+* [Chapter 7: Closure vs Object](manuscript/ch7.md/#chapter-7-closure-vs-object)
+* [Chapter 8: Recursion](manuscript/ch8.md/#chapter-8-recursion)
+* [Chapter 9: List Operations](manuscript/ch9.md/#chapter-9-list-operations)
+* [Chapter 10: Functional Async](manuscript/ch10.md/#chapter-10-functional-async)
+* [Chapter 11: Putting It All Together](manuscript/ch11.md/#chapter-11-putting-it-all-together)
+* [Appendix A: Transducing](manuscript/apA.md/#appendix-a-transducing)
+* [Appendix B: The Humble Monad](manuscript/apB.md/#appendix-b-the-humble-monad)
+* [Appendix C: FP Libraries](manuscript/apC.md/#appendix-c-fp-libraries)
+
+## Publishing
+
+This book has been published [and is now available for purchase on Leanpub](https://leanpub.com/fljs/). I'll also be trying to work out an option to sell print book copies, but that part is still uncertain.
+
+[![Buy on Leanpub](https://img.shields.io/badge/Buy-Leanpub-yellow.svg)](https://leanpub.com/fljs)
+
+If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the book, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
 
 <a href="https://www.patreon.com/getify">[![patreon.png](https://s11.postimg.org/axpzguh77/patreon.png)](https://www.patreon.com/getify)</a>
 
-## 对面教学
+## In-person Training
 
-这些书的内容很大程度上衍生自我职业中（公开的和私营企业培训的形式）教授的一个同名辅导班。
+The content for this book derives heavily from a training workshop I teach professionally (in both public and private-corporate workshop format) of the same name.
 
-如果你喜欢这些内容并且想要联系我进行关于这些内容，或其他关于 JS/HTML5/node.js 话题的培训，请通过这里罗列的渠道联系我：
+If you like this content and would like to contact me regarding conducting training on this, or other various JS/HTML5/Node.js topics, please reach out to me through email: getify @ gmail
 
-[http://getify.me](http://getify.me)
+## Online Video Training
 
-## 在线视频教学
+I also have several JS training courses available in on-demand video format. I [teach courses](https://FrontendMasters.com/teachers/kyle-simpson) through [Frontend Masters](https://FrontendMasters.com), like my [Functional-Light JavaScript v2](https://frontendmasters.com/courses/functional-javascript-v2/) workshop. Some of my courses are also available on [PluralSight](https://www.pluralsight.com/search?q=kyle%20simpson&categories=all).
 
-我还有一些以请求方式发布的视频 JS 培训课程。我通过 [Frontend Masters](https://FrontendMasters.com) 教授课程，比如我的 [Functional-Lite JS](https://frontendmasters.com/courses/functional-js-lite/) 教室。这些课程中的一些还可以通过 [PluralSight](https://www.pluralsight.com/search?q=kyle%20simpson&categories=all) 找到。
+## Contributions
 
-## 内容贡献
+Any contributions you make to this effort **are of course greatly appreciated**.
 
-**非常感谢** 你向本作品做出的任何贡献。
+But **PLEASE** read the [Contributions Guidelines](CONTRIBUTING.md) carefully before submitting a PR.
 
-但是在提交 PR 以前 **请** 仔细阅读[内容贡献指引](CONTRIBUTING.md)。
-
-## 许可 & 版权
+## License & Copyright
 
 The materials herein are all (c) 2016-2017 Kyle Simpson.
 
