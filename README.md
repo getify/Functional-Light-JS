@@ -2,7 +2,7 @@
 
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-nd/4.0/) [![Buy on Leanpub](https://img.shields.io/badge/Buy-Leanpub-yellow.svg)](https://leanpub.com/fljs)
 
-This book is a balanced, pragramtic look at FP in JavaScript. The first edition is now complete.
+This book is a balanced, pragmatic look at FP in JavaScript. The first edition is now complete.
 
 **NOTE:** This branch is only used for publishing to Leanpub. See "master" branch for the main content.
 
