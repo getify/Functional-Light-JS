@@ -146,7 +146,7 @@ With this tidy little FP utility, we can solve our `then(..)` annoyance properly
 p1.then( foo ).then( constant( p2 ) ).then( bar );
 ```
 
-**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the book (see Chapter 5, "Reducing Side Effects").
+**Warning:** Although the `() => p2` arrow function version is shorter than `constant(p2)`, I would encourage you to resist the temptation to use it. The arrow function is returning a value from outside of itself, which is a bit worse from the FP perspective. We'll cover the pitfalls of such actions later in the book (see [Chapter 5](ch5.md)).
 
 ## Adapting Arguments to Parameters
 
