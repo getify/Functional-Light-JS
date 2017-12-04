@@ -1,5 +1,7 @@
 "use strict";
 
+var pipe = reverseArgs(compose);
+
 // curried list operators
 var map = unboundMethod( "map", 2 );
 var filter = unboundMethod( "filter", 2 );
@@ -19,6 +21,12 @@ function filterOut(predicateFn,arr) {
 	return filterIn( not( predicateFn ), arr );
 }
 
+function unary(fn) {
+	return function onlyOneArg(arg){
+		return fn( arg );
+	};
+}
+
 function not(predicate) {
 	return function negated(...args){
 		return !predicate( ...args );
@@ -32,7 +40,7 @@ function reverseArgs(fn) {
 }
 
 function spreadArgs(fn) {
-	return function spreadFn(argsArr) {
+	return function spreadFn(argsArr){
 		return fn( ...argsArr );
 	};
 }
@@ -44,7 +52,7 @@ function partial(fn,...presetArgs) {
 }
 
 function partialRight(fn,...presetArgs) {
-	return function partiallyApplied(...laterArgs) {
+	return function partiallyApplied(...laterArgs){
 		return fn( ...laterArgs, ...presetArgs );
 	};
 }
@@ -89,28 +97,11 @@ function zip(arr1,arr2) {
 }
 
 function compose(...fns) {
-	return function composed(result){
-		// copy the array of functions
-		var list = fns.slice();
-
-		while (list.length > 0) {
-			result = list.pop()( result );
-		}
-
-		return result;
-	};
-}
-
-function pipe(...fns) {
-	return function piped(result){
-		var list = fns.slice();
-
-		while (list.length > 0) {
-			result = list.shift()( result );
-		}
-
-		return result;
-	};
+    return fns.reduceRight( function reducer(fn1,fn2){
+        return function composed(...args){
+            return fn2( fn1( ...args ) );
+        };
+    } );
 }
 
 function prop(name,obj) {
