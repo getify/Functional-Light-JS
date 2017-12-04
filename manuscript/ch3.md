@@ -469,7 +469,7 @@ Another more straightforward (and certainly more performant) implementation of `
 
 ```js
 function partialRight(fn,...presetArgs) {
-    return function partiallyApplied(...laterArgs) {
+    return function partiallyApplied(...laterArgs){
         return fn( ...laterArgs, ...presetArgs );
     };
 }

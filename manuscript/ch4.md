@@ -301,7 +301,7 @@ While you may very well never implement your own `compose(..)` to use in product
 
 So let's examine some different implementation options for `compose(..)`. We'll also see there are some pros/cons to each implementation, especially performance.
 
-We'll be looking at the `reduce(..)` utility in detail in Chapter 9, but for now, just know that it reduces a list (array) to a single finite value. It's like a fancy loop.
+We'll be looking at the [`reduce(..)` utility in detail in Chapter 9](ch9.md/#reduce), but for now, just know that it reduces a list (array) to a single finite value. It's like a fancy loop.
 
 For example, if you did an addition-reduction across the list of numbers `[1,2,3,4,5,6]`, you'd be looping over them adding them together as you go. The reduction would add `1` to `2`, and add that result to `3`, and then add that result to `4`, and so on, resulting in the final summation: `21`.
 
@@ -327,6 +327,8 @@ var compose = (...fns) =>
             , result
         );
 ```
+
+**Note:** This implementation of `compose(..)` uses `fns.reverse().reduce(..)` to reduce from right-to-left. We'll [revisit `compose(..)` in Chapter 9](ch9.md/#user-content-composereduceright), instead using `reduceRight(..)` for that purpose.
 
 Notice that the `reduce(..)` looping happens each time the final `composed(..)` function is run, and that each intermediate `result(..)` is passed along to the next iteration as the input to the next call.
 
