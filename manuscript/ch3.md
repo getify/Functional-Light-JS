@@ -356,7 +356,7 @@ var getCurrentUser = function partiallyApplied(...laterArgs) {
 };
 
 // version 2
-var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs) {
+var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs){
     var getPerson = function innerPartiallyApplied(...innerLaterArgs){
         return ajax( "http://some.api/person", ...innerLaterArgs );
     };
@@ -446,7 +446,7 @@ var cacheResult = reverseArgs(
 cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
 ```
 
-Instead of manually using `reverseArgs(..)` (twice!) for this purpose, we could define a `partialRight(..)` which partially applies from the right. Under the covers, it could use the same double-reverse trick:
+Instead of manually using `reverseArgs(..)` (twice!) for this purpose, we can define a `partialRight(..)` which partially applies the rightmost arguments. Under the covers, it can use the same double-reverse trick:
 
 <a name="partialright"></a>
 
@@ -531,7 +531,7 @@ Instead of taking all the arguments at once (like `ajax(..)`), or some of the ar
 
 Currying is similar to partial application in that each successive curried call partially applies another argument to the original function, until all arguments have been passed.
 
-The main difference is that `curriedAjax(..)` will return a function (we call `curriedGetPerson(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
+The main difference is that `curriedAjax(..)` will return a function (we call it  `personFetcher(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
 
 If an original function expected five arguments, the curried form of that function would take just the first argument, and return a function to accept the second. That one would take just the second argument, and return a function to accept the third. And so on.
 
@@ -646,12 +646,12 @@ Let's examine more closely the `curriedSum(..)` from the previous section. Recal
 What if we manually defined a `curriedSum(..)` instead of using `curry(..)`? How would that look?
 
 ```js
-function curriedSum(val1) {
-    return function(val2){
-        return function(val3){
-            return function(val4){
-                return function(val5){
-                    return sum( val1, val2, val3, val4, val5 );
+function curriedSum(v1) {
+    return function(v2){
+        return function(v3){
+            return function(v4){
+                return function(v5){
+                    return sum( v1, v2, v3, v4, v5 );
                 };
             };
         };
@@ -667,18 +667,18 @@ In fact, to reinforce that point, let's consider the same code but written with 
 
 ```js
 curriedSum =
-    val1 =>
-        val2 =>
-            val3 =>
-                val4 =>
-                    val5 =>
-                        sum( val1, val2, val3, val4, val5 );
+    v1 =>
+        v2 =>
+            v3 =>
+                v4 =>
+                    v5 =>
+                        sum( v1, v2, v3, v4, v5 );
 ```
 
 And now, all on one line:
 
 ```js
-curriedSum = val1 => val2 => val3 => val4 => val5 => sum( val1, val2, val3, val4, val5 );
+curriedSum = v1 => v2 => v3 => v4 => v5 => sum( v1, v2, v3, v4, v5 );
 ```
 
 Depending on your perspective, that form of visualizing the curried function may be more or less helpful to you. For me, it's a fair bit more obscured.
@@ -687,7 +687,7 @@ But the reason I show it that way is that it happens to look almost identical to
 
 ### Why Currying and Partial Application?
 
-With either style -- currying (`sum(1)(2)(3)`) or partial application (`partial(sum,1,2)(3)`) -- the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we ever go this direction** when adopting FP? There are multiple layers to answering that question.
+With either style -- currying (such as `sum(1)(2)(3)`) or partial application (such as `partial(sum,1,2)(3)`) -- the call-site unquestionably looks stranger than a more common one like `sum(1,2,3)`. So **why would we ever go this direction** when adopting FP? There are multiple layers to answering that question.
 
 The first and most obvious reason is that both currying and partial application allow you to separate in time/space (throughout your codebase) when and where separate arguments are specified, whereas traditional function calls require all the arguments to be present at the same time. If you have a place in your code where you'll know some of the arguments and another place where the other arguments are determined, currying or partial application are very useful.
 
@@ -906,7 +906,7 @@ function bar(x,y,z) {
 }
 ```
 
-Just like the `spreadArgs(..)` utility earlier, we could define a `spreadArgProps(..)` helper that takes the `key: value` pairs out of an object argument and "spreads" the values out as individual arguments.
+Just like the `spreadArgs(..)` utility earlier, we can define a `spreadArgProps(..)` helper that takes the `key: value` pairs out of an object argument and "spreads" the values out as individual arguments.
 
 There are some quirks to be aware of, though. With `spreadArgs(..)`, we were dealing with arrays, where ordering is well defined and obvious. However, with objects, property order is less clear and not necessarily reliable. Depending on how an object is created and properties set, we cannot be absolutely certain what enumeration order properties would come out.
 
@@ -926,7 +926,7 @@ function spreadArgProps(
         .split( /\s*,\s*/ )
         .map( v => v.replace( /[=\s].*$/, "" ) )
 ) {
-    return function spreadFn(argsObj) {
+    return function spreadFn(argsObj){
         return fn( ...propOrder.map( k => argsObj[k] ) );
     };
 }

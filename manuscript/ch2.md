@@ -476,11 +476,11 @@ Remember our <code>f(x) = 2x<sup>2</sup> + 3</code> function from earlier in the
 ```js
 var y;
 
-function foo(x) {
+function f(x) {
     y = (2 * Math.pow( x, 2 )) + 3;
 }
 
-foo( 2 );
+f( 2 );
 
 y;                      // 11
 ```
@@ -488,16 +488,16 @@ y;                      // 11
 I know this is a silly example; we could just as easily have `return`d the value instead of setting it into `y` from within the function:
 
 ```js
-function foo(x) {
+function f(x) {
     return (2 * Math.pow( x, 2 )) + 3;
 }
 
-var y = foo( 2 );
+var y = f( 2 );
 
 y;                      // 11
 ```
 
-Both functions accomplish the same task. Is there any reason we should pick one over the other? **Yes, absolutely.**
+Both functions accomplish the same task, so is there any reason we should pick one version over the other? **Yes, absolutely.**
 
 One way to explain the difference is that the `return` in the latter version signals an explicit output, whereas the `y` assignment in the former is an implicit output. You may already have some intuition that guides you in such cases; typically, developers prefer explicit patterns over implicit ones.
 

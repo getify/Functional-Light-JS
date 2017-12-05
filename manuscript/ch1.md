@@ -11,7 +11,7 @@ Functional Programming (FP) is not a new concept by any means. It's been around 
 
 That's all changing, though. A groundswell of interest is growing around FP, not just at the languages level but even in libraries and frameworks. You very well might be reading this text because you've finally realized FP is something you can't ignore any longer. Or maybe you're like me and you've tried to learn FP many times before but struggled to wade through all the terms or mathematical notation.
 
-This first chapter's purpose is to answer questions like "Why should I use FP style with my code?" and "How does Functional-Light JavaScript compare to what others say about FP?" After we've layed that groundwork, in the next chapter and throughout the rest of the book we'll begin uncovering, piece by piece, the techniques and patterns of writing JS in Functional-Light style.
+This first chapter's purpose is to answer questions like "Why should I use FP style with my code?" and "How does Functional-Light JavaScript compare to what others say about FP?" After we've layed that groundwork, throughout the rest of the book we'll uncover, piece by piece, the techniques and patterns for writing JS in Functional-Light style.
 
 ## At a Glance
 
