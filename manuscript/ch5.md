@@ -733,7 +733,7 @@ Did you spot it?
 
 Is a side cause/effect that's unobserved like this tree:
 
-C> If a tree falls in the forest, but no one is around to hear it, does it still make a sound?
+C> *If a tree falls in the forest, but no one is around to hear it, does it still make a sound?*
 
 By the narrowest definition of referential transparency, I think you'd have to say `calculateAverage(..)` is still a pure function. However, because we're trying to avoid a strictly academic approach in favor of balancing it with pragmatism, I also think this conclusion needs more perspective. Let's explore.
 
@@ -814,7 +814,7 @@ That last sentence may seem like a subtle point, but actually I think it might b
 
 Recall this philosophical musing:
 
-C> If a tree falls in the forest, but no one is around to hear it, does it still make a sound?
+C> *If a tree falls in the forest, but no one is around to hear it, does it still make a sound?*
 
 Going with the metaphor, what I'm getting at is: whether the sound is made or not, it would be better if we never create a scenario where the tree can fall without us being around; we'll always hear the sound when a tree falls.
 
