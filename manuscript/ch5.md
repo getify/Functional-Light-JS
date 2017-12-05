@@ -307,7 +307,13 @@ This function mutates an object via reference by incrementing `obj.count`, so it
 
 From the mathematical point of view, idempotence means an operation whose output won't ever change after the first call, if you feed that output back into the operation over and over again. In other words, `foo(x)` would produce the same output as `foo(foo(x))` and `foo(foo(foo(x)))`.
 
-A typical mathematical example is `Math.abs(..)` (absolute value). `Math.abs(-2)` is `2`, which is the same result as `Math.abs(Math.abs(Math.abs(Math.abs(-2))))`. Other mathematical utilities like `Math.min(..)`, `Math.max(..)`, `Math.round(..)`, `Math.floor(..)`, and `Math.ceil(..)` are all idempotent.
+A typical mathematical example is `Math.abs(..)` (absolute value). `Math.abs(-2)` is `2`, which is the same result as `Math.abs(Math.abs(Math.abs(Math.abs(-2))))`. Other idempotent mathematical utilities include:
+
+* `Math.min(..)`
+* `Math.max(..)`
+* `Math.round(..)`
+* `Math.floor(..)`
+* `Math.ceil(..)`
 
 Some custom mathematical operations we could define with this same characteristic:
 
