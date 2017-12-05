@@ -51,6 +51,8 @@ A basic primitive monad underlying many other monads you will run across is call
 
 Since a monad is a type, you might think we'd define `Just` as a class to be instantiated. That's a valid way of doing it, but it introduces `this`-binding issues in the methods that I don't want to juggle; instead, I'm going to stick with just a simple function approach.
 
+{pagebreak}
+
 Here's a basic implementation:
 
 ```js
@@ -97,7 +99,7 @@ Monadic `chain(..)` kinda does the same thing as `map(..)`, but then it sort of 
 var A = Just( 10 );
 var eleven = A.chain( v => v + 1 );
 
-eleven;                 // 11
+eleven;                     // 11
 typeof eleven;              // "number"
 ```
 
@@ -114,7 +116,7 @@ flatMap( v => [v,v+1], x );     // [3,4]
 
 See the difference? The mapper function `v => [v,v+1]` results in a `[3,4]` array, which ends up in the single first position of the outer array, so we get `[[3,4]]`. But `flatMap(..)` flattens out the inner array into the outer array, so we get just `[3,4]` instead.
 
-That's the same kind of thing going on with a monad's `chain(..)` (aka `flatMap(..)`). Instead of getting a monad holding the value as `map(..)` does, `chain(..)` additionally flattens the monad into the underlying value. Actually, instead of creating that intermediate monad only to immediately flatten it, `chain(..)` is generally implemented more performantly to just take a shortcut and not create the monad in the first place. Either way, the end result is the same.
+That's the same kind of thing going on with a monad's `chain(..)` (often referred to as `flatMap(..)`). Instead of getting a monad holding the value as `map(..)` does, `chain(..)` additionally flattens the monad into the underlying value. Actually, instead of creating that intermediate monad only to immediately flatten it, `chain(..)` is generally implemented more performantly to just take a shortcut and not create the monad in the first place. Either way, the end result is the same.
 
 One way to illustrate `chain(..)` in this manner is in combination with the `identity(..)` utility (see [Chapter 3](ch3.md/#one-on-one)), to effectively extract a value from a monad:
 
@@ -150,7 +152,7 @@ Now, how could we make a new monad where the values `10` and `3` had been added 
 
 To use `ap(..)`, we said we first need to construct a monad that holds a function. Specifically, we need one that holds a function that itself holds (remembers via closure) the value in `A`. Let that sink in for a moment.
 
-To make a monad from `A` that holds a value-containing function, we'll call `A.map(..)`, giving it a curried function that "remembers" that extracted value (see [Chapter 3](ch3.md/#one-at-a-time)) as its first argument. We'll call this new function-containing monad `C`:
+To make a monad from `A` that holds a value-containing function, we call `A.map(..)`, giving it a curried function that "remembers" that extracted value (see [Chapter 3](ch3.md/#one-at-a-time)) as its first argument. We'll call this new function-containing monad `C`:
 
 ```js
 function sum(x,y) { return x + y; }
@@ -358,6 +360,8 @@ frank.map( teamMembers ).ap( bob );
 
 `teamMembers(..)` never gets called (and no message is printed), because `frank` is a `Nothing()` instance. That's the power of the Maybe monad, and our `MaybeHumble(..)` factory allows us to select based on the ego level. Cool!
 
+{pagebreak}
+
 ### Humility
 
 One more example to illustrate the behaviors of our Maybe+Humble data structure:
@@ -390,6 +394,8 @@ learner
 
 Unfortunately, the learning process seems to have been cut short. You see, I've found that learning a bunch of stuff without sharing with others inflates your ego too much and is not good for your skills.
 
+{pagebreak}
+
 Let's try a better approach to learning:
 
 ```js
@@ -420,10 +426,8 @@ Sharing while you learn. That's the best way to learn more and learn better.
 
 ## Summary
 
-What is a monad, anyway?
+What is a monad, anyway? A monad is a value type, an interface, an object data structure with encapsulated behaviors.
 
-A monad is a value type, an interface, an object data structure with encapsulated behaviors.
-
-But none of those definitions are particularly useful. Here's an attempt at something better: a monad is how you organize behavior around a value in a more declarative way.
+But none of those definitions are particularly useful. Here's an attempt at something better: **a monad is how you organize behavior around a value in a more declarative way.**
 
 As with everything else in this book, use monads where they are helpful but don't use them just because everyone else talks about them in FP. Monads aren't a universal silver bullet, but they do offer some utility when used conservatively.
