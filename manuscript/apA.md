@@ -309,8 +309,6 @@ But this is actually necessary to get to the next step of our derivation. Rememb
 
 This step is the trickiest of all to visualize. So read slowly and pay close attention here.
 
-{pagebreak}
-
 Let's consider the curried functions from earlier, but without the `listCombine(..)` function having been passed in to each:
 
 ```js

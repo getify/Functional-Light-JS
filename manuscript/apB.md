@@ -51,8 +51,6 @@ A basic primitive monad underlying many other monads you will run across is call
 
 Since a monad is a type, you might think we'd define `Just` as a class to be instantiated. That's a valid way of doing it, but it introduces `this`-binding issues in the methods that I don't want to juggle; instead, I'm going to stick with just a simple function approach.
 
-{pagebreak}
-
 Here's a basic implementation:
 
 ```js
@@ -207,8 +205,6 @@ It's very common in FP material to cover well-known monads like Maybe. Actually,
 
 We've already seen Just; Nothing is a monad that holds an empty value. Maybe is a monad that either holds a Just or an Empty.
 
-{pagebreak}
-
 Here's a minimal implementation of Maybe:
 
 ```js
@@ -362,8 +358,6 @@ frank.map( teamMembers ).ap( bob );
 
 `teamMembers(..)` never gets called (and no message is printed), because `frank` is a `Nothing()` instance. That's the power of the Maybe monad, and our `MaybeHumble(..)` factory allows us to select based on the ego level. Cool!
 
-{pagebreak}
-
 ### Humility
 
 One more example to illustrate the behaviors of our Maybe+Humble data structure:
@@ -395,8 +389,6 @@ learner
 ```
 
 Unfortunately, the learning process seems to have been cut short. You see, I've found that learning a bunch of stuff without sharing with others inflates your ego too much and is not good for your skills.
-
-{pagebreak}
 
 Let's try a better approach to learning:
 
