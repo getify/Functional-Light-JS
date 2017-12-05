@@ -259,7 +259,7 @@ Additionally, we reinforce that notion with the `restNums.length > 0` guard, bec
 
 Next, we turn our attention to checking `num1` against `maxRest` -- the main logic of the algorithm is how to determine which of two numbers, if any, is a max-even. If `num1` is not even (`num1 % 2 != 0`), or it's less than `maxRest`, then `maxRest` *has* to be `return`ed, even if it's `undefined`. Otherwise, `num1` is the answer.
 
-The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` approach.
+The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` version.
 
 **Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see [Chapter 9](ch9.md)), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
 
