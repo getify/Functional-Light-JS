@@ -283,8 +283,8 @@ var curriedMapReducer =
         };
     } );
 
-var curriedFilterReducer = curry(
-    function filterReducer(predicateFn,combinerFn){
+var curriedFilterReducer =
+    curry( function filterReducer(predicateFn,combinerFn){
         return function reducer(list,val){
             if (predicateFn( val )) return combinerFn( list, val );
             return list;
@@ -306,6 +306,8 @@ But this is actually necessary to get to the next step of our derivation. Rememb
 ### Composing Curried
 
 This step is the trickiest of all to visualize. So read slowly and pay close attention here.
+
+{pagebreak}
 
 Let's consider the curried functions from earlier, but without the `listCombine(..)` function having been passed in to each:
 
@@ -547,14 +549,15 @@ Clearing our brains for a minute, let's turn our attention back to just using tr
 Recall the helpers we defined earlier; let's rename them for clarity:
 
 ```js
-var transduceMap = curry( function mapReducer(mapperFn,combinerFn){
-    return function reducer(list,v){
-        return combinerFn( list, mapperFn( v ) );
-    };
-} );
+var transduceMap =
+    curry( function mapReducer(mapperFn,combinerFn){
+        return function reducer(list,v){
+            return combinerFn( list, mapperFn( v ) );
+        };
+    } );
 
-var transduceFilter = curry(
-    function filterReducer(predicateFn,combinerFn){
+var transduceFilter =
+    curry( function filterReducer(predicateFn,combinerFn){
         return function reducer(list,v){
             if (predicateFn( v )) return combinerFn( list, v );
             return list;
@@ -625,7 +628,7 @@ I> ## Note
 I>
 I> The preceding snippet uses `transformers.comp(..)` because the library provides it, but in this case our [`compose(..)` from Chapter 4](#ch4generalcompose) would produce the same outcome. In other words, composition itself isn't a transducing-sensitive operation.
 
-The composed function in this snippet is named `transformer` instead of `transducer`. That's because if we call `transformer(listCombine)` (or `transformer(strConcat)`), we won't get a straight-up transduce-reducer function as earlier.
+The composed function in this snippet is named `transformer` instead of `transducer`. That's because if we call `transformer( listCombine )` (or `transformer( strConcat )`), we won't get a straight-up transduce-reducer function as earlier.
 
 `transducers.map(..)` and `transducers.filter(..)` are special helpers that adapt regular predicate or mapper functions into functions that produce a special transform object (with the transducer function wrapped underneath); the library uses these transform objects for transducing. The extra capabilities of this transform object abstraction are beyond what we'll explore, so consult the library's documentation for more information.
 
