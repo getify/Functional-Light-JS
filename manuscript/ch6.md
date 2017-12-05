@@ -226,7 +226,7 @@ Typically, blocks are considered best designed to be only a few lines long. If y
 
 No other part of the program can ever affect the assignment of `x`. **Period.**
 
-My claims is that program has basically the same magnitude of readability as this one:
+My claim is that program has basically the same magnitude of readability as this one:
 
 ```js
 // lots of code
