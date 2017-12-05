@@ -531,7 +531,7 @@ Instead of taking all the arguments at once (like `ajax(..)`), or some of the ar
 
 Currying is similar to partial application in that each successive curried call partially applies another argument to the original function, until all arguments have been passed.
 
-The main difference is that `curriedAjax(..)` will return a function (we call it  `personFetcher(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
+The main difference is that `curriedAjax(..)` will return a function (we call it `personFetcher(..)`) that expects **only the next argument** `data`, not one that (like the earlier `getPerson(..)`) can receive all the rest of the arguments.
 
 If an original function expected five arguments, the curried form of that function would take just the first argument, and return a function to accept the second. That one would take just the second argument, and return a function to accept the third. And so on.
 
