@@ -93,7 +93,7 @@ This prime checking basically works by trying each integer from `2` up to the sq
 
 One of the most famous examples of recursion is calculating a Fibonacci number, where the sequence is defined as:
 
-```
+```txt
 fib( 0 ): 0
 fib( 1 ): 1
 fib( n ):
@@ -210,7 +210,7 @@ This implementation is not particularly intractable, but it's also not readily a
 
 Let's instead consider a recursive approach, to compare. We could notate the recursion this way:
 
-```
+```txt
 maxEven( nums ):
     maxEven( nums.0, maxEven( ...nums.1 ) )
 ```
