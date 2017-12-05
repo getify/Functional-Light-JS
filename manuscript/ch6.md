@@ -443,6 +443,8 @@ Unfortunately, for historical reasons, quite a few other array methods are impur
 
 It should not be seen as *forbidden* to use these kinds of utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
 
+<a name="hiddenmutation"></a>
+
 Recall one of the implementations of [`compose(..)` from Chapter 4](ch4.md/#user-content-generalcompose):
 
 ```js
