@@ -188,7 +188,7 @@ We can define a helper to adapt a function so that it spreads out a single recei
 {id="ch3spreadargs"}
 ```js
 function spreadArgs(fn) {
-    return function spreadFn(argsArr) {
+    return function spreadFn(argsArr){
         return fn( ...argsArr );
     };
 }
@@ -216,7 +216,7 @@ While we're talking about a `spreadArgs(..)` utility, let's also define a utilit
 
 ```js
 function gatherArgs(fn) {
-    return function gatheredFn(...argsArr) {
+    return function gatheredFn(...argsArr){
         return fn( argsArr );
     };
 }
@@ -1096,7 +1096,7 @@ var isLongEnough = not( isShortEnough );
 printIf( isLongEnough, msg2 );          // Hello World
 ```
 
-That's pretty good, isn't it? But we *could* keep going. The definition of the `printIf(..)` function can actually be refactored to be point-free itself.
+That's pretty good, isn't it? But we *could* keep going. `printIf(..)` could be refactored to be point-free itself.
 
 We can express the `if` conditional part with a `when(..)` utility:
 
@@ -1119,7 +1119,7 @@ var when =
 Let's mix `when(..)` with a few other helper utilities we've seen earlier in this chapter, to make the point-free `printIf(..)`:
 
 ```js
-var printIf = uncurry( rightPartial( when, output ) );
+var printIf = uncurry( partialRight( when, output ) );
 ```
 
 Here's how we did it: we right-partially-applied the `output` method as the second (`fn`) argument for `when(..)`, which leaves us with a function still expecting the first argument (`predicate`). *That* function when called produces another function expecting the message string; it would look like this: `fn(predicate)(str)`.
