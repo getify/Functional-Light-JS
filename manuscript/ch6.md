@@ -223,7 +223,7 @@ Typically, blocks are considered best designed to be only a few lines long. If y
 
 No other part of the program can ever affect the assignment of `x`. **Period.**
 
-My claims is that program has basically the same magnitude of readability as this one:
+My claim is that program has basically the same magnitude of readability as this one:
 
 ```js
 // lots of code
@@ -446,6 +446,7 @@ Unfortunately, for historical reasons, quite a few other array methods are impur
 
 It should not be seen as *forbidden* to use these kinds of utilities, as some claim. For reasons such as performance optimization, sometimes you will want to use them. But you should never use such a method on an array value that is not already local to the function you're working in, to avoid creating a side effect on some other remote part of the code.
 
+{id="ch6hiddenmutation"}
 Recall one of the implementations of [`compose(..)` from Chapter 4](#ch4generalcompose):
 
 ```js
