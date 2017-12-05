@@ -672,7 +672,8 @@ Now for the object (and `this`) approach:
 
 ```js
 function StudentRecord(){
-    return `${this.name}, Major: ${this.major}, GPA: ${this.gpa.toFixed(1)}`;
+    return `${this.name}, Major: ${this.major}, \
+GPA: ${this.gpa.toFixed(1)}`;
 }
 
 var student = StudentRecord.bind( {

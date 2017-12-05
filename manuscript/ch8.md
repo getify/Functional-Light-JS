@@ -93,7 +93,7 @@ This prime checking basically works by trying each integer from `2` up to the sq
 
 One of the most famous examples of recursion is calculating a Fibonacci number, where the sequence is defined as:
 
-```
+```txt
 fib( 0 ): 0
 fib( 1 ): 1
 fib( n ):
@@ -210,7 +210,7 @@ This implementation is not particularly intractable, but it's also not readily a
 
 Let's instead consider a recursive approach, to compare. We could notate the recursion this way:
 
-```
+```txt
 maxEven( nums ):
     maxEven( nums.0, maxEven( ...nums.1 ) )
 ```
@@ -259,7 +259,7 @@ Additionally, we reinforce that notion with the `restNums.length > 0` guard, bec
 
 Next, we turn our attention to checking `num1` against `maxRest` -- the main logic of the algorithm is how to determine which of two numbers, if any, is a max-even. If `num1` is not even (`num1 % 2 != 0`), or it's less than `maxRest`, then `maxRest` *has* to be `return`ed, even if it's `undefined`. Otherwise, `num1` is the answer.
 
-The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` approach.
+The case I'm making is that this reasoning while reading an implementation is more straightforward, with fewer nuances or noise to distract us, than the imperative approach; it's **more declarative** than the `for`-loop with `-Infinity` version.
 
 **Tip:** We should point out that another (likely better!) way to model this besides manual iteration or recursion would be with list operations (see [Chapter 9](ch9.md)), with a `filter(..)` to include only evens and then a `reduce(..)` to find the max. We only used this example to illustrate the more declarative nature of recursion over manual iteration.
 

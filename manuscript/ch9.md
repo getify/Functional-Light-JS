@@ -675,8 +675,8 @@ flatten(
     firstNames
     .map( entry => [ entry.name, ...entry.variations ] )
 );
-// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
-//  "Fred","Freddy"]
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy",
+//  "Frederick","Fred","Freddy"]
 ```
 
 Besides being slightly more verbose, the disadvantage of doing the `map(..)` and `flatten(..)` as separate steps is primarily around performance; this approach processes the list twice, and creates an intermediate list that's then thrown away.
@@ -685,8 +685,8 @@ FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) th
 
 ```js
 flatMap( entry => [ entry.name, ...entry.variations ], firstNames );
-// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
-//  "Fred","Freddy"]
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy",
+//  "Frederick","Fred","Freddy"]
 ```
 
 The naive implementation of `flatMap(..)` with both steps done separately:
@@ -1503,7 +1503,7 @@ BinaryTree.reduce(
 // ["avocado","cucumber"]
 ```
 
-**Note:** We aren't making any effort to rebalance a tree after any of the `map`/`reduce`/`filter` operations on BSTs. Technically, this means the results are not themselves binary *search* trees. Most JS values have a reasonable less-than operation (`<`) by which we could rebalance such a tree, but some values (like promises) wouldn't have any such definition. For the sake of keeping this chapter practical in length, we'll punt on handling this complication.
+**Note:** We aren't making any effort to rebalance a tree after any of the `map`/`reduce`/`filter` operations on BSTs. Technically, this means the results are not themselves binary *search* trees. Most JS values have a reasonable less-than comparison operation (`<`) by which we could rebalance such a tree, but some values (like promises) wouldn't have any such definition. For the sake of keeping this chapter practical in length, we'll punt on handling this complication.
 
 You will likely use most of the list operations from this chapter in the context of simple arrays. But now we've seen that the concepts apply to whatever data structures and operations you might need. That's a powerful expression of how FP can be widely applied to many different application scenarios!
 

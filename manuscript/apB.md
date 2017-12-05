@@ -97,7 +97,7 @@ Monadic `chain(..)` kinda does the same thing as `map(..)`, but then it sort of 
 var A = Just( 10 );
 var eleven = A.chain( v => v + 1 );
 
-eleven;                 // 11
+eleven;                     // 11
 typeof eleven;              // "number"
 ```
 
@@ -114,7 +114,7 @@ flatMap( v => [v,v+1], x );     // [3,4]
 
 See the difference? The mapper function `v => [v,v+1]` results in a `[3,4]` array, which ends up in the single first position of the outer array, so we get `[[3,4]]`. But `flatMap(..)` flattens out the inner array into the outer array, so we get just `[3,4]` instead.
 
-That's the same kind of thing going on with a monad's `chain(..)` (aka `flatMap(..)`). Instead of getting a monad holding the value as `map(..)` does, `chain(..)` additionally flattens the monad into the underlying value. Actually, instead of creating that intermediate monad only to immediately flatten it, `chain(..)` is generally implemented more performantly to just take a shortcut and not create the monad in the first place. Either way, the end result is the same.
+That's the same kind of thing going on with a monad's `chain(..)` (often referred to as `flatMap(..)`). Instead of getting a monad holding the value as `map(..)` does, `chain(..)` additionally flattens the monad into the underlying value. Actually, instead of creating that intermediate monad only to immediately flatten it, `chain(..)` is generally implemented more performantly to just take a shortcut and not create the monad in the first place. Either way, the end result is the same.
 
 One way to illustrate `chain(..)` in this manner is in combination with the `identity(..)` utility (see [Chapter 3](ch3.md/#one-on-one)), to effectively extract a value from a monad:
 
@@ -150,7 +150,7 @@ Now, how could we make a new monad where the values `10` and `3` had been added 
 
 To use `ap(..)`, we said we first need to construct a monad that holds a function. Specifically, we need one that holds a function that itself holds (remembers via closure) the value in `A`. Let that sink in for a moment.
 
-To make a monad from `A` that holds a value-containing function, we'll call `A.map(..)`, giving it a curried function that "remembers" that extracted value (see [Chapter 3](ch3.md/#one-at-a-time)) as its first argument. We'll call this new function-containing monad `C`:
+To make a monad from `A` that holds a value-containing function, we call `A.map(..)`, giving it a curried function that "remembers" that extracted value (see [Chapter 3](ch3.md/#one-at-a-time)) as its first argument. We'll call this new function-containing monad `C`:
 
 ```js
 function sum(x,y) { return x + y; }
@@ -251,7 +251,7 @@ Maybe.of( someObj )
 
 In other words, if at any point in the chain we get a `null`/`undefined` value, the Maybe magically switches into no-op mode -- it's now a `Nothing()` monad instance! -- and stops doing anything for the rest of the chain. That makes the nested-property access safe against throwing JS exceptions if some property is missing/empty. That's cool, and a nice helpful abstraction for sure!
 
-But... that approach to Maybe is not a pure monad.
+But... ***that approach to Maybe is not a pure monad.***
 
 The core spirit of a Monad says that it must be valid for all values and cannot do any inspection of the value, at all -- not even a null check. So those other implementations are cutting corners for the sake of convenience. It's not a huge deal, but when it comes to learning something, you should probably learn it in its purest form first before you go bending the rules.
 
@@ -420,10 +420,8 @@ Sharing while you learn. That's the best way to learn more and learn better.
 
 ## Summary
 
-What is a monad, anyway?
+What is a monad, anyway? A monad is a value type, an interface, an object data structure with encapsulated behaviors.
 
-A monad is a value type, an interface, an object data structure with encapsulated behaviors.
-
-But none of those definitions are particularly useful. Here's an attempt at something better: a monad is how you organize behavior around a value in a more declarative way.
+But none of those definitions are particularly useful. Here's an attempt at something better: **a monad is how you organize behavior around a value in a more declarative way.**
 
 As with everything else in this book, use monads where they are helpful but don't use them just because everyone else talks about them in FP. Monads aren't a universal silver bullet, but they do offer some utility when used conservatively.

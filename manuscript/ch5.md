@@ -200,13 +200,16 @@ function fetchUserData(userId) {
 }
 
 function fetchOrders(userId) {
-    ajax( `http://some.api/orders/${userId}`, function onOrders(orders){
-        for (let order of orders) {
-            // keep a reference to latest order for each user
-            users[userId].latestOrder = order;
-            userOrders[orders[i].orderId] = order;
+    ajax(
+        `http://some.api/orders/${userId}`,
+        function onOrders(orders){
+            for (let order of orders) {
+                // keep a reference to latest order for each user
+                users[userId].latestOrder = order;
+                userOrders[orders[i].orderId] = order;
+            }
         }
-    } );
+    );
 }
 
 function deleteOrder(orderId) {
@@ -218,19 +221,22 @@ function deleteOrder(orderId) {
         hideLatestOrderDisplay();
     }
 
-    ajax( `http://some.api/delete/${orderId}`, function onDelete(success){
-        if (success) {
-            // deleted the latest order for a user?
-            if (isLatestOrder) {
-                user.latestOrder = null;
-            }
+    ajax(
+        `http://some.api/delete/order/${orderId}`,
+        function onDelete(success){
+            if (success) {
+                // deleted the latest order for a user?
+                if (isLatestOrder) {
+                    user.latestOrder = null;
+                }
 
-            userOrders[orderId] = null;
+                userOrders[orderId] = null;
+            }
+            else if (isLatestOrder) {
+                showLatestOrderDisplay();
+            }
         }
-        else if (isLatestOrder) {
-            showLatestOrderDisplay();
-        }
-    } );
+    );
 }
 ```
 
@@ -264,7 +270,7 @@ The bug: the data (state) *might* now be out of sync. `latestOrder` will be unse
 
 The worst part of this kind of bug is that you don't get a program-crashing exception like we did with the other bug. We just simply have state that is incorrect; our application's behavior is "silently" broken.
 
-The sequencing dependency between `fetchUserData(..)` and `fetchOrders(..)` is fairly obvious, and straightforwardly addressed. But it's far less clear that there's a potential sequencing dependency between `fetchOrders(..)` and `deleteOrder(..)`. These two seem to be more independent. And ensuring that their order is preserved is more tricky, because you don't know in advance (before the results from `fetchOrders(..)`) whether that sequencing really must be enforced.
+The sequencing dependency between `fetchUserData(..)` and `fetchOrders(..)` is fairly obvious, and straightforwardly addressed. But the potential sequencing dependency between `fetchOrders(..)` and `deleteOrder(..)` is far less obvious. These two seem to be more independent. And ensuring that their order is preserved is more tricky, because you don't know in advance (before the results from `fetchOrders(..)`) whether that sequencing really must be enforced.
 
 Yes, you can recompute the `isLatestOrder` flag once `deleteOrder(..)` fires. But now you have a different problem: your UI state can be out of sync.
 
@@ -301,7 +307,13 @@ This function mutates an object via reference by incrementing `obj.count`, so it
 
 From the mathematical point of view, idempotence means an operation whose output won't ever change after the first call, if you feed that output back into the operation over and over again. In other words, `foo(x)` would produce the same output as `foo(foo(x))` and `foo(foo(foo(x)))`.
 
-A typical mathematical example is `Math.abs(..)` (absolute value). `Math.abs(-2)` is `2`, which is the same result as `Math.abs(Math.abs(Math.abs(Math.abs(-2))))`. Utilities like `Math.min(..)`, `Math.max(..)`, `Math.round(..)`, `Math.floor(..)`, and `Math.ceil(..)` are all idempotent.
+A typical mathematical example is `Math.abs(..)` (absolute value). `Math.abs(-2)` is `2`, which is the same result as `Math.abs(Math.abs(Math.abs(Math.abs(-2))))`. Other idempotent mathematical utilities include:
+
+* `Math.min(..)`
+* `Math.max(..)`
+* `Math.round(..)`
+* `Math.floor(..)`
+* `Math.ceil(..)`
 
 Some custom mathematical operations we could define with this same characteristic:
 
@@ -748,7 +760,7 @@ This silly `specialNumber(..)` algorithm is deterministic and thus pure from the
 
 However, the function has to do quite a bit of work to calculate some of the bigger numbers, especially the `987654321` input. If we needed to get that particular special number multiple times throughout our program, the `cache`ing of the result means that subsequent calls are far more efficient.
 
-Don't be so quick to assume that you could just run the `specialNumber(987654321)` calculation once and manually stick that result in some variable/constant. Programs are often highly modularized and globally accessible scopes are not usually the way you want to go around sharing state between those independent pieces. Having `specialNumber(..)` do its own caching (even though it happens to be using a global variable to do so!) is a more preferable abstraction of that state sharing.
+Don't be so quick to assume that you could just run the calculation `specialNumber(987654321)` once and manually stick that result in some variable/constant. Programs are often highly modularized and globally accessible scopes are not usually the way you want to share state between those independent pieces. Having `specialNumber(..)` do its own caching (even though it happens to be using a global variable to do so!) is a more preferable abstraction of that state sharing.
 
 The point is that if `specialNumber(..)` is the only part of the program that accesses and updates the `cache` side cause/effect, the referential transparency perspective observably holds true, and this might be seen as an acceptable pragmatic "cheat" of the pure function ideal.
 
@@ -875,9 +887,12 @@ function safer_fetchUserData(userId,users) {
 
     // original untouched impure function:
     function fetchUserData(userId) {
-        ajax( `http://some.api/user/${userId}`, function onUserData(user){
-            users[userId] = user;
-        } );
+        ajax(
+            `http://some.api/user/${userId}`,
+            function onUserData(user){
+                users[userId] = user;
+            }
+        );
     }
 }
 ```
