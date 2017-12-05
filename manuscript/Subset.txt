@@ -1,3 +1,3 @@
-ch4.md
-ch5.md
-ch6.md
+ch7.md
+ch8.md
+ch9.md
