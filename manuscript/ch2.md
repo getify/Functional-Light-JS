@@ -432,9 +432,7 @@ function foo(x) {
 
 Pop quiz: without cheating and running this code in your browser, what does `foo(2)` return? What about `foo(4)`? And `foo(8)`? And `foo(12)`?
 
-| |
-
-----
+{pagebreak}
 
 How confident are you in your answers? How much mental tax did you pay to get those answers? I got it wrong the first two times I tried to think it through, and I wrote it!
 
@@ -489,11 +487,11 @@ Remember our {$$}f(x) = 2x^2 + 3{/$$} function from earlier in the chapter? We c
 ```js
 var y;
 
-function foo(x) {
+function f(x) {
     y = (2 * Math.pow( x, 2 )) + 3;
 }
 
-foo( 2 );
+f( 2 );
 
 y;                      // 11
 ```
@@ -501,16 +499,16 @@ y;                      // 11
 I know this is a silly example; we could just as easily have `return`d the value instead of setting it into `y` from within the function:
 
 ```js
-function foo(x) {
+function f(x) {
     return (2 * Math.pow( x, 2 )) + 3;
 }
 
-var y = foo( 2 );
+var y = f( 2 );
 
 y;                      // 11
 ```
 
-Both functions accomplish the same task. Is there any reason we should pick one over the other? **Yes, absolutely.**
+Both functions accomplish the same task, so is there any reason we should pick one version over the other? **Yes, absolutely.**
 
 One way to explain the difference is that the `return` in the latter version signals an explicit output, whereas the `y` assignment in the former is an implicit output. You may already have some intuition that guides you in such cases; typically, developers prefer explicit patterns over implicit ones.
 
