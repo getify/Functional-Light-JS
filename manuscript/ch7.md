@@ -726,9 +726,7 @@ I just want to reiterate: these performance observations are not absolutes, and 
 
 ## Summary
 
-C> *The truth of this chapter cannot be written out.*
-C>
-C> *One must read this chapter to find its truth.*
+> The truth of this chapter cannot be written out. One must read this chapter to find its truth.
 
 Coining some Zen wisdom here was my attempt at being clever. But you deserve a proper summary of this chapter's message.
 
