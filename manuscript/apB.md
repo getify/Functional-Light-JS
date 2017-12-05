@@ -9,7 +9,7 @@ We're basically ending this book with a brief glimpse at monads, whereas most ot
 
 There's a bit of a joke around the JavaScript FP world that pretty much everybody has to write their own tutorial or blog post on what a monad is, like the writing of it alone is some rite of passage. Over the years, monads have variously been depicted as burritos, onions, and all sorts of other wacky conceptual abstractions. I hope there's none of that silly business going on here!
 
-> A monad is just a monoid in the category of endofunctors.
+C> *A monad is just a monoid in the category of endofunctors.*
 
 We started the preface with this quote, so it seems fitting we come back to it here. But no, we won't be talking about monoids, endofunctors, or category theory. That quote is not only condescending, but totally unhelpful.
 
@@ -206,6 +206,8 @@ If the *how* of this discussion on monad methods is unclear so far, go back and 
 It's very common in FP material to cover well-known monads like Maybe. Actually, the Maybe monad is a particular pairing of two other simpler monads: Just and Nothing.
 
 We've already seen Just; Nothing is a monad that holds an empty value. Maybe is a monad that either holds a Just or an Empty.
+
+{pagebreak}
 
 Here's a minimal implementation of Maybe:
 
