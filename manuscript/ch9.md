@@ -292,7 +292,7 @@ If you described the `[1,3,5]` result, would you say, "I filtered out the even n
 
 I personally find this semantic confusing. There's no question there's plenty of precedent for experienced developers. But if you just start with a fresh slate, this expression of the logic seems kinda like not speaking without a double negative -- aka, speaking with a double negative.
 
-We could make this easier by renaming the function from `isOdd(..)` to `isEven(..)`:
+We could make this easier by renaming `isOdd(..)` to `isEven(..)`:
 
 ```js
 var isEven = v => v % 2 == 1;
@@ -1090,7 +1090,7 @@ The result of this mapping is an array of functions that are ready to compose (a
 )
 ```
 
-Next, let's observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
+Next, observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
@@ -1543,7 +1543,7 @@ Three common and powerful list operations we looked at:
 * `filter(..)`: Selects or excludes values as it projects them to a new list.
 * `reduce(..)`: Combines values in a list to produce some other (usually but not always non-list) value.
 
-Other more advanced operations that can be very useful in processing lists: `unique(..)`, `flatten(..)`, and `merge(..)`.
+Other more advanced operations that are useful in processing lists: `unique(..)`, `flatten(..)`, and `merge(..)`.
 
 Fusion uses function composition techniques to consolidate multiple adjacent `map(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
 
