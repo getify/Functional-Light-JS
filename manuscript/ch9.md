@@ -1070,7 +1070,7 @@ The result of this mapping is an array of functions that are ready to compose (a
 )
 ```
 
-Next, observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
+Next, let's observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
@@ -1086,7 +1086,7 @@ var mergeReducer =
         (merged.splice( idx * 2, 0, v ), merged);
 ```
 
-We can use `reduce(..)` (our Swiss Army knife, remember!?) to "insert" `lookupUser(..)` in the array between the generated `getSessionId(..)` and `getUserId(..)` functions, by merging two lists:
+We can use `reduce(..)` (our Swiss Army knife, remember!?) to "insert" `lookupUser(..)` in the array between the generated functions `getSessionId(..)` and `getUserId(..)`, by merging two lists:
 
 ```js
 .reduce( mergeReducer, [ lookupUser ] )
@@ -1517,6 +1517,6 @@ Three common and powerful list operations we looked at:
 
 Other more advanced operations that are useful in processing lists: `unique(..)`, `flatten(..)`, and `merge(..)`.
 
-Fusion uses function composition techniques to consolidate multiple adjacent `map(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
+Fusion uses function composition to consolidate multiple adjacent `map(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
 
 Lists are typically visualized as arrays, but can be generalized as any data structure that represents/produces an ordered collection of values. As such, all these "list operations" are actually "data structure operations".
