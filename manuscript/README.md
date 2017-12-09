@@ -1,6 +1,6 @@
 # Functional-Light JavaScript
 
-<a href="https://leanpub.com/fljs"><img src="images/marketing/book-cover-small.png" width="20%"></a>
+<a href="https://leanpub.com/fljs"><img src="images/marketing/front-cover-small.png" width="20%"></a>
 
 [![Buy on Leanpub](https://img.shields.io/badge/Buy-Leanpub-yellow.svg)](https://leanpub.com/fljs)
 
