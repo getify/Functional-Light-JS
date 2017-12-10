@@ -1503,6 +1503,7 @@ BinaryTree.filter = function filter(predicateFn,node){
     }
 };
 ```
+
 The majority of this code listing is dedicated to handling the shifting of a node's parent/child references if it's "removed" (filtered out) of the duplicated tree structure.
 
 As an example to illustrate using `filter(..)`, let's narrow our produce tree down to only vegetables:
