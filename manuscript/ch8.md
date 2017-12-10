@@ -340,7 +340,7 @@ function baz() {
 baz();
 ```
 
-Visualizing this program's stack frame step by step:
+Visualizing this program's stack frames step by step:
 
 <p align="center">
     <img src="images/fig15.png" width="80%">
@@ -404,7 +404,7 @@ return x;
 return 1 + foo( .. );
 ```
 
-**Note:** A JS engine, or a smart transpiler, *could* do some code reorganization to realize that `var x = foo(); return x;` is effectively the same as `return foo();`, which would then make it eligible as PTC. But that is not required by the specification.
+**Note:** A JS engine, or a smart transpiler, *could* do some code reorganization to treat `var x = foo(); return x;` effectively the same as `return foo();`, which would then make it eligible for PTC. But that is not required by the specification.
 
 The `1 +` part is definitely processed *after* `foo(..)` finishes, so the stack frame has to be kept around.
 
