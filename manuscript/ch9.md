@@ -1237,7 +1237,7 @@ The important part to maintain in the spirit of FP is that these operators must 
 
 <img src="images/fig7.png" align="left" width="20%" hspace="20" vspace="20">
 
-Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has at most two references to other nodes (themselves binary trees), typically referred to as *left* and *right* child trees. Each node in the tree holds one value of the overall data structure:
+Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has at most two references to other nodes (themselves binary trees), typically referred to as *left* and *right* child trees. Each node in the tree holds one value of the overall data structure.
 
 For ease of illustration, we'll make our binary tree a binary search tree (BST). However, the operations we'll identify work the same for any regular non-BST binary tree.
 
@@ -1479,6 +1479,7 @@ BinaryTree.filter = function filter(predicateFn,node){
     }
 };
 ```
+
 The majority of this code listing is dedicated to handling the shifting of a node's parent/child references if it's "removed" (filtered out) of the duplicated tree structure.
 
 As an example to illustrate using `filter(..)`, let's narrow our produce tree down to only vegetables:
