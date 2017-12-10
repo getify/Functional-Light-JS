@@ -1,7 +1,7 @@
 # 轻量函数式 JavaScript
-# 第七章：闭包 vs 对象
+# 第七章：闭包 vs. 对象
 
-多年以前，Anton van Straaten 编写了一个名声显赫而且广为流传的 [禅家公案](https://www.merriam-webster.com/dictionary/koan)，描绘并挑起了闭包与对象之间一种重要的紧张状态。
+多年以前，Anton van Straaten 编写了一个名声显赫而且广为流传的 [禅家公案](https://www.merriam-webster.com/dictionary/koan)，展示了并挑起了闭包与对象之间一种重要的紧张状态。
 
 > 庄严的 Qc Na 大师在与他的学生 Anton 一起散步。Anto 希望促成一次与师傅的讨论，他说：“师傅，我听说对象是个非常好的东西 —— 真的吗？” Qc Na 同情地看着他的学生回答道，“笨学生 —— 对象只不过是一种简单的闭包。”
 >
@@ -15,7 +15,7 @@
 
 原版的文章，虽然简短，但是拥有更多关于其起源与动机的背景内容，我强烈建议你阅读这篇文章，来为本章的学习正确地设置你的思维模式。
 
-我见过许多读过这段公案的人都对它的聪明机智表现出一丝假笑，然后并没有改变太多他们的想法就离开了。然而，一个公案的目的（从佛教禅的角度而言）就是刺激读者对其中矛盾的真理上下求索。所以，回头再读一遍。然后再读一遍。
+我见过许多读过这段公案的人都对它的聪明机智表现出一丝假笑，然后并没有改变太多他们的想法就离开了。然而，一个公案的目的（从佛教禅的角度而言）就是刺激读者对其中矛盾的真理上下求索。所以，回头再读一遍。现在就再读一遍。
 
 它到底是什么？闭包是简化的对象，或者对象是简化的闭包？或都不是？或都是？难道唯一的重点是闭包和对象在某种意义上是等价的？
 
@@ -23,38 +23,38 @@
 
 ## 同一轨道
 
-首先，让我们确保当我们谈到闭包和对象时我们都在同一轨道上。显然我们的语境是 JavaScript 如何应对这两种机制，而且具体来说谈到的是简单的函数闭包（参见第二章的“保持作用域”）与简单对象（键值对的集合）。
+首先，让我们确保当我们谈到闭包和对象时我们都在同一轨道上。显然我们的语境是 JavaScript 如何应对这两种机制，而且具体来说谈到的是简单的函数闭包（见[第二章，“保持作用域”](ch2.md/#keeping-scope)）与简单对象（键值对的集合）。
 
-一个简单的函数闭包：
+为准确起见，这里展示了一个简单的函数闭包：
 
 ```js
 function outer() {
-	var one = 1;
-	var two = 2;
+    var one = 1;
+    var two = 2;
 
-	return function inner(){
-		return one + two;
-	};
+    return function inner(){
+        return one + two;
+    };
 }
 
 var three = outer();
 
-three();			// 3
+three();            // 3
 ```
 
-一个简单的对象：
+以及一个简单的对象：
 
 ```js
 var obj = {
-	one: 1,
-	two: 2
+    one: 1,
+    two: 2
 };
 
 function three(outer) {
-	return outer.one + outer.two;
+    return outer.one + outer.two;
 }
 
-three( obj );		// 3
+three( obj );       // 3
 ```
 
 当你提到“闭包”时，很多人都会在脑中唤起许多额外的东西，比如异步回调，甚至是带有封装的模块模式和信息隐藏。相似地，“对象”会把类带到思维中，`this`、原型、以及一大堆其他的工具和模式。
@@ -78,17 +78,17 @@ three( obj );		// 3
 
 ```js
 function outer() {
-	var one = 1;
-	var two = 2;
+    var one = 1;
+    var two = 2;
 
-	return function inner(){
-		return one + two;
-	};
+    return function inner(){
+        return one + two;
+    };
 }
 
 var obj = {
-	one: 1,
-	two: 2
+    one: 1,
+    two: 2
 };
 ```
 
@@ -98,9 +98,9 @@ var obj = {
 
 ```js
 var point = {
-	x: 10,
-	y: 12,
-	z: 14
+    x: 10,
+    y: 12,
+    z: 14
 };
 ```
 
@@ -108,13 +108,13 @@ var point = {
 
 ```js
 function outer() {
-	var x = 10;
-	var y = 12;
-	var z = 14;
+    var x = 10;
+    var y = 12;
+    var z = 14;
 
-	return function inner(){
-		return [x,y,z];
-	}
+    return function inner(){
+        return [x,y,z];
+    }
 };
 
 var point = outer();
@@ -126,12 +126,12 @@ var point = outer();
 
 ```js
 var person = {
-	name: "Kyle Simpson",
-	address: {
-		street: "123 Easy St",
-		city: "JS'ville",
-		state: "ES"
-	}
+    name: "Kyle Simpson",
+    address: {
+        street: "123 Easy St",
+        city: "JS'ville",
+        state: "ES"
+    }
 };
 ```
 
@@ -139,20 +139,20 @@ var person = {
 
 ```js
 function outer() {
-	var name = "Kyle Simpson";
-	return middle();
+    var name = "Kyle Simpson";
+    return middle();
 
-	// ********************
+    // ********************
 
-	function middle() {
-		var street = "123 Easy St";
-		var city = "JS'ville";
-		var state = "ES";
+    function middle() {
+        var street = "123 Easy St";
+        var city = "JS'ville";
+        var state = "ES";
 
-		return function inner(){
-			return [name,street,city,state];
-		};
-	}
+        return function inner(){
+            return [name,street,city,state];
+        };
+    }
 }
 
 var person = outer();
@@ -162,33 +162,33 @@ var person = outer();
 
 ```js
 function point(x1,y1) {
-	return function distFromPoint(x2,y2){
-		return Math.sqrt(
-			Math.pow( x2 - x1, 2 ) +
-			Math.pow( y2 - y1, 2 )
-		);
-	};
+    return function distFromPoint(x2,y2){
+        return Math.sqrt(
+            Math.pow( x2 - x1, 2 ) +
+            Math.pow( y2 - y1, 2 )
+        );
+    };
 }
 
 var pointDistance = point( 1, 1 );
 
-pointDistance( 4, 5 );		// 5
+pointDistance( 4, 5 );      // 5
 ```
 
-`distFromPoint(..)` 闭合着 `x1` 和 `y1`，但我们可以将这些值作为一个对象明确地传递：
+`distFromPoint(..)` 闭包着 `x1` 和 `y1`，但我们可以将这些值作为一个对象明确地传递：
 
 ```js
 function pointDistance(point,x2,y2) {
-	return Math.sqrt(
-		Math.pow( x2 - point.x1, 2 ) +
-		Math.pow( y2 - point.y1, 2 )
-	);
+    return Math.sqrt(
+        Math.pow( x2 - point.x1, 2 ) +
+        Math.pow( y2 - point.y1, 2 )
+    );
 };
 
 pointDistance(
-	{ x1: 1, y1: 1 },
-	4,	// x2
-	5	// y2
+    { x1: 1, y1: 1 },
+    4,  // x2
+    5   // y2
 );
 // 5
 ```
@@ -203,40 +203,40 @@ pointDistance(
 
 ```js
 function person(name,age) {
-	return happyBirthday(){
-		age++;
-		console.log(
-			"Happy " + age + "th Birthday, " + name + "!"
-		);
-	}
+    return happyBirthday(){
+        age++;
+        console.log(
+            `Happy ${age}th Birthday, ${name}!`
+        );
+    }
 }
 
 var birthdayBoy = person( "Kyle", 36 );
 
-birthdayBoy();			// Happy 37th Birthday, Kyle!
+birthdayBoy();          // Happy 37th Birthday, Kyle!
 ```
 
-内部函数 `happyBirthday()` 闭合着 `name` 与 `age`，所以其中的功能和状态一起保留了下来。
+内部函数 `happyBirthday()` 闭包着 `name` 与 `age`，所以其中的功能和状态一起保留了下来。
 
 我们可以使用 `this` 与一个对象的绑定取得相同的能力：
 
 ```js
 var birthdayBoy = {
-	name: "Kyle",
-	age: 36,
-	happyBirthday() {
-		this.age++;
-		console.log(
-			"Happy " + this.age + "th Birthday, " + this.name + "!"
-		);
-	}
+    name: "Kyle",
+    age: 36,
+    happyBirthday() {
+        this.age++;
+        console.log(
+            `Happy ${this.age}th Birthday, ${this.name}!`
+        );
+    }
 };
 
 birthdayBoy.happyBirthday();
 // Happy 37th Birthday, Kyle!
 ```
 
-我们仍然使用 `happyBirthday()` 函数来表达状态数据的封装，但使用一个对象而不是闭包。而且我们不必向一个函数明确地传入一个对象（比如前一个例子）；JavaScript 的 `this` 绑定很容易地创建了一个隐含绑定。
+我们仍然使用 `happyBirthday()` 函数来表达状态数据的封装，但使用一个对象而非闭包。而且我们不必向一个函数明确地传入一个对象（比如前一个例子）；JavaScript 的 `this` 绑定很容易地创建了一个隐含绑定。
 
 另一种分析这种关系的方式是：一个闭包将一个函数与一组状态联系起来，而一个持有相同状态的对象可以有任意多个操作这些状态的函数。
 
@@ -244,14 +244,14 @@ birthdayBoy.happyBirthday();
 
 ```js
 var person = {
-	firstName: "Kyle",
-	lastName: "Simpson",
-	first() {
-		return this.firstName;
-	},
-	last()
-		return this.lastName;
-	}
+    firstName: "Kyle",
+    lastName: "Simpson",
+    first() {
+        return this.firstName;
+    },
+    last() {
+        return this.lastName;
+    }
 }
 
 person.first() + " " + person.last();
@@ -262,28 +262,28 @@ person.first() + " " + person.last();
 
 ```js
 function createPerson(firstName,lastName) {
-	return API;
+    return API;
 
-	// ********************
+    // ********************
 
-	function API(methodName) {
-		switch (methodName) {
-			case "first":
-				return first();
-				break;
-			case "last":
-				return last();
-				break;
-		};
-	}
+    function API(methodName) {
+        switch (methodName) {
+            case "first":
+                return first();
+                break;
+            case "last":
+                return last();
+                break;
+        };
+    }
 
-	function first() {
-		return firstName;
-	}
+    function first() {
+        return firstName;
+    }
 
-	function last() {
-		return lastName;
-	}
+    function last() {
+        return lastName;
+    }
 }
 
 var person = createPerson( "Kyle", "Simpson" );
@@ -298,21 +298,21 @@ person( "first" ) + " " + person( "last" );
 
 许多人一开始认为闭包和对象在可变性方面表现不同；闭包可以防止外部改变而对象不能。但是，事实表明，两种形式具有完全相同的可变性行为。
 
-这是因为我们关心的，正如第六章中所讨论的，是 **值** 的可变性，而它是值本身的性质，与它在哪里以及如何被赋值无关。
+这是因为我们关心的，正如[第六章](ch6.md)中所讨论的，是 **值** 的可变性，而它是值本身的性质，与它在哪里以及如何被赋值无关。
 
 ```js
 function outer() {
-	var x = 1;
-	var y = [2,3];
+    var x = 1;
+    var y = [2,3];
 
-	return function inner(){
-		return [ x, y[0], y[1] ];
-	};
+    return function inner(){
+        return [ x, y[0], y[1] ];
+    };
 }
 
 var xyPublic = {
-	x: 1,
-	y: [2,3]
+    x: 1,
+    y: [2,3]
 };
 ```
 
@@ -322,27 +322,27 @@ var xyPublic = {
 
 ```js
 function outer() {
-	var x = 1;
-	return middle();
+    var x = 1;
+    return middle();
 
-	// ********************
+    // ********************
 
-	function middle() {
-		var y0 = 2;
-		var y1 = 3;
+    function middle() {
+        var y0 = 2;
+        var y1 = 3;
 
-		return function inner(){
-			return [ x, y0, y1 ];
-		};
-	}
+        return function inner(){
+            return [ x, y0, y1 ];
+        };
+    }
 }
 
 var xyPublic = {
-	x: 1,
-	y: {
-		0: 2,
-		1: 3
-	}
+    x: 1,
+    y: {
+        0: 2,
+        1: 3
+    }
 };
 ```
 
@@ -354,13 +354,15 @@ var xyPublic = {
 
 如今 “同构” 这个词经常被扔到 JavaScript 旁边，它通常用来指代可以在服务器与浏览器中使用/共享的代码。一段时间以前我写过一篇博客，声称对 “同构” 这一词的这种用法是一种捏造，它实际上有一种明确和重要的含义被掩盖了。
 
+这里是那篇博客的一段节选：
+
 > 同构意味着什么？好吧，我们可以从数学上，或社会学上，或生物学上讨论它。同构的一般概念是，你有两个东西，它们虽然不同但在结构上有相似之处。
 >
 > 在所有这些用法中，同构与等价以这样的方式被区分开：如果两个值在所有的方面都完全相等，那么它们就是等价的。但如果它们表现不同，却仍然拥有 1 对 1 的、双向的映射关系，那么它们就是同构的。
 >
 > 换言之，如果你能够从 A 映射（转换）到 B 而后又可以从用反向的映射从 B 走回到 A，那么 A 和 B 就是同构的。
 
-回忆一下第二章的 “数学简忆”，我们讨论了函数的数学定义 —— 输入与输出之间的映射。我们指出这在技术上被称为一种态射。同构是双射（也就是两个方向的）的一种特殊情况，它不仅要求映射必须能够在两个方向上进行，而且要求这两种形式在行为上也完全一样。
+回忆一下[第二章的 “数学简忆”](ch2.md/#brief-math-review)，我们讨论了函数的数学定义是输入与输出之间的映射。我们指出这在技术上被称为一种态射。同构是双射（也就是两个方向的）的一种特殊情况，它不仅要求映射必须能够在两个方向上进行，而且要求这两种形式在行为上也完全一样。
 
 把对数字的思考放在一边，让我们将同构联系到代码上。再次引用我的博客：
 
@@ -370,7 +372,7 @@ var xyPublic = {
 
 简而言之，闭包和对象是状态（以及与之关联的功能）的同构表现形式。
 
-当一下次你听到某些人说 “X 与 Y 是同构的”，那么他们的意思是，“X 和 Y 可以在两个方向上从一者转换为另一者，并保持相同的行为。”
+当一下次你听到某些人说 “X 与 Y 是同构的”，那么他们的意思是，“X 和 Y 可以在两个方向上从一者转换为另一者，而且不会丢失任何信息。”
 
 ### 底层
 
@@ -380,11 +382,11 @@ var xyPublic = {
 
 ```js
 function outer() {
-	var x = 1;
+    var x = 1;
 
-	return function inner(){
-		return x;
-	};
+    return function inner(){
+        return x;
+    };
 }
 ```
 
@@ -392,7 +394,7 @@ function outer() {
 
 ```js
 scopeOfOuter = {
-	x: 1
+    x: 1
 };
 ```
 
@@ -421,7 +423,7 @@ return scopeOfInner.x;
 
 那么闭包和对象是等价的，对吧？不完全是。我打赌它们要比你在读这一章之前看起来相似多了，但它们依然有重要的不同之处。
 
-这些不同不应视为弱点或用法上的争议；那是错误的视角。它们应当被视为使其中一者比另一者具有更适于（而且更合理！）某种特定任务的特性或优势。
+这些不同不应视为弱点或用法上的争议；那是错误的视角。它们应当被视为使其中一者比另一者具有更适于（而且可读性更好！）某种特定任务的特性或优势。
 
 ### 结构可变性
 
@@ -439,7 +441,7 @@ return scopeOfInner.x;
 
 ```js
 function trackEvent(evt,keypresses = []) {
-	return keypresses.concat( evt );
+    return [ ...keypresses, evt ];
 }
 
 var keypresses = trackEvent( newEvent1 );
@@ -447,7 +449,7 @@ var keypresses = trackEvent( newEvent1 );
 keypresses = trackEvent( newEvent2, keypresses );
 ```
 
-**注意：** 你有没有发现，为什么我使用 `concat(..)` 而不是直接向 `keypresses` 中 `push(..)`？因为在 FP 中，我们总是想将数组视为一种不可变 —— 可以被重新创建并添加新元素 —— 的数据结构，而不是直接被改变的。我们用了一个明确的重新复制将副作用的恶果替换掉了（稍后有更多关于这一点的内容）。
+**注意：** 你有没有发现，为什么我没有直接向 `keypresses` 中 `push(..)`？因为在 FP 中，我们总是想将数组视为一种不可变 —— 可以被重新创建并添加新元素 —— 的数据结构，而不是直接被改变的。我们用了一个明确的重新复制将副作用的恶果替换掉了（稍后有更多关于这一点的内容）。
 
 虽然我们没有改变数组的结构，但如果我们想的话就可以。待会儿会详细说明这一点。
 
@@ -455,9 +457,9 @@ keypresses = trackEvent( newEvent2, keypresses );
 
 ```js
 function trackEvent(evt,keypresses = () => []) {
-	return function newKeypresses() {
-		return [ ...keypresses(), evt ];
-	};
+    return function newKeypresses() {
+        return [ ...keypresses(), evt ];
+    };
 }
 
 var keypresses = trackEvent( newEvent1 );
@@ -473,36 +475,36 @@ keypresses = trackEvent( newEvent2, keypresses );
 
 顺带一提，虽然我将这种结构上的（不）可变性作为闭包和对象间的一种明显的不同，但是我们将对象作为一个不可变的值来使用的方式实际上更加像是一种相似性。
 
-为每次数组的递增创建一个新数组（通过 `concat(..)`）就是讲数组视为结构上不可变的，这与闭包是结构上不可变的设计初衷在概念上是平行的。
+为每次数组的递增创建一个新数组就是将数组视为结构上不可变的，这与闭包是结构上不可变的设计初衷在概念上是平行的。
 
 ### 私有性
 
-在分析闭包 vs 对象时，你可能想到的第一个不同就是闭包通过嵌套的词法作用域提供了状态的“私有性”，而对象将所有的东西都作为公共属性暴露出来。这样的私有性有一个炫酷的名字：信息隐藏。
+在分析闭包 vs. 对象时，你可能想到的第一个不同就是闭包通过嵌套的词法作用域提供了状态的“私有性”，而对象将所有的东西都作为公共属性暴露出来。这样的私有性有一个炫酷的名字：信息隐藏。
 
 考虑一下词法闭包隐藏：
 
 ```js
 function outer() {
-	var x = 1;
+    var x = 1;
 
-	return function inner(){
-		return x;
-	};
+    return function inner(){
+        return x;
+    };
 }
 
 var xHidden = outer();
 
-xHidden();			// 1
+xHidden();          // 1
 ```
 
 现在是公有的相同状态：
 
 ```js
 var xPublic = {
-	x: 1
+    x: 1
 };
 
-xPublic.x;			// 1
+xPublic.x;          // 1
 ```
 
 对于一般的软件工程原理来说这里有一些明显的不同 —— 考虑到抽象，带有公共和私有 API 的模块模式，等等 —— 但是让我们将我们的讨论限定在 FP 的角度之上；毕竟，这是一本关于函数式编程的书！
@@ -515,8 +517,8 @@ xPublic.x;			// 1
 
 ```js
 function recordKeypress(keypressEvt) {
-	// 数据库工具
-	DB.store( "keypress-events", keypressEvt );
+    // 数据库工具
+    DB.store( "keypress-events", keypressEvt );
 }
 ```
 
@@ -526,32 +528,32 @@ function recordKeypress(keypressEvt) {
 keypresses.forEach( recordKeypress );
 ```
 
-但是，如果击键的列表被隐藏在闭包中的话，你就不得不在闭包的公共 API 上暴露一个工具，并使它拥有访问隐藏数据的特权。
+但是，如果击键的列表被隐藏在闭包中的话，你就不得不在闭包的公共 API 上暴露一个工具，并使它拥有访问隐藏数据的权限。
 
 例如，我们可以给闭包的 `keypresses` 示例一个它自己的 `forEach`，就像数组拥有的内建函数一样：
 
 ```js
 function trackEvent(
-	evt,
-	keypresses = {
-		list() { return []; },
-		forEach() {}
-	}
+    evt,
+    keypresses = {
+        list() { return []; },
+        forEach() {}
+    }
 ) {
-	return {
-		list() {
-			return [ ...keypresses.list(), evt ];
-		},
-		forEach(fn) {
-			keypresses.forEach( fn );
-			fn( evt );
-		}
-	};
+    return {
+        list() {
+            return [ ...keypresses.list(), evt ];
+        },
+        forEach(fn) {
+            keypresses.forEach( fn );
+            fn( evt );
+        }
+    };
 }
 
 // ..
 
-keypresses.list();		// [ evt, evt, .. ]
+keypresses.list();      // [ evt, evt, .. ]
 
 keypresses.forEach( recordKeypress );
 ```
@@ -562,15 +564,15 @@ keypresses.forEach( recordKeypress );
 
 如果词法变量 `x` 隐藏在一个闭包中，那么唯一能够对它进行重新赋值的代码也一定在这个闭包中；从外部修改 `x` 是不可能的。
 
-正如我们在第六章中看到的，仅这一点就改善了代码的可读性，它减小了读者为了判定一个已知变量的行为而必须考虑的代码的表面积。
+正如我们在[第六章](ch6.md)中看到的，仅这一点就改善了代码的可读性，它减小了读者为了判定一个已知变量的行为而必须考虑的代码的表面积。
 
-词法上重新赋值的局部接近性是我不觉得 `const` 是一个有用特性的一大原因。作用域（因此闭包也是）一般来说应当都很小，这意味着仅有几行代码可能会影响到重新赋值。在上面的 `outer()` 中，我们可以很快地检视并看到没有代码对 `x` 进行重新赋值，所以对于一切目的和意图来说它都是一个常数。
+词法上重新赋值在局部上距离很接近是我不觉得 `const` 是一个有用特性的一大原因。作用域（因此闭包也是）一般来说应当都很小，这意味着仅有几行代码可能会影响到重新赋值。在上面的 `outer()` 中，我们可以很快地检视并看到没有代码对 `x` 进行重新赋值，所以对于一切目的和意图来说它都是一个常数。
 
 这种保证及大地增强了我们在函数的纯粹性上的信心。
 
 另一方面，`xPublic.x` 是一个公共属性，程序中任何得到 `xPublic` 引用的部分都默认地有能力将 `xPublic.x` 重新赋值为其他的某些值。要考虑的代码行数可要多多了！
 
-这就是为什么在第六章中，我们看到 `Object.freeze(..)` 以一种简单粗暴的方式将一个对象的所有属性都设置为只读（`writable: false`），这样一来它们就不会不可预知地被重新赋值了。
+这就是为什么在[第六章中，我们看到 `Object.freeze(..)`](ch6.md/#its-freezing-in-here) 以一种简单粗暴的方式将一个对象的所有属性都设置为只读（`writable: false`），这样一来它们就不会不可预知地被重新赋值了。
 
 不幸的是，`Object.freeze(..)` 会冻结所有属性而且不可逆转。
 
@@ -582,15 +584,15 @@ keypresses.forEach( recordKeypress );
 
 这本书讲的是 JavaScript 的“轻量函数式”编程，而这就是我与 FP 的核心人群意见相左的情况之一。
 
-我认为变量的重新赋值可以十分有用，而且，如果使用得当，它的明确性相当易读。而且从经验上讲，当你在调试中插入 `debugger` 或断点，或者一个监视表达式的时候，将会更容易。
+我认为变量的重新赋值可以十分有用，而且，如果使用得当，它的明确性相当易读。而且从我的经验上讲，当你在调试中插入 `debugger` 或断点，或者一个监视表达式的时候，将会更容易。
 
 ### 状态克隆
 
-正如我们在第六章中学到的，防止副作用损害我们代码的可预见性的最佳方法之一，就是确保我们将所有状态值都视为不可变的，而不管它们实际上是否真的是不可变（被冻结）的。
+正如我们在[第六章](ch6.md)中学到的，防止副作用损害我们代码的可预见性的最佳方法之一，就是确保我们将所有状态值都视为不可变的，而不管它们实际上是否真的是不可变（被冻结）的。
 
 如果你没有在使用一个专门为此建造的、提供了精巧的不可变数据结构的库，那么最简单的方法也够了：在每次改变你的对象/数组之前复制它们。
 
-数组很容易浅克隆：使用 `slice()` 方法就行：
+数组很容易浅克隆 —— 使用 `slice()` 方法就行：
 
 ```js
 var a = [ 1, 2, 3 ];
@@ -598,16 +600,16 @@ var a = [ 1, 2, 3 ];
 var b = a.slice();
 b.push( 4 );
 
-a;			// [1,2,3]
-b;			// [1,2,3,4]
+a;          // [1,2,3]
+b;          // [1,2,3,4]
 ```
 
 对象也可以相对容易地进行浅克隆：
 
 ```js
 var o = {
-	x: 1,
-	y: 2
+    x: 1,
+    y: 2
 };
 
 // 在 ES2017+ 中，使用对象扩散操作：
@@ -619,7 +621,7 @@ var p = Object.assign( {}, o );
 p.y = 3;
 ```
 
-如果在一个对象/数组中的值本身就是非基本类型（对象/数组），那么为了进行深度克隆，你就必须手动遍历并克隆每一个被嵌套的对象。否则，你会得到那些字对象的共享引用的拷贝，而这很可能会在你的程序逻辑中造成灾难。
+如果在一个对象/数组中的值本身是非基本类型（对象/数组），那么为了进行深度克隆，你就必须手动遍历并克隆每一个被嵌套的对象。否则，你会得到那些子对象的共享引用的拷贝，而这很可能会在你的程序逻辑中造成灾难。
 
 你有没有注意到，这种克隆之所以可能，仅仅是由于所有这些状态值都可见，并因此可以很容易拷贝？那么包装在一个闭包中的一组状态呢？你如何拷贝那些状态？
 
@@ -639,9 +641,9 @@ p.y = 3;
 
 ```js
 function StudentRecord(name,major,gpa) {
-	return function printStudent(){
-		return `${name}, Major: ${major}, GPA: ${gpa.toFixed(1)}`;
-	};
+    return function printStudent(){
+        return `${name}, Major: ${major}, GPA: ${gpa.toFixed(1)}`;
+    };
 }
 
 var student = StudentRecord( "Kyle Simpson", "kyle@some.tld", "CS", 4 );
@@ -658,14 +660,16 @@ student();
 
 ```js
 function StudentRecord(){
-	return `${this.name}, Major: ${this.major}, GPA: ${this.gpa.toFixed(1)}`;
+    return `${this.name}, Major: ${this.major}, \
+GPA: ${this.gpa.toFixed(1)}`;
 }
 
 var student = StudentRecord.bind( {
-	name: "Kyle Simpson",
-	major: "CS",
-	gpa: 4
+    name: "Kyle Simpson",
+    major: "CS",
+    gpa: 4
 } );
+
 
 // 稍后
 
@@ -673,11 +677,11 @@ student();
 // Kyle Simpson, Major: CS, GPA: 4.0
 ```
 
-`student()` 函数 —— 技术上成为一个“被绑定函数” —— 拥有一个硬绑定的 `this` 引用，它指向我们传入的对象字面量，这样稍后对 `student()` 的调用将会使用这个对象作为 `this`，因此可以访问它所封装的状态。
+`student()` 函数 —— 技术上称为一个“被绑定函数” —— 拥有一个硬绑定的 `this` 引用，它指向我们传入的对象字面量，这样稍后对 `student()` 的调用将会使用这个对象作为 `this`，因此可以访问它所封装的状态。
 
 这两种实现都有相同的结果：一个保留着状态的函数。那么性能呢？会有什么不同？
 
-**注意：** 准确地、可操作地判断一段 JS 代码的性能是一件非常棘手的事情。我们不会在此深入所有的细节，但我强烈建议你阅读“你不懂 JS：异步与性能”一书，特别是第六章“基准分析与调优”，来了解更多细节。
+**注意：** 准确地、可操作地判断一段 JS 代码的性能是一件非常棘手的事情。我们不会在此深入所有的细节，但我强烈建议你阅读 *“你不懂 JS：异步与性能”* 一书，特别是第六章 “基准分析与调优”，来了解更多细节。
 
 如果你在编写一个库，它创建一个带有函数的状态 —— 要么是一个代码段中对 `StudentRecord(..)` 的调用，要么是第二个代码段中对 `StudentRecord.bind(..)` 的调用 —— 你最关心的很可能是它们两个如何工作。检视它们的代码，我们可以发现前者不得不每次创建一个新的函数表达式。而第二个使用了 `bind(..)`，这由于它的隐晦而不那么明显。
 
@@ -685,9 +689,9 @@ student();
 
 ```js
 function bind(orinFn,thisObj) {
-	return function boundFn(...args) {
-		return origFn.apply( thisObj, args );
-	};
+    return function boundFn(...args) {
+        return origFn.apply( thisObj, args );
+    };
 }
 
 var student = bind( StudentRecord, { name: "Kyle.." } );
@@ -697,7 +701,7 @@ var student = bind( StudentRecord, { name: "Kyle.." } );
 
 然而，内建的 `bind(..)` 工具不必真的创建闭包来完成这个任务。它只是创建一个函数并手动地将它内部的 `this` 设置为指定的对象。这潜在地是一种比我们自己做的闭包更高效的操作。
 
-我们在这里讨论的这种性能提升在个别的操作中的影响微乎其微。但如果你的库的关键路径在成百上千次，或更多地重复这件事，那么这种提升的效果就会很快累加起来。许多的库 —— 例如 Bluebird 就是一例 —— 都正是由于这个原因，最终通过移除闭包而使用对象来进行了优化。
+我们在这里讨论的这种性能提升在个别操作中的影响微乎其微。但如果你的库的关键路径在成百上千次，或更多地重复这件事，那么这种提升的效果就会很快累加起来。许多的库 —— 比如 Bluebird 就是一例 —— 都正是由于这个原因，最终通过移除闭包而使用对象来进行了优化。
 
 在库之外的用例当中，带有自己函数的状态通常只在一个应用程序的关键路径上相对少地出现几次。对比之下，函数 + 状态的用法 —— 在两个代码段中对 `student()` 的调用 —— 通常更常见。
 
@@ -712,3 +716,13 @@ var student = bind( StudentRecord, { name: "Kyle.." } );
 ## 总结
 
 这一章的真理是无法付诸笔头的。你必须阅读这一章来找出它的真理。
+
+----
+
+在这里提出一些禅的智慧不过是我想让自己显得聪明一些。但你需要对本章内容的一些恰当总结。
+
+对象和闭包是相互同构的，这意味着在表达你程序的状态和行为时它们可以被互换地使用。
+
+表达为一个闭包有一些特定的好处，比如粒度更细的改变控制和自动带来的私有性。表达为对象有另外一些好处，比如更容易克隆状态。
+
+思维严谨的 FP 程序员应当能够使用这两种表现形式构思程序中的任何状态和行为的片段，而且能够为当前手中的任务挑选一种最恰当的表现形式。

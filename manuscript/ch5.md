@@ -1,13 +1,13 @@
 # 轻量函数式 JavaScript
 # 第五章：降低副作用
 
-在第二章中，我们讨论了一个函数如何能够拥有 `return` 值之外的输出。至此你应当对一个函数的 FP 定义感到非常适应了，那么这种副输出 —— 副作用！—— 的想法应当散发出臭味了。
+在[第二章](ch2.md)中，我们讨论了一个函数如何能够拥有 `return` 值之外的输出。至此你应当对一个函数的 FP 定义感到非常适应了，那么这种副输出 —— 副作用！—— 的想法应当散发出臭味了。
 
 我们将要检视各种不同形式的副作用，并看看为什么它们对我们代码的质量和可读性有害。
 
 但别让我在这里喧宾夺主。这一章的要点是：写出一个没有副作用的程序是不可能的。好吧，不是不可能；你当然能。但是那样的程序将不会有什么用，也无法观察。如果你写了一个副作用为零的程序，那么你将无法说出它与一个被删除的或空的程序有什么区别。
 
-FP 程序员不会消灭所有的副作用。他们的目标是尽量地限制它们。为此，我们需要完全地理解它们。
+FP 程序员不会消灭所有的副作用。他们的目标是尽可能地限制它们。为此，我们首先需要完全地理解它们。
 
 ## 拜托，副作用靠边站
 
@@ -21,7 +21,7 @@ FP 程序员不会消灭所有的副作用。他们的目标是尽量地限制�
 
 ```js
 function foo(x) {
-	return x * 2;
+    return x * 2;
 }
 
 var y = foo( 3 );
@@ -33,7 +33,7 @@ var y = foo( 3 );
 
 ```js
 function foo(x) {
-	y = x * 2;
+    y = x * 2;
 }
 
 var y;
@@ -48,14 +48,14 @@ foo( 3 );
 要是我给你一个你看不到代码的函数 `bar(..)` 的调用引用，但我告诉你它没有这样的间接副作用，而只有一个明确的 `return` 值的效果呢？
 
 ```js
-bar( 4 );			// 42
+bar( 4 );           // 42
 ```
 
-因为你知道 `bar(..)` 的内部不会制造任何副作用，所以你现在可以用更加直接了当的方式推理任何一个像 `bar(..)` 这样的调用。但如果你不知道 `bar(..)` 没有副作用，那么要理解调用它的结果，你就不得不去阅读并剖析它所有的逻辑。对读者来说这是额外的思维负担。
+因为你知道 `bar(..)` 的内部不会产生任何副作用，所以你现在可以用更加直接了当的方式推理任何一个像 `bar(..)` 这样的调用。但如果你不知道 `bar(..)` 没有副作用，那么要理解调用它的结果，你就不得不去阅读并剖析它所有的逻辑。对读者来说这是额外的思维负担。
 
 **一个带有副作用的函数的可读性要差一些**，因为它要求更大的阅读量才能理解程序。
 
-但是问题会变得更严重。考虑如下代码：
+但是问题会变得更深刻。考虑如下代码：
 
 ```js
 var x = 1;
@@ -89,12 +89,12 @@ console.log( x );
 
 ```js
 function foo(x) {
-	return x + y;
+    return x + y;
 }
 
 var y = 3;
 
-foo( 1 );			// 4
+foo( 1 );           // 4
 ```
 
 `y` 没有被 `foo(..)` 改变，所以这不是我们以前看到的那种副作用。但现在，`foo(..)` 的调用实际上依赖于 `y` 的存在和当前状态。如果稍后我们这么做：
@@ -104,7 +104,7 @@ y = 5;
 
 // ..
 
-foo( 1 );			// 6
+foo( 1 );           // 6
 ```
 
 也许我们会因 `foo(1)` 在调用与调用之间返回不同的结果而感到诧异？
@@ -121,21 +121,21 @@ foo( 1 );			// 6
 
 ```js
 function foo(x) {
-	return x + bar( x );
+    return x + bar( x );
 }
 
 function bar(x) {
-	return x * 2;
+    return x * 2;
 }
 
-foo( 3 );			// 9
+foo( 3 );           // 9
 ```
 
 很清楚，对于 `foo(..)` 和 `bar(..)` 两者来说唯一的直接起因就是形式参数 `x`。那么 `bar(x)` 的调用呢？`bar` 只是一个标识符，而且在 JS 中它甚至默认地不是一个常量（不可再被赋值的变量）。函数 `foo(..)` 依赖于 `bar` 的值 —— 一个引用第二个函数的变量 —— 一个自由变量。
 
 那么这个程序是依赖于侧因的吗？
 
-我说不。即使使用其他函数来覆盖变量 `bar` 的值是 *可能* 的，我也没在这段代码中这么做，这不是我的常见做法，也没有这样的先例。对于我所有的意图和目的来说，我的函数就是常量（从不被重新赋值）。
+我说不。即使使用其他函数来覆盖变量 `bar` 的值是 *可能* 的，我也没在这段代码中这么做，这不是我的常见做法，也没有这样的先例。对于我所有的意图和目的来说，我的函数就是常量（从不会被重新赋值）。
 
 考虑如下代码：
 
@@ -143,10 +143,10 @@ foo( 3 );			// 9
 const PI = 3.141592;
 
 function foo(x) {
-	return x * PI;
+    return x * PI;
 }
 
-foo( 3 );			// 9.424776000000001
+foo( 3 );           // 9.424776000000001
 ```
 
 **注意：** JavaScript 有一个 `Math.PI` 內建值，我们在这本书里使用 `PI` 的例子只是为了方便展示。在实际应用中，要总是使用 `Math.PI` 而不是定义你自己的！
@@ -161,23 +161,23 @@ foo( 3 );			// 9.424776000000001
 
 我的结论：这里的 `PI` 没有违反最小化/避免副作用（或侧因）的精神。前一个代码段中的 `bar(x)` 也没有。
 
-在这两种情况下，`PI` 和 `bar` 都不是程序状态的一部分。它们是固定的，不可被重新赋值的引用（“常量”）。如果它们贯穿程序始终都不改变，我们就不必费心将它们视为可变状态追踪。因此，它们没有损害我们的可读性。而且它们不可能是由于变量以意外的方式改变而引起的 bug 的源头。
+在这两种情况下，`PI` 和 `bar` 都不是程序状态的一部分。它们是固定的，不可被重新赋值的引用。如果它们贯穿程序始终都不改变，我们就不必费心将它们视为可变状态追踪。因此，它们没有损害我们的可读性。而且它们不可能是由于变量以意外的方式改变而引起的 bug 的源头。
 
 **注意：** 依我看，上面 `const` 的使用并不是 `PI` 没有成为侧因的理由；`var PI` 也会得出相同的结论。没有给 `PI` 重新赋值才是重要的，而不是没有这种能力。我们将会在后面的章节中讨论 `const`。
 
 #### 随机性
 
-你可能从没考虑过，但随机性是不纯粹的。一个使用了 `Math.random()` 的函数绝不可能是纯函数，因为你不能基于它的输入保证/预测它的输出。所以任何生成唯一随机 ID 等东西的代码，根据定义都将被认为是依赖于你程序的侧因的。
+你可能从没考虑过，但随机性是一种侧因。一个使用了 `Math.random()` 的函数绝不可能基于它的输入预测它的输出。所以任何生成唯一随机 ID 等东西的代码，根据定义都将被认为是依赖于你程序的侧因的。
 
 在计算机科学中，我们使用称为伪随机算法的东西来生成随机数。事实证明随机性相当难以实现，所以我们只是使用一些产生看起来随机的值的复杂算法来假冒它。这些算法计算出一些很长的数字流，但其中的秘密是，如果你知道它的起点，这些序列实际上是可以预测的。这个起点称为种子（seed）。
 
-有些语言允许你为随机数的生成指定种子值。如果你总是指定相同的种子，那么你将总是从后续的“随机数”生成中得到相同的输出序列。这对测试来说具有不可估量的价值，但是对现实世界中程序的使用有不可估量的危险。
+有些语言允许你为随机数的生成指定种子值。如果你总是指定相同的种子，那么你将总是从后续的“随机数”生成中得到相同的输出序列。这对测试来说具有不可估量的价值，但是在现实世界中的程序中使用却有不可估量的危险。
 
-在 JS 中，`Math.random(..)` 计算出的随机性是基于一个间接输入的，因为你不能指定种子。因此，我们不得不将內建的随机数生成视为一种不纯粹的侧因。
+在 JS 中，`Math.random(..)` 计算的随机性是基于一个间接输入的，因为你不能指定种子。因此，我们不得不将內建的随机数生成视为一种侧因。
 
 ### I/O 效应
 
-可能还不是很明显，但是副作用/侧因的最常见形式是 I/O（输入/输出）。一个没有 I/O 的程序是完全无意义的，因为它完成的工作无论以什么方式都不可见。有用的程序必须至少拥有输出，而且可能还需要输入。输入是一种侧因，而输出是一种副作用。
+副作用/侧因的最常见（而且实质上是不可避免的）形式是输入/输出（I/O）。一个没有 I/O 的程序是完全无意义的，因为它完成的工作无论以什么方式都不可见。有用的程序必须至少拥有输出，而且可能还需要输入。输入是一种侧因，而输出是一种副作用。
 
 在浏览器的 JS 程序中最常见的输入就是用户事件（鼠标，键盘），而输出就是 DOM。如果你用 Node.js 比较多，那么你更可能从文件系统、网络连接、和/或 `stdin`/`stdout` 流中接收输入与发送输出。
 
@@ -194,43 +194,49 @@ var users = {};
 var userOrders = {};
 
 function fetchUserData(userId) {
-	ajax( "http://some.api/user/" + userId, function onUserData(userData){
-		users[userId] = userData;
-	} );
+    ajax( `http://some.api/user/${userId}`, function onUserData(user){
+        users[userId] = user;
+    } );
 }
 
 function fetchOrders(userId) {
-	ajax( "http://some.api/orders/" + userId, function onOrders(orders){
-		for (let i = 0; i < orders.length; i++) {
-			// 为每个用于保持一个最新订单的引用
-			users[userId].latestOrder = orders[i];
-			userOrders[orders[i].orderId] = orders[i];
-		}
-	} );
+    ajax(
+        `http://some.api/orders/${userId}`,
+        function onOrders(orders){
+            for (let order of orders) {
+                // 为每个用于保持一个最新订单的引用
+                users[userId].latestOrder = order;
+                userOrders[orders[i].orderId] = order;
+            }
+        }
+    );
 }
 
 function deleteOrder(orderId) {
-	var user = users[ userOrders[orderId].userId ];
-	var isLatestOrder = (userOrders[orderId] == user.latestOrder);
+    var user = users[ userOrders[orderId].userId ];
+    var isLatestOrder = (userOrders[orderId] == user.latestOrder);
 
-	// 删除一个用户的最近订单吗？
-	if (isLatestOrder) {
-		hideLatestOrderDisplay();
-	}
+    // 删除一个用户的最近订单吗？
+    if (isLatestOrder) {
+        hideLatestOrderDisplay();
+    }
 
-	ajax( "http://some.api/delete/order/" + orderId, function onDelete(success){
-		if (success) {
-			// 一个用户的最近订单被删除了？
-			if (isLatestOrder) {
-				user.latestOrder = null;
-			}
+    ajax(
+        `http://some.api/delete/order/${orderId}`,
+        function onDelete(success){
+            if (success) {
+                // 一个用户的最近订单被删除了？
+                if (isLatestOrder) {
+                    user.latestOrder = null;
+                }
 
-			userOrders[orderId] = null;
-		}
-		else if (isLatestOrder) {
-			showLatestOrderDisplay();
-		}
-	} );
+                userOrders[orderId] = null;
+            }
+            else if (isLatestOrder) {
+                showLatestOrderDisplay();
+            }
+        }
+    );
 }
 ```
 
@@ -256,11 +262,11 @@ onOrders(..);
 onDelete(..);
 ```
 
-你看到 `fetchOrders(..)` / `onOrders(..)` 与 `deleteOrder(..)` / `onDelete(..)` 之间的穿插了吗？在我们状态管理的侧因/副作用中，这种潜在的序列暴露出了一个奇怪的状态。
+你看到 `fetchOrders(..)` / `onOrders(..)` 与 `deleteOrder(..)` / `onDelete(..)` 之间的穿插了吗？由于我们状态管理的侧因/副作用，这种潜在的序列暴露出了一个奇怪的状态。
 
 在我们设置 `isLatestOrder` 标志，和我们使用它来决定我们是否应当清空 `user` 中用户数据的 `latestOrder` 属性之间存在一个时间的延迟（因为回调）。在这个延迟期间，如果 `onOrders(..)` 被触发，它就可能潜在地改变用户的 `latestOrder` 引用的订单值。而之后在 `onDelete(..)` 被触发时，它将假定它依然需要解除 `latestOrder` 引用。
 
-bug 就是：现在数据（状态）*可能* 已经不同步了。在 `latestOrder` 本应潜在地保持指向来自 `onOrders(..)` 的更新的订单时，这种指向被解除了。
+bug 就是：现在数据（状态）*可能* 已经不同步了。在 `latestOrder` 本应潜在地保持指向来自 `onOrders(..)` 的新订单时，这种指向被解除了。
 
 这种 bug 最可怕的地方就是它不会像其他 bug 那样，给你一个程序崩溃的异常。我们就这样得到一个不正确的状态；我们应用程序的行为 “平静地” 坏掉了。
 
@@ -274,24 +280,24 @@ bug 就是：现在数据（状态）*可能* 已经不同步了。在 `latestOr
 
 函数式程序员痛恨这种侧因/副作用 bug，因为它极大地伤害了我们的可读性、可推理性、可验证性，而且最终伤害到了代码的 **可信任性**。这就是为什么他们如此严肃地对待避免侧因/副作用的原则。
 
-有多种不同的策略可以避免/修复侧因/副作用。我们会在本章稍后谈到一些，另外一些在后续章节讨论。我可以确信一件事情：**带着侧因/副作用编写程序经常是我们一般的默认状态**，所以避免它们就要求小心和有意识的努力。
+有多种不同的策略可以避免和修复侧因与副作用。我们会在本章稍后谈到一些，另外一些在后续章节讨论。我可以确信一件事情：**带着侧因/副作用编写程序经常是我们一般的默认状态**，所以避免它们就要求小心和有意识的努力。
 
 ## 谢谢，一次就够了
 
 如果你必须制造副作用来改变状态，有一类称为幂等性的操作对于限制潜在的麻烦十分有用。如果你对一个值的更新是幂等的，那么数据就能承受来自不同副作用源头的多次同种类的更新。
 
-幂等性的定义有些令人糊涂；与程序员经常使用的含义相比，数学家们使用的含义稍有不同。但是对于函数式程序员来说两种角度都有用。
+如果你试着探究它，会发现幂等性的定义有些令人糊涂；与程序员经常使用的含义相比，数学家们使用的含义稍有不同。但是对于函数式程序员来说两种角度都有用。
 
 首先，让我们给出一个计数器的例子，它既不是数学上幂等的也不是程序上幂等的：
 
 ```js
 function updateCounter(obj) {
-	if (obj.count < 10) {
-		obj.count++;
-		return true;
-	}
+    if (obj.count < 10) {
+        obj.count++;
+        return true;
+    }
 
-	return false;
+    return false;
 }
 ```
 
@@ -301,22 +307,28 @@ function updateCounter(obj) {
 
 从数学的视角来看，幂等性意味着一个操作的输出在第一次调用之后就不会再改变了，即使你将这个输出一次又一次地送回这个操作。换言之，`foo(x)` 产生的输出将与 `foo(foo(x))`、`foo(foo(foo(x)))` 等相同。
 
-一个典型的数学的例子是 `Math.abs(..)`（绝对值）。`Math.abs(-2)` 是 `2`，它的结果与 `Math.abs(Math.abs(Math.abs(Math.abs(-2))))` 相同。像 `Math.min(..)`、`Math.max(..)`、`Math.round(..)`、`Math.floor(..)` 和 `Math.ceil(..)` 这样的工具也都是幂等的。
+一个典型的数学的例子是 `Math.abs(..)`（绝对值）。`Math.abs(-2)` 是 `2`，它的结果与 `Math.abs(Math.abs(Math.abs(Math.abs(-2))))` 相同。其他数学幂等的工具包括：
+
+* `Math.min(..)`
+* `Math.max(..)`
+* `Math.round(..)`
+* `Math.floor(..)`
+* `Math.ceil(..)`
 
 我们可以用与此相同的性质定义一些自己的数学操作：
 
 ```js
 function toPower0(x) {
-	return Math.pow( x, 0 );
+    return Math.pow( x, 0 );
 }
 
 function snapUp3(x) {
-	return x - (x % 3) + (x % 3 > 0 && 3);
+    return x - (x % 3) + (x % 3 > 0 && 3);
 }
 
-toPower0( 3 ) == toPower0( toPower0( 3 ) );			// true
+toPower0( 3 ) == toPower0( toPower0( 3 ) );         // true
 
-snapUp3( 3.14 ) == snapUp3( snapUp3( 3.14 ) );		// true
+snapUp3( 3.14 ) == snapUp3( snapUp3( 3.14 ) );      // true
 ```
 
 数学上的幂等性 **不** 局限于数学操作。我们可以展示这种形式的幂等性的另一个地方是 JavaScript 的基本类型强制转换：
@@ -324,52 +336,52 @@ snapUp3( 3.14 ) == snapUp3( snapUp3( 3.14 ) );		// true
 ```js
 var x = 42, y = "hello";
 
-String( x ) === String( String( x ) );				// true
+String( x ) === String( String( x ) );              // true
 
-Boolean( y ) === Boolean( Boolean( y ) );			// true
+Boolean( y ) === Boolean( Boolean( y ) );           // true
 ```
 
 在本书先前的部分中，我们探索过一个满足这种形式的幂等性的常见的 FP 工具：
 
 ```js
-identity( 3 ) === identity( identity( 3 ) );	// true
+identity( 3 ) === identity( identity( 3 ) );    // true
 ```
 
 一些特定的字符串操作也都是自然幂等的，比如：
 
 ```js
 function upper(x) {
-	return x.toUpperCase();
+    return x.toUpperCase();
 }
 
 function lower(x) {
-	return x.toLowerCase();
+    return x.toLowerCase();
 }
 
 var str = "Hello World";
 
-upper( str ) == upper( upper( str ) );				// true
+upper( str ) == upper( upper( str ) );              // true
 
-lower( str ) == lower( lower( str ) );				// true
+lower( str ) == lower( lower( str ) );              // true
 ```
 
 我们甚至可以用幂等的方式来设计更精巧的字符串格式化操作，比如：
 
 ```js
 function currency(val) {
-	var num = parseFloat(
-		String( val ).replace( /[^\d.-]+/g, "" )
-	);
-	var sign = (num < 0) ? "-" : "";
-	return `${sign}$${Math.abs( num ).toFixed( 2 )}`;
+    var num = parseFloat(
+        String( val ).replace( /[^\d.-]+/g, "" )
+    );
+    var sign = (num < 0) ? "-" : "";
+    return `${sign}$${Math.abs( num ).toFixed( 2 )}`;
 }
 
-currency( -3.1 );									// "-$3.10"
+currency( -3.1 );                                   // "-$3.10"
 
-currency( -3.1 ) == currency( currency( -3.1 ) );	// true
+currency( -3.1 ) == currency( currency( -3.1 ) );   // true
 ```
 
-`currency(..)` 展示了一种重要的技术：在某些情况下开发者可以采取额外的步骤来规范化一个输入/输出操作，以保证这个通常不是幂等的操作是幂等的。
+`currency(..)` 展示了一种重要的技术：有些操作通常不是幂等的，但在某些情况下开发者可以采取额外的步骤来规范化一个输入/输出操作，以保证这个操作是幂等的。
 
 无论何处，将副作用限制为幂等操作要比无限制的更新好多了。
 
@@ -379,9 +391,9 @@ currency( -3.1 ) == currency( currency( -3.1 ) );	// true
 
 这种角度更符合我们对副作用的观察，因为一个这样的 `f(..)` 操作更像是制造了一个幂等的副作用，而不是必然返回一个幂等的输出值。
 
-这种幂等风格经常被 HTTP 操作（动词）引用，比如 GET 或 PUT。如果一个 HTTP REST API 恰当地按照幂等性的规范指引设计，PUT 被定义为完全替换一个资源的更新操作。那么，一个客户端就可以发送 PUT 请求一次或多次（用相同的数据），而服务器将无论如何都拥有相同的结果状态。
+这种幂等风格经常被 HTTP 操作（动词）引用，比如 GET 或 PUT。如果一个 HTTP REST API 恰当地按照幂等性的规范指导设计，PUT 被定义为完全替换一个资源的更新操作。那么，一个客户端就可以发送 PUT 请求一次或多次（用相同的数据），而服务器将无论如何都拥有相同的结果状态。
 
-使用编程中更具体的术语考虑这个问题，让我们检视一些副作用操作的幂等性：
+使用编程中更具体的术语考虑这个问题，让我们检视一些副作用操作的幂等性（或非幂等性）：
 
 ```js
 // 幂等：
@@ -395,7 +407,7 @@ a[a.length] = 42;
 person.lastUpdated = Date.now();
 ```
 
-记住：在这里幂等性的概念是，每个幂等的操作都可以被重复多次，而除了第一次更新以外都不会改变程序的状态。而非幂等操作每次都会改变状态。
+记住：在这里幂等性的概念是，每个幂等的操作（比如 `obj.count = 2`）都可以被重复多次，而除了第一次更新以外都不会改变程序的状态。而非幂等操作每次都会改变状态。
 
 那 DOM 的更新呢？
 
@@ -410,9 +422,9 @@ var update = document.createTextNode( order.latestUpdate );
 hist.appendChild( update );
 ```
 
-这里展示的关键的不同是，幂等更新替换了 DOM 元素的内容。DOM 元素的当前状态无关紧要，因为它被无条件地覆盖了。非幂等操作向元素添加内容；DOM 元素当前的状态隐含地成为了下一个状态的计算的一部分。
+这里展示的关键的不同是，幂等性更新替换了 DOM 元素的内容。DOM 元素的当前状态无关紧要，因为它被无条件地覆盖了。非幂等操作向元素添加内容；DOM 元素当前的状态隐含地成为了下一个状态的计算的一部分。
 
-以幂等的方式定义你在数据上的操作不总是可能的，但如果你能，它绝对能帮你降低这种可能性 —— 副作用在你最预想不到的时候产生并毁了你的预想。
+以幂等的方式定义你在数据上的操作不总是可能的，但如果你能，它绝对能帮你降低这种可能性 —— 副作用在你最预想不到的时候产生并摧毁了你的预想。
 
 ## 纯粹的福佑
 
@@ -420,7 +432,7 @@ hist.appendChild( update );
 
 ```js
 function add(x,y) {
-	return x + y;
+    return x + y;
 }
 ```
 
@@ -429,15 +441,15 @@ function add(x,y) {
 然而，不是所有的纯函数都在数学的意义上是幂等的，因为它们不必返回一个适于传递给自己作为输入的值。考虑如下代码：
 
 ```js
-function calculateAverage(list) {
-	var sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
-	}
-	return sum / list.length;
+function calculateAverage(nums) {
+    var sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
-calculateAverage( [1,2,4,7,11,16,22] );			// 9
+calculateAverage( [1,2,4,7,11,16,22] );         // 9
 ```
 
 输出 `9` 不是一个数组，所以你不能这样把它传递回去：`calculateAverage(calculateAverage( .. ))`。
@@ -450,11 +462,11 @@ calculateAverage( [1,2,4,7,11,16,22] );			// 9
 const PI = 3.141592;
 
 function circleArea(radius) {
-	return PI * radius * radius;
+    return PI * radius * radius;
 }
 
 function cylinderVolume(radius,height) {
-	return height * circleArea( radius );
+    return height * circleArea( radius );
 }
 ```
 
@@ -464,9 +476,9 @@ function cylinderVolume(radius,height) {
 
 ```js
 function unary(fn) {
-	return function onlyOneArg(arg){
-		return fn( arg );
-	};
+    return function onlyOneArg(arg){
+        return fn( arg );
+    };
 }
 ```
 
@@ -478,11 +490,13 @@ function unary(fn) {
 
 另一种准确描述函数纯粹性的常见方式是：**给定相同的输入，它总是产生相同的输出。** 如果你向 `circleArea(..)` 传递 `3`，它将总是输出相同的结果（`28.274328`）。
 
-如果一个函数 *能* 在每次被给予相同输入时产生不同的输出，那么它就不是纯粹的。即便一个函数总是 `return` 相同的值，如果他产生了一个间接的副作用输出，那么程序的状态也会在每次它被调用时改变；这不是纯粹的。
+如果一个函数 *能* 在每次被给予相同输入时产生不同的输出，那么它就不是纯粹的。即便一个函数总是 `return` 相同的值，如果它产生了一个间接的副作用输出，使程序的状态也会在每次它被调用时改变；这也不是纯粹的。
 
 不纯粹的函数不受欢迎是因为它们使得所有对它们的调用都更难推理。一个纯函数的调用是完全可以预测的。当某人阅读代码看到多个 `circleArea(3)` 调用时，他不必花费任何额外的努力就能搞清楚它的 *每一次* 输出是什么。
 
-### 纯粹地相对
+**注意：** 一个值得深思的有趣的问题：即使对于最纯粹的函数/程序来说，在执行任何给定的操作时 CPU 产生的热量是一种不可避免的副作用吗？那么 CPU 在一个纯粹的操作上花费时间，而使另一个操作发生的延迟呢？
+
+### 纯粹的相对性
 
 当我们谈论一个函数是否纯粹的时候必须非常小心。JavaScript 动态值的天性使得隐晦的侧因/副作用太容易发生了。
 
@@ -490,9 +504,9 @@ function unary(fn) {
 
 ```js
 function rememberNumbers(nums) {
-	return function caller(fn){
-		return fn( nums );
-	};
+    return function caller(fn){
+        return fn( nums );
+    };
 }
 
 var list = [1,2,3,4,5];
@@ -502,14 +516,14 @@ var simpleList = rememberNumbers( list );
 
 `simpleList(..)` 看起来是一个纯函数，它是一个内部函数 `caller(..)` 的引用，这个内部函数闭包着自由变量 `nums`。然而，其实有好几种方式可以使 `simpleList(..)` 成为不纯粹的。
 
-首先，我们对纯粹性的断言是基于数组值（同时被 `list` 和 `nums` 引用着）绝不会改变：
+首先，我们对纯粹性的判断是基于数组值（同时被 `list` 和 `nums` 引用着）绝不会改变：
 
 ```js
 function median(nums) {
-	return (nums[0] + nums[nums.length - 1]) / 2;
+    return (nums[0] + nums[nums.length - 1]) / 2;
 }
 
-simpleList( median );		// 3
+simpleList( median );       // 3
 
 // ..
 
@@ -517,7 +531,7 @@ list.push( 6 );
 
 // ..
 
-simpleList( median );		// 3.5
+simpleList( median );       // 3.5
 ```
 
 当我们改变这个数组时，`simpleList(..)` 调用改变了它的输出。那么，`simpleList(..)` 是纯粹的还是不纯粹的？这要看你的角度。对于给定的一组假设来说它是纯粹的。在任何没有 `list.push(6)` 变化的程序中它都可以是纯粹的。
@@ -526,12 +540,12 @@ simpleList( median );		// 3.5
 
 ```js
 function rememberNumbers(nums) {
-	// 制造一个数组的拷贝
-	nums = nums.slice();
+    // 制造一个数组的拷贝
+    nums = nums.slice();
 
-	return function caller(fn){
-		return fn( nums );
-	};
+    return function caller(fn){
+        return fn( nums );
+    };
 }
 ```
 
@@ -542,14 +556,14 @@ var list = [1,2,3,4,5];
 
 // 使 `list[0]` 成为一个带有副作用的 getter
 Object.defineProperty(
-	list,
-	0,
-	{
-		get: function(){
-			console.log( "[0] was accessed!" );
-			return 1;
-		}
-	}
+    list,
+    0,
+    {
+        get: function(){
+            console.log( "[0] was accessed!" );
+            return 1;
+        }
+    }
 );
 
 var simpleList = rememberNumbers( list );
@@ -560,9 +574,9 @@ var simpleList = rememberNumbers( list );
 
 ```js
 function rememberNumbers(...nums) {
-	return function caller(fn){
-		return fn( nums );
-	};
+    return function caller(fn){
+        return fn( nums );
+    };
 }
 
 var simpleList = rememberNumbers( ...list );
@@ -578,18 +592,18 @@ var simpleList = rememberNumbers( ...list );
 ```js
 // 没错，一个矫揉造作的例子 :)
 function firstValue(nums) {
-	return nums[0];
+    return nums[0];
 }
 
 function lastValue(nums) {
-	return firstValue( nums.reverse() );
+    return firstValue( nums.reverse() );
 }
 
-simpleList( lastValue );	// 5
+simpleList( lastValue );    // 5
 
-list;						// [1,2,3,4,5] -- OK!
+list;                       // [1,2,3,4,5] -- OK!
 
-simpleList( lastValue );	// 1
+simpleList( lastValue );    // 1
 ```
 
 **注意：** 尽管 `reverse()` 返回了一个反向的数组而且看起来安全（就像其他 JS 的数组方法一样），但它其实改变了数组而不是创建了一个新的。
@@ -598,10 +612,10 @@ simpleList( lastValue );	// 1
 
 ```js
 function rememberNumbers(...nums) {
-	return function caller(fn){
-		// 发送一个拷贝！
-		return fn( nums.slice() );
-	};
+    return function caller(fn){
+        // 发送一个拷贝！
+        return fn( nums.slice() );
+    };
 }
 ```
 
@@ -611,13 +625,13 @@ function rememberNumbers(...nums) {
 
 ```js
 simpleList( function impureIO(nums){
-	console.log( nums.length );
+    console.log( nums.length );
 } );
 ```
 
 事实上，没有办法能定义 `rememberNumbers(..)` 而使 `simpleList(..)` 成为一个完美的纯函数。
 
-纯粹性就是信心。但在许多情况下我们不得不承认，**我们感到的信心实际上都是相对于我们程序的上下文环境**，以及我们对它知道多少。在（JavaScript 的）实际应用中，函数纯粹性的问题不是关于是否绝对纯粹，而是关于对它纯粹性的信心的范围。
+纯粹性就是信心。但在许多情况下我们不得不承认，**我们感到的信心实际上都是相对于我们程序上下文环境的**，以及我们对它知道多少。在（JavaScript 的）实际应用中，函数纯粹性的问题不是关于是否绝对纯粹，而是关于对它纯粹性的信心的范围。
 
 越纯粹越好。你在使一个函数变得纯粹上付出的努力越多，你就在阅读使用它的代码时越有信心，而这将会使这部分代码可读性更好。
 
@@ -633,34 +647,34 @@ simpleList( function impureIO(nums){
 
 ```js
 function calculateAverage(list) {
-	var sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
-	}
-	return sum / list.length;
+    var sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
 var nums = [1,2,4,7,11,16,22];
 
 var avg = calculateAverage( nums );
 
-console.log( "The average is:", avg );		// The average is: 9
+console.log( "The average is:", avg );      // The average is: 9
 ```
 
 ```js
 function calculateAverage(list) {
-	var sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
-	}
-	return sum / list.length;
+    var sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
 var nums = [1,2,4,7,11,16,22];
 
 var avg = 9;
 
-console.log( "The average is:", avg );		// The average is: 9
+console.log( "The average is:", avg );      // The average is: 9
 ```
 
 这两个代码段的唯一区别是，在后者中我们跳过了 `calculateAverage(nums)` 调用而只是内联了它的输出（`9`）。因为程序其余部分的行为完全一样，所以 `calculateAverage(..)` 具有引用透明性，因此是一个纯函数。
@@ -669,7 +683,7 @@ console.log( "The average is:", avg );		// The average is: 9
 
 一个引用透明的纯函数 *可以* 被它的输出替换的概念不意味着它 *就应当被* 替换掉。远远不是。
 
-我们在程序中建造函数而不使用提前计算好的魔法常量，不只是为了对数据的改变作出反应，还是为了恰当抽象的可读性等等。与只是进行明确赋值的那一行比起来，计算那一组数值的平均值的调用使程序的那一部分更具可读性。它给读者讲述了一个故事，`avg` 从何而来，它是什么意思等等。
+我们在程序中建造函数而不使用提前计算好的魔法常量，不只是为了对数据的改变作出反应，还是为了恰当抽象的可读性。与只是进行明确赋值的那一行比起来，计算那一组数值的平均值的调用使程序的那一部分更具可读性。它给读者讲述了一个故事，`avg` 从何而来，它是什么意思等等。
 
 引用透明性的真正含义是，在你阅读一个程序时，一旦你在思维上计算出了一个纯函数调用的输出是什么，你就不再需要在代码中看到它时考虑这个函数调用究竟在做什么，特别是当它出现许多次的时候。
 
@@ -687,11 +701,11 @@ console.log( "The average is:", avg );		// The average is: 9
 
 ```js
 function calculateAverage(list) {
-	sum = 0;
-	for (let i = 0; i < list.length; i++) {
-		sum += list[i];
-	}
-	return sum / list.length;
+    sum = 0;
+    for (let num of nums) {
+        sum += num;
+    }
+    return sum / nums.length;
 }
 
 var sum, nums = [1,2,4,7,11,16,22];
@@ -707,7 +721,7 @@ var avg = calculateAverage( nums );
 
 > 如果一棵树在森林中倒下，但周围没有人听到，那么它发出倒下声音了吗？
 
-根据引用透明性的最狭义的定义，我认为你不得不承认 `calculateAverage(..)` 依然是一个纯函数。但因为我们一直试着使我们的学习不仅学术化，而且要与实用主义平衡，我想这个结论需要更多的观察角度。让我们探索一下。
+根据引用透明性的最狭义的定义，我认为你不得不承认 `calculateAverage(..)` 依然是一个纯函数。但是，因为我们一直试着使我们的学习避免严格的学术化，而是要与实用主义平衡，我想这个结论需要更多的观察角度。让我们探索一下。
 
 #### 性能上的影响
 
@@ -717,39 +731,37 @@ var avg = calculateAverage( nums );
 var cache = [];
 
 function specialNumber(n) {
-	// 如果我们已经计算过这个特殊的数字，
-	// 那么就跳过计算工作而直接从缓存中返回它
-	if (cache[n] !== undefined) {
-		return cache[n];
-	}
+    // 如果我们已经计算过这个特殊的数字，
+    // 那么就跳过计算工作而直接从缓存中返回它
+    if (cache[n] !== undefined) {
+        return cache[n];
+    }
 
-	var x = 1, y = 1;
+    var x = 1, y = 1;
 
-	for (let i = 1; i <= n; i++) {
-		x += i % 2;
-		y += i % 3;
-	}
+    for (let i = 1; i <= n; i++) {
+        x += i % 2;
+        y += i % 3;
+    }
 
-	cache[n] = (x * y) / (n + 1);
+    cache[n] = (x * y) / (n + 1);
 
-	return cache[n];
+    return cache[n];
 }
 
-specialNumber( 6 );				// 4
-specialNumber( 42 );			// 22
-specialNumber( 1E6 );			// 500001
-specialNumber( 987654321 );		// 493827162
+specialNumber( 6 );             // 4
+specialNumber( 42 );            // 22
+specialNumber( 1E6 );           // 500001
+specialNumber( 987654321 );     // 493827162
 ```
 
 这个呆萌的 `specialNumber(..)` 算法是确定性的，而且从对相同的输入总是给出相同的输出这个定义上讲是纯粹的。它从引用透明性的角度上讲也是纯粹的 —— 使用 `22` 替换所有 `specialNumber(42)`，程序的最终结果是相同的。
 
 然而，为了计算某些大一点儿的数字这个函数不得不做相当多的工作，特别是 `987654321` 这个输入。如果我们需要在程序中多次取得这个特别的数字，缓存（`cache`）结果可以使后续的调用高效得多。
 
-**注意：** 一个值得深思的有趣的事情：即使对于最纯粹的函数/程序来说，在执行任何给定的操作时 CPU 产生的热量是一种不可避免的副作用吗？那么 CPU 在一个纯粹的操作上花费时间，而使另一个操作发生的延迟呢？
-
 别那么快就假定你可以运行 `specialNumber(987654321)` 计算一次并手动把结果贴在某个变量/常量上。程序通常是高度模块化的，而且全局的可访问作用域通常不是你想要在那些独立的部分之间共享状态的方式。让 `specialNumber(..)` 实现它的自己的缓存（尽管它刚好是使用一个全局变量这么做的！）是这种状态共享的更好的抽象。
 
-重点是如果 `specialNumber(..)` 是程序中唯一可以访问和更新 `cache` 侧因/副作用的部分，那么引用透明性看起来就是成立的，而且这可能看起来可以作为实现纯函数典范的一种可接受的实用的“作弊”手段。
+重点是如果 `specialNumber(..)` 是程序中唯一可以访问和更新 `cache` 侧因/副作用的部分，那么引用透明性看起来就是成立的，而且这可能看起来可以作为实现纯函数典范的一种可接受的、实用的“作弊”手段。
 
 但它应该是吗？
 
@@ -759,30 +771,30 @@ specialNumber( 987654321 );		// 493827162
 
 ```js
 var specialNumber = (function memoization(){
-	var cache = [];
+    var cache = [];
 
-	return function specialNumber(n){
-		// 如果我们已经计算过这个特殊的数字，
-		// 那么就跳过计算工作而直接从缓存中返回它
-		if (cache[n] !== undefined) {
-			return cache[n];
-		}
+    return function specialNumber(n){
+        // 如果我们已经计算过这个特殊的数字，
+        // 那么就跳过计算工作而直接从缓存中返回它
+        if (cache[n] !== undefined) {
+            return cache[n];
+        }
 
-		var x = 1, y = 1;
+        var x = 1, y = 1;
 
-		for (let i = 1; i <= n; i++) {
-			x += i % 2;
-			y += i % 3;
-		}
+        for (let i = 1; i <= n; i++) {
+            x += i % 2;
+            y += i % 3;
+        }
 
-		cache[n] = (x * y) / (n + 1);
+        cache[n] = (x * y) / (n + 1);
 
-		return cache[n];
-	};
+        return cache[n];
+    };
 })();
 ```
 
-我们将侧因/副作用 `cache` 包含在了 IIFE `memoization()` 内部，于是现在我们可以确信程序中没有其他部分 *能够* 观察到它了，而不只是它们 *不去* 观察它。
+我们将 `specialNumber(..)` 的侧因/副作用 `cache` 包含在了 IIFE `memoization()` 内部，于是现在我们可以确信程序中没有其他部分 *能够* 观察到它了，而不只是它们 *不去* 观察它。
 
 这最后一句话可能听起来在说一件不起眼儿的事，但实际上我认为它可能是 **这整个章节中最重要的观点**。再把它读一遍。
 
@@ -790,19 +802,57 @@ var specialNumber = (function memoization(){
 
 > 如果一棵树在森林中倒下，但周围没有人听到，那么它发出倒下声音了吗？
 
-我在这个类比中得到的启示是：无论有没有发出声音，最好是我们绝不制造树倒下而我们不在场的场景；在一棵树倒下时我们将总是听到声响。
+我在这个比喻中得到的启示是：无论有没有发出声音，最好是我们绝不制造树倒下而我们不在场的场景；让我们在一棵树倒下时总是能够听到声响。
 
-减少侧因/副作用的行为本质上不是去制造一个人们无法观察到的程序，而是为了设计一个侧因/副作用尽可能少的程序，因为这会使程序更易于推理。一段带有侧因/副作用的程序 *碰巧* 没有被观察到，对于达成一个 *不能* 观察到它们的程序的目标来说根本没有效果。
+减少侧因/副作用的行为本质上不是去制造一个人们无法观察到它们的程序，而是为了设计一个侧因/副作用尽可能少的程序，因为这会使程序更易于推理。一段带有侧因/副作用的程序 *碰巧* 没有被观察到，对于达成一个 *不能* 观察到它们的程序的目标来说根本没有效果。
 
 如果侧因/副作用可能发生，那么作者与读者就必须在思维上演练它们。如果使它们不可能发生，那么作者与读者就将会对在任何地方什么会发生和什么不会发生有更多的信心。
 
 ## 纯粹化
 
-如果你有一个你无法将之重构为纯函数的非纯函数，你该怎么做？
+在编写函数时的最佳首选项，是在一开始就将它们设计为纯粹的。但是你将花费相当多的时间去维护既存代码，决策已经被做出了；你会遇到许多非纯函数。
+
+如果可能，就将一个非纯函数重构为纯函数。有时你可以将一个函数的副作用提取到程序中发生调用这个函数的部分。副作用没有被消灭，但在调用点将它展示出来这使得它更加明显。
+
+考虑这个不起眼儿的例子：
+
+```js
+function addMaxNum(arr) {
+    var maxNum = Math.max( ...arr );
+    arr.push( maxNum + 1 );
+}
+
+var nums = [4,2,7,3];
+
+addMaxNum( nums );
+
+nums;       // [4,2,7,3,8]
+```
+
+数组 `nums` 需要被修改，但我们不必把这种作用包含在 `addMaxNum(..)` 中来模糊它。让我们将 `push(..)` 这个改变移出来，这样 `addMaxNum(..)` 就成为了一个纯函数，副作用也更加明显了：
+
+```js
+function addMaxNum(arr) {
+    var maxNum = Math.max( ...arr );
+    return maxNum + 1;
+}
+
+var nums = [4,2,7,3];
+
+nums.push(
+    addMaxNum( nums )
+);
+
+nums;       // [4,2,7,3,8]
+```
+
+**注意：** 另一种完成类似任务的技术是使用不变的数据结构，我们将在下一章讲解。
+
+但是如果你有一个很难将之重构为纯函数的非纯函数，你该怎么做？
 
 你需要搞清楚这个函数有什么种类的侧因/副作用。侧因/副作用可能来自于各种途径，词法自由变量、通过引用的修改、或者甚至是 `this` 绑定。我们将看一看解决这些场景的方式。
 
-### 牵制副作用
+### 遏制副作用
 
 如果我们关心的侧因/副作用来自于词法自由变量，而且你可以修改周围的代码，那么你就可以使用作用域来封装它们。
 
@@ -812,9 +862,9 @@ var specialNumber = (function memoization(){
 var users = {};
 
 function fetchUserData(userId) {
-	ajax( "http://some.api/user/" + userId, function onUserData(userData){
-		users[userId] = userData;
-	} );
+    ajax( `http://some.api/user/${userId}`, function onUserData(user){
+        users[userId] = user;
+    } );
 }
 ```
 
@@ -822,34 +872,39 @@ function fetchUserData(userId) {
 
 ```js
 function safer_fetchUserData(userId,users) {
-	// 简单、幼稚的 ES6+ 对象浅拷贝，
-	// 也可以通过各种库或框架做到
-	users = Object.assign( {}, users );
+    // 简单、幼稚的 ES6+ 对象浅拷贝，
+    // 也可以通过各种库或框架做到
+    users = Object.assign( {}, users );
 
-	fetchUserData( userId );
+    fetchUserData( userId );
 
-	// 返回拷贝的状态
-	return users;
+    // 返回拷贝的状态
+    return users;
 
 
-	// ***********************
+    // ***********************
 
-	// 没有被碰过的原版非纯函数：
-	function fetchUserData(userId) {
-		ajax( "http://some.api/user/" + userId, function onUserData(userData){
-			users[userId] = userData;
-		} );
-	}
+    // 没有被碰过的原版非纯函数：
+    function fetchUserData(userId) {
+        ajax(
+            `http://some.api/user/${userId}`,
+            function onUserData(user){
+                users[userId] = user;
+            }
+        );
+    }
 }
 ```
 
+**警告：** `safer_fetchUserData(..)` *更加* 纯粹，但由于它依然依赖于发起 Ajax 调用的 I/O ，它不是严格纯粹的。Ajax 调用是一种不纯粹的副作用 —— 这一事实无法避免，所以我们干脆将这个细节置之不理。
+
 `userId` 与 `users` 都是原始 `fetchUserData` 的输入，而且 `users` 还是输出。`safer_fetchUserData(..)` 接收这两个输入，并返回 `users`。为了确保我们没有在后面修改 `users` 时制造副作用，我们制造了一个 `users` 的本地拷贝。
 
-这种技术几乎只有有限的用处，因为如果你不能把函数本身修改为纯粹的，那么你也不太可能修改它周围的代码。然而，在可能的情况下探索它一下还是有帮助的，因为它是我们的修改中最简单的一种。
+这种技术只有有限的用处，主要因为如果你不能把函数本身修改为纯粹的，那么你也不太可能修改它周围的代码。然而，在可能的情况下探索它一下还是有帮助的，因为它是我们的修改中最简单的一种。
 
-不论这对于重构为纯函数来说是不是一种实际可行的技术，重点是函数的纯粹性只需要如皮毛一般肤浅。也就是，**一个函数的纯粹性是从外部判断的**，而不管内部发生了什么。只要一个函数的使用表现为纯粹的，那么它就是纯粹的。在一个纯函数内部，可以由于各种原因 —— 适度地！—— 使用非纯粹的技术，包括最常见的为了性能而这样做。它不一定是像人们说的那样，是“海龟背地球”。
+不论这对于纯函数重构来说是不是一种实际可行的技术，重点是函数的纯粹性只需要如皮毛一般肤浅。也就是，**一个函数的纯粹性是从外部判断的**，而不管内部发生了什么。只要一个函数的使用表现为纯粹的，那么它就是纯粹的。在一个纯函数内部，可以由于各种原因 —— 适度地！—— 使用非纯粹的技术，包括最常见的为了性能而这样做。它不一定是像人们说的那样，是“海龟背地球”。
 
-但是要非常小心。程序中任何不纯粹的部分，即便它被一个纯函数包装而且仅为纯函数所用，也是潜在的 bug 以及代码读者困惑的源头。我们的总体目标是尽可能减少副作用，而不是仅将它们藏起来。
+但是要非常小心。程序中任何不纯粹的部分，即便它被一个纯函数包装而且仅通过纯函数使用，也是潜在的 bug 以及代码读者困惑的源头。我们的总体目标是尽可能减少副作用，而不是仅将它们藏起来。
 
 ### 掩盖副作用
 
@@ -861,18 +916,18 @@ var smallCount = 0;
 var largeCount = 0;
 
 function generateMoreRandoms(count) {
-	for (let i = 0; i < count; i++) {
-		let num = Math.random();
+    for (let i = 0; i < count; i++) {
+        let num = Math.random();
 
-		if (num >= 0.5) {
-			largeCount++;
-		}
-		else {
-			smallCount++;
-		}
+        if (num >= 0.5) {
+            largeCount++;
+        }
+        else {
+            smallCount++;
+        }
 
-		nums.push( num );
-	}
+        nums.push( num );
+    }
 }
 ```
 
@@ -887,35 +942,35 @@ function generateMoreRandoms(count) {
 
 ```js
 function safer_generateMoreRandoms(count,initial) {
-	// (1) 保存原始状态
-	var orig = {
-		nums,
-		smallCount,
-		largeCount
-	};
+    // (1) 保存原始状态
+    var orig = {
+        nums,
+        smallCount,
+        largeCount
+    };
 
-	// (2) 建立副作用之前的初始状态
-	nums = initial.nums.slice();
-	smallCount = initial.smallCount;
-	largeCount = initial.largeCount;
+    // (2) 建立副作用之前的初始状态
+    nums = initial.nums.slice();
+    smallCount = initial.smallCount;
+    largeCount = initial.largeCount;
 
-	// (3) 小心不纯粹性！
-	generateMoreRandoms( count );
+    // (3) 小心不纯粹性！
+    generateMoreRandoms( count );
 
-	// (4) 捕获副作用状态
-	var sides = {
-		nums,
-		smallCount,
-		largeCount
-	};
+    // (4) 捕获副作用状态
+    var sides = {
+        nums,
+        smallCount,
+        largeCount
+    };
 
-	// (5) 重置原始状态
-	nums = orig.nums;
-	smallCount = orig.smallCount;
-	largeCount = orig.largeCount;
+    // (5) 重置原始状态
+    nums = orig.nums;
+    smallCount = orig.smallCount;
+    largeCount = orig.largeCount;
 
-	// (6) 将副作用直接暴露为输出
-	return sides;
+    // (6) 将副作用直接暴露为输出
+    return sides;
 }
 ```
 
@@ -923,17 +978,17 @@ function safer_generateMoreRandoms(count,initial) {
 
 ```js
 var initialStates = {
-	nums: [0.3, 0.4, 0.5],
-	smallCount: 2,
-	largeCount: 1
+    nums: [0.3, 0.4, 0.5],
+    smallCount: 2,
+    largeCount: 1
 };
 
 safer_generateMoreRandoms( 5, initialStates );
 // { nums: [0.3,0.4,0.5,0.8510024448959794,0.04206799238...
 
-nums;			// []
-smallCount;		// 0
-largeCount;		// 0
+nums;           // []
+smallCount;     // 0
+largeCount;     // 0
 ```
 
 为了避免几个侧因/副作用要做许多手动工作；要是它们一开始就不存在就容易多了。但如果我们别无选择，那么为了在我们程序中避免意外这种额外的努力还是值得的。
@@ -942,22 +997,22 @@ largeCount;		// 0
 
 ### 回避副作用
 
-当我们要对付的副作用的性质是通过引用修改了一个直接输入值（对象，数组等等），我们同样可以创建一个接口函数来与之互动，从而取代原始的非纯函数。
+当我们要对付的副作用的性质是通过引用修改了一个直接输入的值（对象，数组等等），我们同样可以创建一个接口函数来与之互动，从而取代原始的非纯函数。
 
 考虑如下代码：
 
 ```js
 function handleInactiveUsers(userList,dateCutoff) {
-	for (let i = 0; i < userList.length; i++) {
-		if (userList[i].lastLogin == null) {
-			// 从列表中移除用户
-			userList.splice( i, 1 );
-			i--;
-		}
-		else if (userList[i].lastLogin < dateCutoff) {
-			userList[i].inactive = true;
-		}
-	}
+    for (let i = 0; i < userList.length; i++) {
+        if (userList[i].lastLogin == null) {
+            // 从列表中移除用户
+            userList.splice( i, 1 );
+            i--;
+        }
+        else if (userList[i].lastLogin < dateCutoff) {
+            userList[i].inactive = true;
+        }
+    }
 }
 ```
 
@@ -965,17 +1020,17 @@ function handleInactiveUsers(userList,dateCutoff) {
 
 ```js
 function safer_handleInactiveUsers(userList,dateCutoff) {
-	// 为列表以及它的用户对象制造一个拷贝
-	let copiedUserList = userList.map( function mapper(user){
-		// 拷贝一个 `user` 对象
-		return Object.assign( {}, user );
-	} );
+    // 为列表以及它的用户对象制造一个拷贝
+    let copiedUserList = userList.map( function mapper(user){
+        // 拷贝一个 `user` 对象
+        return Object.assign( {}, user );
+    } );
 
-	// 使用拷贝调用原版函数
-	handleInactiveUsers( copiedUserList, dateCutoff );
+    // 使用拷贝调用原版函数
+    handleInactiveUsers( copiedUserList, dateCutoff );
 
-	// 将被改变的列表作为直接的输出
-	return copiedUserList;
+    // 将被改变的列表作为直接的输出
+    return copiedUserList;
 }
 ```
 
@@ -983,16 +1038,16 @@ function safer_handleInactiveUsers(userList,dateCutoff) {
 
 #### 重温 `this`
 
-另外一种由引用引起的侧因/副作用是在 `this` 敏感的函数中使用 `this` 作为一种隐含的输入。关于为什么 `this` 关键字对 FP 程序员来说是个问题，详见第二章的“This 是什么”。
+另外一种由引用引起的侧因/副作用是在 `this` 敏感的函数中使用 `this` 作为一种隐含的输入。关于为什么 `this` 关键字对 FP 程序员来说是个问题，详见[第二章的“This 是什么”](ch2.md/#whats-this)。
 
 考虑如下代码：
 
 ```js
 var ids = {
-	prefix: "_",
-	generate() {
-		return this.prefix + Math.random();
-	}
+    prefix: "_",
+    generate() {
+        return this.prefix + Math.random();
+    }
 };
 ```
 
@@ -1000,7 +1055,7 @@ var ids = {
 
 ```js
 function safer_generate(context) {
-	return ids.generate.call( context );
+    return ids.generate.call( context );
 }
 
 // *********************
@@ -1021,4 +1076,4 @@ safer_generate( { prefix: "foo" } );
 
 将一个非纯函数重构为纯函数是不错的选择。但如果那不可能，就可以封装侧因/副作用，或者创建一个纯粹的接口来防护它们。
 
-没有程序是完全没有副作用的。但在实际中要在尽可能多的地方首选纯函数。尽可能多地将非纯函数的副作用集中在一起，这样如果 bug 发生，定位并检查嫌疑最大的祸首时会容易一些。
+完全没有副作用的程序是不存在的。但在实际中要在尽可能多的地方首选纯函数。尽可能多地将非纯函数的副作用集中在一起，这样如果 bug 发生，定位并检查嫌疑最大的祸首时会容易一些。
