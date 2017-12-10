@@ -217,7 +217,7 @@ maxEven( nums ):
 
 In other words, we can define the max-even of a list of numbers as the max-even of the first number compared to the max-even of the rest of the numbers. For example:
 
-```
+```txt
 maxEven( 1, 10, 3, 2 ):
     maxEven( 1, maxEven( 10, maxEven( 3, maxEven( 2 ) ) )
 ```
@@ -242,7 +242,7 @@ First, the signature is a little different than before. I intentionally called o
 
 This function signature is an intentional hint at the recursive definition. It reads like this:
 
-```
+```txt
 maxEven( num1, ...restNums ):
     maxEven( num1, maxEven( ...restNums ) )
 ```
@@ -269,7 +269,7 @@ Here's another recursion example: calculating the depth of a binary tree. In fac
 
 The depth of a binary tree is the longest path down (either left or right) through the nodes of the tree. Another way to define that is recursively -- the depth of a tree at any node is 1 (the current node) plus the greater of depths from either its left or right child trees:
 
-```
+```txt
 depth( node ):
     1 + max( depth( node.left ), depth( node.right ) )
 ```
