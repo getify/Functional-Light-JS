@@ -26,7 +26,7 @@ function isShortEnough(str) {
 }
 ```
 
-In [Chapter 3, we used these predicate functions](#ch3shortlongenough) to test a single word. Then in [Chapter 9](#ch9filter), we learned how to repeat such tests using list operations like `filter(..)`. For example:
+In [Chapter 3, we used these predicate functions](#ch3shortlongenough) to test a single word. Then in Chapter 9, we learned how to repeat such tests [using list operations like `filter(..)`](#ch9filter). For example:
 
 ```js
 var words = [ "You", "have", "written", "something", "very",
