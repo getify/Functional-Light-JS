@@ -127,7 +127,7 @@ var identity = v => v;
 A.chain( identity );        // 10
 ```
 
-`A.chain(..)` calls `identity(..)` with the value in `A`, and whatever value `identity(..)` returns (`10` in this case) just comes right out without any intervening monad. In other words, from that earlier `Just(..)` code listing, we wouldn't actually need to include that optional `inspect(..)` helper, as `chain(inspect)` accomplishes the same goal; it's purely for ease of debugging as we learn monads.
+`A.chain(..)` calls `identity(..)` with the value in `A`, and whatever value `identity(..)` returns (`10` in this case) just comes right out without any intervening monad. In other words, from that earlier `Just(..)` code listing, we wouldn't actually need to include that optional `inspect(..)` helper, as `chain(identify)` accomplishes the same goal; it's purely for ease of debugging as we learn monads.
 
 At this point, hopefully both `map(..)` and `chain(..)` feel fairly reasonable to you.
 
