@@ -178,7 +178,7 @@ Do you spot why `bar(foo)` fails?
 
 The array `[3,9]` is sent in as a single value to `fn(..)`, but `foo(..)` expects `x` and `y` separately. If we could change the declaration of `foo(..)` to be `function foo([x,y]) { ..`, we'd be fine. Or, if we could change the behavior of `bar(..)` to make the call as `fn(...[3,9])`, the values `3` and `9` would be passed in individually.
 
-There will be occasions when you have two functions that are imcompatible in this way, and you won't be able to change their declarations/definitions. So, how can you use them together?
+There will be occasions when you have two functions that are incompatible in this way, and you won't be able to change their declarations/definitions. So, how can you use them together?
 
 We can define a helper to adapt a function so that it spreads out a single received array as its individual arguments:
 
@@ -733,7 +733,7 @@ Whether you use currying or partial application, creating specialized functions 
 
 The definition and implementation I've given of currying thus far is, I believe, as true to the spirit as we can likely get in JavaScript.
 
-Specifically, if we look briefly at how currying works in Haskell, we can observe that multiple arguments always go in to a function one at a time, one per curried call -- other than tuples (analogus to arrays for our purposes) that transport multiple values in a single argument.
+Specifically, if we look briefly at how currying works in Haskell, we can observe that multiple arguments always go in to a function one at a time, one per curried call -- other than tuples (analogous to arrays for our purposes) that transport multiple values in a single argument.
 
 For example, in Haskell:
 
