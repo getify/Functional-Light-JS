@@ -206,7 +206,7 @@ function fetchOrders(userId) {
             for (let order of orders) {
                 // keep a reference to latest order for each user
                 users[userId].latestOrder = order;
-                userOrders[orders[i].orderId] = order;
+                userOrders[order.orderId] = order;
             }
         }
     );
