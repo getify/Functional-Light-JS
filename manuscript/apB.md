@@ -206,7 +206,7 @@ If the *how* of this discussion on monad methods is unclear so far, go back and 
 
 It's very common in FP material to cover well-known monads like Maybe. Actually, the Maybe monad is a particular pairing of two other simpler monads: Just and Nothing.
 
-We've already seen Just; Nothing is a monad that holds an empty value. Maybe is a monad that either holds a Just or an Empty.
+We've already seen Just; Nothing is a monad that holds an empty value. Maybe is a monad that either holds a Just or a Nothing.
 
 {pagebreak}
 
