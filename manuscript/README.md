@@ -1,66 +1,95 @@
-# 轻量函数式 JavaScript（书籍）
+# 轻量函数式 JavaScript
 
-这本书在将函数式编程（FP）应用于 JavaScript 的同时探索它的核心原理。但是这本书与众不同的是，我们讲解这些原理的方式不会沉浸在所有那些专门术语中。我们将关注于一个我称之为 “轻量函数式编程” 的 FP 基础概念子集，并将它应用在 JavaScript 上。
+<a href="https://leanpub.com/fljs"><img src="images/marketing/front-cover-small.png" width="20%"></a>
 
-**注意：** 尽管在标题中出现了 “轻量” 一词，但我不认为或推荐将这本书看做一本在这个话题上的 “入门”、“简易”、或者 “介绍” 书籍。这本书十分缜密而且充满了细节；它希望读者在深入之前有坚实的 JS 知识基础。“轻量” 意味着在范围上的限制；取代更加广泛讨论的是，这本书与你经常能够看到的其他 FP-JavaScript 书籍相比在每一个话题上都要深入得多。
+[![Buy on Leanpub](https://img.shields.io/badge/Buy-Leanpub-yellow.svg)](https://leanpub.com/fljs)
 
-让我们直面这个问题：除非你已经是 FP 酷小子俱乐部的一员（我不是！），那么像 “单子只是自函子范畴中的幺半群” 这样的话对我们不意味着任何有用的东西。
+## 目录
 
-这不是说这些名词 *没有* 意义，或者 FP 程序员使用它们很不好。一旦你从轻量函数式中毕业，你就可能/希望去更正规的学习 FP，而且你无疑会有很多机会搞清楚它们意味着什么和为什么。
-
-但我想让你 *现在* 就能够将 FP 基础中的一些应用到你的 JavaScript 中去，因为我相信它能帮你写出更好，更 *合理* 的代码。
-
-**要了解更多本书背后的动机与视角，请参阅[前言](preface.md)。**
-
-## 书籍
-
-[目录](toc.md)
-
-* 序 (TBA)
-* [前言](preface.md)
-* [第一章：为什么要进行函数式编程？](ch1.md)
-* [第二章：函数式函数的基础](ch2.md)
-* [第三章：管理函数输入](ch3.md)
-* [第四章：组合函数](ch4.md)
-* [第五章：降低副作用](ch5.md)
-* [第六章：值不可变性](ch6.md)
-* [第七章：闭包 vs 对象](ch7.md)
-* [第八章：列表操作](ch8.md)
-* [第九章：递归](ch9.md)
-* [第十章：函数式异步](ch10.md)
-* [第十一章：综合应用](ch11.md)
-* [附录A：转导](apA.md)
-* [附录B：谦逊的单子（Monad）](apB.md)
-* [附录C：FP 库](apC.md)
-
-## 出版
-
-这本书由我自出版，最有可能是在 [Leanpub](https://leanpub.com/fljs/) 上出版数字版本。我也在为贩卖此书的印刷版想办法，但这部分还不确定。
-
-除了购买这本书以外，如果你想要对本作品（或者我的其他在线开源内容）做出经济上的贡献，我有一个 [patreon](https://www.patreon.com/getify)。我将永远感激你的慷慨。
-
-<a href="https://www.patreon.com/getify">[![patreon.png](https://s11.postimg.org/axpzguh77/patreon.png)](https://www.patreon.com/getify)</a>
-
-## 对面教学
-
-这些书的内容很大程度上衍生自我职业中（公开的和私营企业培训的形式）教授的一个同名辅导班。
-
-如果你喜欢这些内容并且想要联系我进行关于这些内容，或其他关于 JS/HTML5/node.js 话题的培训，请通过这里罗列的渠道联系我：
-
-[http://getify.me](http://getify.me)
-
-## 在线视频教学
-
-我还有一些以请求方式发布的视频 JS 培训课程。我通过 [Frontend Masters](https://FrontendMasters.com) 教授课程，比如我的 [Functional-Lite JS](https://frontendmasters.com/courses/functional-js-lite/) 教室。这些课程中的一些还可以通过 [PluralSight](https://www.pluralsight.com/search?q=kyle%20simpson&categories=all) 找到。
-
-## 内容贡献
-
-**非常感谢** 你向本作品做出的任何贡献。
-
-但是在提交 PR 以前 **请** 仔细阅读[内容贡献指引](CONTRIBUTING.md)。
-
-## 许可 & 版权
-
-The materials herein are all (c) 2016-2017 Kyle Simpson.
-
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License</a>.
+* [序](foreword.md/#foreword)
+* [前言](preface.md/#preface)
+* [第一章：为什么要进行函数式编程？](ch1.md/#chapter-1-why-functional-programming)
+    * [一瞥](ch1.md/#at-a-glance)
+    * [信心](ch1.md/#confidence)
+    * [交流](ch1.md/#communication)
+    * [可读性](ch1.md/#readability)
+    * [视角](ch1.md/#perspective)
+    * [如何寻找平衡](ch1.md/#how-to-find-balance)
+    * [资源](ch1.md/#resources)
+* [第二章：函数的性质](ch2.md/#chapter-2-the-nature-of-functions)
+    * [什么是函数？](ch2.md/#what-is-a-function)
+    * [函数输入](ch2.md/#function-input)
+    * [命名实际参数](ch2.md/#named-arguments)
+    * [函数输出](ch2.md/#function-output)
+    * [函数的函数](ch2.md/#functions-of-functions)
+    * [语法](ch2.md/#syntax)
+    * [This 是什么？](ch2.md/#whats-this)
+* [第三章：管理函数输入](ch3.md/#chapter-3-managing-function-inputs)
+    * [皆归为一](ch3.md/#all-for-one)
+    * [实际参数适配形式参数](ch3.md/#adapting-arguments-to-parameters)
+    * [有些现在，有些后来](ch3.md/#some-now-some-later)
+    * [一次一个](ch3.md/#one-at-a-time)
+    * [顺序的重要性](ch3.md/#order-matters)
+    * [无点](ch3.md/#no-points)
+* [第四章：组合函数](ch4.md/#chapter-4-composing-functions)
+    * [输出到输入](ch4.md/#output-to-input)
+    * [泛化组合](ch4.md/#general-composition)
+    * [重排组合](ch4.md/#reordered-composition)
+    * [抽象](ch4.md/#abstraction)
+    * [重温 “点”](ch4.md/#revisiting-points)
+* [第五章：降低副作用](ch5.md/#chapter-5-reducing-side-effects)
+    * [拜托，副作用靠边站](ch5.md/#effects-on-the-side-please)
+    * [谢谢，一次就够了](ch5.md/#once-is-enough-thanks)
+    * [纯粹的福佑](ch5.md/#pure-bliss)
+    * [在或不在](ch5.md/#there-or-not)
+    * [纯粹化](ch5.md/#purifying)
+* [第六章：值的不可变性](ch6.md/#chapter-6-value-immutability)
+    * [基本类型的不可变性](ch6.md/#primitive-immutability)
+    * [从值到值](ch6.md/#value-to-value)
+    * [重新赋值](ch6.md/#reassignment)
+    * [性能](ch6.md/#performance)
+    * [解决方法](ch6.md/#treatment)
+* [第七章：闭包 vs. 对象](ch7.md/#chapter-7-closure-vs-object)
+    * [同一轨道](ch7.md/#the-same-page)
+    * [看起来很像](ch7.md/#look-alike)
+    * [分道扬镳](ch7.md/#two-roads-diverged-in-a-wood)
+* [第八章：递归](ch8.md/#chapter-8-recursion)
+    * [定义](ch8.md/#definition)
+    * [声明式递归](ch8.md/#declarative-recursion)
+    * [栈](ch8.md/#stack)
+    * [重新安排递归](ch8.md/#rearranging-recursion)
+* [第九章：列表操作](ch9.md/#chapter-9-list-operations)
+    * [非 FP 列表处理](ch9.md/#non-fp-list-processing)
+    * [Map](ch9.md/#map)
+    * [Filter](ch9.md/#filter)
+    * [Reduce](ch9.md/#reduce)
+    * [高级列表操作](ch9.md/#advanced-list-operations)
+    * [方法 vs. 独立函数](ch9.md/#method-vs-standalone)
+    * [寻找列表](ch9.md/#looking-for-lists)
+    * [融合（Fusion）](ch9.md/#fusion)
+    * [列表以外](ch9.md/#beyond-lists)
+* [第十章：函数式异步](ch10.md/#chapter-10-functional-async)
+    * [作为状态的时间](ch10.md/#time-as-state)
+    * [急切 vs. 懒惰](ch10.md/#eager-vs-lazy)
+    * [响应式 FP](ch10.md/#reactive-fp)
+* [第十一章：综合应用](ch11.md/#chapter-11-putting-it-all-together)
+    * [准备](ch11.md/#setup)
+    * [证券事件](ch11.md/#stock-events)
+    * [证券报价机的 UI](ch11.md/#stock-ticker-ui)
+* [附录 A：Transducing](apA.md/#appendix-a-transducing)
+    * [首先，为什么](apA.md/#why-first)
+    * [接下来，如何做](apA.md/#how-next)
+    * [最后，是什么](apA.md/#what-finally)
+* [附录 B：谦逊的单子](apB.md/#appendix-b-the-humble-monad)
+    * [类型](apB.md/#type)
+    * [宽松接口](apB.md/#loose-interface)
+    * [Just 单子](apB.md/#just-a-monad)
+    * [Maybe](apB.md/#maybe)
+    * [Humble](apB.md/#humble)
+* [附录 C：FP 库](apC.md/#appendix-c-fp-libraries)
+    * [调研对象](apC.md/#stuff-to-investigate)
+    * [Ramda](apC.md/#ramda-0230)
+    * [Lodash/fp](apC.md/#lodashfp-4174)
+    * [Mori](apC.md/#mori-032)
+    * [福利：FPO](apC.md/#bonus-fpo)
+    * [福利 #2：fasy](apC.md/#bonus-2-fasy)

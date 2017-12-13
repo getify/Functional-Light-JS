@@ -1,0 +1,34 @@
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#stock-ticker {
+	background-color: #efefef;
+	padding: 1em;
+	margin: 0;
+	width: 14em;
+}
+
+.stock {
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 1em 0;
+}
+
+.stock:last-child {
+	margin-bottom: 0;
+}
+
+.stock > span {
+	display: inline-block;
+	width: 4em;
+	text-align: right;
+	overflow: hidden;
+}
+
+.stock-name {
+	font-weight: bold;
+	text-align: center;
+}
+

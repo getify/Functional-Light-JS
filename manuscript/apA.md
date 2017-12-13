@@ -537,7 +537,7 @@ words.reduce( transducer( strConcat ), "" );
 
 轰！这就是你的 transducing。我不会真的在这里摔麦克，而是轻轻地将它放下……
 
-## 最后，什么
+## 最后，是什么
 
 深呼吸。这真是有太多东西要消化了。
 
