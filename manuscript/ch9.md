@@ -548,7 +548,7 @@ Now that we feel somewhat comfortable with the foundational list operations `map
 
 ### Unique
 
-Filtering a list to include only unique values, based on `indexOf(..)` searching (which uses `===` strict equality comparision):
+Filtering a list to include only unique values, based on `indexOf(..)` searching (which uses `===` strict equality comparison):
 
 ```js
 var unique =
