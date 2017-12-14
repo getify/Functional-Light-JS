@@ -675,8 +675,8 @@ flatten(
     firstNames
     .map( entry => [entry.name].concat( entry.variations ) )
 );
-// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
-//  "Fred","Freddy"]
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy",
+//  "Frederick","Fred","Freddy"]
 ```
 
 除了稍稍繁冗之外，将 `map(..)` 和 `flatten(..)` 作为两个步骤分开做的缺点主要关乎性能；这个方式将列表处理了两次，而且创建了一个用完就扔的中间列表。
@@ -685,8 +685,8 @@ FP 库中经常定义一个 “映射之后平整” 结合的 `flatMap(..)`（�
 
 ```js
 flatMap( entry => [entry.name].concat( entry.variations ), firstNames );
-// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy","Frederick",
-//  "Fred","Freddy"]
+// ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy",
+//  "Frederick","Fred","Freddy"]
 ```
 
 将两个步骤分开做的 `flatMap(..)` 的幼稚的实现是：
@@ -992,7 +992,6 @@ compose(
 让我们 **集中于（2）**。为了展示其中的要点，我们将转换之前递归的 `flatten(..)` 独立工具：
 
 ```js
-var flatten =
 var flatten =
     arr =>
         arr.reduce(

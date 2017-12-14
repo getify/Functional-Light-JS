@@ -100,8 +100,8 @@ function upper(txt) {
     return txt.toUpperCase();
 }
 
-output( "Hello World", upper );		// HELLO WORLD
-output( "Hello World" );			// Hello World
+output( "Hello World", upper );     // HELLO WORLD
+output( "Hello World" );            // Hello World
 ```
 
 你还可能看到 `identity(..)` 被用作 `map(..)` 的默认变形函数，或者在一个函数列表的 `reduce(..)` 中作为初始值；这两种工具都将在[第九章](ch9.md)中讲解。
@@ -203,7 +203,7 @@ var spreadArgs =
 现在我们可以使用 `spreadArgs(..)` 来适配 `foo(..)`，使之成为 `bar(..)` 的恰当输入：
 
 ```js
-bar( spreadArgs( foo ) );			// 12
+bar( spreadArgs( foo ) );           // 12
 ```
 
 这些场景为什么会发生看起来还不清楚，但你会经常看到它们。实质上，`spreadArgs(..)` 将允许我们定义这样的函数：它通过一个数组 `return` 多个值，但依然使这些值被独立地视为另一个函数的输入。
@@ -212,7 +212,7 @@ bar( spreadArgs( foo ) );			// 12
 
 ```js
 function gatherArgs(fn) {
-    return function gatheredFn(...argsArr) {
+    return function gatheredFn(...argsArr){
         return fn( argsArr );
     };
 }
@@ -257,11 +257,11 @@ function ajax(url,data,callback) {
 
 ```js
 function getPerson(data,cb) {
-	ajax( "http://some.api/person", data, cb );
+    ajax( "http://some.api/person", data, cb );
 }
 
 function getOrder(data,cb) {
-	ajax( "http://some.api/order", data, cb );
+    ajax( "http://some.api/order", data, cb );
 }
 ```
 
@@ -321,7 +321,7 @@ var getOrder = partial( ajax, "http://some.api/order" );
 
 ```js
 var getPerson = function partiallyApplied(...laterArgs) {
-	return ajax( "http://some.api/person", ...laterArgs );
+    return ajax( "http://some.api/person", ...laterArgs );
 };
 ```
 
@@ -356,7 +356,7 @@ var getCurrentUser = function partiallyApplied(...laterArgs) {
 };
 
 // 版本 2
-var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs) {
+var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs){
     var getPerson = function innerPartiallyApplied(...innerLaterArgs){
         return ajax( "http://some.api/person", ...innerLaterArgs );
     };
@@ -373,7 +373,7 @@ var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs) {
 
 ```js
 function add(x,y) {
-	return x + y;
+    return x + y;
 }
 ```
 
@@ -531,7 +531,7 @@ getCurrentUser( function foundUser(user){ /* .. */ } );
 
 柯里化与局部应用的相似之处在于，每个连续的柯里化调用都是对原始函进行另一个参数的局部应用，直到所有参数都被传递过来。
 
-主要的区别是 `curriedAjax(..)` 将会返回一个 **仅期待下个参数** `data` 的函数（我们称为 `curriedGetPerson(..)`），而不是接收所有剩余参数的函数（比如早先的 `getPerson(..)`）。
+主要的区别是 `curriedAjax(..)` 将会返回一个 **仅期待下个参数** `data` 的函数（我们称为 `personFetcher(..)`），而不是接收所有剩余参数的函数（比如早先的 `getPerson(..)`）。
 
 如果一个原始函数期待五个参数，那么这个函数的柯里化形式将会仅仅接收第一个参数，并返回一个接收第二个参数的函数。而这个函数会仅接收第二个参数，并返回接收第三个参数的函数。以此类推。
 
@@ -646,12 +646,12 @@ curriedSum( 1 )( 2 )( 3 )( 4 )( 5 );        // 15
 要是我们不使用 `curry(..)` 而手动定义一个 `curriedSum(..)` 会怎么样？它看起来什么样？
 
 ```js
-function curriedSum(val1) {
-    return function(val2){
-        return function(val3){
-            return function(val4){
-                return function(val5){
-                    return sum( val1, val2, val3, val4, val5 );
+function curriedSum(v1) {
+    return function(v2){
+        return function(v3){
+            return function(v4){
+                return function(v5){
+                    return sum( v1, v2, v3, v4, v5 );
                 };
             };
         };
@@ -667,18 +667,18 @@ function curriedSum(val1) {
 
 ```js
 curriedSum =
-    val1 =>
-        val2 =>
-            val3 =>
-                val4 =>
-                    val5 =>
-                        sum( val1, val2, val3, val4, val5 );
+    v1 =>
+        v2 =>
+            v3 =>
+                v4 =>
+                    v5 =>
+                        sum( v1, v2, v3, v4, v5 );
 ```
 
 现在，把它们放在一行：
 
 ```js
-curriedSum = val1 => val2 => val3 => val4 => val5 => sum( val1, val2, val3, val4, val5 );
+curriedSum = v1 => v2 => v3 => v4 => v5 => sum( v1, v2, v3, v4, v5 );
 ```
 
 根据你的观点不同，这种将柯里化函数进行可视化的形式可能或多或少对你有用。对我来说，它相当费解。
@@ -687,7 +687,7 @@ curriedSum = val1 => val2 => val3 => val4 => val5 => sum( val1, val2, val3, val4
 
 ### 为什么要进行柯里化和局部应用？
 
-不管是柯里化风格（`sum(1)(2)(3)`）还是局部应用风格（`partial(sum,1,2)(3)`），调用点都毫无疑问地看起来比更常见的 `sum(1,2,3)` 更奇怪。那么在采用 FP 时 **我们为什么要走向这个方向呢**？有许多层面可以回答这个问题。
+不管是柯里化风格（例如 `sum(1)(2)(3)`）还是局部应用风格（例如 `partial(sum,1,2)(3)`），调用点都毫无疑问地看起来比更常见的 `sum(1,2,3)` 更奇怪。那么在采用 FP 时 **我们为什么要走向这个方向呢**？有许多层面可以回答这个问题。
 
 第一个也是最明显的原因是，当参数在不同的时间与位置被声明时，柯里化与局部应用都允许你在时间/空间上进行分离（在你的整个代码库中），而传统函数调用要求所有的参数都被提前准备好。如果你将在你的代码中的一个地方知道参数中的一些，而在另一个地方其他参数才能被确定，柯里化与局部应用就非常有用。
 
@@ -926,7 +926,7 @@ function spreadArgProps(
         .split( /\s*,\s*/ )
         .map( v => v.replace( /[=\s].*$/, "" ) )
 ) {
-    return function spreadFn(argsObj) {
+    return function spreadFn(argsObj){
         return fn( ...propOrder.map( k => argsObj[k] ) );
     };
 }
@@ -1075,7 +1075,7 @@ var isLongEnough = not( isShortEnough );
 printIf( isLongEnough, msg2 );          // Hello World
 ```
 
-这相当好，不是吗？但我们 *可以* 走得更远。函数 `printIf(..)` 的定义本身实际上可以被重构为无点风格。
+这相当好，不是吗？但我们 *可以* 走得更远。`printIf(..)` 的本身可以被重构为无点风格。
 
 我们可以使用一个 `when(..)` 工具来表达 `if` 条件的部分：
 
@@ -1098,7 +1098,7 @@ var when =
 让我们把 `when` 与本章早先看到的几种其他帮助工具混合在一起，来制造无点的 `printIf(..)`：
 
 ```js
-var printIf = uncurry( rightPartial( when, output ) );
+var printIf = uncurry( partialRight( when, output ) );
 ```
 
 我们是这样做的：我们将 `output` 方法从右侧局部应用为 `when(..)` 的第二个参数（`fn`），这给了我们一个依然在期望第一个参数（`predicate`）的函数。这个函数在被调用时会产生另一个期待消息字符串的函数；看起来就像这样：`fn(predicate)(str)`。
@@ -1147,6 +1147,5 @@ printIf( isLongEnough, msg2 );          // Hello World
 其他像 `unary(..)`、`identity(..)`、和 `constant(..)` 这样重要的操作，都是 FP 基础工具箱的一部分。
 
 无点是一种编写代码的风格，它消灭了没必要的形式参数（“点”）到实际参数映射的繁冗，使得代码更易于阅读/理解。
-
 
 所有这些技术都把函数进行各种扭曲，以使它们可以更自然地一起工作。现在带着你塑造好的函数，下一章将会教你如何将它们组合，来对你程序中的数据流进行建模。

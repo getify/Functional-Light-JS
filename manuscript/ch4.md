@@ -15,13 +15,13 @@
 
 ## 输出到输入
 
-我们已经看到了几个组合的例子。例如，在第三章我们关于 [`unary(..)`](ch3.md/#user-content-unary) 的讨论中包含了这个表达式：[`[ .. ].map(unary(parseInt))`](ch3.md/#user-content-mapunary)。考虑一下这里发生了什么。
+我们已经看到了几个组合的例子。例如，在第三章我们关于 [`unary(..)`](ch3.md/#user-content-unary) 的讨论中包含了这个表达式：[`[..].map(unary(parseInt))`](ch3.md/#user-content-mapunary)。考虑一下这里发生了什么。
 
 要将两个函数组合在一起，可以将第一个函数调用的输出作为第二个函数调用的输入传递。在 `map(unary(parseInt))` 中，`unary(parseInt)` 函数调用返回一个值（一个函数）；这个值作为实际参数直接传递给 `map(..)`，它返回一个数组。
 
 退一步并把概念上的数据流可视化表达一下的话：
 
-```
+```txt
 arrayValue <-- map <-- unary <-- parseInt
 ```
 
@@ -115,13 +115,13 @@ function uniqueWords(str) {
 }
 ```
 
-`uniqueWords(..)` 接收一个字符串并返回一个数组。它是一个 `unique(..)` 和 `words(..)` 的组合，它完成这样的数据流：
+`uniqueWords(..)` 接收一个字符串并返回一个数组。它是两个函数 `unique(..)` 和 `words(..)` 的组合，它创建这样的数据流：
 
-```
+```txt
 wordsUsed <-- unique <-- words <-- text
 ```
 
-现在你一定明白了：在糖果工厂设计中进行的革新就是函数组合。
+现在你可能看出来了：在糖果工厂设计中进行的革新就是函数组合。
 
 ### 制造机器
 
@@ -187,7 +187,7 @@ chars;
 
 如果我们能够定义两个函数的组合，那么我们就能继续支持任意多个函数的组合。任意多个函数被组合后的泛化数据流的可视化表现看起来像这样：
 
-```
+```txt
 finalValue <-- func1 <-- func2 <-- ... <-- funcN <-- origValue
 ```
 
@@ -233,7 +233,7 @@ var compose =
         };
 ```
 
-**警告：** `...fns` 是一个被收集好的实际参数数组，而不是一个被传入的数组，因此，它是存在于 `compose(..)` 本地的。这可能会让人觉得 `fns.slice()` 因此是不必要的。然而，在这种特定的实现中，内部的 `composed(..)` 函数中的 `.pop()` 在改变这个列表，所以如果我们没有每次都制造一份拷贝，那么返回的组合函数就只能可靠地工作一次。我们会在[第六章](ch6.md)中重新审视这个麻烦。
+**警告：** `...fns` 是一个被收集好的实际参数数组，而不是一个被传入的数组，因此，它是存在于 `compose(..)` 本地的。这可能会让人觉得 `fns.slice()` 因此是不必要的。然而，在这种特定的实现中，内部的 `composed(..)` 函数中的 `.pop()` 在改变这个列表，所以如果我们没有每次都制造一份拷贝，那么返回的组合函数就只能可靠地工作一次。我们会在[第六章](ch6.md/#user-content-hiddenmutation)中重新审视这个麻烦。
 
 现在让我们看一个组合两个以上函数的例子。回想我们 `uniqueWords(..)` 组合的例子，让我们加入一个 `skipShortWords(..)`：
 
@@ -251,7 +251,7 @@ function skipShortWords(list) {
 }
 ```
 
-让我们定义一个包含 `skipShortWords(..)` 的 `biggerWords(..)`。我们追寻的手动组合的等价物是 `skipShortWords(unique(words(text)))`，那么让我们用 `compose(..)` 这么做的话：
+让我们定义一个包含 `skipShortWords(..)` 的 `biggerWords(..)`。手动组合的等价物是 `skipShortWords( unique( words( text ) ) )`，那么让我们用 `compose(..)` 这么做的话：
 
 ```js
 var text = "To compose two functions together, pass the \
@@ -272,7 +272,8 @@ wordsUsed;
 然后，我们可以通过分别使用不同的第一个参数调用 `filterWords(..)` 来多次完成组合：
 
 ```js
-// 注意：使用 `<= 4` 检查来取代 `skipShortWords(..)` 中使用的 `> 4` 检查
+// 注意：使用 `<= 4` 检查来取代
+// `skipShortWords(..)` 中使用的 `> 4` 检查
 function skipLongWords(list) { /* .. */ }
 
 var filterWords = partialRight( compose, unique, words );
@@ -302,7 +303,7 @@ shorterWords( text );
 
 我们将在第九章中详细讲解 `reduce(..)` 工具，但就目前来说，只要知道它将一个列表（数组）递减为一个单独的有限值就行了。它就像一个神奇的循环。
 
-例如，如果你在一个数字列表 `[1,2,3,4,5,6]` 上进行加法递减，你将会循环遍历它们并随着你的循环前进把它们加在一起。递减将会把 `1` 加到 `2` 上，然后把结果加到 `3` 上，然后再把结果加到 `4` 上，如此类推，得到最终的和：`21`。
+例如，如果你在一个数字列表（例如 `[1,2,3,4,5,6]`）上进行加法递减，你将会循环遍历它们并随着你的循环前进把它们加在一起。递减将会把 `1` 加到 `2` 上，然后把结果加到 `3` 上，然后再把结果加到 `4` 上，如此类推，得到最终的和：`21`。
 
 原始版本的 `compose(..)` 使用一个循环并急切地（也就是立即地）计算一个调用的结果以把它传递给下一个调用。我们可以使用 `reduce(..)` 做同样的事情：
 
@@ -326,6 +327,8 @@ var compose = (...fns) =>
             , result
         );
 ```
+
+**注意：** 这个 `compose(..)` 的实现使用了 `fns.reverse().reduce(..)` 来从右至左地递减。我们将在[第九章中重温`compose(..)`](ch9.md/#user-content-composereduceright)，但是为此目的使用 `reduceRight(..)`。
 
 注意 `reduce(..)` 循环会在最终的 `composed(..)` 函数每次运行时发生，而且每个中间的 `result(..)` 都作为下一次调用的输入被传递给下一个迭代。
 
@@ -365,7 +368,7 @@ var compose =
 
 我们还可以使用递归来定义 `compose(..)`。`compose(fn1,fn2, .. fnN)` 的递归定义看起来就像：
 
-```
+```txt
 compose( compose(fn1,fn2, .. fnN-1), fnN );
 ```
 
@@ -375,7 +378,7 @@ compose( compose(fn1,fn2, .. fnN-1), fnN );
 
 ```js
 function compose(...fns) {
-	  // 卸下最后两个参数
+    // 卸下最后两个参数
     var [ fn1, fn2, ...rest ] = fns.reverse();
 
     var composedFn = function composed(...args){
@@ -453,7 +456,7 @@ var biggerWords = compose( skipShortWords, unique, words );
 var biggerWords = pipe( words, unique, skipShortWords );
 ```
 
-`pipe(..)` 的优势是它按照函数执行的顺序罗列它们，这有时会减少读者的困惑。可能 `pipe(words,unique,skipShortWords)` 看起来和读起来简单一些：我们先做 `words(..)`，然后做 `unique(..)`，最后做 `skipShortWords(..)`。
+`pipe(..)` 的优势是它按照执行的顺序罗列函数，这有时会减少读者的困惑。它对于阅读代码来说简单一些：`pipe( words, unique, skipShortWords)`，并看出它先执行 `words(..)`，然后 `unique(..)`，最后 `skipShortWords(..)`。
 
 在你想局部应用 *第一个* 被执行的函数时，`pipe(..)` 也很方便。早先我们是用 `compose(..)` 的右侧局部应用这样做的。
 
@@ -569,7 +572,7 @@ function trackEvent(evt) {
 
 在这段引文中，“无关”，就被隐藏起来的东西而言，不应被认为是一种绝对的定性判断，而是相对于在某一时刻你想要集中思考的东西而言的。换言之，当我们把 X 和 Y 分隔开时，如果我想集中考虑 X，那么此时 Y 就是无关的。在另一时刻，如果我想集中考虑 Y，那么 X 就是无关的。
 
-**我们抽象不是为了隐藏，而是为了分离以增进集中性**。
+**我们抽象不是为了隐藏细节，我们是分离细节以增进集中性**。
 
 回忆一下本书开始时我描述过的 FP 的目标：创建更具可读性的，更易理解的代码。做到这一点的一个有效方法是，将交织在一起 —— 就像紧紧纠缠在一起的绳子 —— 的代码解开，成为分离的、更简单 —— 松散地绑在一起 —— 的代码块。这样，读者就不会在寻找某一部分的细节时被另一部分的细节分心了。
 
@@ -719,13 +722,13 @@ var extractName = partial( prop, "name" );
 
 ```js
 getLastOrder( function orderFound(order){
-	getPerson( { id: order.personId }, outputPersonName );
+    getPerson( { id: order.personId }, outputPersonName );
 } );
 ```
 
 我们如何定义 `outputPersonName(..)`？为了把我们需要的东西可视化表达出来，考虑一下我们期望的数据流：
 
-```
+```txt
 output <-- extractName <-- person
 ```
 
@@ -782,28 +785,31 @@ var personData = partial( makeObjProp, "id" );
 
 要使用 `processPerson(..)` 来实施与一个 `order` 值相关联的人的查询，我们需要这一系列操作的概念上的数据流：
 
-```
+```txt
 processPerson <-- personData <-- extractPersonId <-- order
 ```
 
 所以我们将再次使用 `compose(..)` 来定义一个 `lookupPerson(..)` 工具：
 
 ```js
-var lookupPerson = compose( processPerson, personData, extractPersonId );
+var lookupPerson =
+    compose( processPerson, personData, extractPersonId );
 ```
 
 然后…… 就是它！将整个例子不带任何“点”地重新组装回来：
 
 ```js
 var getPerson = partial( ajax, "http://some.api/person" );
-var getLastOrder = partial( ajax, "http://some.api/order", { id: -1 } );
+var getLastOrder =
+    partial( ajax, "http://some.api/order", { id: -1 } );
 
 var extractName = partial( prop, "name" );
 var outputPersonName = compose( output, extractName );
 var processPerson = partialRight( getPerson, outputPersonName );
 var personData = partial( makeObjProp, "id" );
 var extractPersonId = partial( prop, "personId" );
-var lookupPerson = compose( processPerson, personData, extractPersonId );
+var lookupPerson =
+    compose( processPerson, personData, extractPersonId );
 
 getLastOrder( lookupPerson );
 ```

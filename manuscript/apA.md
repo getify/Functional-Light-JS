@@ -30,7 +30,8 @@ function isShortEnough(str) {
 在[第三章中，我们使用了这些判定函数](ch3.md/#user-content-shortlongenough)来测试一个单词。然后在第九章中，我们学习了如何[使用 `filter(..）` 之类的列表操作](ch9.md/#filter)重复这样的测试。例如：
 
 ```js
-var words = [ "You", "have", "written", "something", "very", "interesting" ];
+var words = [ "You", "have", "written", "something", "very",
+    "interesting" ];
 
 words
 .filter( isLongEnough )

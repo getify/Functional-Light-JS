@@ -163,7 +163,7 @@ foo( 3 );           // 9.424776000000001
 
 在这两种情况下，`PI` 和 `bar` 都不是程序状态的一部分。它们是固定的，不可被重新赋值的引用。如果它们贯穿程序始终都不改变，我们就不必费心将它们视为可变状态追踪。因此，它们没有损害我们的可读性。而且它们不可能是由于变量以意外的方式改变而引起的 bug 的源头。
 
-**注意：** 依我看，上面 `const` 的使用并不是 `PI` 没有成为侧因的理由；`var PI` 也会得出相同的结论。没有给 `PI` 重新赋值才是重要的，而不是没有这种能力。我们将会在后面的章节中讨论 `const`。
+**注意：** 依我看，上面 `const` 的使用并不是 `PI` 没有成为侧因的理由；`var PI` 也会得出相同的结论。没有给 `PI` 重新赋值才是重要的，而不是没有这种能力。我们将会在[第六章中讨论 `const`](ch6.md/#reassignment)。
 
 #### 随机性
 
@@ -700,7 +700,7 @@ console.log( "The average is:", avg );      // The average is: 9
 这里有一个：
 
 ```js
-function calculateAverage(list) {
+function calculateAverage(nums) {
     sum = 0;
     for (let num of nums) {
         sum += num;
@@ -708,9 +708,10 @@ function calculateAverage(list) {
     return sum / nums.length;
 }
 
-var sum, nums = [1,2,4,7,11,16,22];
+var sum;
+var numbers = [1,2,4,7,11,16,22];
 
-var avg = calculateAverage( nums );
+var avg = calculateAverage( numbers );
 ```
 
 你发现了吗？
