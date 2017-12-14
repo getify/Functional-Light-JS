@@ -1,23 +1,23 @@
-# Contributing
+# 贡献
 
-Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. If there's any doubt or if you think that a word/phrase is used confusingly, **before submitting a PR, open an issue to ask about it.**
+欢迎通过提交 PR 改进代码段，讲解等，来为此内容的质量做出贡献。如果有任何疑问，或者你认为一个词/句的用法令人糊涂，那么 **在提交 PR 之前，先开一个 issue 来询问此事。**
 
-However, if you choose to contribute content (not just typo corrections) to this repo, you agree that you're giving me a non-exclusive license to use that content for the book, as I (and any future publisher) deem appropriate. You probably guessed that already, but I just have to make sure the lawyers are happy by explicitly stating it.
+但是，如果你选择向这个代码库贡献内容（不只是修改拼写错误），你就相当于同意给予我一个非独家许可，以我（和任何未来的出版商）认为恰当的方式使用那些内容。你可能已经猜到了，但我不得不把话说明白来使律师们高兴一些。
 
-## Search First!
+## 先搜索一下！
 
-If you have any questions or concerns, please make sure to search the issues (both open and closed!) first, to keep the churn of issues to a minimum. I want to keep my focus on improving the content as much as possible.
+另外，如果你有任何问题或疑问，请首先搜索 issue（打开的与关闭的两者！），以使 issue 数量维持在最小。我想让自己竟可能地将注意力集中在改进内容上。
 
-## Typos?
+## 拼写错误？
 
-This book has already been edited. Most typos have already been caught and fixed, but there might still be some mistakes here and there.
+本书已经经过编辑。大多数拼写错误已经被找出并修复了，但是在四处可能还有一些错误。
 
-If you're going to submit a PR for typo fixes, please be measured in doing so, perhaps by collecting several small changes into a single PR (in separate commits).
+如果你要为拼写错误的修改提交 PR，请适度地这样做，也许将几个小的修改综合在一个单独的 PR 中（分为几个 commit）。
 
-## Reading Experience (Chapter/Section links, etc)
+## 阅读体验（章节链接，等等）
 
-This repo **is not optimized for your reading experience.** It's optimized for the publishing process.
+这个代码库 **没有为你的阅读体验而优化。** 它是为了出版过程而优化的。
 
-The primary intended reading experience -- likely the most pleasant one for many of you! -- is the ebook, [which is now on sale](https://leanpub.com/fljs). The balance I'm striking here is releasing the content for free, but selling the reading experience. Other authors make different decisions on that balance, but that's what I've come to for now.
+主要关注的阅读体验 —— 就像你们大多数人最喜欢的！—— 是 ebook，它[已经上市](https://leanpub.com/fljs)。我在这里调整的平衡，是免费发布内容，贩卖阅读体验。其他的作者会在这种平衡中做出不同的决定，但这是我目前的想法。
 
-I hope you continue to enjoy and benefit from the content, and I also hope you value it enough to purchase the best reading experience in the ebook/print form.
+我希望你能继续享受这里的内容并从中获益，也希望你通过购买电子书与印刷版中的最佳阅读体验来给予它足够的肯定。

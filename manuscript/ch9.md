@@ -1,72 +1,72 @@
-# Functional-Light JavaScript
-# Chapter 9: List Operations
+# 轻量函数式 JavaScript
+# 第九章：列表操作
 
-> *If you can do something awesome, keep doing it repeatedly.*
+> 如果你能做很赞的事情，那就反复做。
 
-We've already seen several brief references earlier in the text to some utilities that we now want to take a very close look at, namely `map(..)`, `filter(..)`, and `reduce(..)`. In JavaScript, these utilities are typically used as methods on the array (aka, "list") prototype, so we would naturally refer to them as array or list operations.
+我们在本书先前的部分已经看到了对一些工具的简要引用，现在我们要非常仔细地看看它们，它们是 `map(..)`、`filter(..)`、和 `reduce(..)`。在 JavaScript 中，这些工具经常作为数组（也就是 “列表”）原型上的方法使用，所以我们很自然地称它们为数组或列表操作。
 
-Before we talk about the specific array methods, we want to examine conceptually what these operations are used for. It's equally important in this chapter that you understand *why* list operations are important as it is to understand *how* list operations work. Make sure you approach this chapter with that detail in mind.
+在我们讨论具体的数组方法之前，我们要在概念上检视一下这些操作是用来做什么的。在这一章中有两件同等重要的事情：理解列表操作 *为什么* 重要以及理解列表操作是 *如何* 工作的。确保你在头脑中带着这些细节来阅读这一章。
 
-The vast majority of common illustrations of these operations, both outside of this book and here in this chapter, depict trivial tasks performed on lists of values (like doubling each number in an array); it's a cheap and easy way to get the point across.
+在这本书之外的世界以及这一章中，展示这些操作的最广泛、最常见方式是，描述一些在值的列表中解决的微不足道的问题（比如将一个数组中的每个数字翻倍）；这是一种讲清要点的简单廉价的方式。
 
-But don't just gloss over these simple examples and miss the deeper point. Some of the most important FP value in understanding list operations comes from being able to model a sequence of tasks -- a series of statements that wouldn't otherwise *look* like a list -- as a list operation instead of performing them individually.
+但是不要仅仅将这些简单的例子一带而过却忽略了深层次的意义。理解列表操作对于 FP 来说最重要的价值来源于能够将一个任务的序列 —— 一系列 *看起来* 不太像一个列表的语句 —— 模型化为一个操作的列表，而非分别独立地执行它们。
 
-This isn't just a trick to write more terse code. What we're after is to move from imperative to declarative style, to make the code patterns more readily recognizable and thus more readable.
+这不只是一个编写更简洁代码的技巧。我们追求的是从指令式转向声明式，使代码模式可以轻而易举地识别从而可读性更强。
 
-But there's something **even more important to grasp**. With imperative code, each intermediate result in a set of calculations is stored in variable(s) through assignment. The more of these imperative patterns your code relies on, the harder it is to verify that there aren't mistakes -- in the logic, accidental mutation of values, or hidden side causes/effects lurking.
+但是这里还有 **更重要的东西需要把握住**。使用指令式代码，一组计算中的每一个中间结果都通过赋值存储在变量中。你的代码越依赖这样的指令式模式，验证它在逻辑上没有错误就越困难 —— 对值的意外改变，或者埋藏下侧因／副作用。
 
-By chaining and/or composing list operations together, the intermediate results are tracked implicitly and largely protected from these hazards.
+通过将列表操作链接和／或组合在一起，中间结果会被隐含地追踪，并极大程度地防止这些灾难的发生。
 
-**Note:** More than previous chapters, to keep the many following code snippets as brief as possible, we'll rely heavily on the ES6 `=>` form. However, my [advice on `=>` from Chapter 2](ch2.md/#functions-without-function) still applies for general coding.
+**注意：** 与前面的章节相比，为了尽可能地保持后述代码段的简洁，我们将重度应用 ES6 的 `=>` 形式。但是，我在[第二章中关于 `=>` 的建议](ch2.md/#functions-without-function)依然在一般性的编码中适用。
 
-## Non-FP List Processing
+## 非 FP 列表处理
 
-As a quick preamble to our discussion in this chapter, I want to call out a few operations which may seem related to JavaScript arrays and FP list operations, but which aren't. These operations will not be covered here, because they are not consistent with general FP best practices:
+作为我们在本章中的讨论的序言，我要指出几个看起来与 JavaScript 数组和 FP 列表操作相关，但其实无关的操作。这些操作将不会在这里讲解，因为它们不符合一般的 FP 最佳实践：
 
 * `forEach(..)`
 * `some(..)`
 * `every(..)`
 
-`forEach(..)` is an iteration helper, but it's designed for each function call to operate with side effects; you can probably guess why that's not an endorsed FP list operation for our discussion!
+`forEach(..)` 是一个迭代帮助函数，但它被设计为对每一个执行的函数调用都带有副作用；你可能猜到了为什么我们的讨论不赞同它是一个 FP 列表操作！
 
-`some(..)` and `every(..)` do encourage the use of pure functions (specifically, predicate functions like `filter(..)` expects), but they inevitably reduce a list to a `true`/`false` result, essentially like a search or matching. These two utilities don't really fit the mold of how we want to model our code with FP, so we're going to skip covering them here.
+`some(..)` 和 `every(..)` 确实鼓励使用纯函数（具体地讲，和 `filter(..)` 所期待的检测函数相似），但它们实质上像一个检索或匹配一样，不可避免地将一个列表递减为一个 `true` / `false` 的结果。这两个工具不是很适合作为我们想要对代码进行 FP 建模的模具，所以这里我们跳过它们不讲。
 
 ## Map
 
-We'll start our exploration of FP list operations with one of the most basic and fundamental: `map(..)`.
+我们将从最基本而且最基础的 FP 列表操作之一开始我们的探索：`map(..)`。
 
-A mapping is a transformation from one value to another value. For example, if you start with the number `2` and you multiply it by `3`, you have mapped it to `6`. It's important to note that we're not talking about mapping transformation as implying *in-place* mutation or reassignment; instead, we're looking at how mapping transformation projects a new value from one location to the other.
+一个映射是从一个值到另一个值的变形。例如，如果你有一个数字 `2` 而你将它乘以 `3`，那么你就将它映射到了 `6`。值得注意的是，我们所说的映射变形没有暗示着 *原地* 修改或者重新赋值；而是关注映射变形如何将一个新的值从一个地方投射到另一个地方。
 
-In other words:
+换句话说：
 
 ```js
 var x = 2, y;
 
-// transformation / projection
+// 变形/投射
 y = x * 3;
 
-// mutation / reassignment
+// 改变/重新赋值
 x = x * 3;
 ```
 
-If we define a function for this multiplying by `3`, that function acts as a mapping (transformer) function:
+如果我们将这个乘以 `3` 定义为一个函数，这个函数作为一个映射（变形）函数动作的话：
 
 ```js
 var multipleBy3 = v => v * 3;
 
 var x = 2, y;
 
-// transformation / projection
+// 变形/投射
 y = multiplyBy3( x );
 ```
 
-We can naturally extend mapping from a single value transformation to a collection of values. `map(..)` is an operation that transforms all the values of a list as it projects them to a new list:
+我们可以很自然地将映射从一个单独值的变形扩展到一个值的集合。`map(..)` 操作将列表中的所有值变形并将它们投射到一个新的列表中：
 
 <p align="center">
     <img src="images/fig9.png" width="50%">
 </p>
 
-To implement `map(..)`:
+要实现 `map(..)` 的话：
 
 ```js
 function map(mapperFn,arr) {
@@ -82,22 +82,22 @@ function map(mapperFn,arr) {
 }
 ```
 
-**Note:** The parameter order `mapperFn, arr` may feel backwards at first, but this convention is much more common in FP libraries because it makes these utilities easier to compose (with currying).
+**注意：** 形式参数的顺序 `mapperFn, arr` 一开始可能感觉是弄反了，但是在 FP 库中这种惯例非常常见，因为它使这些工具更容易（使用柯里化）组合。
 
-The `mapperFn(..)` is naturally passed the list item to map/transform, but also an `idx` and `arr`. We're doing that to keep consistency with the built-in array `map(..)`. These extra pieces of information can be very useful in some cases.
+`mapperFn(..)` 自然地将项目列表传递给映射/变形，同时还有 `idx` 和 `arr`。我们这样做是为了与内建的 `map(..)` 保持一致。在某些情况下这些额外的信息可能十分有用。
 
-But in other cases, you may want to use a `mapperFn(..)` that only the list item should be passed to, because the extra arguments might change its behavior. In [Chapter 3, "All For One"](ch3.md/#all-for-one), we introduced `unary(..)`, which limits a function to only accept a single argument (no matter how many are passed).
+但是在其他情况下，你可能想使用一个仅有列表项目应当被传入的 `mapperFn(..)`，因为额外的参数有可能会改变它的行为。在第[三章中的 “皆归为一”](ch3.md/#all-for-one) 中介绍了 `unary(..)`，它限制一个函数仅接收一个实际参数（不论有多少被传递）。
 
-Recall [the example from Chapter 3](ch3.md/#user-content-mapunary) about limiting `parseInt(..)` to a single argument to be used safely as a `mapperFn(..)`, which we can also utilize with the standalone `map(..)`:
+回忆一下[第三章中将 `parseInt(..)` 限制为一个参数的例子](ch3.md/#user-content-mapunary)，它可以安全地用作 `mapperFn(..)`，我们也可以将它与独立的 `map(..)` 一起使用：
 
 ```js
 map( ["1","2","3"], unary( parseInt ) );
 // [1,2,3]
 ```
 
-**Note:** The JavaScript array prototype operations (`map(..)`, `filter(..)`, and `reduce(..)`) all accept an optional last argument to use for `this` binding of the function. As we discussed in [Chapter 2, "What's This?"](ch2.md/#whats-this), `this`-based coding should generally be avoided wherever possible in terms of being consistent with the best practices of FP. As such, our example implementations in this chapter do not support such a `this`-binding feature.
+**注意：** JavaScript 原型操作（`map(..)`、`filter(..)`、和 `reduce(..)`）都接收一个最后的可选参数，它用于函数的 `this` 绑定。在我们[第二章的 “This 是什么”](ch2.md/#whats-this) 的讨论中，从为了符合 FP 的最佳实践的角度讲，基于 `this` 的编码一般来说应当尽可能避免。因此，我们在这一章例子的实现中不支持这样的 `this` 绑定特性。
 
-Beyond the obvious numeric or string operations you could perform against a list of those respective value types, here are some other examples of mapping operations. We can use `map(..)` to transform a list of functions into a list of their return values:
+除了你可以分别对数字和字符串列表实施的各种显而易见的操作之外，还有一些其他的映射操作的例子。我们可以使用 `map(..)` 来把一个函数的列表变形为一个它们返回值的列表：
 
 ```js
 var one = () => 1;
@@ -108,7 +108,7 @@ var three = () => 3;
 // [1,2,3]
 ```
 
-Or we can first transform a list of functions by composing each of them with another function, and then execute them:
+或者我们可以首先将列表中的每一个函数都与另一个函数组合，然后再执行它们：
 
 ```js
 var increment = v => ++v;
@@ -123,17 +123,17 @@ var double = v => v * 2;
 // [7,5,36]
 ```
 
-Something interesting to observe about `map(..)`: we typically would assume that the list is processed left-to-right, but there's nothing about the concept of `map(..)` that really requires that. Each transformation is supposed to be independent of every other transformation.
+关于 `map(..)` 的一件有趣的事情：我们通常会臆测列表是从左到右处理的，但是 `map(..)` 的概念中对此没有任何要求。每一个变形对于其他的变形来说都应该是独立的。
 
-Mapping in a general sense could even been parallelized in an environment that supports that, which for a large list could drastically improve performance. We don't see JavaScript actually doing that because there's nothing that requires you to pass a pure function as `mapperFn(..)`, even though you **really ought to**. If you were to pass an impure function and JS were to run different calls in different orders, it would quickly cause havoc.
+从一般的意义上说，在一个支持并行的环境中映射甚至可以是并行化的，这对很大的列表来说可以极大地提升性能。我们没有看到 JavaScript 实际上在这样做，因为没有任何东西要求你传入一个像 `mapperFn(..)` 这样的纯函数，即使你 **本应这样做**。如果你传入一个非纯函数而且 JS 以不同的顺序运行不同的调用，那么这很快就会引起灾难。
 
-Even though theoretically, individual mapping operations are independent, JS has to assume that they're not. That's a bummer.
+虽然在理论上每一个映射操作都是独立的，但 JS 不得不假定它们不是。这很扫兴。
 
-### Sync vs. Async
+### 同步 vs. 异步
 
-The list operations we're discussing in this chapter all operate synchronously on a list of values that are all already present; `map(..)` as conceived here is an eager operation. But another way of thinking about the mapper function is as an event handler which is invoked for each new value encountered in the list.
+我们在这一章中要讨论的列表操作都是在一个所有值都已存在的列表上同步地操作；`map(..)` 在这里被设想为是一种迫切的操作。但另一种考虑映射函数的方法是将它作为一个事件处理器，为在列表中出现的每一个新的值而被调用。
 
-Imagine something fictional like this:
+想象一个如下虚构的东西：
 
 ```js
 var newArr = arr.map();
@@ -141,50 +141,50 @@ var newArr = arr.map();
 arr.addEventListener( "value", multiplyBy3 );
 ```
 
-Now, any time a value is added to `arr`, the `multiplyBy3(..)` event handler -- mapper function -- is called with the value, and its transformation is added to `newArr`.
+现在，无论什么时候一个值被添加到 `arr` 种，事件处理器 `multiplyBy3(..)` —— 映射函数 —— 都会用这个值被调用，它变形出的值被添加到 `newArr`。
 
-What we're hinting at is that arrays, and the array operations we perform on them, are the eager synchronous versions, whereas these same operations can also be modeled on a "lazy list" (aka, stream) that receives its values over time. We'll dive into this topic in [Chapter 10](ch10.md).
+我们在暗示的是，数组以及我们在它们之上施加的数组操作，都是迫切的同步版本，而这些相同的操作也可以在一个经过一段时间后才收到值的 “懒惰列表” （也就是流（stream））上建模。我们将在[第十章](ch10.md)中深入这个话题。
 
-### Mapping vs. Eaching
+### 映射 vs. 迭代
 
-Some advocate using `map(..)` as a general form of `forEach(..)`-iteration, where essentially the value received is passed through untouched, but then some side effect can be performed:
+一些人鼓吹将 `map(..)` 作为一个一般形式的 `forEach(..)` 迭代使用，让它收到的值原封不动地通过，但之后可能实施一些副作用：
 
 ```js
 [1,2,3,4,5]
 .map( function mapperFn(v){
-    console.log( v );           // side effect!
+    console.log( v );      // 副作用！
     return v;
 } )
 ..
 ```
 
-The reason this technique can seem useful is that the `map(..)` returns the array so you can keep chaining more operations after it; the return value of `forEach(..)` is `undefined`. However, I think you should avoid using `map(..)` in this way, because it's a net confusion to use a core FP operation in a decidedly un-FP way.
+这种技术看起来好像有用是因为 `map(..)` 返回这个数组，于是你就可以继续在它后面链接更多操作；而 `forEach(..)` 的返回值是 `undefined`。然而，我认为你应当避免以这种方式使用 `map(..)`，因为以一种明确的非 FP 方式使用一种 FP 核心操作除了困惑不会造成其他任何东西。
 
-You've heard the old adage about using the right tool for the right job, right? Hammer for a nail, screwdriver for a screw... This is slightly different: it's use the right tool *in the right way*.
+你听说过用正确的工具做正确的事这句谚语，对吧？锤子对钉子，改锥对螺丝…… 这里有点儿不同：它是 *用正确的方式* 使用正确的工具。
 
-A hammer is meant to be held in your hand; if you instead hold it in your mouth and try to hammer the nail, you're not gonna be very effective. `map(..)` is intended to map values, not create side effects.
+一把锤子本应在你的手中挥动；但如果你用嘴叼住它来砸钉子，那你就不会非常高效。`map(..)` 的本意是映射值，不是造成副作用。
 
-### A Word: Functors
+### 一个词：函子（functor）
 
-We've mostly tried to stay away from invented terminology in FP as much as possible in this book. We have used official terms at times, but mostly when we can derive some sense of meaning from them in regular everyday conversation.
+在这本书中我们绝大多数时候都尽可能地与人工发明的 FP 术语保持距离。我们有时候用一些官方术语，但这多数是在我们可以从中衍生出一些对普通日常对话有意义的东西的时候。
 
-I'm going to very briefly break that pattern and use a word that might be a little intimidating: functor. The reason I want to talk about functors here is because we now already understand what they do, and because that term is used heavily throughout the rest of FP literature; indeed, functors are foundational ideas in FP that come straight from the mathematical principles (category theory). You being at least familiar with and not scared by this term will be beneficial.
+我将要非常简要地打破这种模式，而使用一个可能有点儿吓人的词：函子（functor）。我想谈一下函子的原因是因为我们现在已经知道它们是做什么的了，也因为这个词在其他的 FP 文献中被频繁使用；的确，函子是从数学原理（范畴论）中直接引出的 FP 基础思想。至少你熟悉它而不会被它吓到是有好处的。
 
-A functor is a value that has a utility for using an operator function on that value, which preserves composition.
+一个函子是一个值，它有一个工具可以使一个操作函数作用于这个值，这保留了组合性。
 
-If the value in question is compound, meaning it's comprised of individual values -- as is the case with arrays, for example! -- a functor uses the operator function on each individual value. Moreover, the functor utility creates a new compound value holding the results of all the individual operator function calls.
+如果这个值是复合的，也就是它由一些独立的值组成 —— 例如就像这里的数组一样！—— 那么函子会在每一个独立的值上应用操作函数。另外，函子工具会创建一个新的复合值来持有所有独立操作函数调用的结果。
 
-This is all a fancy way of describing what we just looked at with `map(..)`. The `map(..)` function takes its associated value (an array) and a mapping function (the operator function), and executes the mapping function for each individual value in the array. Finally, it returns a new array with all the newly mapped values in it.
+这只是对我们刚刚看到的 `map(..)` 的一种很炫的描述。`map(..)` 函数拿着与它关联的值（一个数组）和一个映射函数（操作函数），并对数组中每一个独立的值执行这个映射函数。最终，它返回一个带有所有被映射好的值的数组。
 
-Another example: a string functor would be a string plus a utility that executes some operator function across all the characters in the string, returning a new string with the processed letters. Consider this highly contrived example:
+另一个例子：一个字符串函子将是一个字符串外加一个工具，这个工具对字符串中的每一个字符执行一些操作函数，返回一个带有被处理过的字符的新字符串。考虑这个高度造作的例子：
 
 ```js
 function uppercaseLetter(c) {
     var code = c.charCodeAt( 0 );
 
-    // lowercase letter?
+    // 小写字符？
     if (code >= 97 && code <= 122) {
-        // uppercase it!
+        // 改为大写！
         code = code - 32;
     }
 
@@ -199,41 +199,41 @@ stringMap( uppercaseLetter, "Hello World!" );
 // HELLO WORLD!
 ```
 
-`stringMap(..)` allows a string to be a functor. You can define a mapping function for any data structure; as long as the utility follows these rules, the data structure is a functor.
+`stringMap(..)` 允许一个字符串成为一个函子。你可以为任意数据结构定义一个映射函数；只要这个工具符合这些规则，那么这种数据结构就是一个函子。
 
 ## Filter
 
-Imagine I bring an empty basket with me to the grocery store to visit the fruit section; there's a big display of fruit (apples, oranges, and bananas). I'm really hungry so I want to get as much fruit as they have available, but I really only prefer the round fruits (apples and oranges). So I sift through each fruit one by one, and I walk away with a basket full of just the apples and oranges.
+想象我在百货商店里拿着一个空篮子来到了水果卖场；这里有一大堆水果货架（苹果、橘子、和香蕉）。我真的很饿，所以要尽可能多地拿水果，但我非常喜欢圆形的水果（苹果和橘子）。于是我一个一个地筛选，然后带着仅装有苹果和橘子的篮子离开了。
 
-Let's say we call this process *filtering*. Would you more naturally describe my shopping as starting with an empty basket and **filtering in** (selecting, including) only the apples and oranges, or starting with the full display of fruits and **filtering out** (skipping, excluding) the bananas as my basket is filled with fruit?
+假定我们称这种处理为 *过滤*。你将如何更自然地描述我的购物过程？是以一个空篮子为起点并仅仅 **滤入**（选择，包含）苹果和橘子，还是以整个水果货架为起点并 **滤除**（跳过，排除）香蕉，直到我的篮子装满水果？
 
-If you cook spaghetti in a pot of water, and then pour it into a strainer (aka filter) over the sink, are you filtering in the spaghetti or filtering out the water? If you put coffee grounds into a filter and make a cup of coffee, did you filter in the coffee into your cup, or filter out the coffee grounds?
+如果你在一锅水中煮意大利面，然后把它倒进水槽上的笊篱（也就是过滤器）中，你是在滤入意大利面还是在滤除水？如果你将咖啡粉末放进滤纸中泡一杯咖啡，你是在自己的杯子中滤入了咖啡，还是滤除了咖啡粉末？
 
-Does your view of filtering depend on whether the stuff you want is "kept" in the filter or passes through the filter?
+你对过滤的视角是不是有赖于你想要的东西是否 “保留” 在过滤器中或者通过了过滤器？
 
-What about on airline/hotel websites, when you specify options to "filter your results"? Are you filtering in the results that match your criteria, or are you filtering out everything that doesn't match? Think carefully: this example might have a different semantic than the previous ones.
+那么当你在航空公司/酒店的网站上制定一些选项来 “过滤你的结果” 呢？你是在滤入符合你标准的结果，还是在滤除所有不符合标准的东西？仔细考虑一下：这个例子与前一个比起来可能有不同的语义。
 
-### Filtering Confusion
+### 过滤的困惑
 
-Depending on your perspective, filtering is either exclusionary or inclusionary. This conceptual conflation is unfortunate.
+根据你的视角不同，过滤不是排除性的就是包含性的。这种概念上的冲突非常不幸。
 
-I think the most common interpretation of filtering -- outside of programming, anyway -- is that you filter out unwanted stuff. Unfortunately, in programming, we have essentially flipped this semantic to be more like filtering in wanted stuff.
+我认为对过滤的最常见的解释 —— 在编程的世界之外 —— 是你在滤除不想要的东西。不幸的是，在编程中，我们实质上更像是将这种语义反转为滤入想要的东西。
 
-The `filter(..)` list operation takes a function to decide if each value in the original array should be in the new array or not. This function needs to return `true` if a value should make it, and `false` if it should be skipped. A function that returns `true`/`false` for this kind of decision making goes by the special name: predicate function.
+`filter(..)` 列表操作用一个函数来决定原来数组中的每一个值是否应该保留在新的数组中。如果一个值应当被保留，那么这个函数需要返回 `true`，如果它应当被跳过则返回 `false`。一个为做决定而返回 `true` / `false` 的函数有一个特殊的名字：判定函数（predicate function）。
 
-If you think of `true` as indicating a positive signal, the definition of `filter(..)` is that you are saying "keep" (to filter in) a value rather than saying "discard" (to filter out) a value.
+如果你将 `true` 作为一个正面的信号，那么 `filter(..)` 的定义就是你想要 “保留”（滤入）一个值而非 “丢弃”（滤除）一个值。
 
-To use `filter(..)` as an exclusionary action, you have to twist your brain to think of positively signaling an exclusion by returning `false`, and passively letting a value pass through by returning `true`.
+为了将 `filter(..)` 作为一种排除性操作使用，你不得不把思维拧过来，通过返回 `false` 将正面信号考虑为一种排除，并通过返回 `true` 被动地让一个值通过。
 
-The reason this semantic mismatch matters is because of how you will likely name the function used as `predicateFn(..)`, and what that means for the readability of code. We'll come back to this point shortly.
+这种语义错位很重要的原因，是因为它会影响你如何命名那个用作 `predicateFn(..)` 的函数，以及它对代码可读性的意义。我们马上就会谈到这一点。
 
-Here's how to visualize a `filter(..)` operation across a list of values:
+这是 `filter(..)` 操作在一个值的列表中的可视化表达：
 
 <p align="center">
     <img src="images/fig10.png" width="50%">
 </p>
 
-To implement `filter(..)`:
+要实现 `filter(..)`：
 
 ```js
 function filter(predicateFn,arr) {
@@ -249,23 +249,23 @@ function filter(predicateFn,arr) {
 }
 ```
 
-Notice that just like `mapperFn(..)` before, `predicateFn(..)` is passed not only the value but also the `idx` and `arr`. Use `unary(..)` to limit its arguments as necessary.
+注意，正如之前的 `mapperFn(..)` 一样，`predicateFn(..)` 不仅被传入一个值，而且还被传入了 `idx` 和 `arr`。可以根据需要使用 `unary(..)` 来限制它的参数。
 
-Just as with `map(..)`, `filter(..)` is provided as a built-in utility on JS arrays.
+和 `map(..)` 一样，`filter(..)` 作为一种 JS 数组上的内建工具被提供。
 
-Let's consider a predicate function like this:
+让我们考虑一个这样的判定函数：
 
 ```js
 var whatToCallIt = v => v % 2 == 1;
 ```
 
-This function uses `v % 2 == 1` to return `true` or `false`. The effect here is that an odd number will return `true`, and an even number will return `false`. So, what should we call this function? A natural name might be:
+这个函数使用 `v % 2 == 1` 来返回 `true` 或 `false`。这里的效果是一个奇数将会返回 `true`，而一个偶数将会返回 `false`。那么，我们应该管这个函数叫什么？一个自然的名字可能是：
 
 ```js
 var isOdd = v => v % 2 == 1;
 ```
 
-Consider how you might use `isOdd(..)` with a simple value check somewhere in your code:
+考虑一下在你代码中的某处你将如何使用 `isOdd(..)` 进行简单的值校验：
 
 ```js
 var midIdx;
@@ -278,18 +278,18 @@ else {
 }
 ```
 
-Makes sense, right? But, let's consider using it with the built-in array `filter(..)` to filter a list of values:
+有些道理，对吧？让我们再考虑一下将它与数组内建的 `filter(..)` 一起使用来过滤一组值：
 
 ```js
 [1,2,3,4,5].filter( isOdd );
 // [1,3,5]
 ```
 
-If you described the `[1,3,5]` result, would you say, "I filtered out the even numbers", or would you say "I filtered in the odd numbers"? I think the former is a more natural way of describing it. But the code reads the opposite. The code reads, almost literally, that we "filtered (in) each number that is odd".
+如果要你描述一下 `[1,3,5]` 这个结果，你会说 “我滤除了偶数” 还是 “我滤入了奇数”？我觉得前者是描述它的更自然的方式。但是代码读起来却相反。代码读起来几乎就是，我们 “过滤（入）了每一个是奇数的数字”。
 
-I personally find this semantic confusing. There's no question there's plenty of precedent for experienced developers. But if you just start with a fresh slate, this expression of the logic seems kinda like not speaking without a double negative -- aka, speaking with a double negative.
+我个人觉得这种语义令人糊涂。对于有经验的开发者来说无疑有许多先例可循。但是如果你刚刚起步，这种逻辑表达式看起来有点儿像不用双否定就不会说话 —— 也就是，用双否定说话。
 
-We could make this easier by renaming `isOdd(..)` to `isEven(..)`:
+我们可以通过把函数 `isOdd(..)` 重命名为 `isEven(..)` 让事情容易一些：
 
 ```js
 var isEven = v => v % 2 == 1;
@@ -298,15 +298,15 @@ var isEven = v => v % 2 == 1;
 // [1,3,5]
 ```
 
-Yay! But that function makes no sense with its name, in that it returns `false` when it's even:
+呀！但这个函数用这个名字根本讲不通，因为当数字为偶数时它返回 `false`：
 
 ```js
 isEven( 2 );        // false
 ```
 
-Yuck.
+讨厌。
 
-Recall that in [Chapter 3, "No Points"](ch3.md/#no-points), we defined a `not(..)` operator that negates a predicate function. Consider:
+回忆一下[第三章中的 “无点”](ch3.md/#no-points)，我们定义了一个对判定函数取反的 `not(..)` 操作符。考虑：
 
 ```js
 var isEven = not( isOdd );
@@ -314,18 +314,18 @@ var isEven = not( isOdd );
 isEven( 2 );        // true
 ```
 
-But we can't use *this* `isEven(..)` with `filter(..)` the way it's currently defined, because our logic will be reversed; we'll end up with evens, not odds. We'd need to do:
+但是我们将 *这个* `isEven(..)` 按照它当前定义的方式与 `filter(..)` 一起使用，因为逻辑将是相反的；我们将会得到偶数，不是奇数。我们需要这样做：
 
 ```js
 [1,2,3,4,5].filter( not( isEven ) );
 // [1,3,5]
 ```
 
-That defeats the whole purpose, though, so let's not do that. We're just going in circles.
+这违背了我们的初衷，所以不要这样做。我们只是在绕圈子。
 
-### Filtering-Out & Filtering-In
+### 滤除 & 滤入
 
-To clear up all this confusion, let's define a `filterOut(..)` that actually **filters out** values by internally negating the predicate check. While we're at it, we'll alias `filterIn(..)` to the existing `filter(..)`:
+为了扫清这一切困惑，让我们定义一个通过在内部对判定检查取反来真正 **滤除** 一些值的 `filterOut(..)`。同时我们将 `filterIn(..)` 作为既存的 `filter(..)` 的别名：
 
 ```js
 var filterIn = filter;
@@ -335,7 +335,7 @@ function filterOut(predicateFn,arr) {
 }
 ```
 
-Now we can use whichever filtering makes most sense at any point in our code:
+现在我们可以在代码的任何地方使用最合理的那一种过滤了：
 
 ```js
 isOdd( 3 );                             // true
@@ -345,46 +345,46 @@ filterIn( isOdd, [1,2,3,4,5] );         // [1,3,5]
 filterOut( isEven, [1,2,3,4,5] );       // [1,3,5]
 ```
 
-I think using `filterIn(..)` and `filterOut(..)` (known as `reject(..)` in Ramda) will make your code a lot more readable than just using `filter(..)` and leaving the semantics conflated and confusing for the reader.
+与仅使用 `filter(..)` 并将语义上的混淆和困惑留给读者相比，我觉得使用 `filterIn(..)` 和 `filterOut(..)`（在 Ramda 中称为 `reject(..)`）将会使你代码的可读性好得多。
 
 ## Reduce
 
-While `map(..)` and `filter(..)` produce new lists, typically this third operator (`reduce(..)`) combines (aka "reduces") the values of a list down to a single finite (non-list) value, like a number or string. However, later in this chapter, we'll look at how you can push `reduce(..)` to use it in more advanced ways. `reduce(..)` is one of the most important FP tools; it's like a Swiss Army all-in-one knife with all its usefulness.
+`map(..)` 和 `filter(..)` 产生一个新的列表，但这第三种操作（`reduce(..)`）经常将一个列表的值结合（也就是“递减”）为一个单独的有限（非列表）值，比如数字或字符串。但是在本章稍后，我们将会看到如何以更高级的方式使用 `reduce(..)`。`reduce(..)` 是最重要的 FP 工具之一；它就像瑞士军刀一样多才多艺。
 
-A combination/reduction is abstractly defined as taking two values and making them into one value. Some FP contexts refer to this as "folding", as if you're folding two values together into one value. That's a helpful visualization, I think.
+结合/递减被抽象地定义为将两个值变成一个值。一些 FP 语境中将之称为 “折叠（folding）”，就好像你把两个值折叠成为一个值一样。我觉得这种视觉化很有助于理解。
 
-Just like with mapping and filtering, the manner of the combination is entirely up to you, and generally dependent on the types of values in the list. For example, numbers will typically be combined through arithmetic, strings through concatenation, and functions through composition.
+正如映射与过滤那样，结合的行为完全由你来决定，而且这一般要看列表中值的种类而定。例如，数字通常将通过算数方式来结合，字符串通过连接，而函数通过组合。
 
-Sometimes a reduction will specify an `initialValue` and start its work by combining it with the first value in the list, cascading down through each of the rest of the values in the list. That looks like this:
+有时递减将会指定一个 `initialValue` 并用它与列表中的第一个值结合的结果做为起点，穿过列表中剩余的其他每一个值。看起来就像这样：
 
 <p align="center">
     <img src="images/fig11.png" width="50%">
 </p>
 
-Alternatively, you can omit the `initialValue` in which case the first value of the list will act in place of the `initialValue` and the combining will start with the second value in the list, like this:
+另一种方式是你可以忽略 `initialValue`，这时列表中的第一个值将作为 `initialValue`，而结合将始于它与列表中的第二个值，就像这样：
 
 <p align="center">
     <img src="images/fig12.png" width="50%">
 </p>
 
-**Warning:** In JavaScript, if there's not at least one value in the reduction (either in the array or specified as `initialValue`), an error is thrown. Be careful not to omit the `initialValue` if the list for the reduction could possibly be empty under any circumstance.
+**注意：** 在 JavaScript 中，递减至少需要一个值（要么在数组中，要么作为 `initialValue` 指定），否则就会抛出一个错误。如果用来递减的列表在某些环境下可能为空，那么就要小心不要忽略 `initialValue`。
 
-The function you pass to `reduce(..)` to perform the reduction is typically called a reducer. A reducer has a different signature from the mapper and predicate functions we looked at earlier. Reducers primarily receive the current reduction result as well as the next value to reduce it with. The current result at each step of the reduction is often referred to as the accumulator.
+你传递给 `reduce(..)` 来执行递减的函数通常称为一个递减函数（reducer）。递减函数的签名与我们早先看到的映射和判定函数不同。递减函数主要接收当前的递减结果以及下一个用于与之递减的值。在递减每一步中的结果经常被称为聚集器（accumulator）。
 
-For example, consider the steps involved in multiply-reducing the numbers `5`, `10`, and `15`, with an `initialValue` of `3`:
+例如，考虑将 `3` 作为 `initialValue` 对数字 `5`、`10`、和 `15` 进行乘法递减时的步骤：
 
 1. `3` * `5` = `15`
 2. `15` * `10` = `150`
 3. `150` * `15` = `2250`
 
-Expressed in JavaScript using the built-in `reduce(..)` method on arrays:
+在 JavaScript 中使用内建在数组上的 `reduce(..)` 来表达的话：
 
 ```js
 [5,10,15].reduce( (product,v) => product * v, 3 );
 // 2250
 ```
 
-But a standalone implementation of `reduce(..)` might look like this:
+一个独立的 `reduce(..)` 的实现可能像是这样：
 
 ```js
 function reduce(reducerFn,initialValue,arr) {
@@ -410,9 +410,9 @@ function reduce(reducerFn,initialValue,arr) {
 }
 ```
 
-Just as with `map(..)` and `filter(..)`, the reducer function is also passed the lesser-common `idx` and `arr` arguments in case that's useful to the reduction. I would say I don't typically use these, but I guess it's nice to have them available.
+和 `map(..)` 与 `filter(..)` 一样，递减函数也会被传入不太常用的 `idx` 和 `arr` 参数以备递减中的不时之需。我不常用这些东西，但我猜它们可以随时取用是一件不错的事情。
 
-Recall in [Chapter 4, we discussed the `compose(..)` utility](ch4.md/#user-content-composereduce) and showed an implementation with `reduce(..)`:
+回忆一下[第四章，我们讨论了 `compose(..)`](ch4.md/#user-content-composereduce) 工具而且展示了一种使用 `reduce(..)` 的实现：
 
 ```js
 function compose(...fns) {
@@ -424,7 +424,7 @@ function compose(...fns) {
 }
 ```
 
-To illustrate `reduce(..)`-based composition differently, consider a reducer that will compose functions left-to-right (like `pipe(..)` does), to use in an array chain:
+为了以一种不同的方式展示基于 `reduce(..)` 的组合，考虑一个从左到右（像 `pipe(..)` 那样）组合函数的递减函数，将它用于一个数组中：
 
 ```js
 var pipeReducer = (composedFn,fn) => pipe( composedFn, fn );
@@ -438,9 +438,9 @@ fn( 9 );            // 11016  (9 * 3 * 17 * 6 * 4)
 fn( 10 );           // 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
-`pipeReducer(..)` is unfortunately not point-free (see [Chapter 3, "No Points"](ch3.md/#no-points)), but we can't just pass `pipe(..)` as the reducer itself, because it's variadic; the extra arguments (`idx` and `arr`) that `reduce(..)` passes to its reducer function would be problematic.
+不幸的是 `pipeReducer(..)` 不是无点的（见[第三章的 “无点”](ch3.md/#no-points)），但我们不能简单地将 `pipe(..)` 作为递减函数本身传递，因为它是参数可变的；`reduce(..)` 传递给递减函数的额外参数（`idx` 和 `arr`）将会引起问题。
 
-Earlier we talked about using `unary(..)` to limit a `mapperFn(..)` or `predicateFn(..)` to just a single argument. It might be handy to have a `binary(..)` that does something similar but limits to two arguments, for a `reducerFn(..)` function:
+早先我们谈到过使用 `unary(..)` 来将 `mapperFn(..)` 或 `predicateFn(..)` 限定为一个参数。对于一个 `reducerFn(..)` 来说，要是有一个与之相似但限定为两个参数的 `binary(..)` 可能会很方便：
 
 ```js
 var binary =
@@ -449,7 +449,7 @@ var binary =
             fn( arg1, arg2 );
 ```
 
-Using `binary(..)`, our previous example is a little cleaner:
+使用 `binary(..)`，我们的前一个例子会干净一些：
 
 ```js
 var pipeReducer = binary( pipe );
@@ -463,10 +463,10 @@ fn( 9 );            // 11016  (9 * 3 * 17 * 6 * 4)
 fn( 10 );           // 12240  (10 * 3 * 17 * 6 * 4)
 ```
 
-Unlike `map(..)` and `filter(..)` whose order of passing through the array wouldn't actually matter, `reduce(..)` definitely uses left-to-right processing. If you want to reduce right-to-left, JavaScript provides a `reduceRight(..)`, with all other behaviors the same as `reduce(..)`:
+对 `map(..)` 和 `filter(..)` 来说遍历数组的顺序实际上不重要，与此不同的是，`reduce(..)` 绝对是按照从左到右的顺序处理。如果你想要从右到左地递减，JavaScript 提供了一个 `reduceRight(..)`，它除了顺序以外其他一切行为都与 `reduce(..)` 相同：
 
 ```js
-var hyphenate = (str,char) => `${str}-${char}`;
+var hyphenate = (str,char) => str + "-" + char;
 
 ["a","b","c"].reduce( hyphenate );
 // "a-b-c"
@@ -477,7 +477,7 @@ var hyphenate = (str,char) => `${str}-${char}`;
 
 <a name="composereduceright"></a>
 
-Where `reduce(..)` works left-to-right and thus acts naturally like `pipe(..)` in composing functions, `reduceRight(..)`'s right-to-left ordering is natural for performing a `compose(..)`-like operation. So, let's revisit [`compose(..)` from Chapter 4](ch4.md/#user-content-composereduce), but implement it using `reduceRight(..)`:
+`reduce(..)` 从左到右地工作，因此在组合函数时很自然地像 `pipe(..)` 一样动作，而 `reduceRight(..)` 从右到左的顺序对于 `compose(..)` 一样的操作来说更自然。那么，让我们使用 `reduceRight(..)` 来重新实现[第四章中的 `compose(..)`](ch4.md/#user-content-composereduce)：
 
 ```js
 function compose(...fns) {
@@ -489,11 +489,11 @@ function compose(...fns) {
 }
 ```
 
-Now, we don't need to do `fns.reverse()`; we just reduce from the other direction!
+现在我们不需要 `fns.reverse()` 了；我们只要从另一个方向递减即可！
 
-### Map as Reduce
+### Reduce 用作 Map
 
-The `map(..)` operation is iterative in its nature, so it can also be represented as a reduction (`reduce(..)`). The trick is to realize that the `initialValue` of `reduce(..)` can be itself an (empty) array, in which case the result of a reduction can be another list!
+`map(..)` 操作天生就是迭代性的，所以它也可以表达为一种递减（`reduce(..)`）。这其中的技巧是要理解 `reduce(..)` 的 `initialValue` 本身可以是一个（空）数组，这样递减的结果就可以是另一个列表！
 
 ```js
 var double = v => v * 2;
@@ -512,13 +512,13 @@ var double = v => v * 2;
 
 <a name="reducecheating"></a>
 
-**Note:** We're cheating with this reducer: using a side effect by allowing `list.push(..)` to mutate the list that was passed in. In general, that's not a good idea, obviously, but since we know the `[]` list is being created and passed in, it's less dangerous. You could be more formal -- yet less performant! -- by creating a new list with the val `concat(..)`d onto the end. We'll come back to [this cheat in Appendix A](apA.md/#user-content-cheating).
+**注意：** 我们在欺骗这个递减函数：通过允许 `list.push(..)` 改变被传入的列表而引入了副作用。一般来说，这不是个好主意，但是因为我们知道 `[]` 是被新建并传入的，所以这没那么危险。你可以更正式一些 —— 性能也差一些！—— 将值 `concat(..)` 在一个新列表的末尾。我们将在[附录A中再次回到这个问题上](apA.md/#user-content-cheating)。
 
-Implementing `map(..)` with `reduce(..)` is not on its surface an obvious step or even an improvement. However, this ability will be a crucial recognition for more advanced techniques like those we'll cover in [Appendix A](apA.md).
+使用 `reduce(..)` 实现 `map(..)` 在表面上看来不直观，它甚至不是一种改进。然而，对于我们将在附录A中讲解的更高级的技术来说，这种能力将是识别它的关键。
 
-### Filter as Reduce
+### Reduce 用作 Filter
 
-Just as `map(..)` can be done with `reduce(..)`, so can `filter(..)`:
+就像 `map(..)` 可以用 `reduce(..)` 完成一样，`filter(..)` 也能：
 
 ```js
 var isOdd = v => v % 2 == 1;
@@ -535,15 +535,15 @@ var isOdd = v => v % 2 == 1;
 // [1,3,5]
 ```
 
-**Note:** More impure reducer cheating here. Instead of `list.push(..)`, we could have done `list.concat(..)` and returned the new list. We'll come back to this [cheat in Appendix A](apA.md/#user-content-cheating).
+**注意：** 这里使用了更不纯粹的递减函数。我们本可以用 `list.concat(..)` 并返回一个新列表来取代 `list.push(..)`。我们将在[附录A中回到这个问题](apA.md/#user-content-cheating)。
 
-## Advanced List Operations
+## 高级列表操作
 
-Now that we feel somewhat comfortable with the foundational list operations `map(..)`, `filter(..)`, and `reduce(..)`, let's look at a few more-sophisticated operations you may find useful in various situations. These are generally utilities you'll find in various FP libraries.
+现在我们对基础的列表操作 `map(..)`、`filter(..)`、和 `reduce(..)` 有些熟悉了，让我们看几个你可能会在各种情景下觉得很有用的更加精巧的操作。它们通常都是你可以在各种 FP 库中找到的工具。
 
 ### Unique
 
-Filtering a list to include only unique values, based on `indexOf(..)` searching (which uses `===` strict equality comparison):
+基于 `indexOf(..)` 搜索（它使用 `===` 严格等价比较），过滤一个列表使之仅包含唯一的值：
 
 ```js
 var unique =
@@ -554,9 +554,9 @@ var unique =
         );
 ```
 
-This technique works by observing that we should only include the first occurrence of an item from `arr` into the new list; when running left-to-right, this will only be true if its `idx` position is the same as the `indexOf(..)` found position.
+这种技术的工作方式是，仅将第一次出现在 `arr` 中的项目加入到新的列表中；当从左到右运行时，这仅在项目的 `idx` 位置与 `indexOf(..)` 找到的位置相同时成立。
 
-Another way to implement `unique(..)` is to run through `arr` and include an item into a new (initially empty) list if that item cannot already be found in the new list. For that processing, we use `reduce(..)`:
+另一种实现 `unique(..)` 的方式是遍历 `arr`，如果一个项目没有在新的列表中（初始为空）找到就将它加入这个新的列表。我们为这样的处理使用 `reduce(..)`：
 
 ```js
 var unique =
@@ -568,9 +568,9 @@ var unique =
         , [] );
 ```
 
-**Note:** There are many other ways to implement this algorithm using more imperative approaches like loops, and many of them are likely "more efficient" performance-wise. However, the advantage of either of these presented approaches is that they use existing built-in list operations, which makes them easier to chain/compose alongside other list operations. We'll talk more about those concerns later in this chapter.
+**注意：** 使用诸如循环之类的更具指令式的方式，有许多种其他不同的方法可以实现这个算法，而且其中很多在性能方面可能看起来 “更高效”。然而，上面展示的这两种方式有一个优势是它们都使用了既存的列表操作，这使它们与其他列表操作链接/组合起来更容易。我们将会在本章稍后更多地谈到这些问题。
 
-`unique(..)` nicely produces a new list with no duplicates:
+`unique(..)` 可以出色地产生一个没有重复的新列表：
 
 ```js
 unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
@@ -579,19 +579,19 @@ unique( [1,4,7,1,3,1,7,9,2,6,4,0,5,3] );
 
 ### Flatten
 
-From time to time, you may have (or produce through some other operations) an array that's not just a flat list of values -- for instance, it might include nested arrays, as shown here:
+时不时地，你会得到（或者从一些其他操作中得到）一个这样的数组：它不只是一个值的扁平的列表，它可能包含一个嵌套的数组，例如：
 
 ```js
 [ [1, 2, 3], 4, 5, [6, [7, 8]] ]
 ```
 
-What if you'd like to transform it as follows?
+要是你想要将它变形为这样呢？
 
 ```js
 [ 1, 2, 3, 4, 5, 6, 7, 8 ]
 ```
 
-The operation we're looking for is typically called `flatten(..)`, and it could be implemented like this using our Swiss Army knife `reduce(..)`:
+我们在寻找的操作通常称为 `flatten(..)`，它可以使用我们的瑞士军刀 `reduce(..)` 像这样实现：
 
 ```js
 var flatten =
@@ -602,16 +602,16 @@ var flatten =
         , [] );
 ```
 
-**Note:** This implementation choice relies on recursion as we saw in [Chapter 8](ch8.md).
+**注意：** 这种实现依赖于使用我们在[第八章](ch8.md)中看到的递归处理嵌套的列表。
 
-To use `flatten(..)` with an array of arrays (of any nested depth):
+要对一个（嵌套多层的）数组的数组使用 `flatten(..)`：
 
 ```js
 flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]] );
 // [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
 ```
 
-You might like to limit the recursive flattening to a certain depth. We can handle this by adding an optional `depth` limit argument to the implementation:
+你可能想要将递归平整限制在一个特定的深度上。我们可以通过为这种实现添加一个可选的 `depth` 限制参数来实现：
 
 ```js
 var flatten =
@@ -629,7 +629,7 @@ var flatten =
         , [] );
 ```
 
-Illustrating the results with different flattening depths:
+这是不同平整深度的结果：
 
 ```js
 flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 0 );
@@ -651,9 +651,9 @@ flatten( [[0,1],2,3,[4,[5,6,7],[8,[9,[10,[11,12],13]]]]], 5 );
 // [0,1,2,3,4,5,6,7,8,9,10,11,12,13]
 ```
 
-#### Mapping, Then Flattening
+#### Mapping，之后 Flattening
 
-One of the most common usages of `flatten(..)` behavior is when you've mapped a list of elements where each transformed value from the original list is now itself a list of values. For example:
+`flatten(..)` 行为的最常见用法之一是在你映射一个列表时，每一个从原数组变形而来的元素本身就是一个值的列表。例如：
 
 ```js
 var firstNames = [
@@ -663,33 +663,33 @@ var firstNames = [
 ];
 
 firstNames
-.map( entry => [ entry.name, ...entry.variations ] );
+.map( entry => [entry.name].concat( entry.variations ) );
 // [ ["Jonathan","John","Jon","Jonny"], ["Stephanie","Steph","Stephy"],
 //   ["Frederick","Fred","Freddy"] ]
 ```
 
-The return value is an array of arrays, which might be more awkward to work with. If we want a single dimension list with all the names, we can then `flatten(..)` that result:
+返回值是一个数组的数组，这使用起来可能很尴尬。如果我们要的是一个所有名字的一维数组，那么就可以 `flatten(..)` 这个结果：
 
 ```js
 flatten(
     firstNames
-    .map( entry => [ entry.name, ...entry.variations ] )
+    .map( entry => [entry.name].concat( entry.variations ) )
 );
 // ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy",
 //  "Frederick","Fred","Freddy"]
 ```
 
-Besides being slightly more verbose, the disadvantage of doing the `map(..)` and `flatten(..)` as separate steps is primarily around performance; this approach processes the list twice, and creates an intermediate list that's then thrown away.
+除了稍稍繁冗之外，将 `map(..)` 和 `flatten(..)` 作为两个步骤分开做的缺点主要关乎性能；这个方式将列表处理了两次，而且创建了一个用完就扔的中间列表。
 
-FP libraries typically define a `flatMap(..)` (often also called `chain(..)`) that does the mapping-then-flattening combined. For consistency and ease of composition (via currying), the `flatMap(..)` (aka `chain(..)`) utility typically matches the `mapperFn, arr` parameter order that we saw earlier with the standalone `map(..)`, `filter(..)`, and `reduce(..)` utilities:
+FP 库中经常定义一个 “映射之后平整” 结合的 `flatMap(..)`（也常被称为 `chain(..)`）。为了一致性和易于（通过柯里化）组合，`flatMap(..)`（也就是 `chain(..)`）工具通常都与我们以前看到的 `map(..)`、`filter(..)`、和 `reduce(..)` 独立工具的 `mapperFn, arr` 参数顺序相吻合。
 
 ```js
-flatMap( entry => [ entry.name, ...entry.variations ], firstNames );
+flatMap( entry => [entry.name].concat( entry.variations ), firstNames );
 // ["Jonathan","John","Jon","Jonny","Stephanie","Steph","Stephy",
 //  "Frederick","Fred","Freddy"]
 ```
 
-The naive implementation of `flatMap(..)` with both steps done separately:
+将两个步骤分开做的 `flatMap(..)` 的幼稚的实现是：
 
 <a name="flatmap"></a>
 
@@ -699,35 +699,35 @@ var flatMap =
         flatten( arr.map( mapperFn ), 1 );
 ```
 
-**Note:** We use `1` for the flattening-depth because the typical definition of `flatMap(..)` is that the flattening is shallow on just the first level.
+**注意：** 我们将 `1` 用于平整深度是因为 `flatMap(..)` 的常见定义是仅发生在第一层的浅平整。
 
-Since this approach still processes the list twice resulting in worse performance, we can combine the operations manually, using `reduce(..)`:
+因为这种方式依然将列表处理两次而导致差劲的性能，所以我们可以使用 `reduce(..)` 手动结合这些操作：
 
 ```js
 var flatMap =
     (mapperFn,arr) =>
         arr.reduce(
             (list,v) =>
-                // note: concat(..) used here since it automatically
-                // flattens an array into the concatenation
+                // 注意：这里使用 concat(..) 是因为它自动地
+                // 将数组平整化到连接的结果中
                 list.concat( mapperFn( v ) )
         , [] );
 ```
 
-While there's some convenience and performance gained with a `flatMap(..)` utility, there may very well be times when you need other operations like `filter(..)`ing mixed in. If that's the case, doing the `map(..)` and `flatten(..)` separately might still be more appropriate.
+虽然 `flatMap(..)` 工具会带来一些方便与性能上的增益，但有时候你很可能需要混合一些 `filter(..)` 这样的操作。如果是这样，将 `map(..)` 与 `flatten(..)` 分开做可能还是更合适的。
 
 ### Zip
 
-So far, the list operations we've examined have operated on a single list. But some cases will need to process multiple lists. One well-known operation alternates selection of values from each of two input lists into sub-lists, called `zip(..)`:
+至此，我们检视过的列表操作都是在一个列表上进行操作的。但是有些情况需要处理多个列表。一个广为人知的操作是从两个输入列表中交替选择值放入子列表中，称为 `zip(..)`：
 
 ```js
 zip( [1,3,5,7,9], [2,4,6,8,10] );
 // [ [1,2], [3,4], [5,6], [7,8], [9,10] ]
 ```
 
-Values `1` and `2` were selected into the sub-list `[1,2]`, then `3` and `4` into `[3,4]`, and so on. The definition of `zip(..)` requires a value from each of the two lists. If the two lists are of different lengths, the selection of values will continue until the shorter list has been exhausted, with the extra values in the other list ignored.
+值 `1` 和 `2` 被选入子列表 `[1,2]`，然后 `3` 和 `4` 被选入 `[3,4]`，等等。`zip(..)` 的定义要求从两个列表中各取一个值。如果这两个列表长度不同，那么值的选择将会进行到较短的那个列表耗尽为止，在另一个列表中额外的值将会被忽略。
 
-An implementation of `zip(..)`:
+一种 `zip(..)` 的实现：
 
 ```js
 function zip(arr1,arr2) {
@@ -743,20 +743,20 @@ function zip(arr1,arr2) {
 }
 ```
 
-The `arr1.slice()` and `arr2.slice()` calls ensure `zip(..)` is pure by not causing side effects on the received array references.
+调用 `arr1.slice()` 和 `arr2.slice()` 通过不在收到的数组引用上造成副作用来保证 `zip(..)` 是纯粹的。
 
-**Note:** There are some decidedly un-FP things going on in this implementation. There's an imperative `while`-loop and mutations of lists with both `shift()` and `push(..)`. Earlier in the book, I asserted that it's reasonable for pure functions to use impure behavior inside them (usually for performance), as long as the effects are fully self-contained. This implementation is safely pure.
+**注意：** 在这种实现中毫无疑问地发生了一些非 FP 的事情。这里有一个指令式的 `while` 循环而且使用 `shift()` 和 `push(..)` 改变了列表。在本书早先的部分中，我论证过在纯函数内部（通常是为了性能）使用非纯粹的行为是合理的，只要其造成的效应是完全自包含的就行。这种实现是安全且纯粹的。
 
 ### Merge
 
-Merging two lists by interleaving values from each source looks like this:
+通过将两个列表中的值穿插来融合它们，看起来就像：
 
 ```js
 mergeLists( [1,3,5,7,9], [2,4,6,8,10] );
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-It may not be obvious, but this result seems similar to what we get if we compose `flatten(..)` and `zip(..)`:
+可能不太明显，但是这个结果看起来很类似于我们将 `flatten(..)` 和 `zip(..)` 组合得到的东西：
 
 ```js
 zip( [1,3,5,7,9], [2,4,6,8,10] );
@@ -765,14 +765,14 @@ zip( [1,3,5,7,9], [2,4,6,8,10] );
 flatten( [ [1,2], [3,4], [5,6], [7,8], [9,10] ] );
 // [1,2,3,4,5,6,7,8,9,10]
 
-// composed:
+// 组合后：
 flatten( zip( [1,3,5,7,9], [2,4,6,8,10] ) );
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-However, recall that `zip(..)` only selects values until the shorter of two lists is exhausted, ignoring the leftover values; merging two lists would most naturally retain those extra values. Also, `flatten(..)` works recursively on nested lists, but you might expect list-merging to only work shallowly, keeping nested lists.
+然而，回忆一下， `zip(..)` 对值的选择仅截止到较短的列表耗尽为止，而且忽略剩下的值；而融合两个列表时保留那些额外的值将是最自然的。另外，`flatten(..)` 会在嵌套的列表中递归地执行，但你可能希望列表融合仅在浅层工作，保留嵌套的列表。
 
-So, let's define a `mergeLists(..)` that works more like we'd expect:
+那么，让我们定义一个如我们所愿的 `mergeLists(..)`：
 
 ```js
 function mergeLists(arr1,arr2) {
@@ -793,18 +793,18 @@ function mergeLists(arr1,arr2) {
 }
 ```
 
-**Note:** Various FP libraries don't define a `mergeLists(..)` but instead define a `merge(..)` that merges properties of two objects; the results of such a `merge(..)` will differ from our `mergeLists(..)`.
+**注意：** 各种 FP 库不会定义 `mergeLists(..)`，取而代之的是定义了融合两个对象的属性的 `merge(..)`；这样的 `merge(..)` 的结果将与我们的 `mergeLists(..)` 的结果不同。
 
-Alternatively, here are a couple of options to implement the list merging as a reducer:
+此外，还有许多其他选择可以将列表的融合实现为一个递减函数：
 
 ```js
-// via @rwaldron
+// 由 @rwaldron 编写
 var mergeReducer =
     (merged,v,idx) =>
         (merged.splice( idx * 2, 0, v ), merged);
 
 
-// via @WebReflection
+// 由 @WebReflection 编写
 var mergeReducer =
     (merged,v,idx) =>
         merged
@@ -812,7 +812,7 @@ var mergeReducer =
             .concat( v, merged.slice( idx * 2 ) );
 ```
 
-And using a `mergeReducer(..)`:
+使用 `mergeReducer(..)`：
 
 ```js
 [1,3,5,7,9]
@@ -820,13 +820,13 @@ And using a `mergeReducer(..)`:
 // [1,2,3,4,5,6,7,8,9,10]
 ```
 
-**Tip:** We'll use the `mergeReducer(..)` trick later in the chapter.
+**提示：** 我们将在本章稍后使用这个 `mergeReducer(..)` 技巧。
 
-## Method vs. Standalone
+## 方法 vs. 独立函数
 
-A common source of frustration for FPers in JavaScript is unifying their strategy for working with utilities when some of them are provided as standalone functions (think about the various FP utilities we've derived in previous chapters) and others are methods of the array prototype (like the ones we've seen in this chapter).
+在 JavaScript 中一个令 FP 程序员们沮丧的根源是，当一些工具作为独立函数被提供（考虑一下我们在前一章中衍生出来的各种工具），而另一些是数组原型的方法（就像我们在本章中看到的）时，如何为使用这些工具来统一他们的策略。
 
-The pain of this problem becomes more evident when you consider combining multiple operations:
+当你考虑组合多个操作时，这个问题使人头疼的地方就变得更加明显：
 
 ```js
 [1,2,3,4,5]
@@ -846,26 +846,26 @@ reduce(
 );                                  // 18
 ```
 
-Both API styles accomplish the same task, but they have very different ergonomics. Many FPers will prefer the latter to the former, but the former is unquestionably more common in JavaScript. One thing specifically that's disliked about the latter is the nesting of the calls. The preference for the method chain style -- typically called a fluent API style, as in jQuery and other tools -- is that it's compact/concise and it reads in declarative top-down order.
+这两种 API 风格都完成相同的任务，但它们在人体工程学上十分的不同。相较于前者许多 FP 程序员偏好后者，但前者毫无疑问地在 JavaScript 中更常见。后者一个特别令人厌恶的东西就是调用的嵌套。方法链风格招人喜欢的地方 —— 常被称为流利的 API 风格（fluent API style），就像在 jQuery 和其他工具中那样 —— 在于其紧凑/简洁，以及它读起来是声明式的从上到下顺序。
 
-The visual order for that manual composition of the standalone style is neither strictly left-to-right (top-to-bottom) nor right-to-left (bottom-to-top); it's inner-to-outer, which harms the readability.
+对于独立函数风格的手动组合来说，它的视觉顺序既不是从左到右（从上到下）也不是从右到左（从下到上）；而是由内而外，这损害了可读性。
 
-Automatic composition normalizes the reading order as right-to-left (bottom-to-top) for both styles. So, to explore the implications of the style differences, let's examine composition specifically; it seems like it should be straightforward, but it's a little awkward in both cases.
+自动组合将两种风格的阅读顺序规范化为从右到左（从下到上）。那么为了探索不同风格可能造成的影响，让我们专门讲解一下组合；这看起来应当很直接，但是实际上在两种情况下都有些尴尬。
 
-### Composing Method Chains
+### 组合方法链
 
-The array methods receive the implicit `this` argument, so despite their appearance, they can't be treated as unary; that makes composition more awkward. To cope, we'll first need a `this`-aware version of `partial(..)`:
+数组方法接收隐含的 `this` 参数，所以尽管它们没有出现，这些方法也不能被视为一元的；这使得组合更加尴尬。为了应付它，首先我们需要一个 `this` 敏感版本的 `partial(..)`：
 
 ```js
 var partialThis =
     (fn,...presetArgs) =>
-        // intentionally `function` to allow `this`-binding
+        // 有意地制造一个允许 `this` 绑定的 `function`
         function partiallyApplied(...laterArgs){
             return fn.apply( this, [...presetArgs, ...laterArgs] );
         };
 ```
 
-We'll also need a version of `compose(..)` that calls each of the partially applied methods in the context of the chain -- the input value it's being "passed" (via implicit `this`) from the previous step:
+我们还需要另一个版本的 `compose(..)`，它在这个链条的上下文环境中调用每一个被部分应用的方法 —— 从上一个步骤中（通过隐含的 `this`）被 “传递” 过来的输入值：
 
 ```js
 var composeChainedMethods =
@@ -878,7 +878,7 @@ var composeChainedMethods =
             );
 ```
 
-And using these two `this`-aware utilities together:
+一起使用这两个 `this` 敏感的工具：
 
 ```js
 composeChainedMethods(
@@ -889,11 +889,11 @@ composeChainedMethods(
 ( [1,2,3,4,5] );                    // 18
 ```
 
-**Note:** The three `Array.prototype.XXX`-style references are grabbing references to the built-in `Array.prototype.*` methods so that we can reuse them with our own arrays.
+**注意：** 三个 `Array.prototype.XXX` 风格的引用抓住了内建的 `Array.prototype.*` 方法的引用，这样我们就可以对自己的数组复用它们了。
 
-### Composing Standalone Utilities
+### 组合独立函数工具
 
-Standalone `compose(..)`-style composition of these utilities doesn't need all the `this` contortions, which is its most favorable argument. For example, we could define standalones as:
+这些工具的独立 `compose(..)` 风格组合不需要所有这些扭曲 `this` 的操作，这是它最为人称道的地方。例如，我们可以这样定义独立函数：
 
 ```js
 var filter = (arr,predicateFn) => arr.filter( predicateFn );
@@ -904,7 +904,7 @@ var reduce = (arr,reducerFn,initialValue) =>
     arr.reduce( reducerFn, initialValue );
 ```
 
-But this particular standalone approach, with the `arr` as the first parameter, suffers from its own awkwardness; the cascading array context is the first argument rather than the last, so we have to use right-partial application to compose them:
+但是这种将 `arr` 作为第一个形式参数的特别独立风格有它自己的尴尬之处；层层传递的数组上下文是第一个参数而非最后一个，于是我们不得不使用右侧局部应用来组合它们：
 
 ```js
 compose(
@@ -915,7 +915,7 @@ compose(
 ( [1,2,3,4,5] );                    // 18
 ```
 
-That's why FP libraries typically define `filter(..)`, `map(..)`, and `reduce(..)` to instead receive the array last, not first. They also typically automatically curry the utilities:
+这就是为什么 FP 库通常将 `filter(..)`、`map(..)`、和 `reduce(..)` 定义为最后接收数组而不是最先接收。它们还经常自动地柯里化这些工具：
 
 ```js
 var filter = curry(
@@ -934,7 +934,7 @@ var reduce = curry(
 );
 ```
 
-Working with the utilities defined in this way, the composition flow is a bit nicer:
+使用这样定义的工具，组合的流程变得好了一些：
 
 ```js
 compose(
@@ -945,11 +945,11 @@ compose(
 ( [1,2,3,4,5] );                    // 18
 ```
 
-The cleanliness of this approach is in part why FPers prefer the standalone utility style instead of instance methods. But your mileage may vary.
+这种方式的清晰性在某种程度上就是为什么 FP 程序员喜欢独立的工具风格而不是实例方法。但你的感觉可能会不同。
 
-### Adapting Methods to Standalones
+### 将方法适配为独立函数
 
-In the previous definition of `filter(..)`/`map(..)`/`reduce(..)`, you might have spotted the common pattern across all three: they all dispatch to the corresponding native array method. So, can we generate these standalone adaptations with a utility? Yes! Let's make a utility called `unboundMethod(..)` to do just that:
+在前面 `filter(..)`/`map(..)`/`reduce(..)` 的定义中，你可能发现了这三者的共通模式：它们都被分发到相应的原生数组方法上。那么，我们能否使用一个工具来生成这些独立适配函数呢？可以！让我们为此制造一个称为 `unboundMethod(..)` 的工具：
 
 ```js
 var unboundMethod =
@@ -963,7 +963,7 @@ var unboundMethod =
         );
 ```
 
-And to use this utility:
+要使用这个工具：
 
 ```js
 var filter = unboundMethod( "filter", 2 );
@@ -978,44 +978,44 @@ compose(
 ( [1,2,3,4,5] );                    // 18
 ```
 
-**Note:** `unboundMethod(..)` is called `invoker(..)` in Ramda.
+**注意：** `unboundMethod(..)` 在 Ramda 中称为 `invoker(..)`。
 
-### Adapting Standalones to Methods
+### 将独立函数适配为方法
 
-If you prefer to work with only array methods (fluent chain style), you have two choices. You can:
+如果你喜欢只使用数组方法（流利的链式风格），你有两个选择。你可以：
 
-1. Extend the built-in `Array.prototype` with additional methods.
-2. Adapt a standalone utility to work as a reducer function and pass it to the `reduce(..)` instance method.
+1. 使用额外的方法扩展内建的 `Array.prototype`。
+2. 适配一个用于递减函数的独立工具，并将它传入 `reduce(..)` 实例方法。
 
-**Don't do (1).** It's never a good idea to extend built-in natives like `Array.prototype` -- unless you define a subclass of `Array`, but that's beyond our discussion scope here. In an effort to discourage bad practices, we won't go any further into this approach.
+**不要选择（1）。** 扩展 `Array.prototype` 这样的內建原生类型从来都不是一个好主意 —— 除非你定义一个 `Array` 的子类，但这超出了我们在此的讨论范围。为了不鼓励不好的实践，我们不会在这种方式上再前进了。
 
-Let's **focus on (2)** instead. To illustrate this point, we'll convert the recursive `flatten(..)` standalone utility from earlier:
+让我们 **集中于（2）**。为了展示其中的要点，我们将转换之前递归的 `flatten(..)` 独立工具：
 
 ```js
 var flatten =
     arr =>
         arr.reduce(
             (list,v) =>
-                // note: concat(..) used here since it automatically
-                // flattens an array into the concatenation
+                // 注意：这里使用 concat(..) 是因为它自动地
+                // 将数组平整化到连接的结果中
                 list.concat( Array.isArray( v ) ? flatten( v ) : v )
         , [] );
 ```
 
-Let's pull out the inner `reducer(..)` function as the standalone utility (and adapt it to work without the outer `flatten(..)`):
+让我们将内部的 `reducer(..)` 函数抽离为一个独立工具（并将它适配为可以脱离外部 `flatten(..)` 工作）：
 
 ```js
-// intentionally a function to allow recursion by name
+// 有意地定义一个允许通过名称进行递归的函数
 function flattenReducer(list,v) {
-    // note: concat(..) used here since it automatically
-    // flattens an array into the concatenation
+    // 注意：这里使用 concat(..) 是因为它自动地
+    // 将数组平整化到连接的结果中
     return list.concat(
         Array.isArray( v ) ? v.reduce( flattenReducer, [] ) : v
     );
 }
 ```
 
-Now, we can use this utility in an array method chain via `reduce(..)`:
+现在，我们可以在一个数组方法链中通过 `reduce(..)` 来使用这个工具了：
 
 ```js
 [ [1, 2, 3], 4, 5, [6, [7, 8]] ]
@@ -1023,11 +1023,11 @@ Now, we can use this utility in an array method chain via `reduce(..)`:
 // ..
 ```
 
-## Looking for Lists
+## 寻找列表
 
-So far, most of the examples have been rather trivial, based on simple lists of numbers or strings. Let's now talk about where list operations can start to shine: modeling an imperative series of statements declaratively.
+目前为止，绝大多数例子都很琐碎，它们基于简单的数字或字符串列表。现在让我们谈谈列表操作可以闪光的地方：对一系列指令式的语句进行声明式的建模。
 
-Consider this base example:
+考虑这个基本的例子：
 
 ```js
 var getSessionId = partial( prop, "sessId" );
@@ -1036,16 +1036,16 @@ var getUserId = partial( prop, "uId" );
 var session, sessionId, user, userId, orders;
 
 session = getCurrentSession();
-if (session != null) sessionId = getSessionId( session );
+if (session != null) sessionId = getSessionId( sessionId );
 if (sessionId != null) user = lookupUser( sessionId );
 if (user != null) userId = getUserId( user );
 if (userId != null) orders = lookupOrders( userId );
 if (orders != null) processOrders( orders );
 ```
 
-First, let's observe that the five variable declarations and the running series of `if` conditionals guarding the function calls are effectively one big composition of these six calls `getCurrentSession()`, `getSessionId(..)`, `lookupUser(..)`, `getUserId(..)`, `lookupOrders(..)`, and `processOrders(..)`. Ideally, we'd like to get rid of all these variable declarations and imperative conditionals.
+首先，我们观察到那五个变量声明和守护着函数调用的一系列 `if` 条件实质上是这六个调用的一个大组合：`getCurrentSession()`、`getSessionId(..)`、`lookupUser(..)`、`getUserId(..)`、`lookupOrders(..)`、和 `processOrders(..)`。理想上，我们想要摆脱所有这些变量声明和指令式条件。
 
-Unfortunately, the `compose(..)`/`pipe(..)` utilities we explored in [Chapter 4](ch4.md) don't by themselves offer a convenient way to express the `!= null` conditionals in the composition. Let's define a utility to help:
+不幸的是，我们在[第四章](ch4.md)中探索过的 `compose(..)` / `pipe(..)` 工具自身不会在组合中提供一种表达 `!= null` 条件的简便方法。让我们定义一个工具来提供帮助：
 
 ```js
 var guard =
@@ -1054,14 +1054,14 @@ var guard =
             arg != null ? fn( arg ) : arg;
 ```
 
-This `guard(..)` utility lets us map the five conditional-guarded functions:
+这个 `guard(..)` 工具让我们映射出那五个条件守护着的函数：
 
 ```js
 [ getSessionId, lookupUser, getUserId, lookupOrders, processOrders ]
 .map( guard )
 ```
 
-The result of this mapping is an array of functions that are ready to compose (actually, pipe, in this listed order). We could spread this array to `pipe(..)`, but because we're already doing list operations, let's do it with a `reduce(..)`, using the session value from `getCurrentSession()` as the initial value:
+这个映射的结果是准备好组合的函数的数组（实际上是 pipe，以这个列表的顺序来说）。我们可以将这个数组扩散到 `pipe(..)`，但因为我们已经在做列表操作了，让我们使用一个 `reduce(..)`，将 `getCurrentSession()` 中的 session 值作为初始值：
 
 ```js
 .reduce(
@@ -1070,15 +1070,15 @@ The result of this mapping is an array of functions that are ready to compose (a
 )
 ```
 
-Next, let's observe that `getSessionId(..)` and `getUserId(..)` can be expressed as a mapping from the respective values `"sessId"` and `"uId"`:
+接下来，我们观察到 `getSessionId(..)` 和 `getUserId(..)` 可以被分别表达为值 `"sessId"` 和 `"uId"` 的映射：
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
 ```
 
-But to use these, we'll need to interleave them with the other three functions (`lookupUser(..)`, `lookupOrders(..)`, and `processOrders(..)`) to get the array of five functions to guard/compose as discussed before.
+但为了使用它们，我们需要将它们穿插在其他三个函数中（`lookupUser(..)`、`lookupOrders(..)`、和 `processOrders(..)`），来让这五个函数的数组像上面的讨论中那样守护/组合。
 
-To do the interleaving, we can model this as list merging. Recall `mergeReducer(..)` from earlier in the chapter:
+为了进行穿插，我们可以将此模型化为列表融合。回想一下本章早先的 `mergeReducer`：
 
 ```js
 var mergeReducer =
@@ -1086,19 +1086,19 @@ var mergeReducer =
         (merged.splice( idx * 2, 0, v ), merged);
 ```
 
-We can use `reduce(..)` (our Swiss Army knife, remember!?) to "insert" `lookupUser(..)` in the array between the generated functions `getSessionId(..)` and `getUserId(..)`, by merging two lists:
+我们可以使用 `reduce(..)`（我们的瑞士军刀，记得吗！？）通过融合两个列表，来将 `lookupUser(..)` “插入” 到数组的 `getSessionId(..)` 和 `getUserId(..)` 函数之间：
 
 ```js
 .reduce( mergeReducer, [ lookupUser ] )
 ```
 
-Then we'll concatenate `lookupOrders(..)` and `processOrders(..)` onto the end of the running functions array:
+然后我们把 `lookupOrders(..)` 和 `processOrders(..)` 连接到运行中的函数数组的末尾：
 
 ```js
 .concat( lookupOrders, processOrders )
 ```
 
-To review, the generated list of five functions is expressed as:
+检查一下，生成的五个函数的列表被表达为：
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
@@ -1106,7 +1106,7 @@ To review, the generated list of five functions is expressed as:
 .concat( lookupOrders, processOrders )
 ```
 
-Finally, to put it all together, take this list of functions and tack on the guarding and composition from earlier:
+最后，把所有东西放在一起，将函数的列表向前面讨论过的那样添加守护功能并组合：
 
 ```js
 [ "sessId", "uId" ].map( propName => partial( prop, propName ) )
@@ -1119,17 +1119,17 @@ Finally, to put it all together, take this list of functions and tack on the gua
 );
 ```
 
-Gone are all the imperative variable declarations and conditionals, and in their place we have clean and declarative list operations chained together.
+所有的指令式变量声明和条件都不见了，取而代之的是链接在一起的干净且是声明式的列表操作。
 
-I know this version is likely harder for most readers to understand right now than the original. Don't worry, that's natural. The original imperative form is one you're probably much more familiar with.
+我知道对你来说这个版本比原来的版本读起来更困难。不要担心，这是自然的。原来的版本无疑是你可能更加熟悉的指令式形式。
 
-Part of your evolution to become a functional programmer is to develop a recognition of FP patterns such as list operations, and that takes lots of exposure and practice. Over time, these will jump out of the code more readily as your sense of code readability shifts to declarative style.
+你向函数式程序员演变过程的一部分就是发展出能够识别 FP 模式的能力，而这需要大量的曝光和练习。久而久之，随着你对代码可读性的感觉转换为声明式风格，这些东西将会轻而易举地从代码中跳出来。
 
-Before we move on from this topic, let's take a reality check: the example here is heavily contrived. Not all code segments will be straightforwardly modeled as list operations. The pragmatic take-away is to develop the instinct to look for these opportunities, but not get too hung up on code acrobatics; some improvement is better than none. Always step back and ask if you're **improving or harming** code readability.
+在我们结束这个话题之前，让我们看一下现实：这里的例子都是严重造作的。不是所有的代码段都可以简单地模型化为列表操作。务实的要点是，要开发寻找这些可以进行优化的机会，但不要过于沉迷在代码的杂耍中；有些改进是聊胜于无的。总是退一步并问问你自己，你是 **改善了还是损害了** 代码的可读性。
 
-## Fusion
+## 融合（Fusion）
 
-As FP list operations permeate the way you think about code, you'll very likely start recognizing chains of combined behavior, like:
+随着 FP 列表操作更多地渗透到你对代码的思考中，你很可能很快就会看到像这样组合行为的链条：
 
 ```js
 ..
@@ -1138,7 +1138,7 @@ As FP list operations permeate the way you think about code, you'll very likely 
 .reduce(..);
 ```
 
-And more often than not, you're also probably going to end up with chains with multiple adjacent instances of each operation, like:
+而且你还可能往往会得到每种操作有多个相邻实例的链条，就像：
 
 ```js
 someList
@@ -1150,9 +1150,9 @@ someList
 .reduce(..);
 ```
 
-The good news is the chain-style is declarative and it's easy to read the specific steps that will happen, in order. The downside is that each of these operations loops over the entire list, meaning performance can suffer unnecessarily, especially if the list is longer.
+好消息是这种链式风格是声明式的，而且很容易按顺序读懂将要发生的具体步骤。它的缺点是这些操作的每一个都循环遍历整个列表，这意味着性能可能会有不必要的消耗，特别是在列表很长的时候。
 
-With the alternative standalone style, you might see code like this:
+用另一种独立风格，你可能会看到这样的代码：
 
 ```js
 map(
@@ -1164,11 +1164,11 @@ map(
 );
 ```
 
-With this style, the operations are listed from bottom-to-top, and we still loop over the list three times.
+这种风格中，操作由下至上地罗列，而且我们依然循环遍历列表三遍。
 
-Fusion deals with combining adjacent operators to reduce the number of times the list is iterated over. We'll focus here on collapsing adjacent `map(..)`s as it's the most straightforward to explain.
+融合通过组合相邻的操作来减少列表被循环遍历的次数。我们在这里将集中于将相邻的 `map(..)` 压缩在一起，因为它是讲解起来最直接的。
 
-Imagine this scenario:
+想象这种场景：
 
 ```js
 var removeInvalidChars = str => str.replace( /[^\w]*/g, "" );
@@ -1193,9 +1193,9 @@ words
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
 
-Think about each value that goes through this flow of transformations. The first value in the `words` list starts out as `"Mr."`, becomes `"Mr"`, then `"MR"`, and then passes through `elide(..)` unchanged. Another piece of data flows: `"responsible"` -> `"responsible"` -> `"RESPONSIBLE"` -> `"RESPONS..."`.
+考虑一下通过这个变形流程的每一个值。在 `words` 列表中的第一个值从 `"Mr."` 开始，变成 `"Mr"`，然后变成 `"MR"`，然后原封不动地通过 `elide(..)`。另一个数据流是：`"responsible"` -> `"responsible"` -> `"RESPONSIBLE"` -> `"RESPONS..."`。
 
-In other words, you could think of these data transformations like this:
+换言之，你可以这样考虑这些数据变形：
 
 ```js
 elide( upper( removeInvalidChars( "Mr." ) ) );
@@ -1205,7 +1205,7 @@ elide( upper( removeInvalidChars( "responsible" ) ) );
 // "RESPONS..."
 ```
 
-Did you catch the point? We can express the three separate steps of the adjacent `map(..)` calls as a composition of the transformers, since they are all unary functions and each returns the value that's suitable as input to the next. We can fuse the mapper functions using `compose(..)`, and then pass the composed function to a single `map(..)` call:
+你抓住要点了吗？我们可以将这三个相邻的 `map(..)` 调用的分离步骤表达为一个变形函数的组合，因为它们都是一元函数而且每一个的返回值都适合作为下一个的输入。我们可以使用 `compose(..)` 将映射函数融合，然后将组合好的函数传递给一个 `map(..)` 调用：
 
 ```js
 words
@@ -1215,7 +1215,7 @@ words
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
 
-This is another case where `pipe(..)` can be a more convenient form of composition, for its ordering readability:
+这是另一个 `pipe(..)` 可以作为一种更方便的组合形式的例子，由于它在顺序上的可读性：
 
 ```js
 words
@@ -1225,34 +1225,34 @@ words
 // ["MR","JONES","ISNT","RESPONS...","FOR","THIS","DISASTER"]
 ```
 
-What about fusing two or more `filter(..)` predicate functions? Typically treated as unary functions, they seem suitable for composition. But the wrinkle is they each return a different kind of value (`boolean`) than the next one would want as input. Fusing adjacent `reduce(..)` calls is also possible, but reducers are not unary so that's a bit more challenging; we need more sophisticated tricks to pull this kind of fusion off. We'll cover these advanced techniques in [Appendix A](apA.md).
+要是融合两个或更多的 `filter(..)` 判定函数呢？它们经常被视为一元函数，看起来很适于组合。但别扭的地方是它们每一个都返回 `boolean` 种类的值，而这与下一个所期望的输入值不同。融合相邻的 `reduce(..)` 调用也是可能的，但递减函数不是一元的所以更具挑战性；我们需要更精巧的方法来抽离这种融合。我们会在[附录A](apA.md)中讲解这些高级技术。
 
-## Beyond Lists
+## 列表以外
 
-So far we've been discussing operations in the context of the list (array) data structure; it's by far the most common scenario where you'll encounter them. But in a more general sense, these operations can be performed against any collection of values.
+目前为止我们一直在列表（数组）数据结构的语境中讨论各种操作；这无疑是你遇到它们的最常见的场景。但在更一般的意义上，这些操作可以对各种值的集合执行。
 
-Just as we said earlier that array's `map(..)` adapts a single-value operation to all its values, any data structure can provide a `map(..)` operation to do the same. Likewise, it can implement `filter(..)`, `reduce(..)`, or any other operation that makes sense for working with the data structure's values.
+正如我们早先说过的，数组的 `map(..)` 将一个单值操作适配为对它所有值的操作，任何数据结构都可以提供 `map(..)` 来做到相同的事情。类似地，它可以实现 `filter(..)`，`reduce(..)`，或者任何其他对于使用这种数据结构的值来说有意义的操作。
 
-The important part to maintain in the spirit of FP is that these operators must behave according to value immutability, meaning that they must return a new data structure rather than mutating the existing one.
+从 FP 的精神上讲，需要维护的最重要的部分是这些操作必须根据值的不可变性进行动作，这意味着它们必须返回一个新的数据结构而非改变既存的。
 
 <img src="images/fig7.png" align="left" width="20%" hspace="20" vspace="20">
 
-Let's illustrate with a well-known data structure: the binary tree. A binary tree is a node (just an object!) that has at most two references to other nodes (themselves binary trees), typically referred to as *left* and *right* child trees. Each node in the tree holds one value of the overall data structure.
+让我们通过一个广为人知的数据结构来展示一下：二叉树。一个二叉树是一个节点（就是一个对象！），它拥有指向其他节点（本身也是二叉树）的两个引用，通常称为 *左* 和 *右* 子树。树上的每一个节点都持有整个数据结构中的一个值。
 
-For ease of illustration, we'll make our binary tree a binary search tree (BST). However, the operations we'll identify work the same for any regular non-BST binary tree.
+为了便于展示，我们使我们的二叉树变为一个二叉检索树（binary search tree —— BST）。但是我们将要看到的操作对任何非 BST 二叉树来说工作起来都一样。
 
-**Note:** A binary search tree is a general binary tree with a special constraint on the relationship of values in the tree to each other. Each value of nodes on the left side of a tree is less than the value of the node at the root of that tree, which in turn is less than each value of nodes in the right side of the tree. The notion of "less than" is relative to the kind of data stored; it can be numerical for numbers, lexicographic for strings, and so on. BSTs by definition must remain balanced, which makes searching for a value in the tree more efficient, using a recursive binary search algorithm.
+**注意：** 二叉检索树是一种一般的二叉树，它对树上每一个值之间的关系有一种特殊的限制。在一个树左侧的每一个节点的值都要小于树根节点的值，而树根节点的值要小于树右侧每一个节点的值。“小于” 的概念是相对于被存储的数据的种类的；对于数字它可以是数值上的，对于字符串可以是字典顺序，等等。根据定义 BST 必须保持平衡，这使得用递归的二元检索算法在树上检索一个值变得更高效。
 
-To make a binary tree node object, let's use this factory function:
+为了制造一个二叉树节点对象，让我们使用这个工厂函数：
 
 ```js
 var BinaryTree =
     (value,parent,left,right) => ({ value, parent, left, right });
 ```
 
-For convenience, we make each node store the `left` and `right` child trees as well as a reference to its own `parent` node.
+为了方便起见，我们使每个节点都存储 `left` 和 `right` 子树以及一个指向它自己 `parent` 节点的引用。
 
-Let's now define a BST of names of common produce (fruits, vegetables):
+现在让我们定义一个常见作物（水果，蔬菜）名称的 BST：
 
 ```js
 var banana = BinaryTree( "banana" );
@@ -1260,25 +1260,25 @@ var apple = banana.left = BinaryTree( "apple", banana );
 var cherry = banana.right = BinaryTree( "cherry", banana );
 var apricot = apple.right = BinaryTree( "apricot", apple );
 var avocado = apricot.right = BinaryTree( "avocado", apricot );
-var cantaloupe = cherry.left = BinaryTree( "cantaloupe", cherry );
+var cantelope = cherry.left = BinaryTree( "cantelope", cherry );
 var cucumber = cherry.right = BinaryTree( "cucumber", cherry );
 var grape = cucumber.right = BinaryTree( "grape", cucumber );
 ```
 
-In this particular tree structure, `banana` is the root node; this tree could have been set up with nodes in different locations, but still had a BST with the same traversal.
+在这个特别的二叉树结构中，`banana` 是根节点；这棵树可以使用在不同位置的节点建立，但依然是一个拥有相同遍历过程的 BST。
 
-Our tree looks like:
+我们的树看起来像这样：
 
 <p align="center">
     <img src="images/fig8.png" width="60%">
 </p>
 
-There are multiple ways to traverse a binary tree to process its values. If it's a BST (ours is!) and we do an *in-order* traversal -- always visit the left child tree first, then the node itself, then the right child tree -- we'll visit the values in ascending (sorted) order.
+遍历一个二叉树来处理它的值有多种方法。如果它是一个 BST（我们的就是！）而且我们进行 *按顺序* 的遍历 —— 总是先访问左侧子树，然后是节点自身，最后是右侧子树 —— 那么我们将会按升序（排序过的顺序）访问所有值。
 
-Because you can't just easily `console.log(..)` a binary tree like you can with an array, let's first define a convenience method, mostly to use for printing. `forEach(..)` will visit the nodes of a binary tree in the same manner as an array:
+因为你不能像对一个数组那样简单地 `console.log(..)` 一个二叉树，所以我们先来定义一个主要为了进行打印而生的便利方法。`forEach(..)` 将会像访问一个数组那样访问一个二叉树的节点：
 
 ```js
-// in-order traversal
+// 按顺序遍历
 BinaryTree.forEach = function forEach(visitFn,node){
     if (node) {
         if (node.left) {
@@ -1294,22 +1294,22 @@ BinaryTree.forEach = function forEach(visitFn,node){
 };
 ```
 
-**Note:** Working with binary trees lends itself most naturally to recursive processing. Our `forEach(..)` utility recursively calls itself to process both the left and right child trees. We already discussed recursion in [Chapter 8](ch8.md), where we covered recursion in the chapter on recursion.
+**注意：** 递归处理对于使用二叉树来说再自然不过了。我们的 `forEach(..)` 工具递归地调用它自己来处理左右子树。我们已经在[第八章](ch8.md)中讨论过递归了，就是我们将在关于递归的那一章中讲解递归的那一章。
 
-Recall `forEach(..)` was described at the beginning of this chapter as only being useful for side effects, which is not very typically desired in FP. In this case, we'll use `forEach(..)` only for the side effect of I/O, so it's perfectly reasonable as a helper.
+回忆一下本章开头，`forEach(..)` 被描述为仅对副作用有用处，而在 FP 中这通常不理想。在这个例子中，我们仅将 `forEach(..)` 用于 I/O 副作用，所以它作为一个帮助函数还是非常合理的。
 
-Use `forEach(..)` to print out values from the tree:
+使用 `forEach(..)` 来打印树的值：
 
 ```js
 BinaryTree.forEach( node => console.log( node.value ), banana );
-// apple apricot avocado banana cantaloupe cherry cucumber grape
+// apple apricot avocado banana cantelope cherry cucumber grape
 
-// visit only the `cherry`-rooted subtree
+// 访问 `cherry` 作为根的子树
 BinaryTree.forEach( node => console.log( node.value ), cherry );
-// cantaloupe cherry cucumber grape
+// cantelope cherry cucumber grape
 ```
 
-To operate on our binary tree data structure using FP patterns, let's start by defining a `map(..)`:
+为了使用 FP 的模式来操作我们的二叉树结构，让我们从定义一个 `map(..)` 开始：
 
 ```js
 BinaryTree.map = function map(mapperFn,node){
@@ -1333,9 +1333,9 @@ BinaryTree.map = function map(mapperFn,node){
 };
 ```
 
-You might have assumed we'd `map(..)` only the node `value` properties, but in general we might actually want to map the tree nodes themselves. So, the `mapperFn(..)` is passed the whole node being visited, and it expects to receive a new `BinaryTree(..)` node back, with the transformation applied. If you just return the same node, this operation will mutate your tree and quite possibly cause unexpected results!
+你可能会猜测我们将会仅仅 `map(..)` 节点的 `value` 属性，但一般来说我们可能实际上想要映射树节点本身。所以，整个被访问的节点被传入了 `mapperFn(..)` 函数，而且它期待取回一个带有变形后的值的新 `BinaryTree(..)`。如果你只是返回相同的节点，那么这个操作将会改变你的树而且很可能造成意外的结果！
 
-Let's map our tree to a list of produce with all uppercase names:
+让我们将作物的树映射为所有名称大写的列表：
 
 ```js
 var BANANA = BinaryTree.map(
@@ -1344,19 +1344,19 @@ var BANANA = BinaryTree.map(
 );
 
 BinaryTree.forEach( node => console.log( node.value ), BANANA );
-// APPLE APRICOT AVOCADO BANANA CANTALOUPE CHERRY CUCUMBER GRAPE
+// APPLE APRICOT AVOCADO BANANA CANTELOPE CHERRY CUCUMBER GRAPE
 ```
 
-`BANANA` is a different tree (with all different nodes) than `banana`, just like calling `map(..)` on an array returns a new array. Just like arrays of other objects/arrays, if `node.value` itself references some object/array, you'll also need to handle manually copying it in the mapper function if you want deeper immutability.
+`BANANA` 是一个与 `banana` 不同的树（所有节点都不同），就像在一个数组上调用 `map(..)` 会返回一个新数组一样。正如其他对象/数组的数组一样，如果 `node.value` 本身引用了一些对象/数组，那么如果你想要更深层的不可变性的话，你还需要在映射函数中手动拷贝它。
 
-How about `reduce(..)`? Same basic process: do an in-order traversal of the tree nodes. One usage would be to `reduce(..)` our tree to an array of its values, which would be useful in further adapting other typical list operations. Or we can `reduce(..)` our tree to a string concatenation of all its produce names.
+那么 `reduce(..)` 呢？相同的基本处理：对树的节点进行按顺序的遍历。一种用法是将我们的树 `reduce(..)` 到一个它的值的数组中，这对将来适配其他常用的列表操作会很有用。或者我们可以将我们的树 `reduce(..)` 为一个所有作物名称的字符串连接。
 
-We'll mimic the behavior of the array `reduce(..)`, which makes passing the `initialValue` argument optional. This algorithm is a little trickier, but still manageable:
+我们将模仿数组 `reduce(..)` 的行为，这使得参数 `initialValue` 的传递是可选的。这个算法有些复杂，但依然是可控的：
 
 ```js
 BinaryTree.reduce = function reduce(reducerFn,initialValue,node){
     if (arguments.length < 3) {
-        // shift the parameters since `initialValue` was omitted
+        // 更换参数，因为 `initialValue` 被省略了
         node = initialValue;
     }
 
@@ -1389,19 +1389,19 @@ BinaryTree.reduce = function reduce(reducerFn,initialValue,node){
 };
 ```
 
-Let's use `reduce(..)` to make our shopping list (an array):
+让我们使用 `reduce(..)` 来制造我们的购物单（一个数组）：
 
 ```js
 BinaryTree.reduce(
     (result,node) => [ ...result, node.value ],
     [],
-    banana
+    bananaa
 );
-// ["apple","apricot","avocado","banana","cantaloupe"
+// ["apple","apricot","avocado","banana","cantelope"
 //   "cherry","cucumber","grape"]
 ```
 
-Finally, let's consider `filter(..)` for our tree. This algorithm is trickiest so far because it effectively (not actually) involves removing nodes from the tree, which requires handling several corner cases. Don't get intimidated by the implementation, though. Just skip over it for now, if you prefer, and focus on how we use it instead.
+最后，让我们来为我们的树考虑一下 `filter(..)`。这是目前为止最复杂的算法，因为它实质上（不是实际上）引入了对树上节点的删除，这要求处理几种极端情况。但不要被它的实现吓到。如果你乐意的话可以先跳过它，而关注与我们如何使用它。
 
 ```js
 BinaryTree.filter = function filter(predicateFn,node){
@@ -1480,9 +1480,9 @@ BinaryTree.filter = function filter(predicateFn,node){
 };
 ```
 
-The majority of this code listing is dedicated to handling the shifting of a node's parent/child references if it's "removed" (filtered out) of the duplicated tree structure.
+这个代码段的绝大部分都用来处理当一个节点从树结构的复本中“被移除”（滤除）时，其父/子引用的移动。
 
-As an example to illustrate using `filter(..)`, let's narrow our produce tree down to only vegetables:
+为了展示 `filter(..)` 使用的例子，让我们将作物树收窄为仅含蔬菜：
 
 ```js
 var vegetables = [ "asparagus", "avocado", "broccoli", "carrot",
@@ -1490,12 +1490,12 @@ var vegetables = [ "asparagus", "avocado", "broccoli", "carrot",
     "zucchini" ];
 
 var whatToBuy = BinaryTree.filter(
-    // filter the produce list only for vegetables
+    // 过滤作物的列表，使之仅含蔬菜
     node => vegetables.indexOf( node.value ) != -1,
     banana
 );
 
-// shopping list
+// 购物单
 BinaryTree.reduce(
     (result,node) => [ ...result, node.value ],
     [],
@@ -1504,20 +1504,20 @@ BinaryTree.reduce(
 // ["avocado","cucumber"]
 ```
 
-**Note:** We aren't making any effort to rebalance a tree after any of the `map`/`reduce`/`filter` operations on BSTs. Technically, this means the results are not themselves binary *search* trees. Most JS values have a reasonable less-than comparison operation (`<`) by which we could rebalance such a tree, but some values (like promises) wouldn't have any such definition. For the sake of keeping this chapter practical in length, we'll punt on handling this complication.
+**注意：** 我们没有在 BST 的 `map`/`reduce`/`filter` 中的任何操作之后对树的再平衡做出任何努力。技术上讲，这意味着其结果本身不是二叉 *搜索* 树。大多数 JS 中的值都有一个合理的小于比较操作（`<`），通过它们我们可以将这样的树再平衡，但有些值（比如 promise）就没有这样的定义。为了使这一章的内容保持在一个可接受的长度上，我们将不再讨论这种复杂性。
 
-You will likely use most of the list operations from this chapter in the context of simple arrays. But now we've seen that the concepts apply to whatever data structures and operations you might need. That's a powerful expression of how FP can be widely applied to many different application scenarios!
+你很可能在简单的数组上下文环境中使用本章中提到的大多数列表操作。但我们已经看到了，这其中的概念可以应用于任何你可能需要的数据结构和操作中。这是 FP 如何可以广泛地应用于许多不同应用程序场景的有力证明！
 
-## Summary
+## 总结
 
-Three common and powerful list operations we looked at:
+三个常见而且强大的列表操作：
 
-* `map(..)`: Transforms values as it projects them to a new list.
-* `filter(..)`: Selects or excludes values as it projects them to a new list.
-* `reduce(..)`: Combines values in a list to produce some other (usually but not always non-list) value.
+* `map(..)`：将值投射到新列表中时将其变形。
+* `filter(..)`：将值投射到新列表中时选择或排除它。
+* `reduce(..)`：将一个列表中的值结合为另一个值（通常但不总是数组）。
 
-Other more advanced operations that are useful in processing lists: `unique(..)`, `flatten(..)`, and `merge(..)`.
+其他几个可能在列表处理中非常有用的高级操作：`unique(..)`、`flatten(..)`、和 `merge(..)`。
 
-Fusion uses function composition to consolidate multiple adjacent `map(..)` calls. This is mostly a performance optimization, but it also improves the declarative nature of your list operations.
+融合使用函数组合技术将多个相邻的 `map(..)` 调用合并。这很大程度上是一种性能优化，但也增强了你的列表操作的声明式性质。
 
-Lists are typically visualized as arrays, but can be generalized as any data structure that represents/produces an ordered collection of values. As such, all these "list operations" are actually "data structure operations".
+列表通常在视觉上表现为数组，但也可以被一般化为任何可以表现/产生一个有序的值的序列的集合数据结构。因此，所有这些“列表操作”实际上是“数据结构操作”。

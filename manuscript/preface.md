@@ -1,48 +1,48 @@
-# Functional-Light JavaScript
-# Preface
+# 轻量函数式 JavaScript
+# 前言
 
-> *A monad is just a monoid in the category of endofunctors.*
+> 一个单子只是自函子范畴中的幺半群。
 
-Did I just lose you? Don't worry, I'd be lost, too! All those terms that only mean something to the already-initiated in Functional Programming&trade; (FP) are just jumbled nonsense to many of the rest of us.
+我让你糊涂了？别担心，我也糊涂！所有这些只对已经有了函数式编程&trade;（FP）背景的人才有意义的词儿，对于我们其他大多数人都只是混乱的胡话。
 
-This book is not going to teach you what those words mean. If that's what you're looking for, keep looking. In fact, there are already plenty of great books that teach FP the *right way*, from the top-down. Those words have important meanings and if you formally study FP in-depth, you'll absolutely want to get familiar with them.
+这本书不会教你这些词是什么意思。如果那才是你寻找的，就继续寻找。事实上，已经有许多了不起的书籍在用 *正确的方法* 从上到下地教授 FP。这些词有着重要的含义，而且如果你正式地深度学习 FP，你就绝对需要熟悉他们。
 
-But this book is going to approach the topic quite differently. I'm going to present fundamental FP concepts from the ground-up, with fewer special or non-intuitive terms than most approaches to FP. We'll try to take a practical approach to each principle rather than a purely academic angle. **There will be terms**, no doubt. But we'll be careful and deliberate about introducing them and explaining why they're important.
+但这本书将要用一种十分不同的方式探讨这些话题。与大多数探讨 FP 的方式相比，我将从最底层开始展示 FP 的基础概念，很少使用特殊或不直观的术语。我们将对每一种原理采用一种实践的方式而非一种纯学术的角度。毫无疑问，**这里会有术语**。但对于引入它们并解释为什么它们重要这件事上，我们将会十分小心谨慎。
 
-Sadly, I am not a card-carrying member of the FP Cool Kids Club. I've never been formally taught anything about FP. And though I have a CS academic background and I am decent at math, mathematical notation is not how my brain understands programming. I have never written a line of Scheme, Clojure, or Haskell. I'm not an old-school Lisp'r.
+很遗憾，我不是 FP 酷小子俱乐部的持卡会员。我们从没正式地学习过关于 FP 的任何东西。虽然我有计算机科学的学术背景，而且我数学还不错，但是数学符号也不是我的大脑理解程序的方式。我没写过一行的 Scheme、Clojure、或 Haskell。我也不是一个老式 Lisp 程序员。
 
-I *have* attended countless conference talks about FP, each one with the desperate clinging hope that finally, *this time* would be the time I understood what this whole functional programming mysticism is all about. And each time, I came away frustrated and reminded that those terms got all mixed up in my head and I had no idea if or what I learned. Maybe I learned things. But I couldn't figure out what those things were for the longest time.
+我参加过无数谈论 FP 的会议，每一次都抱着这样一种孤注一掷的希望：终于，*这一次*，将是我理解整个函数式编程谜团的机会。但每一次，我都沮丧地离开，意识到所有那些术语在我头脑中乱成一团而且完全不知道自己学到了什么。也许我学到了东西。但是在很长一段时间里，我无法搞清那些东西是什么。
 
-Little by little, across those various exposures, I teased out bits and pieces of important concepts that seem to just come all too naturally to the formal FPer. I learned them slowly and I learned them pragmatically and experientially, not academically with appropriate terminology. Have you ever known a thing for a long time, and only later found out it had a specific name you never knew!?
+一点儿一点儿地，经过各种摸爬滚打，我梳理清楚了那些重要概念的一点一滴，而对正式 FP 程序员来说那是再自然不过的。我学得很慢，而且我是从实用和经验的角度学习的，而非使用恰当术语的学术角度。你有没有过这样的经历，你已经知道一件事情很长时间了，后来才终于发现它有一个你从不知道的特定名称！？
 
-Maybe you're like me; I heard terms such as "map-reduce" around industry segments like "big data" for years with no real idea what they were. Eventually I learned what the `map(..)` function did -- all long before I had any idea that list operations were a cornerstone of the FPer path and what makes them so important. I knew what *map* was long before I ever knew it was called `map(..)`.
+也许你像我一样；我在 “大数据” 这样的行业分支中听了许多年 “map-reduce” 这样的术语，而根本不知道它们是什么。最终我学习了 `map(..)` 函数是做什么的 —— 这要比我知道列表操作是 FP 程序员道路的基石，以及什么使它们如此重要要早得多。我知道 *map* 是什么，要比我知道它被称作 `map(..)` 要早得多。
 
-Eventually I began to gather all these tidbits of understanding into what I now call "Functional-Light Programming" (FLP).
+终于我开始将所有这些理解的细枝末节收集起来，形成了我现在所说的 “轻量函数式编程”（FLP）。
 
-## Mission
+## 使命
 
-But why is it so important for you to learn functional programming, even the light form?
+但是，为什么学习函数式编程对你如此重要，即便是轻量的形式？
 
-I've come to believe something very deeply in recent years, so much so you could *almost* call it a religious belief. I believe that programming is fundamentally about humans, not about code. I believe that code is first and foremost a means of human communication, and only as a *side effect* (hear my self-referential chuckle) does it instruct the computer.
+近几年我开始对一些事情深信不疑，它如此强烈以至于你 *几乎* 可以称它为宗教信仰。我相信程序的根本在于人，而非代码。我相信代码首要意义是人之间的交流，而它指示计算机工作只不过是一种 *副作用*（听听我自负的笑声）。
 
-The way I see it, functional programming is at its heart about using patterns in your code that are well-known, understandable, *and* proven to keep away the mistakes that make code harder to understand. In that view, FP -- or, ahem, FLP! -- might be one of the most important collections of tools any developer could acquire.
+我的看法是，函数式编程的核心是在你的代码中使用一些模式，这些模式尽人皆知、易于理解、*而且* 被证实可以远离那些使代码变得难于理解的错误。照此看来，FP —— 或者，嗯哼，FLP！—— 可能是所有开发者能够得到的最重要的工具集合之一。
 
-> The curse of the monad is that... once you understand... you lose the ability to explain it to anyone else.
+> 单子的诅咒是…… 一旦你理解了它…… 你就失去了向任何人讲明白它的能力。
 >
 > Douglas Crockford 2012 "Monads and Gonads"
 >
 > https://www.youtube.com/watch?v=dkZFtimgAcM
 
-I hope this book "Maybe" breaks the spirit of that curse, even though we won't talk about "monads" until the very end in the appendices.
+我希望这本书 “可能” 打破这种诅咒，尽管我们在最后的附录中才会谈到 “单子”。
 
-The formal FPer will often assert that the *real value* of FP is in using it essentially 100%: it's an all-or-nothing proposition. The belief is that if you use FP in one part of your program but not in another, the whole program is polluted by the non-FP stuff and therefore suffers enough that the FP was probably not worth it.
+正式的 FP 程序员总是声称 FP 的 *真正价值* 在于从根本上 100% 地使用它：一种要么全有要么全无的逻辑。他们相信如果你在程序的一部分中使用 FP 但在另一部分中没有，那么整个程序就会被非 FP 的东西所污染而因此可能使 FP 显得毫无价值。
 
-I'll say unequivocally: **I think that absolutism is bogus**. That's as silly to me as suggesting that this book is only good if I use perfect grammar and active voice throughout; if I make any mistakes, it degrades the entire book's quality. Nonsense.
+我要毫不含糊地说：**我认为绝对主义是一种炒作**。在我看来这就好像在说这本书只有在我自始至终使用完美的语法和主动语态时才是好的；如果我犯了任何错误，就会降低整本书的质量。胡说八道。
 
-The better I am at writing in a clear, consistent voice, the better your reading experience will be. But I'm not a 100% perfect author. Some parts will be better written than others. The parts where I can still improve are not going to invalidate the other parts of this book which are useful.
+我越善于用一种清晰、一致的语态写作，这本书给你的体验就越好。但我不是一个 100% 完美的作者。有些部分会比其他部分写得好。那些我依然可以改进的部分不会使这本书的其他有用的部分作废。
 
-And so it goes with our code. The more you can apply these principles to more parts of your code, the better your code will be. Use them well 25% of the time, and you'll get some good benefit. Use them 80% of the time, and you'll see even more benefit.
+我们的代码也是一样。你越在更多的代码上实施这些原理，你的代码就越好。在 25% 的时间里好好利用它们，你就会得到一些好处。在 80% 的时间里利用它们，你就会看到更多的好处。
 
-With perhaps a few exceptions, I don't think you'll find many absolutes in this text. We'll instead talk about aspirations, goals, principles to strive for. We'll talk about balance and pragmatism and trade-offs.
+也许会有几处例外，但我想你不会在这本书中发现很多绝对的东西。相反我们将会谈到要为之努力的追求、目标、和原理。我们会谈到平衡、实用主义、以及权衡。
 
-Welcome to this journey into the most useful and practical foundations of FP. We both have plenty to learn!
+欢迎参加这次探索 FP 中最有用最实际的基础的旅行。我们都有好多东西要学！

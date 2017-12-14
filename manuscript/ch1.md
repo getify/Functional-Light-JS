@@ -1,21 +1,21 @@
-# Functional-Light JavaScript
-# Chapter 1: Why Functional Programming?
+# 轻量函数式 JavaScript
+# 第一章：为什么要进行函数式编程？
 
-> Functional programmer: (noun) One who names variables "x", names functions "f", and names code patterns "zygohistomorphic prepromorphism"
+> 函数式程序员：（名词）那些将变量命名为 “x”，函数命名为 “f”，并将代码模式称为 “zygohistomorphic prepromorphism” 的程序员。
 >
-> James Iry @jamesiry 5/13/15
+> James Iry ‏@jamesiry 5/13/15
 >
 > https://twitter.com/jamesiry/status/598547781515485184
 
-Functional Programming (FP) is not a new concept by any means. It's been around almost the entire history of programming. However, and I'm not sure it's fair to say, but... it sure hasn't seemed like as mainstream of a concept in the overall developer world until perhaps the last few years. I think FP has more been the realm of academics.
+函数式编程（FP）无论如何都不是一个新概念。它在编程的整个历史中一直存在着。然而，我不确信这样说是否合适，但是…… 确实直到最近几年它才被整个开发者世界看作是一个主流概念。我认为 FP 曾经在学术圈里存在的时间要更长。
 
-That's all changing, though. A groundswell of interest is growing around FP, not just at the languages level but even in libraries and frameworks. You very well might be reading this text because you've finally realized FP is something you can't ignore any longer. Or maybe you're like me and you've tried to learn FP many times before but struggled to wade through all the terms or mathematical notation.
+但一切都变了。关于 FP 的呼声越来越高，不仅是在语言的层面，在库与框架的层面也是如此。很有可能，你就是终于意识到 FP 是一个你无法再忽视的东西才在读这本书的。或者你可能像我一样，曾经多次试图学习 FP 但是苦于在术语和数学符号之中挣扎。
 
-This first chapter's purpose is to answer questions like "Why should I use FP style with my code?" and "How does Functional-Light JavaScript compare to what others say about FP?" After we've laid that groundwork, throughout the rest of the book we'll uncover, piece by piece, the techniques and patterns for writing JS in Functional-Light style.
+“为什么我应当在我的代码中使用 FP 风格？”、“轻量函数式 JavaScript 与人们所说的 FP 有何不同？”，第一章的目的就是要回答诸如此类的问题。在我们做好准备工作之后，在下一章和整本书的其余部分中，我们将开始一点儿一点儿地揭示使用轻量函数式编写 JS 的技术与模式。
 
-## At a Glance
+## 一瞥
 
-Let's briefly illustrate the notion of "Functional-Light JavaScript" with a before-and-after snapshot of code. Consider:
+让我们使用一段代码改造前后的快照来简要地展示一下 “轻量函数式 JavaScript” 的概念。考虑如下代码：
 
 ```js
 var numbers = [4,10,0,27,42,17,15,-6,58];
@@ -48,7 +48,7 @@ function outputMsg() {
 }
 ```
 
-Now consider a very different style that accomplishes exactly the same outcome:
+现在考虑一下这种非常不同的风格，它得到了完全一样的结果：
 
 ```js
 var sumOnlyFavorites = FP.compose( [
@@ -72,156 +72,156 @@ function sum(x,y) { return x + y; }
 function constructMsg(v) { return `The magic number is: ${v}`; }
 ```
 
-Once you understand FP and Functional-Light, this is likely how you'd *read* and mentally process that second snippet:
+一旦你理解了 FP 和轻量函数式，你可能会这样 *阅读* 并思考第二个代码段：
 
-> We're first creating a function called `sumOnlyFavorites(..)` that's a combination of three other functions. We combine two filters, one checking if a value is greater-than-or-equal to 10 and one for less-than-or-equal to 20. Then we include the `sum(..)` reducer in the transducer composition. The resulting `sumOnlyFavorites(..)` function is a reducer that checks if a value passes both filters, and if so, adds the value to an accumulator value.
+> 我们首先创建了一个称为 `sumOnlyFavorites(..)` 的函数，它是其他三个函数的组合。我们组合了两个过滤器，一个检查一个值是否大于等于 10，一个检查一个值是否小于等于 20 。然后我们在 transducer 组合中引入了 `sum(..)` 递减器。`sumOnlyFavorites(..)` 函数的结果是一个递减器，它检查一个值是否同时通过了两个过滤器，如果是，就将这个值加到累计值上。
 >
-> Then we make another function called `printMagicNumber(..)` which first reduces a list of numbers using that `sumOnlyFavorites(..)` reducer we just defined, resulting in a sum of only numbers that passed the *favorite* checks. Then `printMagicNumber(..)` pipes that final sum into `constructMsg(..)`, which creates a string value that finally goes into `console.log(..)`.
+> 然后我们制造了另一个称为 `printMagicNumber(..)` 的函数，它首先使用我们刚刚定义的 `sumOnlyFavorites(..)` 递减器将一个数字的列表递减为一个仅由通过了 *favorite* 检查的数字构成的和。然后 `printMagicNumber(..)` 将这个最终的和输送给 `constructMsg(..)`，它创建一个最终流入 `console.log(..)` 的字符串值。
 
-All those moving pieces *speak* to an FP developer in ways that likely seem highly unfamiliar to you right now. This book will help you *speak* that same kind of reasoning so that it's as readable to you as any other code, if not more so!
+目前，所有这些向 FP 开发者进行的 *讲述* 方式在你看来非常陌生。这本书将帮助你学会用相同的推理方式进行 *讲述*，使它对你来说像其他任何代码一样易读，甚至更容易读懂！
 
-A few other quick remarks about this code comparison:
+关于这段代码比较的其他几个注意点：
 
-* It's likely that for many readers, the former snippet feels closer to comfortable/readable/maintainable than the latter snippet. It's entirely OK if that's the case. You're in exactly the right spot. I'm confident that if you stick it out through the whole book, and practice everything we talk about, that second snippet will eventually become a lot more natural, maybe even preferable!
+* 对于许多读者来说，与后一个代码段相比前一个让人感觉更舒服/易读/易维护。如果这正是你的情况，完全没问题，你正处于正确的位置上。我敢说如果你坚持读完整本书，并实践了我们讨论的每一个话题，那么第二个代码段最终将会变得自然得多，也许甚至是首选！
 
-* You might have done the task significantly or entirely different from either snippet presented. That's OK, too. This book won't be prescriptive in dictating that you should do something a specific way. The goal is to illustrate the pros/cons of various patterns and enable you to make those decisions. By the end of this book, how you would approach the task may fall a little closer to the second snippet than it does right now.
+* 你做过的东西可能与上面两个代码段有巨大不同或完全不同。那也没问题，这本书不会强制灌输你应当用一种特定的方式做事情。它的目标是展示各种模式的优点和缺点，使你有能力做出决断。当这本书结束的时候，你处理事情的方式可能有点儿比现在更接近于第二个代码段。
 
-* It's also possible that you're already a seasoned FP developer who's scanning through the start of this book to see if it has anything useful for you to read. That second snippet certainly has some bits that are quite familiar. But I'm also betting that you thought, "Hmmm, I wouldn't have done it *that* way..." a couple of times. That's OK, and entirely reasonable.
+* 你也可能已经是一位老练的 FP 开发者，正快速地浏览着这本书来看看有没有有用的，值得你读的东西。第二个代码段当然有一些你十分熟悉的东西。但我也打赌你会有好几次这么想：“嗯……，我不会 *这样* 做……”。这没关系，而且完全是合理的。
 
-    This is not a traditional, canonical FP book. We'll at times seem quite heretical in our approaches. We're seeking to strike a pragmatic balance between the clear undeniable benefits of FP, and the need to ship workable, maintainable JS without having to tackle a daunting mountain of math/notation/terminology. This is not *your* FP, it's "Functional-Light JavaScript".
+    这不是一本传统的，经典的 FP 书籍。我们的做法有时候看起来相当异端。我们是在 FP 带来的无法否认的好处，与不必解决一堆吓人的数学/符号/术语就能建造能工作的、可维护的 JS 之间寻找一种实用的平衡。这不是 *你的* 那种 FP，这是 “轻量函数式 JavaScript”。
 
-Whatever your reasons for reading this book, welcome!
+无论你出于什么原因在读这本书，欢迎你！
 
-## Confidence
+## 信心
 
-I have a very simple premise that sort of underlies everything I do as a teacher of software development (in JavaScript): code that you cannot trust is code that you do not understand. The reverse is true also: code that you don't understand is code you can't trust. Furthermore, if you cannot trust or understand your code, then you can't have any confidence whatsoever that the code you write is suitable to the task. You run the program and basically just cross your fingers.
+作为一个（使用 JavaScript）软件开发的教师，我做每一件事都有一个非常简单的前提作为某种基础：你不理解的代码是不能信任的代码。反之亦然，你不能信任的代码是你不能理解的代码。进一步讲，如果你不能信任或理解你自己的代码，那么对于你写的代码能够完成目标任务这件事来说，你就没有任何自信可言。你基本上是在一边祈祷一边运行程序。
 
-What do I mean by trust? I mean that you can verify, by reading and reasoning, not just executing, that you understand what a piece of code *will* do; you aren't just relying on what it *should* do. More often than is perhaps prudent, we tend to rely on running test suites to verify our programs' correctness. I don't mean to suggest tests are bad. But I do think we should aspire to be able to understand our code well enough that we know the test suite will pass before it runs.
+我说的信任是什么意思？我的意思是你可以通过阅读一段代码，不是仅靠运行它，来验证这段代码 *将会* 做什么；而非仅依赖于它 *应当* 做什么。也许更经常的是，我们倾向于通过运行测试套件来验证我们程序的正确性。我不是说测试不好，但我确实认为我们应当有这样的追求：能够对我们的代码有足够的理解，以至于在测试套件运行前我们就知道它能够通过。
 
-The techniques that form the foundation of FP are designed from the mindset of having far more confidence over our programs just by reading them. Someone who understands FP, and who's disciplined enough to diligently use it throughout their programs, will write code that they **and others** can read and verify that the program will do what they want.
+仅仅通过阅读我们的程序就能对它建立起强大的自信 —— 构成 FP 基础的那些技术就是根据这样的思维模式设计而来的。理解 FP 的人，以及在他们的程序中严于律己、孜孜不倦地使用 FP 的人，将会编写出他们 *和其他人* 能够阅读并验证的代码，他们的程序将会做他们想做的事。
 
-Confidence is also increased when we use techniques that avoid or minimize likely sources of bugs. That's perhaps one of the biggest selling points of FP: FP programs often have fewer bugs, and the bugs that do exist are usually in more obvious places, so they're easier to find and fix. FP code tends to be more bug-resistant -- certainly not bug-proof, though.
+在我们使用避免或最小化 bug 源头的技术时，信心也会随之增长。这也许是 FP 最大的卖点之一：FP 程序通常 bug 更少，而且那些确实存在的 bug 通常会出现在更加明显的地方，使得它们更容易被找到和修复。FP 代码的抗 bug 性更强 —— 但它当然不是 bug 免疫的。
 
-As you journey through this book, you will begin to develop more confidence in the code you write, because you will use patterns and practices that are already well proven; and you'll avoid the most common causes of program bugs!
+随着在这本书中启程，你将开始在你编写的代码中建立更多的信心，因为你将会使用那些业已被证明为真的模式和实践做法；而且你将会避开大多数造成程序 bug 的常见原因！
 
-## Communication
+## 交流
 
-Why is Functional Programming important? To answer that, we need to take a bigger step back and talk about why programming itself is important.
+函数式编程为什么很重要？要回答这个问题，我们得退后一大步来谈谈程序本身为什么重要。
 
-It may surprise you to hear this, but I don't believe that code is primarily a set of instructions for the computer. Actually, I think the fact that code instructs the computer is almost a happy accident.
+听到这些你可能很吃惊，但我不认为代码主要是计算机的一套指令。事实上，我认为代码能够驱动计算机几乎是一个欢乐的巧合。
 
-I believe very deeply that the vastly more important role of code is as a means of communication with other human beings.
+我对此深信不疑 —— 代码在人与人之间的交流中扮演的角色要重要得多的多。
 
-You probably know by experience that an awful lot of your time spent "coding" is actually spent reading existing code. Very few of us are so privileged as to spend all or most of our time simply banging out all new code and never dealing with code that others (or our past selves) wrote.
+你可能有这样的经验，你在“编码”上花费的大把的时间其实只是在阅读既存的代码。我们之中很少有人有特权能够把全部的或大部分时间都用来敲新代码，而从来不用对付其他人（或者我们过去自己）写过的代码。
 
-It's widely estimated that developers spend 70% of code maintenance time on reading to understand it. That is eye-opening. 70%. No wonder the global average for a programmer's lines of code written per day is about 10. We spend up to 7 hours of our day just reading the code to figure out where those 10 lines should go!
+初步估计，开发者们花在维护代码上的时间有70%都是用来阅读并理解它的。真让人瞠目结舌。70%。难怪全球程序员每天的平均代码量只有10行。我们一天花费7小时只是阅读代码，来搞清楚那10行应该放在什么地方！
 
-We need to focus a lot more on the readability of our code. And by the way, readability is not just about fewer characters. Readability is actually most impacted by familiarity.<a href="#user-content-footnote-1"><sup>1</sup></a>
+我们应当更多地关注代码的可读性。顺带一提的是，可读性不是减少字母数量。对可读性影响最大的实际上是亲和度。<a href="#user-content-footnote-1"><sup>1</sup></a>
 
-If we are going to spend our time concerned with making code that will be more readable and understandable, FP is central in that effort. The principles of FP are well established, deeply studied and vetted, and provably verifiable. Taking the time to learn and employ these FP principles will ultimately lead to more readily and recognizably familiar code for you and others. The increase in code familiarity, and the expediency of that recognition, will improve code readability.
+如果我们将要花更多的时间来关心如何使我们的代码变得更易读和易理解，那么 FP 就是我们努力的中心。FP 的各种原理十分成熟，经过深刻的研究和检验，而且是可以通过证明来验证的。花时间去学习并利用这些 FP 原理将最终使你的代码能够轻而易举地被你自己和其他人所辨识和熟悉。代码亲和度的提高，以及辨识度带来的好处，将会改进代码的可读性。
 
-For example, once you learn what `map(..)` does, you'll be able to almost instantly spot and understand it when you see it in any program. But every time you see a `for` loop, you're going to have to read the whole loop to understand it. The syntax of the `for` loop may be familiar, but the substance of what it's doing is not; that has to be *read*, every time.
+比如，一旦你学会了 `map(..)` 所做的事情，当你在任何程序中看到它时，你就可以几乎是立即发现并理解它。但你每次遇到 `for` 循环时，你就不得不阅读整个循环来搞懂它。`for` 循环的语法可能令人倍感亲切，但它所做的实质可不是这样；它不得不每次都被 *读* 一遍。
 
-By having more code that's recognizable at a glance, and thus spending less time figuring out what the code is doing, our focus is freed up to think about the higher levels of program logic; this is the important stuff that most needs our attention anyway.
+通过使更多的代码容易辨识，让我们在搞清楚代码在做什么这件事上花的时间更少，使我们的精力被解放出来去思考更高层的程序逻辑；无论如何，这是需要我们最多注意力的重要事务。
 
-FP (at least, without all the terminology weighing it down) is one of the most effective tools for crafting readable code. *That* is why it's so important.
+FP（至少，刨去所有使它魅力骤减的术语）是编写高可读性代码的最有效的工具之一。这就是为什么它很重要。
 
-## Readability
+### 可读性
 
-Readability is not a binary characteristic. It's a largely subjective human factor describing our relationship to code. And it will naturally vary over time as our skills and understanding evolve. I have experienced effects similar to the following figure, and anecdotally many others I've talked to have as well.
+可读性不是一个二元性质。它很大程度上是一种描述我们与代码之间关系的人为主观因素，而且随着我们的技能和理解的发展而自然变化。我经历了和下图相似的过程，而且据许多和我讨论过的人说他们也有相同的经历。
 
 <p align="center">
     <img src="images/fig17.png" width="50%">
 </p>
 
-You may just find yourself experiencing similar effects as you work through the book. But take heart; if you stick this out, the curve comes back up!
+随着你对这本书的学习，你可能会发现自己经历着相似的过程。但是放心，如果你坚持下去，曲线会转而向上延伸！
 
-*Imperative* describes the code most of us probably already write naturally; it's focused on precisely instructing the computer *how* to do something. Declarative code -- the kind we'll be learning to write, which adheres to FP principles -- is code that's more focused on describing the *what* outcome.
+*指令式* 描述了大多数我们可能已经自然编写的代码；它的焦点在于精确地指示计算机 *如何* 做某些事情。声明式代码 —— 我们将要学习编写、遵循 FP 原理的那一种 —— 更多地关注于描述结果是 *什么*。
 
-Let's revisit the two code snippets presented earlier in this chapter.
+让我们回忆一下本章早先出现的两个代码段。
 
-The first snippet is imperative, focused almost entirely on *how* to do the tasks; it's littered with `if` statements, `for` loops, temporary variables, reassignments, value mutations, function calls with side effects, and implicit data flow between functions. You certainly *can* trace through its logic to see how the numbers flow and change to the end state, but it's not at all clear or straightforward.
+第一个代码段是指令式的，几乎全部都是关注于 *如何* 完成任务；它堆满了 `if` 语句、`for` 循环、临时变量、再赋值、改变值、带有副作用的函数调用，以及函数之间隐含的数据流。你当然 *可以* 跟踪它的逻辑来找出那些数字是如何流动并变化为最终状态的，但它一点儿也不清晰和直接。
 
-The second snippet is more declarative; it does away with most of those aforementioned imperative techniques. Notice there's no explicit conditionals, loops, side effects, reassignments, or mutations; instead, it employs well-known (to the FP world, anyway!) and trustable patterns like filtering, reduction, transducing, and composition. The focus shifts from low-level *how* to higher level *what* outcomes.
+第二个代码段更具描述性；它避开了大多数上述指令式技术。注意，它没有明确的条件表达式、循环、副作用、再赋值，或改变值；取而代之的是，它利用了众所周知的（当然，是在 FP 世界中！）、可靠的模式，比如：过滤，递减，transducing，以及组合。关注点从底层的 *如何* 上升到了更高层的结果是 *什么*。
 
-Instead of messing with an `if` statement to test a number, we delegate that to a well-known FP utility like `gte(..)` (greater-than-or-equal-to), and then focus on the more important task of combining that filter with another filter and a summation function.
+与胡乱地使用一个 `if` 语句来检测一个数字不同的是，我们将这个任务委托给了一个众所周知的 FP 工具 `gte(..)`（大于等于），然后将注意力集中于更重要的事情上 —— 将这个过滤器与另一个过滤器以及一个求和函数相组合。
 
-Moreover, the flow of data through the second program is explicit:
+此外，第二个程序的数据流是明确的：
 
-1. A list of numbers goes into `printMagicNumber(..)`.
-2. One at a time those numbers are processed by `sumOnlyFavorites(..)`, resulting in a single number total of only our favorite kinds of numbers.
-3. That total is converted to a message string with `constructMsg(..)`.
-4. The message string is printed to the console with `console.log(..)`.
+1. 一个数字的列表流入 `printMagicNumber(..)`。
+2. 这些数字由 `sumOnlyFavorites(..)` 一次一个地处理，得出一个数字，它是仅由我们最喜欢的数字组成的和。
+3. 这个总和通过 `constructMsg(..)` 转换为一个消息字符串。
+4. 这个消息字符串通过 `console.log(..)` 打印到控制台。
 
-You may still feel this approach is convoluted, and that the imperative snippet was easier to understand. You're much more accustomed to it; familiarity has a profound influence on our judgments of readability. By the end of this book, though, you will have internalized the benefits of the second snippet's declarative approach, and that familiarity will spring its readability to life.
+你可能依然感觉这种做法是绕圈子，而指令式的代码段更容易理解。这是因为你对它要熟悉得多；亲和度对我们在可读性上的判断有着深刻的影响。但是在本书结束的时候，第二个代码段的声明式方式带来的好处将会沉淀在你心中，而且亲和度将会在可读性上充满生机。
 
-I know asking you to believe that at this point is a leap of faith.
+我知道，现在就让你相信这些对你而言是一种信仰上的飞跃。
 
-It takes a lot more effort, and sometimes more code, to improve its readability as I'm suggesting, and to minimize or eliminate many of the mistakes that lead to bugs. Quite honestly, when I started writing this book, I could never have written (or even fully understood!) that second snippet. As I'm now further along on my journey of learning, it's more natural and comfortable.
+需要很多努力，有的时候需要更多的代码，才能将可读性改进到我所说的程度，才能将导致 bug 的许多错误最小化/消除。坦白地讲，当我开始写这本书时，我从来不会去编写（甚至完全理解！）第二个代码段那样的代码。随着我学习的旅程渐行渐远，它变得更自然更舒适。
 
-If you're hoping that FP refactoring, like a magic silver bullet, will quickly transform your code to be more graceful, elegant, clever, resilient, and concise -- that it will come easy in the short term -- unfortunately that's just not a realistic expectation.
+如果你指望 FP 重构像一颗魔法银弹一样，快速地将你的代码变形为更优雅、更聪明、更灵活、更简洁的东西 —— 短期看来很容 —— 很不幸这不是一个切实的期望。
 
-FP is a very different way of thinking about how code should be structured, to make the flow of data much more obvious and to help your reader follow your thinking. It will take time. This effort is eminently worthwhile, but it can be an arduous journey.
+FP 是一种非常不同的思考代码应当如何构造的方式，为的是使数据流变得非常明显来帮助你的读者跟随你的思路。它会花一些时间。这种努力有着非比寻常的价值，但它可能是一次艰苦的旅行。
 
-It still often takes me multiple attempts at refactoring a snippet of imperative code into more declarative FP, before I end up with something that's clear enough for me to understand later. I've found converting to FP is a slow iterative process rather than a quick binary flip from one paradigm to another.
+将一个指令式代码段重构为更具描述性的 FP，在得到对我稍后再来理解它来说足够清晰的结果之前，我依然总是要尝试好几次。我发现将代码转换为 FP 是一种缓慢的迭代过程，而非从一种范式翻转为另一种范式的快速处理。
 
-I also apply the "teach it later" test to every piece of code I write. After I've written a piece of code, I leave it alone for a few hours or days, then come back and try to read it with fresh eyes, and pretend as if I need to teach or explain it to someone else. Usually, it's jumbled and confusing the first few passes, so I tweak it and repeat!
+我还对我编写的每一段代码进行了“稍后再读”测试。在我写好一段代码之后，把这段代码放几个小时或几天，然后回过头来用陌生的眼睛再读一次，假装我需要向某人教授或解释它一样。通常，在前几次它都很混乱且让人糊涂，于是我就调整它再试一次！
 
-I'm not trying to dampen your spirits. I really want you to hack through these weeds. I am glad I did it. I can finally start to see the curve bending upward toward improved readability. The effort has been worth it. It will be for you, too.
+但我不是在给你泼冷水。我真的希望你趟过这片丛林。我很高兴我这么做过。我终于能看到曲线向着更高的可读性倾斜。努力是值得的，我相信这对你来说也一样。
 
-## Perspective
+## 视角
 
-Most other FP texts seem to take a top-down approach, but we're going to go the opposite direction: working from the ground up, we'll uncover the basic foundational principles that I believe formal FPers would admit are the scaffolding for everything they do. But for the most part we'll stay arm's length away from most of the intimidating terminology or mathematical notation that can so easily frustrate learners.
+多数其他的 FP 书籍似乎都采取了一种从上到下的方式，但我们将反其道而行之：从基础开始，我们将揭示一些基本的基础原理 —— 我相信真正的 FP 程序员都会承认这些原理是他们做一切事情时的脚手架。但是大部分情况下，我们将与大多数吓人的学术用语或数学符号保持一定距离，它们太容易使初学者感到沮丧了。
 
-I believe it's less important what you call something and more important that you understand what it is and how it works. That's not to say there's no importance to shared terminology -- it undoubtedly eases communication among seasoned professionals. But for the learner, I've found it can be distracting.
+我认为你如何称呼一个东西并不那么重要，更重要的是你理解它是什么以及它如何工作。这不是说在学术用语上的共识不重要 —— 它毋庸置疑地在老练的专业人士之间简化了交流。但是对于初学者，我发现它可能有些分散人的注意力。
 
-So this book will try to focus more on the base concepts and less on the fancy fluff. That's not to say there won't be terminology; there definitely will be. But don't get too wrapped up in the sophisticated words. Wherever necessary, look beyond them to the ideas.
+所以我希望这本书能够更多地关注于基本概念，而少一些玄之又玄的专业术语。这不是说这里将不会有任何术语；绝对会有的。但不要被这些花哨的词儿绊住。只要有必要，就越过它们去看背后的思想。
 
-I call the less formal practice herein "Functional-Light Programming" because I think where the formalism of true FP suffers is that it can be quite overwhelming if you're not already accustomed to formal thought. I'm not just guessing; this is my own personal story. Even after teaching FP and writing this book, I can still say that the formalism of terms and notation in FP is very, very difficult for me to process. I've tried, and tried, and I can't seem to get through much of it.
+我称这种不那么正式的做法为 “轻量函数式编程”，因为我觉得真正的 FP 的形式主义所遇到的问题是，在你还没习惯正式的想法之前它可能让人感到无所适从。我不是在猜测；这就是我自己的故事。即便是在教授了 FP，写了这本书之后，FP 中用语和符号的形式主义对我来说依然非常、非常难对付。我曾经试了又试，但看起来没获得太多进展。
 
-I know many FPers who believe that the formalism itself helps learning. But I think there's clearly a cliff where that only becomes true once you reach a certain comfort with the formalism. If you happen to already have a math background or even some flavors of CS experience, this may come more naturally to you. But some of us don't, and no matter how hard we try, the formalism keeps getting in the way.
+我知道许多 FP 程序员相信形式主义本身有助于学习。但是我认为在你对这种形式主义有相当程度的适应之前，还是存在一个很明显的断崖。如果你碰巧拥有数学方面的背景，或者甚至有一些计算机科学相关的经验，这对于你来说就显得更自然。但是我们之中的一些人没有，而且无论我们如何努力尝试，形式主义依然是个拦路虎。
 
-So this book introduces the concepts that I believe FP is built on, but comes at it by giving you a boost from below to climb up the cliff wall, rather than condescendingly shouting down at you from the top, prodding you to just figure out how to climb as you go.
+所以这本书介绍我认为的 FP 建立的基础概念，它的目的是从下面给你助力帮你爬上这个断崖，而非高高在上地把你拒之门外，催促你自己去摸爬滚打。
 
-## How to Find Balance
+## 如何寻找平衡
 
-If you've been around programming for very long, chances are you've heard the phrase "YAGNI" before: "You Ain't Gonna Need It". This principle primarily comes from extreme programming, and stresses the high risk and cost of building a feature before it's needed.
+如果你在编程业界待过很长时间，那么你以前很可能听说过 “YAGNI” 这句话：“You Ain't Gonna Need It（你不会需要它）”。这个原则主要是从极限编程中演化出来的，强调一个特性在被需要之前就建造的风险与成本。
 
-Sometimes we guess we'll need a feature in the future, build it now believing it'll be easier to do as we build other stuff, then realize we guessed wrong and the feature wasn't needed, or needed to be quite different. Other times we guess right, but build a feature too early, and suck up time from the features that are genuinely needed now; we incur an opportunity cost in diluting our energy.
+有时候我们会猜测我们在未来会需要一个特性，并且相信在我们建造其他东西的同时现在就建造它将会更容易，然后发觉我们猜错了，这个特性不需要，或者与我们猜测的十分不同。其他一些时候我们猜对了，但是一个特性建造的太早了，它从现在真正需要的特性那里榨取了时间；我们引入了一个机会成本来稀释我们的精力。
 
-YAGNI challenges us to remember: even if it's counterintuitive in a situation, we often should postpone building something until it's presently needed. We tend to exaggerate our mental estimates of the future refactoring cost of adding it later when it is needed. Odds are, it won't be as hard to do later as we might assume.
+YAGNI 挑战我们这样的想法，以让我们记住：即便在某种情况下与直觉相悖，我们也通常应当推迟建造某些东西，直到它当前就是被需要的。对于将一个特性在稍后被需要的时候再加入它这件事，我们倾向于夸大估计未来的重构成本。但很可能的是，稍后再做并不会像我们想象的那么难。
 
-As it applies to functional programming, I would offer this admonition: there will be plenty of interesting and compelling patterns discussed in this text, but just because you find some pattern exciting to apply, it may not necessarily be appropriate to do so in a given part of your code.
+把这种思想应用在函数式编程上，我会给出这样的劝诫：在这本书中会讨论相当多的有趣和迷人的模式，但是仅仅因为你发现某些模式用起来激动人心，并不意味着在你代码的特定部分中使用它们是恰当的。
 
-This is where I will differ from many formal FPers: just because you *can* apply FP to something doesn't mean you *should* apply FP to it. Moreover, there are many ways to slice a problem, and even though you may have learned a more sophisticated approach that is more "future-proof" to maintenance and extensibility, a simpler FP pattern might be more than sufficient in that spot.
+这就是我与许多更正规的 FP 人士之间的不同之处：仅仅因为你 *能* FP 某些东西，不意味着你 *应当* FP 它。另外，有许多方法划分一个问题，而且就算你学过一个更精巧的方式，对可维护性与扩展性更加“适应未来”，但这一点上一个更简单的 FP 模式可能就绰绰有余了。
 
-Generally, I'd recommend seeking balance in what you code, and to be conservative in your application of FP concepts as you get the hang of things. Default to the YAGNI principle in deciding if a certain pattern or abstraction will help that part of the code be more readable or if it's just introducing clever sophistication that isn't (yet) warranted.
+一般说来，我推荐在你的代码中寻找平衡，并在你熟练掌握 FP 的概念时保守地应用它。在决定某种模式或抽象是否能够提高一部分代码的可读性，还是它只是引入了更多（还）不需要的聪明的复杂性时，默认选择 YANGI 原则。
 
-> Reminder, any extensibility point that’s never used isn’t just wasted effort, it’s likely to also get in your way as well
+> 记住，任何永远用不到的扩展点都不只是白费力气，它还很可能成为你的障碍
 >
 > Jeremy D. Miller @jeremydmiller 2/20/15
 >
 > https://twitter.com/jeremydmiller/status/568797862441586688
 
-Remember, every single line of code you write has a reader cost associated with it. That reader may be another team member, or even your future self. Neither of those readers will be impressed with overly clever, unnecessary sophistication just to show off your FP prowess.
+记住，你写的每一行代码都相应的读者成本。这个读者可能是另一个团队的成员，甚至是未来的你自己。他们谁也不会对那些用来炫耀你 FP 灵活性的、聪明过头的、没必要的复杂性感到印象深刻。
 
-The best code is the code that is most readable in the future because it strikes exactly the right balance between what it can/should be (idealism) and what it must be (pragmatism).
+最好的代码是在未来最易读的代码，因为它在自己能/应当做什么（理想主义）与自己必须做什么（实用主义）之间，达到了恰到好处的平衡。
 
-## Resources
+## 资源
 
-I have drawn on a great many different resources to be able to compose this text. I believe you, too, may benefit from them, so I wanted to take a moment to point them out.
+为了创作这本书我借鉴了大量不同的资源。我相信你同样会从中受益，所以我想花一点儿时间将它们指出来。
 
-### Books
+### 书籍
 
-Some FP/JavaScript books that you should definitely read:
+一些你绝对应该读的 FP/JavaScript 书籍：
 
 * [Professor Frisby's Mostly Adequate Guide to Functional Programming](https://drboolean.gitbooks.io/mostly-adequate-guide/content/ch1.html) by [Brian Lonsdorf](https://twitter.com/drboolean)
-* [JavaScript Allongé](https://leanpub.com/javascriptallongesix) by [Reg Braithwaite](https://twitter.com/raganwald)
+* [JavaScript Allongé](https://leanpub.com/javascript-allonge) by [Reg Braithwaite](https://twitter.com/raganwald)
 * [Functional JavaScript](http://shop.oreilly.com/product/0636920028857.do) by [Michael Fogus](https://twitter.com/fogus)
 
-### Blogs/sites
+### 博客/网站
 
-Some other authors and content you should check out:
+一些你应该看看的作者与内容：
 
 * [Fun Fun Function Videos](https://www.youtube.com/watch?v=BMUiFMZr7vk) by [Mattias P Johansson](https://twitter.com/mpjme)
 * [Awesome FP JS](https://github.com/stoeffel/awesome-fp-js)
@@ -233,30 +233,30 @@ Some other authors and content you should check out:
 * [Functional Programming Jargon](https://github.com/hemanth/functional-programming-jargon#functional-programming-jargon)
 * [Functional Programming Exercises](https://github.com/InceptionCode/Functional-Programming-Exercises)
 
-### Libraries
+### 库
 
-The code snippets in this book largely do not rely on libraries. Each operation that we discover, we'll derive how to implement it in standalone, plain ol' JavaScript. However, as you begin to build more of your real code with FP, you'll soon want a library to provide optimized and highly reliable versions of these commonly accepted utilities.
+这本书中的示例代码段不依赖于任何库。我们探索的每一种操作，我们都将推导如何使用独立、普通的 JavaScript 来实现它。然而，在你开始在更多真正的代码上利用 FP 时，你将很快希望能有一个库来提供这些常用工具的优化过的、高度可靠的版本。
 
-By the way, you need to check the documentation for the library functions you use to ensure you know how they work. There will be a lot of similarities in many of them to the code we build on in this text, but there will undoubtedly be some differences, even between popular libraries.
+顺带一提，你将想要确信自己看过那些你使用的库函数的文档，保证你自己知道它们是如何工作的。在它们与我们这本书中建造的代码之间将会存在许多相似之处，但也毫无疑问地存在一些不同，即使是在流行库之间也是这样。
 
-Here are a few popular FP libraries for JavaScript that are a great place to start your exploration with:
+这里是几个 JavaScript 中流行的 FP 库，它们是你开始探索的很好的起点：
 
 * [Ramda](http://ramdajs.com)
 * [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide)
 * [functional.js](http://functionaljs.com/)
 * [Immutable.js](https://github.com/facebook/immutable-js)
 
-[Appendix C takes a deeper look at these libraries](apC.md/#stuff-to-investigate) and others.
+[附录 C 更深入地检视了这些库](apC.md/#stuff-to-investigate) 和其他的一些库。
 
-## Summary
+## 总结
 
-You may have a variety of reasons for starting to read this book, and different expectations of what you'll get out of it. This chapter has explained why I want you to read the book and what I want you to get out of the journey. It also helps you articulate to others (like your fellow developers) why they should come on the journey with you!
+你可能有各种理由开始读这本书，并对从中能得到的东西有着不同的期待。这一章解释了为什么我希望你阅读这本书，以及我希望你从中收获什么。它还能帮助你向其他人（比如你的开发者伙伴）清楚地说明为什么他们应当和你一起踏上这次旅行！
 
-Functional programming is about writing code that is based on proven principles so we can gain a level of confidence and trust over the code we write and read. We shouldn't be content to write code that we anxiously *hope* works, and then abruptly breathe a sigh of relief when the test suite passes. We should *know* what it will do before we run it, and we should be absolutely confident that we've communicated all these ideas in our code for the benefit of other readers (including our future selves).
+函数式编程是关于如何基于一些业已被证明的原理来编写代码，使我们从自己编写和阅读的代码中获得更高一层的信心与信任。编写那些我们焦急地 *希望* 它能够工作的代码，然后当测试套件通过时唐突地长吁一口气 —— 我们不应满足于此。我们应当在测试运行之前就 *知道* 它能够通过，而且我们有绝对的自信说为了其他读者（包括我们未来的自己）的利益，我们已经将所有的想法在代码中交代清楚了。
 
-This is the heart of Functional-Light JavaScript. The goal is to learn to effectively communicate with our code but not have to suffocate under mountains of notation or terminology to get there.
+这就是轻量函数式 JavaScript 的核心。它的目标是学习如何高效地与我们的代码交流，而不必翻过符号或术语的大山来做到这一点。
 
-The journey to learning functional programming starts with deeply understanding the nature of what a function is. That's what we tackle in the next chapter.
+学习函数式编程的旅行始于对函数性质的深刻理解。这是我们在下一章中要讲解的。
 
 ----
 

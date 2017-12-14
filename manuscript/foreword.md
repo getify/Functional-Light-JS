@@ -1,22 +1,22 @@
-# Functional-Light JavaScript
-# Foreword
+# 轻量函数式 JavaScript
+# 序
 
-It's no secret that I am a Functional Programming nut. I evangelize functional ideas and languages wherever I can, try to read the latest academic papers, study abstract algebra in my spare time…the works. Even in JavaScript, I refuse to write an impure statement, which is what led to writing *Professor Frisby's Mostly Adequate Guide to Functional Programming*. Yep, full on, dogmatic zealot.
+我是一个函数式编程迷，这不是什么秘密。我尽自己所能地四处传播函数式思想和语言的福音，试着去阅读最新的学术论文，在我的业余时间研究抽象代数……。即使是在 JavaScript 中，我也拒绝编写任何一个非纯粹的语句，这也导致了《Frisby 教授的函数式编程最佳指南》的诞生。没错，我完全是一个狂热的教条主义者。
 
-I was not always this way… I was once obsessed with objects. I loved modeling the "real world". I was the inventor of synthetic automatons, tinkering through the night with masterful precision. The creator of sentient puppets, fingers dancing on the keyboard to give them life -- a real 1337 h4x0r Geppetto. Yet, after 5 *solid* years of writing object-oriented code, I was never quite satisfied with the outcome. It just never worked out well for me. I felt like a lousy programmer. I even lost faith that a simple, flexible codebase of decent scale was possible.
+我并不一直是这样…… 我曾痴迷于对象。我曾热爱着为“真实的世界”建模。我曾是合成自动机的发明者，以大师级的精度整晚地摆弄它。我是感知玩偶的缔造者，手指在键盘上飞舞以给予它们生命 —— 一个真正的黑客版匹诺曹之父。然而，在足足编写了五年面向对象的代码之后，我发现自己从没有对它的结果感到过十分满意。它从来不能满足我，反而使我觉得自己是一个蹩脚的程序员。我甚至失去了自己的信仰 —— 简单、灵活且规模恰当的代码库是不可能实现的。
 
-I figured I'd try something different: Functional Programming. I began to dabble with functional ideas in my everyday codebase, and much to my coworkers' dismay, hadn't the slightest clue what I was doing. The code I wrote in those days was awful. Atrocious. Digital sewage. The reason was a lack of clear vision or goal on what I was even trying to accomplish. My Jiminy-Coding-Cricket, if you like, was not there to guide me. It took a long time and a lot of garbage programs to figure out how to FP.
+我觉得应当尝试一些不同的东西：函数式编程。我开始在自己日常的代码库中涉足函数式思想，我的同事们都很诧异，对我所做的事情搞不清任何头绪。当时我写的代码很烂，简直是顶级的数字垃圾。究其原因，是因为我对自己想要达成东西都缺乏清晰的认识和目标。我的编码小精灵，如果你喜欢这种说法的话，可没有给我任何指引。要搞清楚如何进行函数式编程，要花很长的时间和经历许多垃圾程序。
 
-Now, after all that messy exploration, I feel that pure Functional Programming has delivered on its promise. Readable programs do exist! Reuse does exist! I no longer invent, but rather discover my model. I've become a rogue detective uncovering a vast conspiracy, cork board pinned full of mathematical evidence. A digital-age Cousteau logging the characteristics of this bizarre land in the name of science! It's not perfect and I still have a lot to learn, but I've never been more satisfied in my work and pleased with the outcome.
+现在，在所有这些摸爬滚打之后，我感觉纯粹的函数式编程正如它期许的那样降临了。可读的程序是确实存在的！复用是确实存在的！我不再去发明，而是去发现我的模型。我变成了一个揭露巨大阴谋的暴戾侦探，软木板上钉满了数学上的证据。一个数字时代的斯托库以科学的名义测量着这个奇异世界的性质！虽不完美而且我依然还有很多东西要学，但我从未在自己的工作中感到如此满足，对结果如此满意。
 
-Had this book existed when I was starting out, my transition into the world of Functional Programming would have been much easier and less destructive. This book is two-fold (right and left): it will not only teach you how to use various constructs from FP effectively in your daily code, but more importantly, provide you with an aim; guiding principles that will keep you on track.
+要是在一切开始的时候有这本书在手中，我皈依函数式编程世界的过程可能会容易得多，而且破坏性更小。这本书有双重意义：它不仅教你如何在日常编码中使用函数式编程的各种结构，更重要的是，为你提供一个瞄准线；是你在正轨上前进的指导原则。
 
-You will learn Functional-Light: A paradigm that Kyle has pioneered to enable declarative, Functional Programming while providing balance and interop with the rest of the JavaScript world. You will understand the foundation which pure FP is built upon without having to subscribe to the paradigm in its entirety. You will gain the skills to practice and explore FP without having to rewrite existing code for it to work well together. You can take a step forward in your software career without backtracking and wandering aimlessly as I did years ago. Coworkers and colleagues rejoice!
+你将学习轻量函数式：一种由 Kyle 开拓而生的范式 —— 开启声明式的函数式编程，同时对 JavaScript 世界中的其他部分提供平衡与互动。你会理解纯函数式编程建立的基础，而不必非得对这种范式在整体上有所了解。你将会得到实践与探索函数式编程的技能，而不必非得为此重写既存代码。你可以在你的软件生涯中前进一步，而不必像我几年前那样漫无目的地乱撞。这也会使工友和同事们很高兴！
 
-Kyle is a great teacher known for his relentless pursuit of the whole picture, leaving no nook or cranny unexplored, yet he maintains an empathy for the learner's plight. His style has resonated with the industry, leveling us all up as a whole. His work has a solid place in JavaScript’s history and most people's bookmarks bar. You are in good hands.
+Kyle 是一位了不起的教师 —— 对完整全貌的不懈追求，不留任何未被探索的边角缝隙，同时对学习者面临的困境保持着一种同理心。Kyle 的风格与这个行业产生了共鸣，将我们所有人整体提升了一个层次。他的工作在 JavaScript 的历史和许多人的收藏夹中有着不可动摇的地位。你找对人了。
 
-Functional Programming has many different definitions. A Lisp programmer's definition is vastly different from a Haskell perspective. OCaml's FP bears little resemblance to the paradigm seen in Erlang. You will even find several competing definitions in JavaScript. Yet there is a tie that binds -- some blurry know-it-when-I-see-it definition, much like obscenity (indeed, some do find FP obscene!) and this book certainly captures it. The end result might not be considered idiomatic in certain circles, but the knowledge acquired here directly applies to any flavor of FP.
+函数式编程有许多不同的定义。一个 Lisp 程序员的定义，从一个 Haskell 程序员的角度来看是十分不同的。OCaml 的函数式编程与 Erlang 中看到的范式几乎没有相似之处。你甚至会在 JavaScript 中发现好几种相互竞争的定义。还有一种纽带 —— 一些模糊的、看到才能明白的定义，更像是下流的做法（确实，有的人觉得 FP 很下流！），而这本书自然也囊括了它。其结果，在某些特定的圈子里可能不被认为是惯用法，但是从中得到的知识可以直接用于任何风格的函数式编程。
 
-This book is a terrific place to begin your FP journey. Take it away, Kyle...
+这本书是你 FP 之旅的绝妙起点。启程吧 Kyle ……
 
 *-Brian Lonsdorf (@drboolean)*
