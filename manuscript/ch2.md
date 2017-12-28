@@ -569,13 +569,13 @@ f( "Hello!" );          // HELLO!
 
 ```js
 function foo() {
-    bar( function inner(msg){
+    return bar( function inner(msg){
         return msg.toUpperCase();
     } );
 }
 
 function bar(func) {
-    func( "Hello!" );
+    return func( "Hello!" );
 }
 
 foo();                  // HELLO!
