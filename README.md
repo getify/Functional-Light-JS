@@ -51,7 +51,7 @@ This book has been published [and is now available for purchase on Leanpub](http
 
 If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the book, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
 
-<a href="https://www.patreon.com/getify">[![patreon.png](https://s11.postimg.org/axpzguh77/patreon.png)](https://www.patreon.com/getify)</a>
+<a href="https://www.patreon.com/getify">[![patreon.png](https://s13.postimg.org/k9nkc5thz/become_a_patron_button.png)](https://www.patreon.com/getify)</a>
 
 ## In-person Training
 
