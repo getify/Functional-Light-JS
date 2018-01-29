@@ -1,6 +1,6 @@
 # Functional-Light JavaScript (book)
 
-[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-nd/4.0/) [![Buy on Leanpub](https://img.shields.io/badge/Buy-Leanpub-yellow.svg)](https://leanpub.com/fljs)
+[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-nd/4.0/) [![Buy on Leanpub](https://img.shields.io/badge/Buy-Leanpub-yellow.svg)](https://leanpub.com/fljs) [![Buy on Amazon](https://img.shields.io/badge/Buy-Amazon-yellow.svg)](http://amazon.fljsbook.com)
 
 This book is a balanced, pragmatic look at FP in JavaScript. The first edition is now complete.
 
