@@ -541,7 +541,7 @@ We could guard against this kind of impurity by altering the definition of `reme
 ```js
 function rememberNumbers(nums) {
     // make a copy of the array
-    nums = nums.slice();
+    nums = [...nums];
 
     return function caller(fn){
         return fn( nums );
@@ -614,7 +614,7 @@ We need a more robust definition of `rememberNumbers(..)` to guard against the `
 function rememberNumbers(...nums) {
     return function caller(fn){
         // send in a copy!
-        return fn( nums.slice() );
+        return fn( [...nums] );
     };
 }
 ```
@@ -951,7 +951,7 @@ function safer_generateMoreRandoms(count,initial) {
     };
 
     // (2) Set up initial pre-side effects state
-    nums = initial.nums.slice();
+    nums = [...initial.nums];
     smallCount = initial.smallCount;
     largeCount = initial.largeCount;
 
@@ -1035,7 +1035,7 @@ function safer_handleInactiveUsers(userList,dateCutoff) {
 }
 ```
 
-The success of this technique will be dependent on the thoroughness of the *copy* you make of the value. Using `userList.slice()` would not work here, since that only creates a shallow copy of the `userList` array itself. Each element of the array is an object that needs to be copied, so we need to take extra care. Of course, if those objects have objects inside them (they might!), the copying needs to be even more robust.
+The success of this technique will be dependent on the thoroughness of the *copy* you make of the value. Using `[...userList]` would not work here, since that only creates a shallow copy of the `userList` array itself. Each element of the array is an object that needs to be copied, so we need to take extra care. Of course, if those objects have objects inside them (they might!), the copying needs to be even more robust.
 
 ### `this` Revisited
 

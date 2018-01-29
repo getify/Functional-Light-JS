@@ -604,12 +604,12 @@ As we learned in [Chapter 6](ch6.md), one of the best ways we prevent side effec
 
 If you're not using a purpose-built library to provide sophisticated immutable data structures, the simplest approach will suffice: duplicate your objects/arrays each time before making a change.
 
-Arrays are easy to clone shallowly -- just use the `slice()` method:
+Arrays are easy to clone shallowly -- just use `...` array spread:
 
 ```js
 var a = [ 1, 2, 3 ];
 
-var b = a.slice();
+var b = [...a];
 b.push( 4 );
 
 a;          // [1,2,3]
@@ -624,11 +624,11 @@ var o = {
     y: 2
 };
 
-// in ES2017+, using object spread:
+// in ES2018+, using object spread:
 var p = { ...o };
 p.y = 3;
 
-// in ES2015+:
+// in ES6/ES2015+:
 var p = Object.assign( {}, o );
 p.y = 3;
 ```
