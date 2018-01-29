@@ -420,7 +420,7 @@ Recall in [Chapter 4, we discussed the `compose(..)` utility](#ch4composereduce)
 ```js
 function compose(...fns) {
     return function composed(result){
-        return fns.reverse().reduce( function reducer(result,fn){
+        return [...fns].reverse().reduce( function reducer(result,fn){
             return fn( result );
         }, result );
     };
@@ -491,7 +491,7 @@ function compose(...fns) {
 }
 ```
 
-Now, we don't need to do `fns.reverse()`; we just reduce from the other direction!
+Now, we don't need to do `[...fns].reverse()`; we just reduce from the other direction!
 
 ### Map as Reduce {#ch9mapasreduce}
 

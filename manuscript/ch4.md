@@ -314,7 +314,7 @@ The original version of `compose(..)` uses a loop and eagerly (aka, immediately)
 ```js
 function compose(...fns) {
     return function composed(result){
-        return fns.reverse().reduce( function reducer(result,fn){
+        return [...fns].reverse().reduce( function reducer(result,fn){
             return fn( result );
         }, result );
     };
@@ -323,7 +323,7 @@ function compose(...fns) {
 // or the ES6 => form
 var compose = (...fns) =>
     result =>
-        fns.reverse().reduce(
+        [...fns].reverse().reduce(
             (result,fn) =>
                 fn( result )
             , result
@@ -332,7 +332,7 @@ var compose = (...fns) =>
 
 I> ## Note
 I>
-I> This implementation of `compose(..)` uses `fns.reverse().reduce(..)` to reduce from right-to-left. We'll [revisit `compose(..)` in Chapter 9](#ch9composereduceright), instead using `reduceRight(..)` for that purpose.
+I> This implementation of `compose(..)` uses `[...fns].reverse().reduce(..)` to reduce from right-to-left. We'll [revisit `compose(..)` in Chapter 9](#ch9composereduceright), instead using `reduceRight(..)` for that purpose.
 
 Notice that the `reduce(..)` looping happens each time the final `composed(..)` function is run, and that each intermediate `result(..)` is passed along to the next iteration as the input to the next call.
 
