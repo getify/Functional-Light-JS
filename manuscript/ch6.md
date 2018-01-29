@@ -141,7 +141,7 @@ We already saw a trick in the previous chapter to avoid such a surprise:
 ```js
 var arr = [1,2,3];
 
-foo( arr.slice() );         // ha! a copy!
+foo( [...arr] );         // ha! a copy!
 
 console.log( arr[0] );      // 1
 ```
@@ -453,7 +453,7 @@ Recall one of the implementations of [`compose(..)` from Chapter 4](#ch4generalc
 function compose(...fns) {
     return function composed(result){
         // copy the array of functions
-        var list = fns.slice();
+        var list = [...fns];
 
         while (list.length > 0) {
             // take the last function off the end of the list
@@ -490,7 +490,7 @@ f( 4 );     // 3
 f( 4 );     // 4 <-- uh oh!
 ```
 
-The second usage of `f(..)` here wasn't correct, since we mutated that `fns` during the first call, which affected any subsequent uses. Depending on the circumstances, making a copy of an array like `list = fns.slice()` may or may not be necessary. But I think it's safest to assume you need it -- even if only for readability sake! -- unless you can prove you don't, rather than the other way around.
+The second usage of `f(..)` here wasn't correct, since we mutated that `fns` during the first call, which affected any subsequent uses. Depending on the circumstances, making a copy of an array like `list = [...fns]` may or may not be necessary. But I think it's safest to assume you need it -- even if only for readability sake! -- unless you can prove you don't, rather than the other way around.
 
 Be disciplined and always treat *received values* as immutable, whether they are or not. That effort will improve the readability and trustability of your code.
 

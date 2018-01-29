@@ -742,8 +742,8 @@ An implementation of `zip(..)`:
 ```js
 function zip(arr1,arr2) {
     var zipped = [];
-    arr1 = arr1.slice();
-    arr2 = arr2.slice();
+    arr1 = [...arr1];
+    arr2 = [...arr2];
 
     while (arr1.length > 0 && arr2.length > 0) {
         zipped.push( [ arr1.shift(), arr2.shift() ] );
@@ -753,7 +753,7 @@ function zip(arr1,arr2) {
 }
 ```
 
-The `arr1.slice()` and `arr2.slice()` calls ensure `zip(..)` is pure by not causing side effects on the received array references.
+The `[...arr1]` and `[...arr2]` copies ensure `zip(..)` is pure by not causing side effects on the received array references.
 
 I> ## Note
 I>
@@ -789,8 +789,8 @@ So, let's define a `mergeLists(..)` that works more like we'd expect:
 ```js
 function mergeLists(arr1,arr2) {
     var merged = [];
-    arr1 = arr1.slice();
-    arr2 = arr2.slice();
+    arr1 = [...arr1];
+    arr2 = [...arr2];
 
     while (arr1.length > 0 || arr2.length > 0) {
         if (arr1.length > 0) {
