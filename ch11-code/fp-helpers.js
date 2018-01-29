@@ -86,8 +86,8 @@ function uncurry(fn) {
 
 function zip(arr1,arr2) {
 	var zipped = [];
-	arr1 = arr1.slice();
-	arr2 = arr2.slice();
+	arr1 = [...arr1];
+	arr2 = [...arr2];
 
 	while (arr1.length > 0 && arr2.length > 0) {
 		zipped.push( [ arr1.shift(), arr2.shift() ] );
