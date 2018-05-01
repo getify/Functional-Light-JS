@@ -41,17 +41,17 @@ setTimeout( function initialStocks(){
 
 setTimeout( function randomStockUpdate(){
 	var stockIds = Object.keys( stocks );
-	var stockIdx = randInRange( 0, stockIds.length - 1 );
+	var stockIdToUpdate = stockIds[randInRange( 0, stockIds.length - 1 )];
 	var change = (randInRange( 1, 10 ) > 7 ? -1 : 1) *
 		(randInRange( 1, 10 ) / 1E2);
 
-	var newStock = Object.assign( stocks[stockIds[stockIdx]] );
+	var newStock = Object.assign( stocks[stockIdToUpdate] );
 	newStock.price += change;
 	newStock.change += change;
 
 	// !!SIDE EFFECTS!!
-	stocks[stockIdx[stockIdx]] = newStock;
-	evtEmitter.emit( "stock-update", Object.assign( { id: stockIds[stockIdx] }, newStock ) );
+	stocks[stockIdToUpdate] = newStock;
+	evtEmitter.emit( "stock-update", Object.assign( { id: stockIdToUpdate }, newStock ) );
 
 	setTimeout( randomStockUpdate, randInRange( 300, 1500 ) );
 }, 1000 );
