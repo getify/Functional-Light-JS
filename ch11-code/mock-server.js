@@ -50,7 +50,7 @@ setTimeout( function randomStockUpdate(){
 	newStock.change += change;
 
 	// !!SIDE EFFECTS!!
-	stocks[stockIdx[stockIdx]] = newStock;
+	stocks[stockIds[stockIdx]] = newStock;
 	evtEmitter.emit( "stock-update", Object.assign( { id: stockIds[stockIdx] }, newStock ) );
 
 	setTimeout( randomStockUpdate, randInRange( 300, 1500 ) );
