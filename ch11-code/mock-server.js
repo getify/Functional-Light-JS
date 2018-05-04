@@ -41,7 +41,7 @@ setTimeout( function initialStocks(){
 
 setTimeout( function randomStockUpdate(){
 	var stockIds = Object.keys( stocks );
-	var stockIdx = randInRange( 0, stockIds.length - 1 );
+	var stockIdx = randInRange( 0, stockIds.length );
 	var change = (randInRange( 1, 10 ) > 7 ? -1 : 1) *
 		(randInRange( 1, 10 ) / 1E2);
 
