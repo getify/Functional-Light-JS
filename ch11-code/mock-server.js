@@ -59,5 +59,5 @@ setTimeout( function randomStockUpdate(){
 
 // !!SIDE EFFECTS!!
 function randInRange(min = 0,max = 1E9) {
-	return (Math.round(Math.random() * 1E4) % (max - min)) + min;
+	return (Math.round(Math.random() * 1E4) % (max - min + 1)) + min;
 }
