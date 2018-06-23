@@ -206,7 +206,7 @@ Now we can use `spreadArgs(..)` to adapt `foo(..)` to work as the proper input t
 bar( spreadArgs( foo ) );           // 12
 ```
 
-It won't seem clear yet why these occasions arise, but you will see them often. Essentially, `spreadArgs(..)` allows us to define functions that `return` multiple values via an array, but still have those multiple values treated independently as inputs to another function.
+It won't seem clear yet why these occasions arise, but you will see them often. Essentially, `spreadArgs(..)` allows us to define functions that `accept` multiple values via an array as its parameter, but still have those multiple values treated independently as inputs to another function.
 
 While we're talking about a `spreadArgs(..)` utility, let's also define a utility to handle the opposite action:
 
