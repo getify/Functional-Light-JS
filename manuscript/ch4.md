@@ -118,7 +118,7 @@ function uniqueWords(str) {
 `uniqueWords(..)` takes a string and returns an array. It's a composition of the two functions: `unique(..)` and `words(..)`; it creates this flow of data:
 
 ```txt
-wordsUsed <-- unique <-- words <-- text
+uniqueWords <-- unique <-- words <-- text
 ```
 
 You probably recognize it by now: the unfolding revolution in candy factory design is function composition.
