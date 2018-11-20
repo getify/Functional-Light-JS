@@ -559,7 +559,7 @@ function curry(fn,arity = fn.length) {
 
 // or the ES6 => arrow form
 var curry =
-    (fn,arity = fn.length,nextCurried) =>
+    (fn,arity = fn.length) =>
         (nextCurried = prevArgs =>
             nextArg => {
                 var args = [ ...prevArgs, nextArg ];
