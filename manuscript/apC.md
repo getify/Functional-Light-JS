@@ -17,6 +17,7 @@ Let's expand the [list of FP libraries to be aware of, from Chapter 1](ch1.md/#l
 * [functional.js](http://functionaljs.com/): General FP Utilities
 * [Immutable](https://github.com/facebook/immutable-js): Immutable Data Structures
 * [Mori](https://github.com/swannodette/mori): (ClojureScript Inspired) Immutable Data Structures
+* [immer](https://github.com/mweststrate/immer): Immutable Data Structures
 * [Seamless-Immutable](https://github.com/rtfeldman/seamless-immutable): Immutable Data Helpers
 * [transducers-js](https://github.com/cognitect-labs/transducers-js): Transducers
 * [monet.js](https://github.com/monet/monet.js): Monadic Types
