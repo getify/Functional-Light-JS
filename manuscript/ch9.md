@@ -52,7 +52,7 @@ x = x * 3;
 If we define a function for this multiplying by `3`, that function acts as a mapping (transformer) function:
 
 ```js
-var multipleBy3 = v => v * 3;
+var multiplyBy3 = v => v * 3;
 
 var x = 2, y;
 
