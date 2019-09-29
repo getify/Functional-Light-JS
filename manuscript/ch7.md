@@ -215,7 +215,7 @@ Consider:
 
 ```js
 function person(name,age) {
-    return happyBirthday(){
+    return function happyBirthday(){
         age++;
         console.log(
             `Happy ${age}th Birthday, ${name}!`
