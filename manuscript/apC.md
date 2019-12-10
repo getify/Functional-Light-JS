@@ -12,6 +12,7 @@ Wherever possible, I recommend you *not* reinvent any wheels. If you find an FP 
 Let's expand the [list of FP libraries to be aware of, from Chapter 1](ch1.md/#libraries). We won't cover all of these (as there's a lot of overlap), but here are the ones that should probably be on your radar screen:
 
 * [Ramda](http://ramdajs.com): General FP Utilities
+* [Rambda](https://github.com/selfrefactor/rambda) Ramda API-compatible, but limited to more common use-cases
 * [Sanctuary](https://github.com/sanctuary-js/sanctuary): Ramda Companion for FP Types
 * [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide): General FP Utilities
 * [functional.js](http://functionaljs.com/): General FP Utilities
