@@ -22,16 +22,6 @@ But I want you to be able to apply some of the fundamentals of FP to your JavaSc
 
 **To read more about the motivations and perspective behind this book, check out the [Preface](manuscript/preface.md).**
 
-## Premium Sponsor
-
-<a href="https://hiberly.com?utm_campaign=os&utm_medium=getify&utm_source=sponsorship"><img src="https://s3-eu-west-2.amazonaws.com/hiberly-wordpress/wp-content/uploads/2019/07/31001245/small-logo-whiteback-blockdots-blacktext-1-e1564532005680.png" height="35" border="0" alt="Hiberly"></a>
-
-A big shoutout and thanks to [Hiberly](https://hiberly.com?utm_campaign=os&utm_medium=getify&utm_source=sponsorship) for being a premium sponsor of the Functional-Light JS book!
-
-Their tool prioritises tech debt by grabbing feedback from developers after each merge. You can then draw cool graphs of your code versus happiness / frustration to help explain the impact of refactoring.
-
-Check them out!
-
 ## Book
 
 [Table of Contents](manuscript/README.md/#table-of-contents)
