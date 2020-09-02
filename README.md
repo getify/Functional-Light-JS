@@ -4,8 +4,6 @@
 
 <a href="http://fljsbook.com"><img src="manuscript/images/marketing/front-cover-small.png" width="25%" align="right" hspace="20" vspace="20" title="Functional-Light JavaScript" alt="Book Cover"></a>
 
-This book is a balanced, pragmatic look at FP in JavaScript. The first edition is now complete. Read here online **for free**, or:
-
 Este livro é uma visão equilibrada e pragmática de PF (programação funcional) em Javascript. A primeira edição já está completa. Leia online **de graça** aqui, ou:
 
 <p align="center">
@@ -24,7 +22,7 @@ Mas eu quero que você seja capaz de aplicar, _agora_, alguns dos fundamentos da
 
 **Para ler mais sobre as motivações e a perspectiva por trás deste livro, verifique o [Prefácio](manuscript/preface.md).**
 
-## Book
+## Livro
 
 [Indíce](manuscript/README.md/#table-of-contents)
 
@@ -63,7 +61,7 @@ O conteúdo desse livro está muito alinhado com um workshop de treinamento que 
 
 Se você gostar deste conteúdo e gostaria de entrar em contato comigo, considerando que conduzo esse tipo de treinamento ou sobre outros diversos tópicos como JS/HTML5/Node.js utilize o email: getify@gmail.com
 
-## Treinamento em Vídeo Online
+## Treinamento Online por Vídeo
 
 Também tenho vários cursos de treinamento em JS disponíveis em formato de vídeo sob demanda. Eu [ensino cursos](https://FrontendMasters.com/teachers/kyle-simpson) por meio do [Frontend Masters](https://FrontendMasters.com), como o workshop [Functional-Light JavaScript v3](https://frontendmasters.com/courses/functional-javascript-v3/). Alguns dos meus cursos também estão disponíveis no [PluralSight](https://www.pluralsight.com/search?q=kyle%20simpson&categories=all).
 
