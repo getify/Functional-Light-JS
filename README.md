@@ -26,7 +26,7 @@ Mas eu quero que você seja capaz de aplicar, _agora_, alguns dos fundamentos da
 
 [Indíce](manuscript/README.md/#table-of-contents)
 
--   [Preâmbulo](manuscript/foreword.md/#foreword) (por [Brian Lonsdorf, mais conhecido como "Prof Frisby"](https://twitter.com/DrBoolean))
+-   [Introdução](manuscript/foreword.md/#foreword) (por [Brian Lonsdorf, mais conhecido como "Prof Frisby"](https://twitter.com/DrBoolean))
 -   [Prefácio](manuscript/preface.md/#preface)
 -   [Capítulo 1: Porquê Programação Funcional?](manuscript/ch1.md/#chapter-1-why-functional-programming)
 -   [Capítulo 2: A Natureza das Funções](manuscript/ch2.md/#chapter-2-the-nature-of-functions)

@@ -1,5 +1,5 @@
 # Functional-Light JavaScript
-# Preâmbulo
+# Introdução
 
 Não é nenhum segredo que eu sou um louco por Programação Funcional. Eu evangelizei as ideias e linguagens funcionais sempre que pude, tento ler os últimos trabalhos acadêmicos, estudo álgebra abstrata no meu tempo livre... nos trabalhos. Mesmo em JavaScript, Eu me recuso a escrever uma declaração impura, que é o que me levou a escrever *o Guia Mais Adequado para Programação Funcional do Professor Frisby*. Sim, completo, fanático dogmático.
 
