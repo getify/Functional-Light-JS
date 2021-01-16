@@ -413,8 +413,7 @@ scopeOfOuter = {
 And then for the `inner()` function, when created, it gets an (empty) scope object called `scopeOfInner`, which is linked via its `[[Prototype]]` to the `scopeOfOuter` object, sorta like this:
 
 ```js
-scopeOfInner = {};
-Object.setPrototypeOf( scopeOfInner, scopeOfOuter );
+scopeOfInner = Object.create(scopeOfOuter);
 ```
 
 Then, inside `inner()`, when it makes reference to the lexical variable `x`, it's actually more like:
