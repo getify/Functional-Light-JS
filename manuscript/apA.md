@@ -187,7 +187,7 @@ function mapReducer(mapperFn) {
     };
 }
 
-var strToUppercaseReducer = mapReducer( strUppercase );
+var strUppercaseReducer = mapReducer( strUppercase );
 ```
 
 Our chain still looks the same:
@@ -270,7 +270,7 @@ function filterReducer(predicateFn,combinerFn) {
 To use this form of our helpers:
 
 ```js
-var strToUppercaseReducer = mapReducer( strUppercase, listCombine );
+var strUppercaseReducer = mapReducer( strUppercase, listCombine );
 var isLongEnoughReducer = filterReducer( isLongEnough, listCombine );
 var isShortEnoughReducer = filterReducer( isShortEnough, listCombine );
 ```
@@ -293,7 +293,7 @@ var curriedFilterReducer =
         };
     } );
 
-var strToUppercaseReducer =
+var strUppercaseReducer =
     curriedMapReducer( strUppercase )( listCombine );
 var isLongEnoughReducer =
     curriedFilterReducer( isLongEnough )( listCombine );
@@ -661,3 +661,4 @@ We use transducing to compose adjacent `map(..)`, `filter(..)`, and `reduce(..)`
 Transducing primarily improves performance, which is especially obvious if used on an observable.
 
 But more broadly, transducing is how we express a more declarative composition of functions that would otherwise not be directly composable. The result, if used appropriately as with all other techniques in this book, is clearer, more readable code! A single `reduce(..)` call with a transducer is easier to reason about than tracing through multiple `reduce(..)` calls.
+
