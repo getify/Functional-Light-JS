@@ -187,7 +187,7 @@ function mapReducer(mapperFn) {
     };
 }
 
-var strToUppercaseReducer = mapReducer( strUppercase );
+var strUppercaseReducer = mapReducer( strUppercase );
 ```
 
 Our chain still looks the same:
