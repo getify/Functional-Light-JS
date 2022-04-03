@@ -485,7 +485,7 @@ f( 2 );
 y;                      // 11
 ```
 
-I know this is a silly example; we could just as easily have `return`d the value instead of setting it into `y` from within the function:
+I know this is a silly example; we could just as easily have `return`ed the value instead of setting it into `y` from within the function:
 
 ```js
 function f(x) {
