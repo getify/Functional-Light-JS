@@ -330,7 +330,7 @@ var compose = (...fns) =>
 
 **Note:** This implementation of `compose(..)` uses `[...fns].reverse().reduce(..)` to reduce from right-to-left. We'll [revisit `compose(..)` in Chapter 9](ch9.md/#user-content-composereduceright), instead using `reduceRight(..)` for that purpose.
 
-Notice that the `reduce(..)` looping happens each time the final `composed(..)` function is run, and that each intermediate `result(..)` is passed along to the next iteration as the input to the next call.
+Notice that the `reduce(..)` looping happens each time the final `composed(..)` function is run, and that each intermediate `result` is passed along to the next iteration as the input to the next call.
 
 The advantage of this implementation is that the code is more concise and also that it uses a well-known FP construct: `reduce(..)`. And the performance of this implementation is also similar to the original `for`-loop version.
 
