@@ -108,8 +108,8 @@ To connect this `chain(..)` method conceptually to stuff we've already learned, 
 ```js
 var x = [3];
 
-map( v => [v,v+1], x );         // [[3,4]]
-flatMap( v => [v,v+1], x );     // [3,4]
+x.map( v => [v,v+1], x );         // [[3,4]]
+x.flatMap( v => [v,v+1], x );     // [3,4]
 ```
 
 See the difference? The mapper function `v => [v,v+1]` results in a `[3,4]` array, which ends up in the single first position of the outer array, so we get `[[3,4]]`. But `flatMap(..)` flattens out the inner array into the outer array, so we get just `[3,4]` instead.
