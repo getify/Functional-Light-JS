@@ -377,7 +377,7 @@ function add(x,y) {
 }
 ```
 
-Now imagine we'd like take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility (see [Chapter 9, "Map"](ch9.md/#map)) built into JS arrays:
+Now imagine we'd like to take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility (see [Chapter 9, "Map"](ch9.md/#map)) built into JS arrays:
 
 ```js
 [1,2,3,4,5].map( function adder(val){
@@ -666,7 +666,7 @@ When trying to decipher curried functions, I've found it helps me tremendously i
 In fact, to reinforce that point, let's consider the same code but written with ES6 arrow functions:
 
 ```js
-curriedSum =
+var curriedSum =
     v1 =>
         v2 =>
             v3 =>
@@ -678,7 +678,7 @@ curriedSum =
 And now, all on one line:
 
 ```js
-curriedSum = v1 => v2 => v3 => v4 => v5 => sum( v1, v2, v3, v4, v5 );
+var curriedSum = v1 => v2 => v3 => v4 => v5 => sum( v1, v2, v3, v4, v5 );
 ```
 
 Depending on your perspective, that form of visualizing the curried function may be more or less helpful to you. For me, it's a fair bit more obscured.
