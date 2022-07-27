@@ -666,7 +666,7 @@ When trying to decipher curried functions, I've found it helps me tremendously i
 In fact, to reinforce that point, let's consider the same code but written with ES6 arrow functions:
 
 ```js
-curriedSum =
+var curriedSum =
     v1 =>
         v2 =>
             v3 =>
@@ -678,7 +678,7 @@ curriedSum =
 And now, all on one line:
 
 ```js
-curriedSum = v1 => v2 => v3 => v4 => v5 => sum( v1, v2, v3, v4, v5 );
+var curriedSum = v1 => v2 => v3 => v4 => v5 => sum( v1, v2, v3, v4, v5 );
 ```
 
 Depending on your perspective, that form of visualizing the curried function may be more or less helpful to you. For me, it's a fair bit more obscured.
