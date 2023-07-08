@@ -377,7 +377,7 @@ function add(x,y) {
 }
 ```
 
-Now imagine we'd like take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility (see [Chapter 9, "Map"](ch9.md/#map)) built into JS arrays:
+Now imagine we'd like to take a list of numbers and add a certain number to each of them. We'll use the `map(..)` utility (see [Chapter 9, "Map"](ch9.md/#map)) built into JS arrays:
 
 ```js
 [1,2,3,4,5].map( function adder(val){
