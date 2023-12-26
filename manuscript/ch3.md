@@ -9,7 +9,7 @@ As a matter of fact, for stylistic purposes of readability, sometimes you'll wan
 
 These kinds of techniques are absolutely essential to making functions truly *function*-al.
 
-## All for One
+## All for One 
 
 Imagine you're passing a function to a utility, where the utility will send multiple arguments to that function. But you may only want the function to receive a single argument.
 
@@ -1148,3 +1148,4 @@ Other important utilities like `unary(..)`, `identity(..)`, and `constant(..)` a
 Point-free is a style of writing code that eliminates unnecessary verbosity of mapping parameters ("points") to arguments, with the goal of making code easier to read/understand.
 
 All of these techniques twist functions around so they can work together more naturally. With your functions shaped compatibly now, the next chapter will teach you how to combine them to model the flows of data through your program.
+
